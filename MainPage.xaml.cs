@@ -24,6 +24,7 @@ public sealed partial class MainPage : Page
         var page = item.Tag?.ToString() switch
         {
             "calculator" => typeof(Views.PlanningCalculatorPage),
+            "unit-scale" => typeof(Views.UnitScaleConverterPage),
             "settings" => typeof(Views.SettingsPage),
             "about" => typeof(Views.AboutPage),
             _ => typeof(Views.HomePage)

@@ -1,0 +1,41 @@
+<Page x:Class="UrbanPlanToolbox.Views.UnitScaleConverterPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <ScrollViewer><StackPanel Padding="32" Spacing="16">
+  <TextBlock Text="单位与比例尺换算" Style="{StaticResource TitleTextBlockStyle}" />
+  <TextBlock Text="用于城乡规划、建筑设计和工程量估算。英美几何单位采用国际英尺定义；不包含 U.S. survey foot 或液体容量单位。" TextWrapping="Wrap" />
+  <Pivot x:Name="ConverterPivot" SelectionChanged="OnCategoryChanged">
+   <PivotItem Header="长度" Tag="Length" /><PivotItem Header="面积" Tag="Area" /><PivotItem Header="体积" Tag="Volume" />
+   <PivotItem Header="比例尺">
+    <StackPanel Spacing="12" Padding="0,12,0,0">
+     <TextBlock Text="图上长度 → 实际长度" Style="{StaticResource SubtitleTextBlockStyle}" />
+     <Grid ColumnSpacing="12" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+      <TextBox x:Name="ForwardDenominatorBox" Header="比例尺分母 N（1 : N）" /><TextBox x:Name="DrawingLengthBox" Grid.Column="1" Header="图上长度" />
+      <ComboBox x:Name="DrawingUnitBox" Grid.Column="2" Header="图上长度单位"><ComboBoxItem Tag="mm" Content="mm" /><ComboBoxItem Tag="cm" Content="cm" /></ComboBox>
+      <ComboBox x:Name="ActualUnitBox" Grid.Row="1" Header="实际长度输出单位"><ComboBoxItem Tag="m" Content="m" /><ComboBoxItem Tag="km" Content="km" /></ComboBox>
+     </Grid>
+     <StackPanel Orientation="Horizontal" Spacing="8"><Button Content="计算" Click="OnForwardCalculate" /><Button Content="填入示例" Click="OnForwardSample" /><Button Content="清空" Click="OnForwardClear" /><Button Content="复制结果" Click="OnForwardCopy" /></StackPanel>
+     <InfoBar x:Name="ForwardErrorBar" Title="输入错误" Severity="Error" IsOpen="False" /><Border Padding="12" CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"><TextBlock x:Name="ForwardResultText" Text="请输入比例尺和图上长度。" /></Border>
+     <TextBlock Text="实际规划建筑比例尺通常使用正整数分母；支持小数分母和长度。" TextWrapping="Wrap" />
+     <TextBlock Text="实际长度 → 图上长度" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,0" />
+     <Grid ColumnSpacing="12" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+      <TextBox x:Name="ReverseDenominatorBox" Header="比例尺分母 N（1 : N）" /><TextBox x:Name="ActualLengthBox" Grid.Column="1" Header="实际长度" />
+      <ComboBox x:Name="ActualInputUnitBox" Grid.Column="2" Header="实际长度单位"><ComboBoxItem Tag="m" Content="m" /><ComboBoxItem Tag="km" Content="km" /></ComboBox>
+      <ComboBox x:Name="DrawingOutputUnitBox" Grid.Row="1" Header="图上长度输出单位"><ComboBoxItem Tag="mm" Content="mm" /><ComboBoxItem Tag="cm" Content="cm" /></ComboBox>
+     </Grid>
+     <StackPanel Orientation="Horizontal" Spacing="8"><Button Content="计算" Click="OnReverseCalculate" /><Button Content="填入示例" Click="OnReverseSample" /><Button Content="清空" Click="OnReverseClear" /><Button Content="复制结果" Click="OnReverseCopy" /></StackPanel>
+     <InfoBar x:Name="ReverseErrorBar" Title="输入错误" Severity="Error" IsOpen="False" /><Border Padding="12" CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"><TextBlock x:Name="ReverseResultText" Text="请输入比例尺和实际长度。" /></Border>
+    </StackPanel>
+   </PivotItem>
+  </Pivot>
+  <StackPanel x:Name="UnitPanel" Spacing="12">
+   <Grid ColumnSpacing="12" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+    <TextBox x:Name="UnitValueBox" Header="输入数值" /><ComboBox x:Name="SourceUnitBox" Grid.Column="1" Header="来源单位" DisplayMemberPath="DisplayName" />
+    <Button Grid.Column="2" Content="交换单位" Click="OnSwapUnits" VerticalAlignment="Bottom" />
+    <ComboBox x:Name="TargetUnitBox" Grid.Row="1" Header="目标单位" DisplayMemberPath="DisplayName" />
+   </Grid>
+   <StackPanel Orientation="Horizontal" Spacing="8"><Button Content="换算" Click="OnUnitCalculate" /><Button Content="填入示例" Click="OnUnitSample" /><Button Content="清空" Click="OnUnitClear" /><Button Content="复制结果" Click="OnUnitCopy" /></StackPanel>
+   <InfoBar x:Name="UnitErrorBar" Title="输入错误" Severity="Error" IsOpen="False" />
+   <Border Padding="16" CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"><TextBlock x:Name="UnitResultText" Text="请输入数值并选择单位。" FontSize="18" /></Border>
+   <TextBlock x:Name="UnitNoteText" TextWrapping="Wrap" />
+  </StackPanel>
+ </StackPanel></ScrollViewer>
+</Page>

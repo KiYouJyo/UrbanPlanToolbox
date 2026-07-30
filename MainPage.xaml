@@ -18,6 +18,7 @@
         <NavigationView.MenuItems>
             <NavigationViewItem Content="首页" Tag="home" Icon="Home" />
             <NavigationViewItem Content="规划指标计算器" Tag="calculator" Icon="Calculator" />
+            <NavigationViewItem Content="单位与比例尺换算" Tag="unit-scale" Icon="Switch" />
             <NavigationViewItem Content="设置" Tag="settings" Icon="Setting" />
         </NavigationView.MenuItems>
         <NavigationView.FooterMenuItems>

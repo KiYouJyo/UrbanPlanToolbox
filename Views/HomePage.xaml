@@ -2,8 +2,9 @@
   <ScrollViewer><StackPanel Padding="32" Spacing="16">
     <TextBlock Text="规划工具箱" Style="{StaticResource TitleTextBlockStyle}" />
     <TextBlock Text="UrbanPlan Toolbox · 城市规划辅助工具箱" Style="{StaticResource SubtitleTextBlockStyle}" />
-    <TextBlock Text="版本 0.1.1。本地完成规划指标快速计算，不上传规划数据。" TextWrapping="Wrap" />
+    <TextBlock Text="版本 0.2.0。本地完成规划指标和单位比例尺换算，不上传规划数据。" TextWrapping="Wrap" />
     <Button Content="打开规划指标快速计算器" Click="OnOpenCalculator" HorizontalAlignment="Left" />
+    <Button Content="打开单位与比例尺换算" Click="OnOpenUnitScale" HorizontalAlignment="Left" />
     <TextBlock Text="后续工具" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,16,0,0" />
     <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
       <InfoBar Title="用地平衡表" Message="敬请期待" IsOpen="True" /><InfoBar Grid.Column="1" Title="停车位测算" Message="敬请期待" IsOpen="True" />
