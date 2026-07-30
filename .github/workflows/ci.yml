@@ -177,10 +177,18 @@ jobs:
           }
 
           git grep -I -n -E -- '-----BEGIN( [A-Z]+)? PRIVATE KEY-----'
-          if ($LASTEXITCODE -eq 0) {
-            throw 'Private key marker found in a tracked file.'
+          $grepExitCode = $LASTEXITCODE
+
+          switch ($grepExitCode) {
+            0 {
+              throw 'Tracked repository files contain a private-key marker.'
+            }
+            1 {
+              Write-Host 'No private-key markers were found.'
+            }
+            default {
+              throw "git grep failed with exit code $grepExitCode."
+            }
           }
 
-          if ($LASTEXITCODE -ne 1) {
-            throw "Unable to inspect tracked files for private key markers (git grep exit code $LASTEXITCODE)."
-          }
+          exit 0
