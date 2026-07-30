@@ -14,7 +14,20 @@ public sealed partial class MainPage : Page
     public MainPage()
     {
         InitializeComponent();
+        ContentFrame.Navigate(typeof(Views.HomePage));
+        Navigation.SelectedItem = Navigation.MenuItems[0];
+    }
 
-        // TODO: Add your initialization logic here.
+    private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        if (args.SelectedItem is not NavigationViewItem item) return;
+        var page = item.Tag?.ToString() switch
+        {
+            "calculator" => typeof(Views.PlanningCalculatorPage),
+            "settings" => typeof(Views.SettingsPage),
+            "about" => typeof(Views.AboutPage),
+            _ => typeof(Views.HomePage)
+        };
+        if (ContentFrame.CurrentSourcePageType != page) ContentFrame.Navigate(page);
     }
 }
