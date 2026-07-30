@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "UrbanPlanToolbox (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "UrbanPlanToolbox (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
