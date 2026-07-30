@@ -5,6 +5,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $payloadRoot = $PSScriptRoot
+. (Join-Path $payloadRoot 'InstallerMetadata.ps1')
 $logDirectory = Join-Path $env:LOCALAPPDATA 'UrbanPlanToolbox\Logs'
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 $logPath = Join-Path $logDirectory ("Install-{0:yyyyMMdd-HHmmss}.log" -f (Get-Date))
@@ -37,23 +38,6 @@ function Assert-PayloadHash([hashtable]$HashMap, [string]$RelativePath) {
     return $path
 }
 
-function Get-MsixMetadata([string]$MsixPath) {
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $archive = [System.IO.Compression.ZipFile]::OpenRead($MsixPath)
-    try {
-        $entry = $archive.Entries | Where-Object { $_.FullName -ieq 'AppxManifest.xml' } | Select-Object -First 1
-        if ($null -eq $entry) { throw 'MSIX 中缺少 AppxManifest.xml。' }
-        $reader = New-Object System.IO.StreamReader($entry.Open())
-        try { [xml]$xml = $reader.ReadToEnd() } finally { $reader.Dispose() }
-    }
-    finally { $archive.Dispose() }
-    $identity = $xml.SelectSingleNode("/*[local-name()='Package']/*[local-name()='Identity']")
-    $application = $xml.SelectSingleNode("/*[local-name()='Package']/*[local-name()='Applications']/*[local-name()='Application']")
-    $runtime = $xml.SelectSingleNode("/*[local-name()='Package']/*[local-name()='Dependencies']/*[local-name()='PackageDependency'][@Name='Microsoft.WindowsAppRuntime.2']")
-    if ($null -eq $identity -or $null -eq $application -or $null -eq $runtime) { throw 'MSIX 缺少应用身份、应用入口或 Microsoft.WindowsAppRuntime.2 依赖。' }
-    [pscustomobject]@{ Name=$identity.Name; Publisher=$identity.Publisher; Version=[version]$identity.Version; Architecture=$identity.ProcessorArchitecture; AppId=$application.Id; RuntimeMinVersion=[version]$runtime.MinVersion }
-}
-
 function Assert-Certificate([string]$CerPath, [string]$ExpectedPublisher) {
     $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($CerPath)
     if ($certificate.HasPrivateKey) { throw '随附 CER 不得包含私钥。' }
@@ -66,14 +50,18 @@ function Assert-Certificate([string]$CerPath, [string]$ExpectedPublisher) {
 
 try {
     Write-InstallLog '开始验证发行有效载荷。'
+    $installerMetadata = Get-InstallerMetadata $payloadRoot
+    $null = Get-SafePayloadFilePath $payloadRoot $installerMetadata.msixFileName
+    $null = Get-SafePayloadFilePath $payloadRoot $installerMetadata.certificateFileName
     $hashMap = Get-PayloadHashMap (Join-Path $payloadRoot 'SHA256SUMS.txt')
-    $msixRelative = 'UrbanPlanToolbox_0.1.1.0_x64_framework-dependent_self-signed.msix'
-    $cerRelative = 'UrbanPlanToolbox-v0.1.1-Framework-Dependent-Preview-Test.cer'
+    $msixRelative = $installerMetadata.msixFileName
+    $cerRelative = $installerMetadata.certificateFileName
     $dependencyRelative = 'Dependencies\x64\Microsoft.WindowsAppRuntime.2.msix'
     $msixPath = Assert-PayloadHash $hashMap $msixRelative
     $cerPath = Assert-PayloadHash $hashMap $cerRelative
     $dependencyPath = Assert-PayloadHash $hashMap $dependencyRelative
-    $metadata = Get-MsixMetadata $msixPath
+    $metadata = Get-MsixPackageMetadata $msixPath
+    Assert-MetadataMatchesMsix $installerMetadata $metadata
     if ($metadata.Architecture -cne 'x64') { throw "主 MSIX 架构不是 x64：$($metadata.Architecture)" }
     $certificate = Assert-Certificate $cerPath $metadata.Publisher
     $certificateThumbprint = $certificate.Thumbprint.ToUpperInvariant()

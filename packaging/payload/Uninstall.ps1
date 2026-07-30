@@ -5,6 +5,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $payloadRoot = $PSScriptRoot
+. (Join-Path $payloadRoot 'InstallerMetadata.ps1')
 $logDirectory = Join-Path $env:LOCALAPPDATA 'UrbanPlanToolbox\Logs'
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 $logPath = Join-Path $logDirectory ("Uninstall-{0:yyyyMMdd-HHmmss}.log" -f (Get-Date))
@@ -14,27 +15,14 @@ function Write-UninstallLog([string]$Message) {
     $line | Tee-Object -FilePath $logPath -Append
 }
 
-function Get-MsixMetadata([string]$MsixPath) {
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $archive = [System.IO.Compression.ZipFile]::OpenRead($MsixPath)
-    try {
-        $entry = $archive.Entries | Where-Object { $_.FullName -ieq 'AppxManifest.xml' } | Select-Object -First 1
-        if ($null -eq $entry) { throw 'MSIX 中缺少 AppxManifest.xml。' }
-        $reader = New-Object System.IO.StreamReader($entry.Open())
-        try { [xml]$xml = $reader.ReadToEnd() } finally { $reader.Dispose() }
-    }
-    finally { $archive.Dispose() }
-    $identity = $xml.SelectSingleNode("/*[local-name()='Package']/*[local-name()='Identity']")
-    if ($null -eq $identity) { throw 'MSIX 缺少 Identity。' }
-    [pscustomobject]@{ Name=$identity.Name; Publisher=$identity.Publisher }
-}
-
 try {
-    $msixPath = Join-Path $payloadRoot 'UrbanPlanToolbox_0.1.1.0_x64_framework-dependent_self-signed.msix'
-    $cerPath = Join-Path $payloadRoot 'UrbanPlanToolbox-v0.1.1-Framework-Dependent-Preview-Test.cer'
+    $installerMetadata = Get-InstallerMetadata $payloadRoot
+    $msixPath = Get-SafePayloadFilePath $payloadRoot $installerMetadata.msixFileName
+    $cerPath = Get-SafePayloadFilePath $payloadRoot $installerMetadata.certificateFileName
     if (-not (Test-Path -LiteralPath $msixPath -PathType Leaf)) { throw '找不到主 MSIX，无法确定准确包身份。' }
     if (-not (Test-Path -LiteralPath $cerPath -PathType Leaf)) { throw '找不到测试 CER，无法确定准确证书指纹。' }
-    $metadata = Get-MsixMetadata $msixPath
+    $metadata = Get-MsixPackageMetadata $msixPath
+    Assert-MetadataMatchesMsix $installerMetadata $metadata
     $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($cerPath)
     if ($certificate.HasPrivateKey -or $certificate.Subject -cne $metadata.Publisher) { throw 'CER 与该 MSIX 的发布者不匹配或包含私钥。' }
     $thumbprint = $certificate.Thumbprint.ToUpperInvariant()
