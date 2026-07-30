@@ -1,0 +1,183 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and test x64
+    runs-on: windows-2025-vs2026
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Show environment
+        shell: pwsh
+        run: |
+          dotnet --info
+          dotnet --version
+          dotnet msbuild -version
+          Write-Host "Runner OS: $env:RUNNER_OS"
+          Write-Host "Commit SHA: $env:GITHUB_SHA"
+          Write-Host "Ref: $env:GITHUB_REF"
+
+      - name: Restore
+        shell: pwsh
+        run: dotnet restore UrbanPlanToolbox.slnx -p:Platform=x64
+
+      - name: Run unit tests
+        shell: pwsh
+        run: dotnet test UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore --verbosity normal
+
+      - name: Build Debug x64
+        shell: pwsh
+        run: dotnet build UrbanPlanToolbox.slnx -c Debug -p:Platform=x64 --no-restore
+
+      - name: Build Release x64
+        shell: pwsh
+        run: dotnet build UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore
+
+      - name: Verify x64 output
+        shell: pwsh
+        run: |
+          $targetFramework = 'net10.0-windows10.0.26100.0'
+          $configurations = @('Debug', 'Release')
+
+          foreach ($configuration in $configurations) {
+            $outputDirectory = Join-Path $PWD "bin/$configuration/$targetFramework/win-x64"
+            $mainAssembly = Join-Path $outputDirectory 'UrbanPlanToolbox.dll'
+
+            if (-not (Test-Path -LiteralPath $outputDirectory -PathType Container)) {
+              throw "Missing x64 output directory: $outputDirectory"
+            }
+
+            if (-not (Test-Path -LiteralPath $mainAssembly -PathType Leaf)) {
+              throw "Missing application assembly: $mainAssembly"
+            }
+          }
+
+          $x86Outputs = Get-ChildItem -Path (Join-Path $PWD 'bin') -Directory -Recurse -Filter 'win-x86' -ErrorAction SilentlyContinue
+          if ($x86Outputs) {
+            $paths = $x86Outputs.FullName -join [Environment]::NewLine
+            throw "Unexpected win-x86 application output generated:`n$paths"
+          }
+
+      - name: Validate PowerShell scripts
+        shell: pwsh
+        run: |
+          $scriptFiles = Get-ChildItem -Path packaging -Filter '*.ps1' -File -Recurse
+          if ($scriptFiles.Count -eq 0) {
+            throw 'No PowerShell scripts found under packaging.'
+          }
+
+          foreach ($scriptFile in $scriptFiles) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $scriptFile.FullName,
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+
+            if ($errors.Count -gt 0) {
+              $details = $errors | ForEach-Object { $_.Message } | Join-String -Separator '; '
+              throw "PowerShell syntax errors in $($scriptFile.FullName): $details"
+            }
+          }
+
+      - name: Validate CMD files
+        shell: pwsh
+        run: |
+          $cmdFiles = @(
+            'packaging/① 安装规划工具箱.cmd',
+            'packaging/② 卸载规划工具箱.cmd'
+          )
+
+          foreach ($relativePath in $cmdFiles) {
+            if (-not (Test-Path -LiteralPath $relativePath -PathType Leaf)) {
+              throw "Missing CMD file: $relativePath"
+            }
+
+            [byte[]]$bytes = [System.IO.File]::ReadAllBytes((Join-Path $PWD $relativePath))
+            if ($bytes | Where-Object { $_ -gt 0x7F }) {
+              throw "CMD file is not ASCII: $relativePath"
+            }
+
+            if ($bytes.Count -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+              throw "CMD file has a UTF-8 BOM: $relativePath"
+            }
+
+            for ($index = 0; $index -lt $bytes.Count; $index++) {
+              if ($bytes[$index] -eq 0x0A -and ($index -eq 0 -or $bytes[$index - 1] -ne 0x0D)) {
+                throw "CMD file contains a bare LF: $relativePath"
+              }
+
+              if ($bytes[$index] -eq 0x0D -and ($index -eq ($bytes.Count - 1) -or $bytes[$index + 1] -ne 0x0A)) {
+                throw "CMD file contains a non-CRLF line ending: $relativePath"
+              }
+            }
+          }
+
+      - name: Validate repository contents
+        shell: pwsh
+        run: |
+          $trackedFiles = git ls-files
+          $forbiddenExtensions = @('.pfx', '.p12', '.cer', '.msix', '.zip', '.key')
+          $forbiddenFiles = @()
+
+          foreach ($trackedFile in $trackedFiles) {
+            $normalizedPath = $trackedFile.Replace('\', '/')
+            $extension = if ($normalizedPath -match '(\.[^./]+)$') {
+              $Matches[1].ToLowerInvariant()
+            } else {
+              ''
+            }
+            $fileName = ($normalizedPath -split '/')[-1].ToLowerInvariant()
+
+            if ($forbiddenExtensions -contains $extension) {
+              $forbiddenFiles += $trackedFile
+              continue
+            }
+
+            if ($normalizedPath -match '(^|/)(bin|obj|AppPackages|\.vs)(/|$)') {
+              $forbiddenFiles += $trackedFile
+              continue
+            }
+
+            if ($extension -eq '.log' -and $fileName -match '(install|setup|uninstall)') {
+              $forbiddenFiles += $trackedFile
+            }
+          }
+
+          if ($forbiddenFiles.Count -gt 0) {
+            $details = $forbiddenFiles -join [Environment]::NewLine
+            throw "Forbidden tracked repository contents:`n$details"
+          }
+
+          git grep -I -n -E -- '-----BEGIN( [A-Z]+)? PRIVATE KEY-----'
+          if ($LASTEXITCODE -eq 0) {
+            throw 'Private key marker found in a tracked file.'
+          }
+
+          if ($LASTEXITCODE -ne 1) {
+            throw "Unable to inspect tracked files for private key markers (git grep exit code $LASTEXITCODE)."
+          }
