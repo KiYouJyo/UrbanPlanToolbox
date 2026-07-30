@@ -1,32 +1,22 @@
-﻿UrbanPlanToolbox v0.1.1 自签名开发预览版
+UrbanPlanToolbox v{{DISPLAY_VERSION}} 自签名测试安装包
 ============================================
 
-这是用于测试的 x64 framework-dependent 安装包，不是正式受信任代码签名。
+这是用于测试的 x64 framework-dependent 安装包（MSIX {{PACKAGE_VERSION}}），不是正式受信任代码签名。
 
 安装步骤
 --------
 1. 下载后必须完整解压 ZIP，不能在压缩包预览中直接运行文件。
-2. 双击“① 安装规划工具箱.cmd”。Windows 会请求管理员权限。
-3. 不要直接双击 payload 文件夹中的 MSIX。若证书尚未受信任，Windows App Installer
-   会显示 Publisher: Unknown 并禁用安装按钮；安装入口会先验证并导入准确的测试公钥。
-
-安装入口使用的 `-ExecutionPolicy Bypass` 只影响本次 PowerShell 子进程，不会修改用户或系统的全局 PowerShell 执行策略。入口诊断日志位于 `%LOCALAPPDATA%\UrbanPlanToolbox\Logs\installer-entry.log`。
+2. 双击“① 安装规划工具箱.cmd”，并接受 Windows UAC。
+3. 不要直接双击 payload 文件夹中的 MSIX；安装入口会验证有效载荷并导入准确测试公钥。
 
 运行库与安全边界
 --------------
-- 测试证书只会导入“本地计算机\受信任人员”(LocalMachine\TrustedPeople)，绝不会导入
-  Trusted Root。
-- 安装脚本优先使用系统中已安装的兼容 Microsoft Windows App Runtime；只有缺少兼容版本
-  时才使用 payload\Dependencies 中随附的 Microsoft x64 依赖。不要单独安装该依赖包。
-- 脚本不会下载网络文件、修改全局 PowerShell 执行策略、关闭 Defender、强制关闭 Widgets、
-  跨设备体验或其他应用。
+- 测试证书只会导入 LocalMachine\TrustedPeople，绝不会导入 Trusted Root。
+- 脚本优先使用已安装的兼容 Microsoft Windows App Runtime；仅在缺少兼容版本时使用随附 x64 依赖。
+- 脚本不会下载网络文件、修改全局 PowerShell 策略或关闭安全软件。
 
 卸载
 ----
-双击“② 卸载规划工具箱.cmd”。它只卸载 UrbanPlanToolbox，并删除该测试包对应的准确测试证书；
-不会卸载共享 Windows App Runtime 或影响其他应用、证书。
+双击“② 卸载规划工具箱.cmd”。它只卸载 UrbanPlanToolbox，并删除该测试包对应证书；不会卸载共享 Runtime。
 
-后续版本
---------
-正式受信任签名或 Microsoft Store 版本将在以后提供。仓库与发行资产中不包含私钥、PFX、P12
-或证书密码。
+仓库与安装包均不包含私钥、PFX、P12 或证书密码。
