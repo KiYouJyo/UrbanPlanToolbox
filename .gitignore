@@ -44,6 +44,11 @@ BundleArtifacts/
 *.pvk
 *.appinstaller
 
+# Preview-installer working files and local logs
+packaging/output/
+packaging/release/
+packaging/**/*.log
+
 # Publish output
 publish/
 *.pubxml
