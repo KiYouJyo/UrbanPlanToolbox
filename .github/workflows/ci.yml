@@ -40,9 +40,12 @@ jobs:
           Write-Host "Commit SHA: $env:GITHUB_SHA"
           Write-Host "Ref: $env:GITHUB_REF"
 
-      - name: Restore
+      - name: Restore Release dependencies
         shell: pwsh
-        run: dotnet restore UrbanPlanToolbox.slnx -p:Platform=x64
+        run: |
+          dotnet restore UrbanPlanToolbox.slnx `
+            -p:Configuration=Release `
+            -p:Platform=x64
 
       - name: Run unit tests
         shell: pwsh
