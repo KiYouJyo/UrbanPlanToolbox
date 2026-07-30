@@ -9,5 +9,11 @@
   <Compile Include="../../Services/SettingsService.cs" Link="Services/SettingsService.cs" />
   <Compile Include="../../Helpers/NumberFormatter.cs" Link="Helpers/NumberFormatter.cs" />
   <Compile Include="../../Helpers/PlanningResultFormatter.cs" Link="Helpers/PlanningResultFormatter.cs" />
+  <Compile Include="../../Models/MeasurementCategory.cs" Link="Models/MeasurementCategory.cs" />
+  <Compile Include="../../Models/MeasurementUnit.cs" Link="Models/MeasurementUnit.cs" />
+  <Compile Include="../../Models/ConversionResult.cs" Link="Models/ConversionResult.cs" />
+  <Compile Include="../../Services/UnitConversionService.cs" Link="Services/UnitConversionService.cs" />
+  <Compile Include="../../Services/ScaleConversionService.cs" Link="Services/ScaleConversionService.cs" />
+  <Compile Include="../../Helpers/ConversionResultFormatter.cs" Link="Helpers/ConversionResultFormatter.cs" />
  </ItemGroup>
 </Project>

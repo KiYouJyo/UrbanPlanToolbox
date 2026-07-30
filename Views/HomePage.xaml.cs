@@ -6,4 +6,5 @@ public sealed partial class HomePage : Page
 {
     public HomePage() => InitializeComponent();
     private void OnOpenCalculator(object sender, RoutedEventArgs e) => Frame.Navigate(typeof(PlanningCalculatorPage));
+    private void OnOpenUnitScale(object sender, RoutedEventArgs e) => Frame.Navigate(typeof(UnitScaleConverterPage));
 }
