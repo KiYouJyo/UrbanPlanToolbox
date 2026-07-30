@@ -15,5 +15,10 @@
   <Compile Include="../../Services/UnitConversionService.cs" Link="Services/UnitConversionService.cs" />
   <Compile Include="../../Services/ScaleConversionService.cs" Link="Services/ScaleConversionService.cs" />
   <Compile Include="../../Helpers/ConversionResultFormatter.cs" Link="Helpers/ConversionResultFormatter.cs" />
+  <Compile Include="../../Models/GitHubRelease.cs" Link="Models/GitHubRelease.cs" />
+  <Compile Include="../../Models/UpdateCheckResult.cs" Link="Models/UpdateCheckResult.cs" />
+  <Compile Include="../../Services/RepositoryLinks.cs" Link="Services/RepositoryLinks.cs" />
+  <Compile Include="../../Services/VersionParser.cs" Link="Services/VersionParser.cs" />
+  <Compile Include="../../Services/GitHubUpdateService.cs" Link="Services/GitHubUpdateService.cs" />
  </ItemGroup>
 </Project>
