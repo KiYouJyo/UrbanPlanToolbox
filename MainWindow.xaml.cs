@@ -20,7 +20,7 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
-        AppWindow.SetIcon("Assets/AppIcon.ico");
+        AppWindow.SetIcon("Assets/UrbanPlanToolbox.ico");
         AppWindow.Resize(new SizeInt32(1100, 760));
 
         // Navigate the root frame to the main page on startup.

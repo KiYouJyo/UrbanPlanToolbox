@@ -1,6 +1,6 @@
 # 规划工具箱（UrbanPlan Toolbox）
 
-当前开发版本 `0.3.0`（未发布）。这是面向 Windows 的城市规划辅助工具箱，所有规划输入都在本地处理。
+当前开发版本为 `0.3.1` 预览版（未发布）。这是面向 Windows 的城市规划辅助工具箱，所有规划输入都在本地处理。
 
 ## 功能
 
@@ -32,4 +32,4 @@ C#、.NET 10、WinUI 3、Windows App SDK 和单项目 MSIX。支持 Windows 10 1
 
 ## 后续计划
 
-1. 用地平衡表；2. 停车位规划测算；3. Excel/CSV 导入导出。
+版本路线图与版本/发布政策见 [docs/ROADMAP.md](docs/ROADMAP.md)。
