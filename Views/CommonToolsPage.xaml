@@ -1,7 +1,10 @@
-<Page x:Class="UrbanPlanToolbox.Views.CommonToolsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <StackPanel Padding="32" Spacing="12">
-    <TextBlock Text="常用功能" Style="{StaticResource TitleTextBlockStyle}" />
-    <TextBlock Text="当前尚未收藏任何工具。" Style="{StaticResource SubtitleTextBlockStyle}" />
-    <TextBlock Text="收藏功能将在后续版本开放。" TextWrapping="Wrap" />
-  </StackPanel>
+<Page x:Class="UrbanPlanToolbox.Views.CommonToolsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:UrbanPlanToolbox.Controls">
+  <ScrollViewer>
+    <StackPanel Padding="32" Spacing="16">
+      <TextBlock Text="常用功能" Style="{StaticResource TitleTextBlockStyle}" />
+      <TextBlock Text="集中访问你收藏的规划工具" Style="{StaticResource SubtitleTextBlockStyle}" />
+      <controls:ToolCardsView x:Name="FavoriteCards" />
+      <InfoBar x:Name="EmptyState" IsClosable="False" IsOpen="False" Severity="Informational" Title="当前尚未收藏工具" Message="可通过工具卡片或工具页面的星标收藏。" />
+    </StackPanel>
+  </ScrollViewer>
 </Page>

@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Windows.ApplicationModel.DataTransfer;
 using UrbanPlanToolbox.Helpers;
 using UrbanPlanToolbox.Models;
+using UrbanPlanToolbox.Models.Tools;
 using UrbanPlanToolbox.Services;
 
 namespace UrbanPlanToolbox.Views;
@@ -20,6 +21,7 @@ public sealed partial class PlanningCalculatorPage : Page
     public PlanningCalculatorPage()
     {
         InitializeComponent();
+        FavoriteButton.ToolId = ToolIds.PlanningIndicatorCalculator;
         _autoCalculateTimer = DispatcherQueue.CreateTimer();
         _autoCalculateTimer.Interval = TimeSpan.FromMilliseconds(350);
         _autoCalculateTimer.Tick += (_, _) => { _autoCalculateTimer.Stop(); CalculateInternal(showValidation: false); };
