@@ -14,7 +14,7 @@
         Use 'dotnet new winui-page' to create additional pages and navigate to them via
         the Frame in MainWindow (RootFrame).
     -->
-    <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" SelectionChanged="OnNavigationSelectionChanged">
+    <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True" Loaded="OnNavigationLoaded" SelectionChanged="OnNavigationSelectionChanged">
         <NavigationView.MenuItems>
             <NavigationViewItem Content="首页" Tag="home" Icon="Home" />
             <NavigationViewItem Content="规划指标计算器" Tag="calculator" Icon="Calculator" />
@@ -22,7 +22,6 @@
         </NavigationView.MenuItems>
         <NavigationView.FooterMenuItems>
             <NavigationViewItem Content="关于" Tag="about" Icon="Help" />
-            <NavigationViewItem Content="设置" Tag="settings" Icon="Setting" />
         </NavigationView.FooterMenuItems>
         <Frame x:Name="ContentFrame" />
     </NavigationView>

@@ -20,7 +20,7 @@
 
         <TitleBar x:Name="AppTitleBar" Title="UrbanPlanToolbox">
             <TitleBar.IconSource>
-                <ImageIconSource ImageSource="Assets/AppIcon.ico" />
+                <ImageIconSource ImageSource="Assets/UrbanPlanToolbox.ico" />
             </TitleBar.IconSource>
         </TitleBar>
 
