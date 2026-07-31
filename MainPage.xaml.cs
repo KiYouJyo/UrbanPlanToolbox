@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using UrbanPlanToolbox.Models.Navigation;
 using UrbanPlanToolbox.Services;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -16,7 +17,7 @@ public sealed partial class MainPage : Page
     public MainPage()
     {
         InitializeComponent();
-        ContentFrame.Navigate(typeof(Views.HomePage));
+        NavigateTo(typeof(Views.HomePage));
     }
 
     private void OnNavigationLoaded(object sender, RoutedEventArgs e)
@@ -27,35 +28,20 @@ public sealed partial class MainPage : Page
         }
 
         Navigation.SelectedItem = Navigation.MenuItems[0];
-        if (ContentFrame.CurrentSourcePageType != typeof(Views.HomePage))
-        {
-            ContentFrame.Navigate(typeof(Views.HomePage));
-        }
+        NavigateTo(typeof(Views.HomePage));
     }
 
-    private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    private void OnNavigationItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
-        if (args.IsSettingsSelected)
+        if (args.IsSettingsInvoked)
         {
             NavigateTo(typeof(Views.SettingsPage));
         }
-        else if (args.SelectedItem is NavigationViewItem item)
+        else if (args.InvokedItemContainer is NavigationViewItem item)
         {
-            var route = item.Tag?.ToString();
-            var page = route switch
+            if (PrimaryNavigation.Default.TryGet(item.Tag?.ToString(), out var route) && route is not null)
             {
-                "about" => typeof(Views.AboutPage),
-                "home" => typeof(Views.HomePage),
-                _ => null
-            };
-
-            if (page is not null)
-            {
-                NavigateTo(page);
-            }
-            else
-            {
-                ToolNavigation.Navigate(ContentFrame, route);
+                NavigateTo(route.PageType);
             }
         }
     }

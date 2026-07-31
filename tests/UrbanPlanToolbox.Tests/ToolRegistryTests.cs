@@ -78,6 +78,10 @@ public sealed class ToolRegistryTests
         Assert.Equal(2, ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Design).Count);
         Assert.Empty(ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Research));
         Assert.Equal(
+            [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter],
+            ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Design).Select(tool => tool.Id));
+        Assert.Empty(ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Research));
+        Assert.Equal(
             ToolIds.PlanningIndicatorCalculator,
             Assert.Single(ToolRegistry.Default.GetBySecondaryCategory(ToolSecondaryCategory.MasterPlanning)).Id);
         Assert.Equal(
