@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using UrbanPlanToolbox.Services;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -34,26 +35,33 @@ public sealed partial class MainPage : Page
 
     private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        Type page;
         if (args.IsSettingsSelected)
         {
-            page = typeof(Views.SettingsPage);
+            NavigateTo(typeof(Views.SettingsPage));
         }
         else if (args.SelectedItem is NavigationViewItem item)
         {
-            page = item.Tag?.ToString() switch
+            var route = item.Tag?.ToString();
+            var page = route switch
             {
-                "calculator" => typeof(Views.PlanningCalculatorPage),
-                "unit-scale" => typeof(Views.UnitScaleConverterPage),
                 "about" => typeof(Views.AboutPage),
-                _ => typeof(Views.HomePage)
+                "home" => typeof(Views.HomePage),
+                _ => null
             };
-        }
-        else
-        {
-            return;
-        }
 
+            if (page is not null)
+            {
+                NavigateTo(page);
+            }
+            else
+            {
+                ToolNavigation.Navigate(ContentFrame, route);
+            }
+        }
+    }
+
+    private void NavigateTo(Type page)
+    {
         if (ContentFrame.CurrentSourcePageType != page) ContentFrame.Navigate(page);
     }
 }
