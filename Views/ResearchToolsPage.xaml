@@ -1,0 +1,7 @@
+<Page x:Class="UrbanPlanToolbox.Views.ResearchToolsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Padding="32" Spacing="12">
+    <TextBlock Text="科研工具" Style="{StaticResource TitleTextBlockStyle}" />
+    <TextBlock Text="暂无已上线的科研工具。" Style="{StaticResource SubtitleTextBlockStyle}" />
+    <TextBlock Text="相关功能将在后续版本逐步加入。" TextWrapping="Wrap" />
+  </StackPanel>
+</Page>

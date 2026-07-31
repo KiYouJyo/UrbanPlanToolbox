@@ -75,6 +75,9 @@ public sealed class ToolRegistry
     public IReadOnlyList<ToolDefinition> GetByPrimaryCategory(ToolPrimaryCategory category) =>
         All.Where(tool => tool.PrimaryCategory == category).ToArray();
 
+    public IReadOnlyList<ToolDefinition> GetAvailableByPrimaryCategory(ToolPrimaryCategory category) =>
+        All.Where(tool => tool.PrimaryCategory == category && tool.IsAvailable).ToArray();
+
     public IReadOnlyList<ToolDefinition> GetBySecondaryCategory(ToolSecondaryCategory category) =>
         All.Where(tool => tool.SecondaryCategory == category).ToArray();
 }

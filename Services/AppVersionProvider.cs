@@ -13,7 +13,7 @@ public static class AppVersionProvider
         }
         catch (Exception) when (OperatingSystem.IsWindows())
         {
-            return VersionParser.Normalize(typeof(AppVersionProvider).Assembly.GetName().Version ?? new Version(0, 3, 2, 0));
+            return VersionParser.Normalize(typeof(AppVersionProvider).Assembly.GetName().Version ?? new Version(0, 3, 3, 0));
         }
     }
 }

@@ -21,7 +21,7 @@ public sealed class GitHubUpdateService
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, RepositoryLinks.LatestReleaseApi);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-            request.Headers.UserAgent.ParseAdd("UrbanPlanToolbox/0.3.2");
+            request.Headers.UserAgent.ParseAdd("UrbanPlanToolbox/0.3.3");
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             if (response.StatusCode == HttpStatusCode.NotFound) return new(UpdateCheckStatus.NoRelease, localVersion);
             if (response.StatusCode == HttpStatusCode.TooManyRequests || response.Headers.TryGetValues("X-RateLimit-Remaining", out var values) && values.Contains("0")) return new(UpdateCheckStatus.RateLimited, localVersion);

@@ -8,17 +8,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <!--
-        This is the main content area of your application.
-        Add your UI elements here — for example, controls, layouts, and data-bound views.
-        Use 'dotnet new winui-page' to create additional pages and navigate to them via
-        the Frame in MainWindow (RootFrame).
-    -->
-    <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True" Loaded="OnNavigationLoaded" SelectionChanged="OnNavigationSelectionChanged">
+    <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True" Loaded="OnNavigationLoaded" ItemInvoked="OnNavigationItemInvoked">
         <NavigationView.MenuItems>
-            <NavigationViewItem Content="首页" Tag="home" Icon="Home" />
-            <NavigationViewItem Content="规划指标计算器" Tag="planning-indicator-calculator" Icon="Calculator" />
-            <NavigationViewItem Content="单位与比例尺换算" Tag="unit-scale-converter" Icon="Switch" />
+            <NavigationViewItem Content="欢迎页面" Tag="welcome" Icon="Home" />
+            <NavigationViewItem Content="常用功能" Tag="common-tools" Icon="Favorite" />
+            <NavigationViewItem Content="设计工具" Tag="design-tools" Icon="Edit" />
+            <NavigationViewItem Content="科研工具" Tag="research-tools" Icon="Library" />
+            <NavigationViewItem Content="项目归档" Tag="project-archive" Icon="Folder" />
         </NavigationView.MenuItems>
         <NavigationView.FooterMenuItems>
             <NavigationViewItem Content="关于" Tag="about" Icon="Help" />
