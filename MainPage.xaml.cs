@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -15,20 +16,44 @@ public sealed partial class MainPage : Page
     {
         InitializeComponent();
         ContentFrame.Navigate(typeof(Views.HomePage));
+    }
+
+    private void OnNavigationLoaded(object sender, RoutedEventArgs e)
+    {
+        if (Navigation.SettingsItem is NavigationViewItem settingsItem)
+        {
+            settingsItem.Content = "设置";
+        }
+
         Navigation.SelectedItem = Navigation.MenuItems[0];
+        if (ContentFrame.CurrentSourcePageType != typeof(Views.HomePage))
+        {
+            ContentFrame.Navigate(typeof(Views.HomePage));
+        }
     }
 
     private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (args.SelectedItem is not NavigationViewItem item) return;
-        var page = item.Tag?.ToString() switch
+        Type page;
+        if (args.IsSettingsSelected)
         {
-            "calculator" => typeof(Views.PlanningCalculatorPage),
-            "unit-scale" => typeof(Views.UnitScaleConverterPage),
-            "settings" => typeof(Views.SettingsPage),
-            "about" => typeof(Views.AboutPage),
-            _ => typeof(Views.HomePage)
-        };
+            page = typeof(Views.SettingsPage);
+        }
+        else if (args.SelectedItem is NavigationViewItem item)
+        {
+            page = item.Tag?.ToString() switch
+            {
+                "calculator" => typeof(Views.PlanningCalculatorPage),
+                "unit-scale" => typeof(Views.UnitScaleConverterPage),
+                "about" => typeof(Views.AboutPage),
+                _ => typeof(Views.HomePage)
+            };
+        }
+        else
+        {
+            return;
+        }
+
         if (ContentFrame.CurrentSourcePageType != page) ContentFrame.Navigate(page);
     }
 }
