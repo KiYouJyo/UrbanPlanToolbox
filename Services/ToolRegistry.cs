@@ -12,7 +12,7 @@ public sealed class ToolRegistry
         new(
             ToolIds.PlanningIndicatorCalculator,
             "规划指标快速计算器",
-            "快速计算常用城市规划指标。",
+            "用于快速计算容积率、建筑密度、绿地率及相关规划指标。",
             ToolPrimaryCategory.Design,
             ToolSecondaryCategory.MasterPlanning,
             "\uE8EF",
@@ -22,7 +22,7 @@ public sealed class ToolRegistry
         new(
             ToolIds.UnitScaleConverter,
             "单位与比例尺换算器",
-            "换算规划设计常用单位与图纸比例尺。",
+            "用于长度、面积及常用图纸比例尺之间的快速换算。",
             ToolPrimaryCategory.Design,
             ToolSecondaryCategory.DetailedDesign,
             "\uE8AB",
@@ -80,4 +80,13 @@ public sealed class ToolRegistry
 
     public IReadOnlyList<ToolDefinition> GetBySecondaryCategory(ToolSecondaryCategory category) =>
         All.Where(tool => tool.SecondaryCategory == category).ToArray();
+
+    public IReadOnlyList<ToolDefinition> GetAvailableByCategories(
+        ToolPrimaryCategory primaryCategory,
+        ToolSecondaryCategory secondaryCategory) =>
+        All.Where(tool =>
+                tool.PrimaryCategory == primaryCategory &&
+                tool.SecondaryCategory == secondaryCategory &&
+                tool.IsAvailable)
+            .ToArray();
 }
