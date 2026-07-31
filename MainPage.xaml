@@ -17,8 +17,8 @@
     <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True" Loaded="OnNavigationLoaded" SelectionChanged="OnNavigationSelectionChanged">
         <NavigationView.MenuItems>
             <NavigationViewItem Content="首页" Tag="home" Icon="Home" />
-            <NavigationViewItem Content="规划指标计算器" Tag="calculator" Icon="Calculator" />
-            <NavigationViewItem Content="单位与比例尺换算" Tag="unit-scale" Icon="Switch" />
+            <NavigationViewItem Content="规划指标计算器" Tag="planning-indicator-calculator" Icon="Calculator" />
+            <NavigationViewItem Content="单位与比例尺换算" Tag="unit-scale-converter" Icon="Switch" />
         </NavigationView.MenuItems>
         <NavigationView.FooterMenuItems>
             <NavigationViewItem Content="关于" Tag="about" Icon="Help" />

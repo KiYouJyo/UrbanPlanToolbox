@@ -20,5 +20,9 @@
   <Compile Include="../../Services/RepositoryLinks.cs" Link="Services/RepositoryLinks.cs" />
   <Compile Include="../../Services/VersionParser.cs" Link="Services/VersionParser.cs" />
   <Compile Include="../../Services/GitHubUpdateService.cs" Link="Services/GitHubUpdateService.cs" />
+  <Compile Include="../../Models/Tools/ToolCategory.cs" Link="Models/Tools/ToolCategory.cs" />
+  <Compile Include="../../Models/Tools/ToolDefinition.cs" Link="Models/Tools/ToolDefinition.cs" />
+  <Compile Include="../../Models/Tools/ToolIds.cs" Link="Models/Tools/ToolIds.cs" />
+  <Compile Include="../../Services/ToolRegistry.cs" Link="Services/ToolRegistry.cs" />
  </ItemGroup>
 </Project>
