@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using UrbanPlanToolbox.Models.Navigation;
 using UrbanPlanToolbox.Models.Tools;
 using UrbanPlanToolbox.Services;
@@ -342,6 +343,71 @@ public sealed partial class LocalizationTests
         }
     }
 
+    [Fact]
+    public void XamlUidResourcesOnlyTargetPropertiesSupportedByTheirElementType()
+    {
+        var allowed = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal)
+        {
+            ["Button"] = ["Content", "AutomationProperties.Name", "ToolTipService.ToolTip"],
+            ["CheckBox"] = ["Content"],
+            ["ComboBox"] = ["Header"],
+            ["ComboBoxItem"] = ["Content"],
+            ["InfoBar"] = ["Message", "Title"],
+            ["PivotItem"] = ["Header"],
+            ["TextBlock"] = ["Text"],
+            ["TextBox"] = ["PlaceholderText"],
+            ["ToggleSwitch"] = ["Header"]
+        };
+        var sourceRoot = FindRepositoryRoot();
+        var xamlFiles = new[] { Path.Combine(sourceRoot, "MainPage.xaml"), Path.Combine(sourceRoot, "Views"), Path.Combine(sourceRoot, "Controls") }
+            .Where(path => Directory.Exists(path) || File.Exists(path))
+            .SelectMany(path => Directory.Exists(path) ? Directory.GetFiles(path, "*.xaml", SearchOption.AllDirectories) : [path]);
+        var uidTargets = xamlFiles.SelectMany(path => XDocument.Load(path).Descendants())
+            .Select(element => new { Type = element.Name.LocalName, Uid = element.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName == "Uid")?.Value })
+            .Where(item => item.Uid is not null)
+            .ToArray();
+
+        foreach (var language in ReswCatalog.Languages)
+        {
+            var resources = ReswCatalog.Load(language);
+            foreach (var target in uidTargets)
+            {
+                Assert.True(allowed.TryGetValue(target.Type, out var properties), $"Add an explicit property allow-list for XAML element '{target.Type}'.");
+                foreach (var key in resources.Keys.Where(key => key.StartsWith(target.Uid + ".", StringComparison.Ordinal)))
+                {
+                    var property = key[(target.Uid!.Length + 1)..];
+                    Assert.Contains(property, properties!);
+                }
+            }
+        }
+    }
+
+    [Fact]
+    public void CodeResourceLookupsDoNotUseXamlPropertyKeys()
+    {
+        var sourceRoot = FindRepositoryRoot();
+        var files = new[]
+        {
+            Path.Combine(sourceRoot, "App.xaml.cs"),
+            Path.Combine(sourceRoot, "MainPage.xaml.cs"),
+            Path.Combine(sourceRoot, "Views"),
+            Path.Combine(sourceRoot, "Controls"),
+            Path.Combine(sourceRoot, "Services"),
+            Path.Combine(sourceRoot, "Helpers")
+        }
+            .Where(path => Directory.Exists(path) || File.Exists(path))
+            .SelectMany(path => Directory.Exists(path) ? Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories) : [path]);
+
+        var propertyKeys = ExtractKeys(files, CodeResourceKeyPattern)
+            .Where(key => key.Contains('.', StringComparison.Ordinal))
+            .ToArray();
+
+        Assert.Empty(propertyKeys);
+        Assert.Equal("WGS 84 Coordinates (Optional)", TestLocalization.EnUs.GetString("Project_Coordinates_Wgs84_Label"));
+        Assert.Equal("WGS 84 坐标（可选）", TestLocalization.ZhCn.GetString("Project_Coordinates_Wgs84_Label"));
+        Assert.Equal("WGS 84 座標（任意）", TestLocalization.JaJp.GetString("Project_Coordinates_Wgs84_Label"));
+    }
+
     private static IEnumerable<LocalizedTool> Flatten(IReadOnlyList<ToolSearchGroup> groups) =>
         groups.SelectMany(group => group.Tools);
 
@@ -385,6 +451,9 @@ public sealed partial class LocalizationTests
 
     [GeneratedRegex(@"(?:GetString|GetFormattedString)\(""([A-Za-z0-9_]+)""", RegexOptions.CultureInvariant)]
     private static partial Regex ResourceKeyPattern();
+
+    [GeneratedRegex(@"(?:GetString|GetFormattedString)\(""([A-Za-z0-9_.]+)""", RegexOptions.CultureInvariant)]
+    private static partial Regex CodeResourceKeyPattern();
 
     [GeneratedRegex(@"x:Uid=""([A-Za-z0-9_]+)""", RegexOptions.CultureInvariant)]
     private static partial Regex XamlUidPattern();

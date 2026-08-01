@@ -34,7 +34,7 @@ public sealed partial class ProjectArchivePage : Page
         public ArchiveCard(ProjectRecord project, ILocalizationService localization) : this(
             project, project.Name,
             string.IsNullOrWhiteSpace(project.AdministrativeArea) ? ProjectPresentation.GetTypeName(project, localization) : $"{ProjectPresentation.GetTypeName(project, localization)} · {project.AdministrativeArea}",
-            localization.GetFormattedString("Project_Card_Statistics", project.Todos.Count(item => item.IsCompleted), project.Todos.Count, project.PlanningSnapshots.Count),
+            localization.GetFormattedString("Project_Card_Milestones", project.Milestones.Count),
             localization.GetFormattedString("ProjectArchive_ArchivedAt", project.ArchivedAtUtc?.ToLocalTime().ToString("g") ?? "—")) { }
     }
 }

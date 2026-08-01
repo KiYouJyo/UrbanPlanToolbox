@@ -1003,7 +1003,7 @@ Latest version: {1}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_State_Active" xml:space="preserve">
-    <value>Active</value>
+    <value>In progress</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_Action_Restore" xml:space="preserve">
@@ -1035,7 +1035,7 @@ Latest version: {1}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_Archive_Message" xml:space="preserve">
-    <value>Project data, todos, snapshots, and folder reference will be kept.</value>
+    <value>Project information, planning requirements, milestones, and the work-folder reference will be kept.</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_Unsaved_Title" xml:space="preserve">
@@ -1043,7 +1043,7 @@ Latest version: {1}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_Unsaved_Message" xml:space="preserve">
-    <value>Project overview changes have not been saved.</value>
+    <value>The current project changes have not been saved.</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Todo_Field_Title" xml:space="preserve">
@@ -1494,4 +1494,53 @@ Latest version: {1}</value>
     <value>Import data</value>
     <comment>v0.3.9 data management resource.</comment>
   </data>
+  <data name="Project_Coordinates_Wgs84_Label" xml:space="preserve"><value>WGS 84 Coordinates (Optional)</value></data>
+  <data name="ProjectWorkspace_BasicInformation" xml:space="preserve"><value>Basic information</value></data>
+  <data name="ProjectWorkspace_Description" xml:space="preserve"><value>Project description</value></data>
+  <data name="ProjectWorkspace_PlanningRequirements" xml:space="preserve"><value>Planning requirements</value></data>
+  <data name="ProjectWorkspace_Milestones" xml:space="preserve"><value>Important milestones</value></data>
+  <data name="ProjectWorkspace_FolderLabel" xml:space="preserve"><value>Work folder</value></data>
+  <data name="ProjectWorkspace_Management" xml:space="preserve"><value>Project management</value></data>
+  <data name="Project_Field_PlanningRequirements" xml:space="preserve"><value>Planning requirements</value></data>
+  <data name="Project_PlanningRequirements_Help" xml:space="preserve"><value>Record constraints, objectives, review requirements, and other planning instructions.</value></data>
+  <data name="Project_LegacyData_Notice" xml:space="preserve"><value>This project contains legacy todos or snapshots. They remain preserved in local data and backups, but are no longer shown in this workspace.</value></data>
+  <data name="Project_Action_Save" xml:space="preserve"><value>Save changes</value></data>
+  <data name="Project_Action_Reset" xml:space="preserve"><value>Reset unsaved changes</value></data>
+  <data name="Project_Action_Delete" xml:space="preserve"><value>Delete permanently</value></data>
+  <data name="Folder_Action_Select" xml:space="preserve"><value>Select folder</value></data>
+  <data name="Folder_Action_Replace" xml:space="preserve"><value>Replace folder</value></data>
+  <data name="Folder_Action_Open" xml:space="preserve"><value>Open folder</value></data>
+  <data name="Folder_Action_Clear" xml:space="preserve"><value>Clear folder reference</value></data>
+  <data name="Milestone_Action_Add" xml:space="preserve"><value>Add milestone</value></data>
+  <data name="Milestone_Action_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Milestone_Action_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Milestone_Add_Title" xml:space="preserve"><value>Add milestone</value></data>
+  <data name="Milestone_Edit_Title" xml:space="preserve"><value>Edit milestone</value></data>
+  <data name="Milestone_Delete_Title" xml:space="preserve"><value>Delete milestone?</value></data>
+  <data name="Milestone_Delete_Message" xml:space="preserve"><value>This milestone will be removed permanently.</value></data>
+  <data name="Milestone_Empty" xml:space="preserve"><value>No milestones yet.</value></data>
+  <data name="Milestone_Field_Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Milestone_Field_Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Milestone_Field_IncludeTime" xml:space="preserve"><value>Include a time</value></data>
+  <data name="Milestone_Field_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Milestone_Field_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="Milestone_Error_TimeRequired" xml:space="preserve"><value>Select a time or turn off “Include a time”.</value></data>
+  <data name="Project_Management_CurrentState" xml:space="preserve"><value>Current state: {0}</value></data>
+  <data name="Project_Management_ArchivedAt" xml:space="preserve"><value>Archived at {0}</value></data>
+  <data name="Project_Delete_Explanation" xml:space="preserve"><value>Permanently delete the project only when it is no longer needed.</value></data>
+  <data name="Project_Delete_Title" xml:space="preserve"><value>Delete project permanently</value></data>
+  <data name="Project_Delete_Warning" xml:space="preserve"><value>This deletes “{0}”, its internal attachments, and local recovery copies. This cannot be undone.</value></data>
+  <data name="Project_Delete_ConfirmName" xml:space="preserve"><value>Type the project name to confirm</value></data>
+  <data name="Project_Delete_ExternalFolderSafe" xml:space="preserve"><value>The external work folder and its files will not be deleted.</value></data>
+  <data name="Project_Delete_Failed" xml:space="preserve"><value>The project could not be deleted. Its data was restored where possible.</value></data>
+  <data name="Project_Unsaved_SaveBeforeAction" xml:space="preserve"><value>Save or reset the current edits before performing this action.</value></data>
+  <data name="Project_Card_Milestones" xml:space="preserve"><value>Milestones: {0}</value></data>
+  <data name="ProjectValidation_PlanningRequirementsTooLong" xml:space="preserve"><value>The planning requirements are too long.</value></data>
+  <data name="ProjectValidation_DuplicateMilestoneId" xml:space="preserve"><value>Duplicate milestone IDs were found.</value></data>
+  <data name="ProjectValidation_MilestoneIdRequired" xml:space="preserve"><value>A milestone ID is missing.</value></data>
+  <data name="ProjectValidation_MilestoneTitleRequired" xml:space="preserve"><value>Enter a milestone title.</value></data>
+  <data name="ProjectValidation_MilestoneTitleTooLong" xml:space="preserve"><value>The milestone title is too long.</value></data>
+  <data name="ProjectValidation_MilestoneNotesTooLong" xml:space="preserve"><value>The milestone notes are too long.</value></data>
+  <data name="ProjectValidation_MilestoneDateInvalid" xml:space="preserve"><value>Select a valid milestone date.</value></data>
+  <data name="ProjectValidation_MilestoneTimestampsMustBeUtc" xml:space="preserve"><value>Milestone timestamps are invalid.</value></data>
 </root>

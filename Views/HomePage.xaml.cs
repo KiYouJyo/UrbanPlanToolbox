@@ -41,7 +41,7 @@ public sealed partial class HomePage : Page
         var error = new TextBlock { Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemFillColorCriticalBrush"], TextWrapping = TextWrapping.Wrap };
         var panel = new StackPanel { Spacing = 10 };
         panel.Children.Add(name); panel.Children.Add(type); panel.Children.Add(customType); panel.Children.Add(area);
-        panel.Children.Add(new TextBlock { Text = _localization.GetString("Project_Coordinates_Wgs84.Text"), FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+        panel.Children.Add(new TextBlock { Text = _localization.GetString("Project_Coordinates_Wgs84_Label"), FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
         panel.Children.Add(latitude); panel.Children.Add(longitude); panel.Children.Add(description); panel.Children.Add(error);
         var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString("Project_New_Title"), Content = new ScrollViewer { Content = panel, MaxHeight = 560 }, PrimaryButtonText = _localization.GetString("Action_Create"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
         dialog.PrimaryButtonClick += async (_, args) =>
@@ -87,7 +87,7 @@ public sealed partial class HomePage : Page
             project,
             project.Name,
             string.IsNullOrWhiteSpace(project.AdministrativeArea) ? ProjectPresentation.GetTypeName(project, localization) : $"{ProjectPresentation.GetTypeName(project, localization)} · {project.AdministrativeArea}",
-            localization.GetFormattedString("Project_Card_Statistics", project.Todos.Count(item => item.IsCompleted), project.Todos.Count, project.PlanningSnapshots.Count),
+            localization.GetFormattedString("Project_Card_Milestones", project.Milestones.Count),
             localization.GetFormattedString("Project_Card_Updated", project.UpdatedAtUtc.ToLocalTime().ToString("g"))) { }
     }
 }

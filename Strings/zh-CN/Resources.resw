@@ -1006,7 +1006,7 @@ dwyblchhq</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_State_Active" xml:space="preserve">
-    <value>活跃</value>
+    <value>进行中</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_Action_Restore" xml:space="preserve">
@@ -1038,7 +1038,7 @@ dwyblchhq</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_Archive_Message" xml:space="preserve">
-    <value>项目数据、待办、快照和文件夹引用都会保留。</value>
+    <value>项目信息、规划要求、重要时间节点和工作文件夹引用都会保留。</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_Unsaved_Title" xml:space="preserve">
@@ -1046,7 +1046,7 @@ dwyblchhq</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Project_Unsaved_Message" xml:space="preserve">
-    <value>项目概览中的修改尚未保存。</value>
+    <value>当前项目修改尚未保存。</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Todo_Field_Title" xml:space="preserve">
@@ -1497,4 +1497,53 @@ dwyblchhq</value>
     <value>导入数据</value>
     <comment>v0.3.9 data management resource.</comment>
   </data>
+  <data name="Project_Coordinates_Wgs84_Label" xml:space="preserve"><value>WGS 84 坐标（可选）</value></data>
+  <data name="ProjectWorkspace_BasicInformation" xml:space="preserve"><value>基本信息</value></data>
+  <data name="ProjectWorkspace_Description" xml:space="preserve"><value>项目描述</value></data>
+  <data name="ProjectWorkspace_PlanningRequirements" xml:space="preserve"><value>规划要求</value></data>
+  <data name="ProjectWorkspace_Milestones" xml:space="preserve"><value>重要时间节点</value></data>
+  <data name="ProjectWorkspace_FolderLabel" xml:space="preserve"><value>工作文件夹</value></data>
+  <data name="ProjectWorkspace_Management" xml:space="preserve"><value>项目管理</value></data>
+  <data name="Project_Field_PlanningRequirements" xml:space="preserve"><value>规划要求</value></data>
+  <data name="Project_PlanningRequirements_Help" xml:space="preserve"><value>记录规划约束、目标、审查要求和其他说明。</value></data>
+  <data name="Project_LegacyData_Notice" xml:space="preserve"><value>此项目包含旧版待办或快照。它们仍保留在本地数据和备份中，但不再显示在当前工作台。</value></data>
+  <data name="Project_Action_Save" xml:space="preserve"><value>保存修改</value></data>
+  <data name="Project_Action_Reset" xml:space="preserve"><value>重置未保存修改</value></data>
+  <data name="Project_Action_Delete" xml:space="preserve"><value>永久删除</value></data>
+  <data name="Folder_Action_Select" xml:space="preserve"><value>选择文件夹</value></data>
+  <data name="Folder_Action_Replace" xml:space="preserve"><value>更换文件夹</value></data>
+  <data name="Folder_Action_Open" xml:space="preserve"><value>打开文件夹</value></data>
+  <data name="Folder_Action_Clear" xml:space="preserve"><value>清除文件夹引用</value></data>
+  <data name="Milestone_Action_Add" xml:space="preserve"><value>新增时间节点</value></data>
+  <data name="Milestone_Action_Edit" xml:space="preserve"><value>编辑</value></data>
+  <data name="Milestone_Action_Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="Milestone_Add_Title" xml:space="preserve"><value>新增时间节点</value></data>
+  <data name="Milestone_Edit_Title" xml:space="preserve"><value>编辑时间节点</value></data>
+  <data name="Milestone_Delete_Title" xml:space="preserve"><value>删除时间节点？</value></data>
+  <data name="Milestone_Delete_Message" xml:space="preserve"><value>此时间节点将被永久移除。</value></data>
+  <data name="Milestone_Empty" xml:space="preserve"><value>暂无时间节点。</value></data>
+  <data name="Milestone_Field_Title" xml:space="preserve"><value>标题</value></data>
+  <data name="Milestone_Field_Date" xml:space="preserve"><value>日期</value></data>
+  <data name="Milestone_Field_IncludeTime" xml:space="preserve"><value>包含具体时间</value></data>
+  <data name="Milestone_Field_Time" xml:space="preserve"><value>时间</value></data>
+  <data name="Milestone_Field_Notes" xml:space="preserve"><value>备注</value></data>
+  <data name="Milestone_Error_TimeRequired" xml:space="preserve"><value>请选择时间，或关闭“包含具体时间”。</value></data>
+  <data name="Project_Management_CurrentState" xml:space="preserve"><value>当前状态：{0}</value></data>
+  <data name="Project_Management_ArchivedAt" xml:space="preserve"><value>归档于 {0}</value></data>
+  <data name="Project_Delete_Explanation" xml:space="preserve"><value>仅在确定不再需要项目时永久删除。</value></data>
+  <data name="Project_Delete_Title" xml:space="preserve"><value>永久删除项目</value></data>
+  <data name="Project_Delete_Warning" xml:space="preserve"><value>这将删除“{0}”、其内部附件和本地恢复副本，且无法撤销。</value></data>
+  <data name="Project_Delete_ConfirmName" xml:space="preserve"><value>输入项目名称以确认</value></data>
+  <data name="Project_Delete_ExternalFolderSafe" xml:space="preserve"><value>外部工作文件夹及其中的文件不会被删除。</value></data>
+  <data name="Project_Delete_Failed" xml:space="preserve"><value>无法删除项目；已尽可能恢复其数据。</value></data>
+  <data name="Project_Unsaved_SaveBeforeAction" xml:space="preserve"><value>请先保存或重置当前修改，再执行此操作。</value></data>
+  <data name="Project_Card_Milestones" xml:space="preserve"><value>重要时间节点：{0}</value></data>
+  <data name="ProjectValidation_PlanningRequirementsTooLong" xml:space="preserve"><value>规划要求过长。</value></data>
+  <data name="ProjectValidation_DuplicateMilestoneId" xml:space="preserve"><value>发现重复的时间节点 ID。</value></data>
+  <data name="ProjectValidation_MilestoneIdRequired" xml:space="preserve"><value>时间节点 ID 缺失。</value></data>
+  <data name="ProjectValidation_MilestoneTitleRequired" xml:space="preserve"><value>请输入时间节点标题。</value></data>
+  <data name="ProjectValidation_MilestoneTitleTooLong" xml:space="preserve"><value>时间节点标题过长。</value></data>
+  <data name="ProjectValidation_MilestoneNotesTooLong" xml:space="preserve"><value>时间节点备注过长。</value></data>
+  <data name="ProjectValidation_MilestoneDateInvalid" xml:space="preserve"><value>请选择有效的时间节点日期。</value></data>
+  <data name="ProjectValidation_MilestoneTimestampsMustBeUtc" xml:space="preserve"><value>时间节点的时间戳无效。</value></data>
 </root>
