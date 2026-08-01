@@ -40,6 +40,10 @@ UrbanPlanToolbox 将逐步发展为面向建筑设计、城乡规划和空间研
 1. 所有 `v0.x.y` 均为预览版，包括 v0.3.0、v0.3.1 和 v0.9.9。预览属性必须在应用内版本显示、CHANGELOG、GitHub Release 说明以及其他面向用户的版本说明中明确标注。
 2. 仅已决定公开发布的版本创建普通 GitHub Release，不使用 GitHub 的 Pre-release 标记。v0.3.4、v0.3.5 和 v0.3.8 是内部开发里程碑，不创建标签或 Release；v0.3.7 已发布，v0.3.9 是当前公开候选。v1.0.0 前的公开版本共享同一条预览更新线，继续通过 `/releases/latest` 检查更新。
 3. v1.0.0 是第一个正式版本，必须创建新的提交、`v1.0.0` 标签和 GitHub Release，重新构建正式发布资产，并在应用内显示“正式版”。不得仅修改旧 `v0.x` Release 或复用旧资产并将其称为正式版。
+## v0.3.11.1
+
+- 完善原生启动资源，并为项目重要时间节点提供 Windows 本地计划通知；保持 Schema 3 和备份格式 1。
+
 ## v0.3.11
 
 - Native startup presentation and focused visual/responsive layout polish; no in-app splash, data migration, or new tools.

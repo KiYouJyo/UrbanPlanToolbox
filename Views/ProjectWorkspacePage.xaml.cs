@@ -377,6 +377,7 @@ public sealed partial class ProjectWorkspacePage : Page
         {
             var result = await _projects.ArchiveAsync(_project.Id, !wasArchived);
             if (!result.Succeeded) { ShowError("Project_Error_SaveFailed"); return; }
+            await MilestoneReminderService.Default.RefreshAsync();
             _confirmedNavigation = true;
             Frame.Navigate(wasArchived ? typeof(HomePage) : typeof(ProjectArchivePage));
         }
@@ -392,6 +393,7 @@ public sealed partial class ProjectWorkspacePage : Page
         {
             var result = await _projects.DeleteAsync(_project.Id, _folders);
             if (!result.Succeeded) { ShowError("Project_Delete_Failed"); return; }
+            await MilestoneReminderService.Default.RefreshAsync();
             _confirmedNavigation = true;
             Frame.Navigate(wasArchived ? typeof(ProjectArchivePage) : typeof(HomePage));
         }
@@ -435,6 +437,7 @@ public sealed partial class ProjectWorkspacePage : Page
         _project = result.Project;
         ShowSuccess("Project_Status_Saved");
         ApplyProject();
+        await MilestoneReminderService.Default.RefreshAsync();
         await Task.CompletedTask;
     }
 

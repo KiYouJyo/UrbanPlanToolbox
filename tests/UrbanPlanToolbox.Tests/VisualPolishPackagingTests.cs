@@ -5,12 +5,12 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class VisualPolishPackagingTests
 {
     [Fact]
-    public void VersionAndUserAgentAre0311()
+    public void VersionAndUserAgentAre03111()
     {
         var root = FindRepositoryRoot();
-        Assert.Contains("Version=\"0.3.11.0\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
-        Assert.Contains("<Version>0.3.11</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
-        Assert.Contains("UrbanPlanToolbox/0.3.11", File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs")));
+        Assert.Contains("Version=\"0.3.11.1\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
+        Assert.Contains("<Version>0.3.11.1</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
+        Assert.Contains("UrbanPlanToolbox/0.3.11.1", File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs")));
     }
 
     [Fact]

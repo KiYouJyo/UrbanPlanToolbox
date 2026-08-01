@@ -48,6 +48,7 @@ public partial class App : Application
         _window = MainWindow = new MainWindow();
         ThemePreference.Apply((FrameworkElement)_window.Content, settings.Theme);
         _window.Activate();
+        _ = MilestoneReminderService.Default.RefreshAsync();
     }
 
     /// <summary>

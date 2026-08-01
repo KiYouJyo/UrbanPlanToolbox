@@ -1577,4 +1577,6 @@
   <data name="Interaction_NotificationName" xml:space="preserve"><value>アプリ通知</value></data>
   <data name="Interaction_ErrorTitle" xml:space="preserve"><value>操作に失敗しました</value></data>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作が完了しました</value></data>
+  <data name="Reminder_NotificationTitle" xml:space="preserve"><value>マイルストーンのリマインダー</value></data>
+  <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}: {1} の期限は {2} です。</value></data>
 </root>
