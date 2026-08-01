@@ -17,9 +17,7 @@
                     <Button
                         AutomationProperties.Name="{Binding DisplayName}"
                         Click="OnToolCardClick"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        Padding="20"
+                        Style="{StaticResource CardActionButtonStyle}"
                         Tag="{Binding}"
                         VerticalAlignment="Stretch"
                         VerticalContentAlignment="Stretch">
@@ -36,8 +34,7 @@
                                 <TextBlock
                                     Text="{Binding DisplayName}"
                                     Style="{StaticResource BodyStrongTextBlockStyle}"
-                                    TextTrimming="CharacterEllipsis"
-                                    TextWrapping="Wrap" />
+                                TextWrapping="Wrap" />
                                 <TextBlock Text="{Binding Description}" Opacity="0.75" TextWrapping="WrapWholeWords" />
                             </StackPanel>
                         </Grid>

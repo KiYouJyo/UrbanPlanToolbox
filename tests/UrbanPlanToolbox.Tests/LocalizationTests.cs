@@ -241,19 +241,19 @@ public sealed partial class LocalizationTests
     }
 
     [Fact]
-    public void VersionConfigurationIs0310()
+    public void VersionConfigurationIs0311()
     {
         var manifest = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Package.appxmanifest"));
-        Assert.Contains("Version=\"0.3.10.0\"", manifest);
+        Assert.Contains("Version=\"0.3.11.0\"", manifest);
         var languages = Regex.Matches(manifest, "<Resource Language=\\\"([^\\\"]+)\\\"")
             .Select(match => match.Groups[1].Value).ToArray();
         Assert.Equal(["zh-CN", "ja-JP", "en-US"], languages);
         Assert.Contains("ms-resource:AppDisplayName", manifest);
 
         var project = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "UrbanPlanToolbox.csproj"));
-        Assert.Contains("<Version>0.3.10</Version>", project);
-        Assert.Contains("<AssemblyVersion>0.3.10.0</AssemblyVersion>", project);
-        Assert.Contains("<FileVersion>0.3.10.0</FileVersion>", project);
+        Assert.Contains("<Version>0.3.11</Version>", project);
+        Assert.Contains("<AssemblyVersion>0.3.11.0</AssemblyVersion>", project);
+        Assert.Contains("<FileVersion>0.3.11.0</FileVersion>", project);
         Assert.Contains("<DefaultLanguage>zh-CN</DefaultLanguage>", project);
         Assert.Contains("<AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>", project);
         Assert.DoesNotContain("<AppxBundleAutoResourcePackageQualifiers>Language", project);

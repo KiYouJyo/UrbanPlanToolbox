@@ -18,9 +18,9 @@
     <Nullable>enable</Nullable>
     <!-- Never let generated test outputs participate in WinUI PRI resource discovery. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);tests\**\*</DefaultItemExcludes>
-    <Version>0.3.10</Version>
-    <AssemblyVersion>0.3.10.0</AssemblyVersion>
-    <FileVersion>0.3.10.0</FileVersion>
+    <Version>0.3.11</Version>
+    <AssemblyVersion>0.3.11.0</AssemblyVersion>
+    <FileVersion>0.3.11.0</FileVersion>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <!-- The preview is a single offline MSIX: language candidates stay in its main PRI. -->
     <AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>
@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
+    <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
     <Content Include="Assets\Square44x44Logo*.png" />
     <Content Include="Assets\StoreLogo.png" />

@@ -213,3 +213,10 @@
 - 支持容积率、建筑密度、绿地率、人口/户均、停车位和公共服务设施配比。
 - 支持主题设置、复制结果和单项目 MSIX 配置。
 - 完成人工 UI 验收；桌面自动化首页入口兼容性问题不阻塞发布。
+## v0.3.11
+
+### Changed
+
+- Windows/MSIX native splash screen reuses the existing official logo; no in-app splash or artificial startup delay.
+- Shared page spacing, card actions, status badges, and less-truncated long tool text.
+- ProjectSchemaVersion remains 3 and BackupFormatVersion remains 1.

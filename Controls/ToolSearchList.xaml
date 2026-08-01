@@ -12,13 +12,13 @@
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,0,0,4">
-                                    <Button AutomationProperties.Name="{Binding DisplayName}" Click="OnToolItemClick" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="12" Tag="{Binding}">
+                                    <Button AutomationProperties.Name="{Binding DisplayName}" Click="OnToolItemClick" Style="{StaticResource CardActionButtonStyle}" Padding="12" Tag="{Binding}">
                                         <Grid ColumnSpacing="12" Padding="0,0,40,0">
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                                             <FontIcon Glyph="{Binding IconGlyph}" FontSize="22" VerticalAlignment="Top" />
                                             <StackPanel Grid.Column="1" Spacing="4">
-                                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
-                                                <TextBlock Text="{Binding Description}" MaxLines="2" Opacity="0.75" TextTrimming="CharacterEllipsis" TextWrapping="WrapWholeWords" />
+                                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding Description}" Opacity="0.75" TextWrapping="WrapWholeWords" />
                                             </StackPanel>
                                         </Grid>
                                     </Button>
