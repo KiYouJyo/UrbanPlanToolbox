@@ -12,6 +12,7 @@
    <TextBox x:Name="PublicServiceBox" Grid.Row="6" /><CheckBox x:Name="UseTotalAreaCheck" Grid.Row="6" Grid.Column="1" x:Uid="Field_UseTotalAreaForPublicService" VerticalAlignment="Bottom" />
   </Grid>
   <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Uid="Action_Calculate" Click="OnCalculate" /><Button x:Uid="Action_FillSample" Click="OnSample" /><Button x:Uid="Action_Reset" Click="OnClear" /><Button x:Uid="Action_CopyResults" Click="OnCopy" /></StackPanel>
+  <StackPanel x:Name="ProjectActions" Orientation="Horizontal" Spacing="8" Visibility="Collapsed"><Button x:Uid="Snapshot_SaveToProject" Click="OnSaveToProject"/><Button x:Uid="Snapshot_ReturnToProject" Click="OnReturnToProject"/></StackPanel>
   <InfoBar x:Name="StaleBar" x:Uid="Status_ResultStaleTitle" Severity="Informational" IsOpen="False" /><InfoBar x:Name="ErrorBar" x:Uid="Error_InputTitle" Severity="Error" IsOpen="False" /><InfoBar x:Name="WarningBar" x:Uid="Status_HintTitle" Severity="Warning" IsOpen="False" />
   <TextBlock x:Uid="Result_ResultsHeader" Style="{StaticResource SubtitleTextBlockStyle}" /><Border Padding="16" CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"><TextBlock x:Name="ResultsText" TextWrapping="Wrap" FontFamily="Consolas" /></Border>
  </StackPanel></ScrollViewer>

@@ -9,7 +9,7 @@ public sealed class PrimaryNavigation
 
     public static PrimaryNavigation Default { get; } = new(
     [
-        new(PrimaryNavigationIds.Welcome, "Navigation_Welcome", typeof(Views.HomePage)),
+        new(PrimaryNavigationIds.Welcome, "Navigation_Projects", typeof(Views.HomePage)),
         new(PrimaryNavigationIds.CommonTools, "Navigation_Search", typeof(Views.CommonToolsPage)),
         new(PrimaryNavigationIds.DesignTools, "Navigation_DesignTools", typeof(Views.DesignToolsPage)),
         new(PrimaryNavigationIds.ResearchTools, "Navigation_ResearchTools", typeof(Views.ResearchToolsPage)),

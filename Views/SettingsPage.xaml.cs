@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
+using Windows.Storage.Pickers;
 
 namespace UrbanPlanToolbox.Views;
 public sealed partial class SettingsPage : Page
@@ -49,4 +50,60 @@ public sealed partial class SettingsPage : Page
         ApplyTheme(settings.Theme);
     }
     private static void ApplyTheme(string theme) { if (App.MainWindow?.Content is FrameworkElement root) root.RequestedTheme = theme switch { "Light" => ElementTheme.Light, "Dark" => ElementTheme.Dark, _ => ElementTheme.Default }; }
+    private async void OnExport(object sender, RoutedEventArgs e)
+    {
+        var picker = new FileSavePicker { SuggestedFileName = $"UrbanPlanToolbox-{DateTime.Now:yyyyMMdd-HHmmss}" };
+        picker.FileTypeChoices.Add(_localization.GetString("DataManagement_BackupFileType"), [".uptbackup"]);
+        InitializePicker(picker);
+        var file = await picker.PickSaveFileAsync(); if (file is null) return;
+        SetDataBusy(true);
+        try
+        {
+            var result = await new BackupDataService(AppDataPathProvider.Default, AppVersionProvider.DisplayVersion).ExportAsync(file.Path);
+            if (!result.Succeeded) await file.DeleteAsync(Windows.Storage.StorageDeleteOption.PermanentDelete);
+            DataStatusBar.Severity = result.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Error;
+            DataStatusBar.Message = result.Succeeded
+                ? _localization.GetFormattedString("DataManagement_ExportSuccess", result.Manifest!.ProjectCount, FormatBytes(result.FileSize))
+                : _localization.GetFormattedString("DataManagement_ExportFailed", result.FailureType ?? string.Empty);
+            DataStatusBar.IsOpen = true;
+        }
+        finally { SetDataBusy(false); }
+    }
+
+    private async void OnImport(object sender, RoutedEventArgs e)
+    {
+        var picker = new FileOpenPicker(); picker.FileTypeFilter.Add(".uptbackup"); InitializePicker(picker);
+        var file = await picker.PickSingleFileAsync(); if (file is null) return;
+        var service = new BackupDataService(AppDataPathProvider.Default, AppVersionProvider.DisplayVersion);
+        SetDataBusy(true);
+        try
+        {
+            var inspection = await service.InspectAsync(file.Path);
+            if (!inspection.Succeeded)
+            {
+                DataStatusBar.Severity = InfoBarSeverity.Error; DataStatusBar.Message = _localization.GetFormattedString("DataManagement_ValidationFailed", inspection.FailureType ?? string.Empty); DataStatusBar.IsOpen = true; return;
+            }
+            var manifest = inspection.Manifest!;
+            var dialog = new ContentDialog
+            {
+                XamlRoot = XamlRoot, Title = _localization.GetString("DataManagement_ImportConfirmTitle"),
+                Content = _localization.GetFormattedString("DataManagement_ImportConfirmMessage", manifest.ProjectCount, manifest.ActiveProjectCount, manifest.ArchivedProjectCount),
+                PrimaryButtonText = _localization.GetString("DataManagement_ImportConfirmAction"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Close
+            };
+            if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+            var result = await service.ImportAsync(file.Path);
+            DataStatusBar.Severity = result.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Error;
+            DataStatusBar.Message = result.Succeeded ? _localization.GetString("DataManagement_ImportSuccess") : _localization.GetFormattedString(result.RollbackSucceeded ? "DataManagement_ImportFailedRolledBack" : "DataManagement_ImportFailed", result.FailureType ?? string.Empty);
+            DataStatusBar.IsOpen = true;
+        }
+        finally { SetDataBusy(false); }
+    }
+
+    private static void InitializePicker(object picker)
+    {
+        if (App.MainWindow is null) return;
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
+    }
+    private void SetDataBusy(bool busy) { ExportButton.IsEnabled = ImportButton.IsEnabled = !busy; }
+    private static string FormatBytes(long bytes) => bytes >= 1024 * 1024 ? $"{bytes / (1024d * 1024d):0.##} MB" : $"{bytes / 1024d:0.##} KB";
 }

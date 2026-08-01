@@ -61,7 +61,7 @@
     <comment>トップページのサブタイトル。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.7 プレビュー版。計画指標と単位・縮尺換算をローカルで処理し、計画データをアップロードしません。</value>
+    <value>v0.3.9 プレビュー版。プロジェクトデータと計画ツールのデータはこのデバイス内に保持されます。</value>
     <comment>トップページのバージョンとプライバシー説明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -109,7 +109,7 @@
     <comment>プロジェクトアーカイブページの状態。</comment>
   </data>
   <data name="Page_ProjectArchive_Description.Text" xml:space="preserve">
-    <value>このモジュールは、あなた自身の設計・計画・研究プロジェクトを管理するために使用されます。</value>
+    <value>アーカイブ済みプロジェクトはこのデバイスに保持され、開いて復元できます。</value>
     <comment>プロジェクトアーカイブページの説明。</comment>
   </data>
   <data name="Category_PreliminaryAnalysis" xml:space="preserve">
@@ -859,4 +859,723 @@
     <value>Release ページを開けませんでした。既定のブラウザ設定を確認して再試行してください。</value>
     <comment>Release ページを開けない場合のメッセージ。</comment>
   </data>
+  <data name="Navigation_Projects" xml:space="preserve">
+    <value>プロジェクト</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_Title.Text" xml:space="preserve">
+    <value>プロジェクトホーム</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_Description.Text" xml:space="preserve">
+    <value>このデバイスに保存する進行中の計画プロジェクトを作成・管理します。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_Empty.Text" xml:space="preserve">
+    <value>進行中のプロジェクトはありません。最初のプロジェクトを作成してください。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_LoadIssues" xml:space="preserve">
+    <value>{0} 件のプロジェクトを安全に読み込めませんでした。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Name" xml:space="preserve">
+    <value>プロジェクト名</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Type" xml:space="preserve">
+    <value>プロジェクト種別</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_CustomType" xml:space="preserve">
+    <value>カスタム種別</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_AdministrativeArea" xml:space="preserve">
+    <value>行政区域</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Latitude" xml:space="preserve">
+    <value>緯度</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Longitude" xml:space="preserve">
+    <value>経度</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Description" xml:space="preserve">
+    <value>プロジェクト説明</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Coordinates_Wgs84.Text" xml:space="preserve">
+    <value>WGS 84 座標</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Coursework" xml:space="preserve">
+    <value>課題</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Competition" xml:space="preserve">
+    <value>コンペ</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Research" xml:space="preserve">
+    <value>研究</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Professional" xml:space="preserve">
+    <value>実務プロジェクト</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Personal" xml:space="preserve">
+    <value>個人プロジェクト</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Other" xml:space="preserve">
+    <value>その他</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_New_Title" xml:space="preserve">
+    <value>新規プロジェクト</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Create" xml:space="preserve">
+    <value>作成</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Confirm" xml:space="preserve">
+    <value>確認</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Discard" xml:space="preserve">
+    <value>変更を破棄</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Delete" xml:space="preserve">
+    <value>削除</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Error_InvalidCoordinate" xml:space="preserve">
+    <value>有効な緯度と経度を入力してください。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Error_SaveFailed" xml:space="preserve">
+    <value>プロジェクトを保存できませんでした。既存データは変更されていません。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Error_NotFound" xml:space="preserve">
+    <value>指定されたプロジェクトが見つかりません。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Error_LoadFailed" xml:space="preserve">
+    <value>プロジェクトを安全に読み込めませんでした。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Status_Saved" xml:space="preserve">
+    <value>プロジェクトの変更を保存しました。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Card_Statistics" xml:space="preserve">
+    <value>タスク：{0}/{1} 完了 · スナップショット：{2}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Card_Updated" xml:space="preserve">
+    <value>更新 {0}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectArchive_ArchivedAt" xml:space="preserve">
+    <value>アーカイブ {0}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Metadata" xml:space="preserve">
+    <value>{0} · 更新 {1}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_State_Archived" xml:space="preserve">
+    <value>アーカイブ済み</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_State_Active" xml:space="preserve">
+    <value>進行中</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Action_Restore" xml:space="preserve">
+    <value>プロジェクトを復元</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Action_Archive" xml:space="preserve">
+    <value>プロジェクトをアーカイブ</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Restore_Explanation" xml:space="preserve">
+    <value>復元すると、このプロジェクトを再び編集できます。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Archive_Explanation" xml:space="preserve">
+    <value>アーカイブしてもデータは削除されません。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Restore_Title" xml:space="preserve">
+    <value>プロジェクトを復元しますか？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Restore_Message" xml:space="preserve">
+    <value>プロジェクトホームに戻ります。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Archive_Title" xml:space="preserve">
+    <value>プロジェクトをアーカイブしますか？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Archive_Message" xml:space="preserve">
+    <value>プロジェクト情報、計画要件、マイルストーン、作業フォルダー参照は保持されます。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Unsaved_Title" xml:space="preserve">
+    <value>未保存の変更を破棄しますか？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Unsaved_Message" xml:space="preserve">
+    <value>現在のプロジェクト変更はまだ保存されていません。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Field_Title" xml:space="preserve">
+    <value>タスク名</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Empty.Text" xml:space="preserve">
+    <value>タスクはありません。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Accessibility_Complete" xml:space="preserve">
+    <value>「{0}」を完了にする</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Delete_Title" xml:space="preserve">
+    <value>タスクを削除しますか？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Delete_Message" xml:space="preserve">
+    <value>このタスクを削除します。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Empty.Text" xml:space="preserve">
+    <value>計画指標スナップショットはありません。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Summary" xml:space="preserve">
+    <value>{0} · 容積率 {1} · 建ぺい率 {2}% · 緑地率 {3}%</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Delete_Title" xml:space="preserve">
+    <value>スナップショットを削除しますか？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Delete_Message" xml:space="preserve">
+    <value>この履歴スナップショットを削除します。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Error_ValidResultRequired" xml:space="preserve">
+    <value>有効な計算結果を作成してください。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Error_SaveFailed" xml:space="preserve">
+    <value>スナップショットを保存できませんでした。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Status_Saved" xml:space="preserve">
+    <value>スナップショットを保存しました。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_None" xml:space="preserve">
+    <value>作業フォルダーは選択されていません。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_Summary" xml:space="preserve">
+    <value>{0} / {1}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_ReselectionSummary" xml:space="preserve">
+    <value>再選択が必要：{0} / 参照パス：{1}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_SelectionCancelled" xml:space="preserve">
+    <value>フォルダー選択をキャンセルしました。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_RequiresReselection" xml:space="preserve">
+    <value>このデバイスで作業フォルダーを再選択してください。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_OpenFailed" xml:space="preserve">
+    <value>作業フォルダーを開けませんでした。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_AccessExpired" xml:space="preserve">
+    <value>アクセス権が失効したか、移動されています。再選択してください。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectArchive_Empty.Text" xml:space="preserve">
+    <value>アーカイブ済みプロジェクトはありません。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectIdRequired" xml:space="preserve">
+    <value>The project ID is missing.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectNameRequired" xml:space="preserve">
+    <value>Enter a project name.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectNameTooLong" xml:space="preserve">
+    <value>The project name is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectTypeInvalid" xml:space="preserve">
+    <value>Select a valid project type.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_CustomProjectTypeRequired" xml:space="preserve">
+    <value>Enter a custom project type.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_CustomProjectTypeTooLong" xml:space="preserve">
+    <value>The custom type is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_CustomProjectTypeOnlyForOther" xml:space="preserve">
+    <value>Custom text is only for Other.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_AdministrativeAreaTooLong" xml:space="preserve">
+    <value>The administrative area is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectDescriptionTooLong" xml:space="preserve">
+    <value>The description is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_CoordinatesMustBePaired" xml:space="preserve">
+    <value>Enter both latitude and longitude, or leave both blank.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_LatitudeOutOfRange" xml:space="preserve">
+    <value>Latitude must be between -90 and 90.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_LongitudeOutOfRange" xml:space="preserve">
+    <value>Longitude must be between -180 and 180.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectTimestampsMustBeUtc" xml:space="preserve">
+    <value>Project timestamps are invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ArchiveStateInvalid" xml:space="preserve">
+    <value>The archive state is invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_TodoIdRequired" xml:space="preserve">
+    <value>A todo ID is missing.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_TodoTitleRequired" xml:space="preserve">
+    <value>Todo titles cannot be blank.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_TodoTitleTooLong" xml:space="preserve">
+    <value>The todo title is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_TodoStateInvalid" xml:space="preserve">
+    <value>A todo state is invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_DuplicateTodoId" xml:space="preserve">
+    <value>Duplicate todo IDs were found.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_DuplicateSnapshotId" xml:space="preserve">
+    <value>Duplicate snapshot IDs were found.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_SnapshotIdRequired" xml:space="preserve">
+    <value>A snapshot ID is missing.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_SnapshotNameTooLong" xml:space="preserve">
+    <value>The snapshot name is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_SnapshotMetadataInvalid" xml:space="preserve">
+    <value>Snapshot metadata is invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_PlanningResultInvalid" xml:space="preserve">
+    <value>The planning result is invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_NewProject.Content" xml:space="preserve">
+    <value>新規プロジェクト</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_NewProject.AutomationProperties.Name" xml:space="preserve">
+    <value>新規プロジェクト</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_NewProject.ToolTipService.ToolTip" xml:space="preserve">
+    <value>新規プロジェクト</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Back.Content" xml:space="preserve">
+    <value>プロジェクトホームへ戻る</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Back.AutomationProperties.Name" xml:space="preserve">
+    <value>プロジェクトホームへ戻る</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Back.ToolTipService.ToolTip" xml:space="preserve">
+    <value>プロジェクトホームへ戻る</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Overview.Content" xml:space="preserve">
+    <value>プロジェクト概要</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Overview.Header" xml:space="preserve">
+    <value>プロジェクト概要</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Overview.AutomationProperties.Name" xml:space="preserve">
+    <value>プロジェクト概要</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Overview.ToolTipService.ToolTip" xml:space="preserve">
+    <value>プロジェクト概要</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Save.Content" xml:space="preserve">
+    <value>変更を保存</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Save.AutomationProperties.Name" xml:space="preserve">
+    <value>変更を保存</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Save.ToolTipService.ToolTip" xml:space="preserve">
+    <value>変更を保存</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Todos.Content" xml:space="preserve">
+    <value>タスク</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Todos.Header" xml:space="preserve">
+    <value>タスク</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Todos.AutomationProperties.Name" xml:space="preserve">
+    <value>タスク</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Todos.ToolTipService.ToolTip" xml:space="preserve">
+    <value>タスク</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Add.Content" xml:space="preserve">
+    <value>タスクを追加</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Add.AutomationProperties.Name" xml:space="preserve">
+    <value>タスクを追加</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Add.ToolTipService.ToolTip" xml:space="preserve">
+    <value>タスクを追加</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Snapshots.Content" xml:space="preserve">
+    <value>計画指標スナップショット</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Snapshots.Header" xml:space="preserve">
+    <value>計画指標スナップショット</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Snapshots.AutomationProperties.Name" xml:space="preserve">
+    <value>計画指標スナップショット</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Snapshots.ToolTipService.ToolTip" xml:space="preserve">
+    <value>計画指標スナップショット</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_OpenCalculator.Content" xml:space="preserve">
+    <value>計画指標計算機を開く</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_OpenCalculator.AutomationProperties.Name" xml:space="preserve">
+    <value>計画指標計算機を開く</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_OpenCalculator.ToolTipService.ToolTip" xml:space="preserve">
+    <value>計画指標計算機を開く</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Folder.Content" xml:space="preserve">
+    <value>作業フォルダー</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Folder.Header" xml:space="preserve">
+    <value>作業フォルダー</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Folder.AutomationProperties.Name" xml:space="preserve">
+    <value>作業フォルダー</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Folder.ToolTipService.ToolTip" xml:space="preserve">
+    <value>作業フォルダー</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Select.Content" xml:space="preserve">
+    <value>フォルダーを選択・変更</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Select.AutomationProperties.Name" xml:space="preserve">
+    <value>フォルダーを選択・変更</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Select.ToolTipService.ToolTip" xml:space="preserve">
+    <value>フォルダーを選択・変更</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Open.Content" xml:space="preserve">
+    <value>フォルダーを開く</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Open.AutomationProperties.Name" xml:space="preserve">
+    <value>フォルダーを開く</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Open.ToolTipService.ToolTip" xml:space="preserve">
+    <value>フォルダーを開く</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Clear.Content" xml:space="preserve">
+    <value>フォルダー参照を解除</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Clear.AutomationProperties.Name" xml:space="preserve">
+    <value>フォルダー参照を解除</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Clear.ToolTipService.ToolTip" xml:space="preserve">
+    <value>フォルダー参照を解除</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Status.Content" xml:space="preserve">
+    <value>プロジェクト状態</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Status.Header" xml:space="preserve">
+    <value>プロジェクト状態</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Status.AutomationProperties.Name" xml:space="preserve">
+    <value>プロジェクト状態</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Status.ToolTipService.ToolTip" xml:space="preserve">
+    <value>プロジェクト状態</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_SaveToProject.Content" xml:space="preserve">
+    <value>現在のプロジェクトに保存</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_SaveToProject.AutomationProperties.Name" xml:space="preserve">
+    <value>現在のプロジェクトに保存</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_SaveToProject.ToolTipService.ToolTip" xml:space="preserve">
+    <value>現在のプロジェクトに保存</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_ReturnToProject.Content" xml:space="preserve">
+    <value>プロジェクトに戻る</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_ReturnToProject.AutomationProperties.Name" xml:space="preserve">
+    <value>プロジェクトに戻る</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_ReturnToProject.ToolTipService.ToolTip" xml:space="preserve">
+    <value>プロジェクトに戻る</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="DataManagement_Title.Text" xml:space="preserve">
+    <value>データ管理</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Description.Text" xml:space="preserve">
+    <value>完全なローカルバックアップを作成するか、検証済みバックアップで現在のデータを完全に置き換えます。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_BackupFileType" xml:space="preserve">
+    <value>UrbanPlanToolbox バックアップ</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ExportSuccess" xml:space="preserve">
+    <value>{0} 件のプロジェクトをエクスポートしました（{1}）。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ExportFailed" xml:space="preserve">
+    <value>エクスポートに失敗しました：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ValidationFailed" xml:space="preserve">
+    <value>バックアップの検証に失敗しました：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmTitle" xml:space="preserve">
+    <value>現在のアプリデータをすべて置き換えますか？</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmMessage" xml:space="preserve">
+    <value>このバックアップには {0} 件（進行中 {1}、アーカイブ {2}）が含まれます。自動安全バックアップ後、現在のプロジェクトと設定を完全に置き換えます。言語とテーマは再起動後に反映される場合があり、作業フォルダーは再選択が必要です。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmAction" xml:space="preserve">
+    <value>置き換えてインポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportSuccess" xml:space="preserve">
+    <value>インポートが完了しました。すべての設定を反映するためアプリを再起動してください。作業フォルダーは再選択が必要です。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportFailedRolledBack" xml:space="preserve">
+    <value>インポートに失敗し、以前のデータを復元しました：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportFailed" xml:space="preserve">
+    <value>インポートに失敗し、自動復元を確認できませんでした：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.Content" xml:space="preserve">
+    <value>データをエクスポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.AutomationProperties.Name" xml:space="preserve">
+    <value>データをエクスポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.ToolTipService.ToolTip" xml:space="preserve">
+    <value>データをエクスポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.Content" xml:space="preserve">
+    <value>データをインポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.AutomationProperties.Name" xml:space="preserve">
+    <value>データをインポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.ToolTipService.ToolTip" xml:space="preserve">
+    <value>データをインポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="Project_Coordinates_Wgs84_Label" xml:space="preserve"><value>WGS 84 座標（任意）</value></data>
+  <data name="ProjectWorkspace_BasicInformation" xml:space="preserve"><value>基本情報</value></data>
+  <data name="ProjectWorkspace_Description" xml:space="preserve"><value>プロジェクト説明</value></data>
+  <data name="ProjectWorkspace_PlanningRequirements" xml:space="preserve"><value>計画要件</value></data>
+  <data name="ProjectWorkspace_Milestones" xml:space="preserve"><value>重要なマイルストーン</value></data>
+  <data name="ProjectWorkspace_FolderLabel" xml:space="preserve"><value>作業フォルダー</value></data>
+  <data name="ProjectWorkspace_Management" xml:space="preserve"><value>プロジェクト管理</value></data>
+  <data name="Project_Field_PlanningRequirements" xml:space="preserve"><value>計画要件</value></data>
+  <data name="Project_PlanningRequirements_Help" xml:space="preserve"><value>計画上の制約、目標、審査要件、その他の指示を記録します。</value></data>
+  <data name="Project_LegacyData_Notice" xml:space="preserve"><value>このプロジェクトには旧形式のタスクまたはスナップショットがあります。ローカルデータとバックアップには保持されますが、このワークスペースには表示されません。</value></data>
+  <data name="Project_Action_Save" xml:space="preserve"><value>変更を保存</value></data>
+  <data name="Project_Action_Reset" xml:space="preserve"><value>未保存の変更をリセット</value></data>
+  <data name="Project_Action_Delete" xml:space="preserve"><value>完全に削除</value></data>
+  <data name="Folder_Action_Select" xml:space="preserve"><value>フォルダーを選択</value></data>
+  <data name="Folder_Action_Replace" xml:space="preserve"><value>フォルダーを変更</value></data>
+  <data name="Folder_Action_Open" xml:space="preserve"><value>フォルダーを開く</value></data>
+  <data name="Folder_Action_Clear" xml:space="preserve"><value>フォルダー参照をクリア</value></data>
+  <data name="Milestone_Action_Add" xml:space="preserve"><value>マイルストーンを追加</value></data>
+  <data name="Milestone_Action_Edit" xml:space="preserve"><value>編集</value></data>
+  <data name="Milestone_Action_Delete" xml:space="preserve"><value>削除</value></data>
+  <data name="Milestone_Add_Title" xml:space="preserve"><value>マイルストーンを追加</value></data>
+  <data name="Milestone_Edit_Title" xml:space="preserve"><value>マイルストーンを編集</value></data>
+  <data name="Milestone_Delete_Title" xml:space="preserve"><value>マイルストーンを削除しますか？</value></data>
+  <data name="Milestone_Delete_Message" xml:space="preserve"><value>このマイルストーンは完全に削除されます。</value></data>
+  <data name="Milestone_Empty" xml:space="preserve"><value>マイルストーンはまだありません。</value></data>
+  <data name="Milestone_Field_Title" xml:space="preserve"><value>タイトル</value></data>
+  <data name="Milestone_Field_Date" xml:space="preserve"><value>日付</value></data>
+  <data name="Milestone_Field_IncludeTime" xml:space="preserve"><value>時刻を含める</value></data>
+  <data name="Milestone_Field_Time" xml:space="preserve"><value>時刻</value></data>
+  <data name="Milestone_Field_Notes" xml:space="preserve"><value>メモ</value></data>
+  <data name="Milestone_Error_TimeRequired" xml:space="preserve"><value>時刻を選択するか、「時刻を含める」をオフにしてください。</value></data>
+  <data name="Project_Management_CurrentState" xml:space="preserve"><value>現在の状態：{0}</value></data>
+  <data name="Project_Management_ArchivedAt" xml:space="preserve"><value>{0} にアーカイブ</value></data>
+  <data name="Project_Delete_Explanation" xml:space="preserve"><value>不要になった場合にのみプロジェクトを完全に削除してください。</value></data>
+  <data name="Project_Delete_Title" xml:space="preserve"><value>プロジェクトを完全に削除</value></data>
+  <data name="Project_Delete_Warning" xml:space="preserve"><value>「{0}」、内部添付ファイル、ローカル復旧コピーが削除されます。この操作は元に戻せません。</value></data>
+  <data name="Project_Delete_ConfirmName" xml:space="preserve"><value>確認のためプロジェクト名を入力</value></data>
+  <data name="Project_Delete_ExternalFolderSafe" xml:space="preserve"><value>外部の作業フォルダーとそのファイルは削除されません。</value></data>
+  <data name="Project_Delete_Failed" xml:space="preserve"><value>プロジェクトを削除できませんでした。可能な範囲でデータを復元しました。</value></data>
+  <data name="Project_Unsaved_SaveBeforeAction" xml:space="preserve"><value>この操作の前に、現在の編集を保存またはリセットしてください。</value></data>
+  <data name="Project_Card_Milestones" xml:space="preserve"><value>マイルストーン：{0}</value></data>
+  <data name="ProjectValidation_PlanningRequirementsTooLong" xml:space="preserve"><value>計画要件が長すぎます。</value></data>
+  <data name="ProjectValidation_DuplicateMilestoneId" xml:space="preserve"><value>重複したマイルストーン ID があります。</value></data>
+  <data name="ProjectValidation_MilestoneIdRequired" xml:space="preserve"><value>マイルストーン ID がありません。</value></data>
+  <data name="ProjectValidation_MilestoneTitleRequired" xml:space="preserve"><value>マイルストーンのタイトルを入力してください。</value></data>
+  <data name="ProjectValidation_MilestoneTitleTooLong" xml:space="preserve"><value>マイルストーンのタイトルが長すぎます。</value></data>
+  <data name="ProjectValidation_MilestoneNotesTooLong" xml:space="preserve"><value>マイルストーンのメモが長すぎます。</value></data>
+  <data name="ProjectValidation_MilestoneDateInvalid" xml:space="preserve"><value>有効なマイルストーンの日付を選択してください。</value></data>
+  <data name="ProjectValidation_MilestoneTimestampsMustBeUtc" xml:space="preserve"><value>マイルストーンのタイムスタンプが無効です。</value></data>
+  <data name="ProjectKind_Design" xml:space="preserve"><value>設計プロジェクト</value></data>
+  <data name="ProjectKind_Research" xml:space="preserve"><value>研究プロジェクト</value></data>
+  <data name="ProjectKind_DesignDescription" xml:space="preserve"><value>都市計画設計、授業設計、コンペ、実務プロジェクト向けです。</value></data>
+  <data name="ProjectKind_ResearchDescription" xml:space="preserve"><value>課題、論文、研究課題向けです。</value></data>
+  <data name="ProjectKind_ChooseTitle" xml:space="preserve"><value>プロジェクト種別を選択</value></data>
+  <data name="ProjectKind_Creating" xml:space="preserve"><value>作成中：{0}</value></data>
+  <data name="ProjectCategory_DesignWithCount" xml:space="preserve"><value>設計プロジェクト（{0}）</value></data>
+  <data name="ProjectCategory_ResearchWithCount" xml:space="preserve"><value>研究プロジェクト（{0}）</value></data>
+  <data name="ProjectHome_DesignEmpty" xml:space="preserve"><value>設計プロジェクトはまだありません。設計資料とマイルストーンを整理するプロジェクトを作成できます。</value></data>
+  <data name="ProjectHome_ResearchEmpty" xml:space="preserve"><value>研究プロジェクトはまだありません。研究分野、対象、方法を整理するプロジェクトを作成できます。</value></data>
+  <data name="Project_Action_NewDesign" xml:space="preserve"><value>設計プロジェクトを新規作成</value></data>
+  <data name="Project_Action_NewResearch" xml:space="preserve"><value>研究プロジェクトを新規作成</value></data>
+  <data name="ResearchProjectType_Coursework" xml:space="preserve"><value>課題</value></data>
+  <data name="ResearchProjectType_Thesis" xml:space="preserve"><value>学位論文</value></data>
+  <data name="ResearchProjectType_Paper" xml:space="preserve"><value>研究論文</value></data>
+  <data name="ResearchProjectType_ResearchProject" xml:space="preserve"><value>研究課題</value></data>
+  <data name="ResearchProjectType_Other" xml:space="preserve"><value>その他</value></data>
+  <data name="ResearchProject_Field_Type" xml:space="preserve"><value>研究プロジェクトの種類</value></data>
+  <data name="ResearchProject_Field_Field" xml:space="preserve"><value>研究分野</value></data>
+  <data name="ResearchProject_Field_Subject" xml:space="preserve"><value>研究対象</value></data>
+  <data name="ResearchProject_Field_Methods" xml:space="preserve"><value>研究方法</value></data>
+  <data name="Project_New_DesignTitle" xml:space="preserve"><value>設計プロジェクトを新規作成</value></data>
+  <data name="Project_New_ResearchTitle" xml:space="preserve"><value>研究プロジェクトを新規作成</value></data>
+  <data name="Action_Continue" xml:space="preserve"><value>続行</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>前のステップに戻る</value></data>
+  <data name="ResearchProjectWorkspace_Details" xml:space="preserve"><value>研究内容</value></data>
+  <data name="ProjectValidation_ProjectKindInvalid" xml:space="preserve"><value>プロジェクト種別が無効です。</value></data>
+  <data name="ProjectValidation_ProjectKindImmutable" xml:space="preserve"><value>作成後にプロジェクト種別を変更することはできません。</value></data>
+  <data name="ProjectValidation_DesignDetailsRequired" xml:space="preserve"><value>設計プロジェクトのデータがありません。</value></data>
+  <data name="ProjectValidation_ResearchDetailsNotAllowed" xml:space="preserve"><value>設計プロジェクトには研究専用データを保存できません。</value></data>
+  <data name="ProjectValidation_DesignDetailsNotAllowed" xml:space="preserve"><value>研究プロジェクトには設計専用データを保存できません。</value></data>
+  <data name="ProjectValidation_ResearchDetailsRequired" xml:space="preserve"><value>研究プロジェクトのデータがありません。</value></data>
+  <data name="ProjectValidation_ResearchFieldRequired" xml:space="preserve"><value>研究分野を入力してください。</value></data>
+  <data name="ProjectValidation_ResearchFieldTooLong" xml:space="preserve"><value>研究分野が長すぎます。</value></data>
+  <data name="ProjectValidation_ResearchSubjectRequired" xml:space="preserve"><value>研究対象を入力してください。</value></data>
+  <data name="ProjectValidation_ResearchSubjectTooLong" xml:space="preserve"><value>研究対象が長すぎます。</value></data>
+  <data name="ProjectValidation_ResearchMethodsRequired" xml:space="preserve"><value>研究方法を入力してください。</value></data>
+  <data name="ProjectValidation_ResearchMethodsTooLong" xml:space="preserve"><value>研究方法が長すぎます。</value></data>
 </root>

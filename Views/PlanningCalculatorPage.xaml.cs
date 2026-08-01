@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using Windows.ApplicationModel.DataTransfer;
 using UrbanPlanToolbox.Helpers;
 using UrbanPlanToolbox.Models;
@@ -17,6 +18,8 @@ public sealed partial class PlanningCalculatorPage : Page
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private readonly DispatcherQueueTimer _autoCalculateTimer;
     private PlanningResult? _lastResult;
+    private PlanningInput? _lastInput;
+    private Guid? _projectId;
     private bool _isProgrammaticChange;
 
     public PlanningCalculatorPage()
@@ -51,6 +54,12 @@ public sealed partial class PlanningCalculatorPage : Page
 
     private IEnumerable<TextBox> InputBoxes => new[] { SiteAreaBox, FootprintBox, TotalAreaBox, AboveAreaBox, UndergroundAreaBox, GreenAreaBox, HouseholdsBox, PopulationBox, PeoplePerHouseholdBox, ParkingTotalBox, SurfaceParkingBox, UndergroundParkingBox, PublicServiceBox };
     private AppSettings CurrentSettings => _settingsService.Load();
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        _projectId = e.Parameter as Guid?;
+        ProjectActions.Visibility = _projectId.HasValue ? Visibility.Visible : Visibility.Collapsed;
+    }
     private void OnLoaded(object sender, RoutedEventArgs e) => SettingsService.SettingsChanged += OnSettingsChanged;
     private void OnUnloaded(object sender, RoutedEventArgs e) => SettingsService.SettingsChanged -= OnSettingsChanged;
     private void OnSettingsChanged(object? sender, AppSettings settings)
@@ -83,12 +92,13 @@ public sealed partial class PlanningCalculatorPage : Page
             invalid.Add(_localization.GetFormattedString("Error_InvalidNumber", box.Header?.ToString() ?? string.Empty));
             return null;
         }
-        var result = _calculator.Calculate(new PlanningInput { SiteArea = Parse(SiteAreaBox), TotalBuildingArea = Parse(TotalAreaBox), AboveGroundArea = Parse(AboveAreaBox), UndergroundArea = Parse(UndergroundAreaBox), BuildingFootprint = Parse(FootprintBox), GreenArea = Parse(GreenAreaBox), HouseholdCount = Parse(HouseholdsBox), Population = Parse(PopulationBox), PeoplePerHousehold = Parse(PeoplePerHouseholdBox), TotalParkingSpaces = Parse(ParkingTotalBox), SurfaceParkingSpaces = Parse(SurfaceParkingBox), UndergroundParkingSpaces = Parse(UndergroundParkingBox), PublicServiceArea = Parse(PublicServiceBox), PublicServiceUsesTotalArea = UseTotalAreaCheck.IsChecked == true });
+        var input = new PlanningInput { SiteArea = Parse(SiteAreaBox), TotalBuildingArea = Parse(TotalAreaBox), AboveGroundArea = Parse(AboveAreaBox), UndergroundArea = Parse(UndergroundAreaBox), BuildingFootprint = Parse(FootprintBox), GreenArea = Parse(GreenAreaBox), HouseholdCount = Parse(HouseholdsBox), Population = Parse(PopulationBox), PeoplePerHousehold = Parse(PeoplePerHouseholdBox), TotalParkingSpaces = Parse(ParkingTotalBox), SurfaceParkingSpaces = Parse(SurfaceParkingBox), UndergroundParkingSpaces = Parse(UndergroundParkingBox), PublicServiceArea = Parse(PublicServiceBox), PublicServiceUsesTotalArea = UseTotalAreaCheck.IsChecked == true };
+        var result = _calculator.Calculate(input);
         if (!showValidation && invalid.Count > 0) { StaleBar.Message = _localization.GetString("Status_InputIncomplete"); StaleBar.IsOpen = true; return; }
         result.Errors.InsertRange(0, invalid);
         ErrorBar.Message = string.Join(Environment.NewLine, result.Errors); ErrorBar.IsOpen = result.Errors.Count > 0;
         WarningBar.Message = string.Join(Environment.NewLine, result.Warnings); WarningBar.IsOpen = result.Warnings.Count > 0;
-        _lastResult = result; ResultsText.Text = PlanningResultFormatter.Format(result, CurrentSettings.DecimalPlaces, _localization); StaleBar.IsOpen = false;
+        _lastInput = input; _lastResult = result; ResultsText.Text = PlanningResultFormatter.Format(result, CurrentSettings.DecimalPlaces, _localization); StaleBar.IsOpen = false;
     }
     private void OnSample(object sender, RoutedEventArgs e)
     {
@@ -96,7 +106,19 @@ public sealed partial class PlanningCalculatorPage : Page
     }
     private void OnClear(object sender, RoutedEventArgs e)
     {
-        _isProgrammaticChange = true; foreach (var box in InputBoxes) box.Text = ""; _isProgrammaticChange = false; ErrorBar.IsOpen = WarningBar.IsOpen = StaleBar.IsOpen = false; _lastResult = null; ResultsText.Text = _localization.GetString("Result_NotCalculated");
+        _isProgrammaticChange = true; foreach (var box in InputBoxes) box.Text = ""; _isProgrammaticChange = false; ErrorBar.IsOpen = WarningBar.IsOpen = StaleBar.IsOpen = false; _lastInput = null; _lastResult = null; ResultsText.Text = _localization.GetString("Result_NotCalculated");
     }
     private void OnCopy(object sender, RoutedEventArgs e) { var data = new DataPackage(); data.SetText(_localization.GetString("Copy_PlanningResultsHeader") + "\r\n\r\n" + ResultsText.Text); Clipboard.SetContent(data); }
+    private async void OnSaveToProject(object sender, RoutedEventArgs e)
+    {
+        if (!_projectId.HasValue || _lastInput is null || _lastResult is null || _lastResult.Errors.Count > 0)
+        {
+            ErrorBar.Message = _localization.GetString("Snapshot_Error_ValidResultRequired"); ErrorBar.IsOpen = true; return;
+        }
+        var result = await ProjectStorageService.Default.AddSnapshotAsync(_projectId.Value, _lastInput, _lastResult);
+        if (!result.Succeeded) { ErrorBar.Message = _localization.GetString("Snapshot_Error_SaveFailed"); ErrorBar.IsOpen = true; return; }
+        StaleBar.Message = _localization.GetString("Snapshot_Status_Saved"); StaleBar.IsOpen = true;
+        Frame.Navigate(typeof(ProjectWorkspacePage), _projectId.Value);
+    }
+    private void OnReturnToProject(object sender, RoutedEventArgs e) { if (_projectId.HasValue) Frame.Navigate(typeof(ProjectWorkspacePage), _projectId.Value); }
 }
