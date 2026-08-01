@@ -1,6 +1,6 @@
 <Page x:Class="UrbanPlanToolbox.Views.ResearchToolsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:UrbanPlanToolbox.Controls">
   <ScrollViewer>
-    <StackPanel Padding="32" Spacing="16">
+    <StackPanel Style="{StaticResource PageContentStackPanelStyle}">
       <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" />
       <TextBlock x:Uid="Page_ResearchTools_Description" Style="{StaticResource SubtitleTextBlockStyle}" />
       <controls:ToolCategoryBrowser x:Name="CategoryBrowser" />

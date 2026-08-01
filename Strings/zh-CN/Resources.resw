@@ -1583,4 +1583,19 @@ dwyblchhq</value>
   <data name="Interaction_NotificationName" xml:space="preserve"><value>应用通知</value></data>
   <data name="Interaction_ErrorTitle" xml:space="preserve"><value>操作失败</value></data>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作完成</value></data>
+  <data name="Reminder_NotificationTitle" xml:space="preserve"><value>重要时间节点提醒</value></data>
+  <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}：{1} 将于 {2} 到期。</value></data>
+  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows 提醒</value></data>
+  <data name="Milestone_Reminder_On" xml:space="preserve"><value>开启（本地通知）</value></data>
+  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>关闭</value></data>
+  <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>项目已保存，但 Windows 未能计划提醒：{0}</value></data>
+  <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>未选择具体时间时，将于当天本地时间 09:00 提醒。</value></data>
+  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>关闭此开关时不会创建 Windows 提醒。</value></data>
+  <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows 通知</value></data>
+  <data name="Notification_Settings_Description" xml:space="preserve"><value>发送测试通知以验证 Windows 能识别 UrbanPlanToolbox 并递送本地提醒。</value></data>
+  <data name="Notification_Test_Action" xml:space="preserve"><value>发送测试通知</value></data>
+  <data name="Notification_Test_Title" xml:space="preserve"><value>UrbanPlanToolbox 测试通知</value></data>
+  <data name="Notification_Test_Body" xml:space="preserve"><value>此应用的 Windows 本地通知已配置。</value></data>
+  <data name="Notification_Test_Sent" xml:space="preserve"><value>测试通知已发送；若横幅被抑制，请查看通知中心。</value></data>
+  <data name="Notification_Test_Failed" xml:space="preserve"><value>Windows 未能发送测试通知：{0}</value></data>
 </root>

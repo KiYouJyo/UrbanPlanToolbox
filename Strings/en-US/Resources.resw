@@ -1580,4 +1580,19 @@ Latest version: {1}</value>
   <data name="Interaction_NotificationName" xml:space="preserve"><value>Application notification</value></data>
   <data name="Interaction_ErrorTitle" xml:space="preserve"><value>Operation failed</value></data>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>Operation completed</value></data>
+  <data name="Reminder_NotificationTitle" xml:space="preserve"><value>Milestone reminder</value></data>
+  <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}: {1} is due {2}.</value></data>
+  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows reminder</value></data>
+  <data name="Milestone_Reminder_On" xml:space="preserve"><value>On (local notification)</value></data>
+  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>Off</value></data>
+  <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>Project saved, but Windows could not schedule its reminder: {0}</value></data>
+  <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>Without a specific time, the reminder is scheduled for 09:00 local time.</value></data>
+  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>No Windows reminder will be created while this switch is off.</value></data>
+  <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows notifications</value></data>
+  <data name="Notification_Settings_Description" xml:space="preserve"><value>Send a test notification to verify that Windows can identify UrbanPlanToolbox and deliver local reminders.</value></data>
+  <data name="Notification_Test_Action" xml:space="preserve"><value>Send test notification</value></data>
+  <data name="Notification_Test_Title" xml:space="preserve"><value>UrbanPlanToolbox test notification</value></data>
+  <data name="Notification_Test_Body" xml:space="preserve"><value>Windows local notifications are configured for this app.</value></data>
+  <data name="Notification_Test_Sent" xml:space="preserve"><value>Test notification sent. Check Notification Center if its banner is suppressed.</value></data>
+  <data name="Notification_Test_Failed" xml:space="preserve"><value>Windows could not send the test notification: {0}</value></data>
 </root>

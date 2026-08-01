@@ -5,7 +5,7 @@
                 HorizontalScrollMode="Disabled"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
-    <Grid x:Name="WorkspaceContent" Padding="32" RowSpacing="16" MaxWidth="1400"
+    <Grid x:Name="WorkspaceContent" Padding="{StaticResource PageContentPadding}" RowSpacing="{StaticResource PageSectionSpacing}" MaxWidth="1400"
           Width="{Binding ViewportWidth, ElementName=WorkspaceScrollViewer}"
           HorizontalAlignment="Left" VerticalAlignment="Top">
       <Grid.RowDefinitions>
@@ -22,7 +22,7 @@
             <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
             <TextBlock x:Name="MetadataText" TextWrapping="Wrap"/>
           </StackPanel>
-          <Border x:Name="StateBadge" Grid.Column="1" Padding="10,5" CornerRadius="12" VerticalAlignment="Top">
+          <Border x:Name="StateBadge" Grid.Column="1" Style="{StaticResource StatusBadgeStyle}">
             <TextBlock x:Name="StateText"/>
           </Border>
         </Grid>

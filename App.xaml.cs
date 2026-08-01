@@ -42,12 +42,17 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        AppDataPathProvider.Default.EnsureInfrastructureDirectories();
         var settings = new SettingsService().Load();
         ApplyLanguagePreference(settings);
         _window = MainWindow = new MainWindow();
         ThemePreference.Apply((FrameworkElement)_window.Content, settings.Theme);
         _window.Activate();
+        // Defer disk and notification work until a complete first frame is available.
+        _window.DispatcherQueue.TryEnqueue(async () =>
+        {
+            AppDataPathProvider.Default.EnsureInfrastructureDirectories();
+            await MilestoneReminderService.Default.RefreshAsync();
+        });
     }
 
     /// <summary>

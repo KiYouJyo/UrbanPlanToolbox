@@ -269,7 +269,7 @@ public sealed partial class ProjectWorkspacePage : Page
         var input = await ShowMilestoneDialogAsync(null);
         if (input is null) return;
         SetBusy(true);
-        try { await ApplyMutationAsync(await _projects.AddMilestoneAsync(_project.Id, input.Title, input.Date, input.Time, input.Notes)); }
+        try { await ApplyMutationAsync(await _projects.AddMilestoneAsync(_project.Id, input.Title, input.Date, input.Time, input.Notes, reminderEnabled: input.ReminderEnabled)); }
         finally { SetBusy(false); }
     }
 
@@ -281,7 +281,7 @@ public sealed partial class ProjectWorkspacePage : Page
         var input = await ShowMilestoneDialogAsync(milestone);
         if (input is null) return;
         SetBusy(true);
-        try { await ApplyMutationAsync(await _projects.UpdateMilestoneAsync(_project.Id, id, input.Title, input.Date, input.Time, input.Notes)); }
+        try { await ApplyMutationAsync(await _projects.UpdateMilestoneAsync(_project.Id, id, input.Title, input.Date, input.Time, input.Notes, reminderEnabled: input.ReminderEnabled)); }
         finally { SetBusy(false); }
     }
 
@@ -301,14 +301,19 @@ public sealed partial class ProjectWorkspacePage : Page
         var includeTime = new CheckBox { Content = _localization.GetString("Milestone_Field_IncludeTime"), IsChecked = milestone?.Time is not null };
         var time = new TimePicker { Header = _localization.GetString("Milestone_Field_Time"), SelectedTime = milestone?.Time?.ToTimeSpan(), Visibility = includeTime.IsChecked == true ? Visibility.Visible : Visibility.Collapsed };
         includeTime.Click += (_, _) => time.Visibility = includeTime.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+        var reminder = new ToggleSwitch { Header = _localization.GetString("Milestone_Field_Reminder"), OffContent = _localization.GetString("Milestone_Reminder_Off"), OnContent = _localization.GetString("Milestone_Reminder_On"), IsOn = milestone?.ReminderEnabled ?? true };
+        var defaultTime = new TextBlock { Text = _localization.GetString("Milestone_Reminder_DefaultTime"), TextWrapping = TextWrapping.Wrap, Visibility = includeTime.IsChecked == true ? Visibility.Collapsed : Visibility.Visible };
+        var reminderOff = new TextBlock { Text = _localization.GetString("Milestone_Reminder_DisabledHint"), TextWrapping = TextWrapping.Wrap, Visibility = reminder.IsOn ? Visibility.Collapsed : Visibility.Visible };
+        includeTime.Click += (_, _) => defaultTime.Visibility = includeTime.IsChecked == true ? Visibility.Collapsed : Visibility.Visible;
+        reminder.Toggled += (_, _) => reminderOff.Visibility = reminder.IsOn ? Visibility.Collapsed : Visibility.Visible;
         var notes = new TextBox { Header = _localization.GetString("Milestone_Field_Notes"), MaxLength = ProjectValidation.MaxMilestoneNotesLength, Text = milestone?.Notes ?? string.Empty, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 100 };
         var error = new TextBlock { Foreground = (Brush)Application.Current.Resources["SystemFillColorCriticalBrush"], TextWrapping = TextWrapping.Wrap };
         var panel = new StackPanel { Spacing = 10 };
-        panel.Children.Add(title); panel.Children.Add(date); panel.Children.Add(includeTime); panel.Children.Add(time); panel.Children.Add(notes); panel.Children.Add(error);
+        panel.Children.Add(title); panel.Children.Add(date); panel.Children.Add(includeTime); panel.Children.Add(time); panel.Children.Add(defaultTime); panel.Children.Add(reminder); panel.Children.Add(reminderOff); panel.Children.Add(notes); panel.Children.Add(error);
         MilestoneEditor? result = null;
         var dialog = new ContentDialog
         {
-            XamlRoot = XamlRoot, Title = _localization.GetString(milestone is null ? "Milestone_Add_Title" : "Milestone_Edit_Title"), Content = panel,
+            XamlRoot = XamlRoot, Title = _localization.GetString(milestone is null ? "Milestone_Add_Title" : "Milestone_Edit_Title"), Content = new ScrollViewer { Content = panel, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, MaxHeight = Math.Max(240, XamlRoot.Size.Height - 240) },
             PrimaryButtonText = _localization.GetString(milestone is null ? "Action_Create" : "Project_Action_Save"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary
         };
         dialog.PrimaryButtonClick += (_, args) =>
@@ -316,7 +321,7 @@ public sealed partial class ProjectWorkspacePage : Page
             if (string.IsNullOrWhiteSpace(title.Text)) { args.Cancel = true; error.Text = _localization.GetString("ProjectValidation_MilestoneTitleRequired"); return; }
             if (date.Date is null) { args.Cancel = true; error.Text = _localization.GetString("ProjectValidation_MilestoneDateInvalid"); return; }
             if (includeTime.IsChecked == true && time.SelectedTime is null) { args.Cancel = true; error.Text = _localization.GetString("Milestone_Error_TimeRequired"); return; }
-            result = new(title.Text, DateOnly.FromDateTime(date.Date.Value.LocalDateTime), includeTime.IsChecked == true ? TimeOnly.FromTimeSpan(time.SelectedTime!.Value) : null, notes.Text);
+            result = new(title.Text, DateOnly.FromDateTime(date.Date.Value.LocalDateTime), includeTime.IsChecked == true ? TimeOnly.FromTimeSpan(time.SelectedTime!.Value) : null, notes.Text, reminder.IsOn);
         };
         return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary ? result : null;
     }
@@ -377,6 +382,7 @@ public sealed partial class ProjectWorkspacePage : Page
         {
             var result = await _projects.ArchiveAsync(_project.Id, !wasArchived);
             if (!result.Succeeded) { ShowError("Project_Error_SaveFailed"); return; }
+            await RefreshRemindersAsync();
             _confirmedNavigation = true;
             Frame.Navigate(wasArchived ? typeof(HomePage) : typeof(ProjectArchivePage));
         }
@@ -392,6 +398,7 @@ public sealed partial class ProjectWorkspacePage : Page
         {
             var result = await _projects.DeleteAsync(_project.Id, _folders);
             if (!result.Succeeded) { ShowError("Project_Delete_Failed"); return; }
+            await RefreshRemindersAsync();
             _confirmedNavigation = true;
             Frame.Navigate(wasArchived ? typeof(ProjectArchivePage) : typeof(HomePage));
         }
@@ -435,7 +442,7 @@ public sealed partial class ProjectWorkspacePage : Page
         _project = result.Project;
         ShowSuccess("Project_Status_Saved");
         ApplyProject();
-        await Task.CompletedTask;
+        await RefreshRemindersAsync();
     }
 
     private void SetBusy(bool busy)
@@ -485,5 +492,14 @@ public sealed partial class ProjectWorkspacePage : Page
     }
 
     private sealed record ProjectTypeOption(string Code, string Name);
-    private sealed record MilestoneEditor(string Title, DateOnly Date, TimeOnly? Time, string? Notes);
+    private async Task RefreshRemindersAsync()
+    {
+        var result = await MilestoneReminderService.Default.RefreshAsync();
+        if (result.Succeeded) return;
+        var message = _localization.GetFormattedString("Milestone_Reminder_SchedulingFailed", result.Diagnostic ?? result.FailureType ?? "Unknown");
+        StatusBar.Severity = InfoBarSeverity.Warning; StatusBar.Message = message; StatusBar.IsOpen = true;
+        AppNotificationService.Default.Notify(new(UrbanPlanToolbox.Models.Interaction.AppNotificationKind.Warning, _localization.GetString("Interaction_ErrorTitle"), message));
+    }
+
+    private sealed record MilestoneEditor(string Title, DateOnly Date, TimeOnly? Time, string? Notes, bool ReminderEnabled);
 }

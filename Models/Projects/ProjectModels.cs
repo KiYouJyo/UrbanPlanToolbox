@@ -93,6 +93,8 @@ public sealed class ProjectMilestone
     public required string Title { get; set; }
     public required DateOnly Date { get; set; }
     public TimeOnly? Time { get; set; }
+    // Missing values from v3 project files intentionally deserialize as true.
+    public bool ReminderEnabled { get; set; } = true;
     public string? Notes { get; set; }
     public required DateTimeOffset CreatedAtUtc { get; init; }
     public required DateTimeOffset UpdatedAtUtc { get; set; }

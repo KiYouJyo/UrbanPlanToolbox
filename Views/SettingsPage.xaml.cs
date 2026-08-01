@@ -16,6 +16,9 @@ public sealed partial class SettingsPage : Page
     {
         InitializeComponent();
         TitleText.Text = _localization.GetString("Navigation_Settings");
+        NotificationTitle.Text = _localization.GetString("Notification_Settings_Title");
+        NotificationDescription.Text = _localization.GetString("Notification_Settings_Description");
+        TestNotificationButton.Content = _localization.GetString("Notification_Test_Action");
         Apply(_settingsService.Load());
     }
     private void OnRestore(object sender, RoutedEventArgs e) { var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; }); Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults"); }
@@ -91,6 +94,11 @@ public sealed partial class SettingsPage : Page
             };
             if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
             var result = await service.ImportAsync(file.Path);
+            if (result.Succeeded)
+            {
+                var reminders = await MilestoneReminderService.Default.RefreshAsync();
+                if (!reminders.Succeeded) DataStatusBar.Message = _localization.GetString("Milestone_Reminder_SchedulingFailed");
+            }
             DataStatusBar.Severity = result.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Error;
             DataStatusBar.Message = result.Succeeded ? _localization.GetString("DataManagement_ImportSuccess") : _localization.GetFormattedString(result.RollbackSucceeded ? "DataManagement_ImportFailedRolledBack" : "DataManagement_ImportFailed", result.FailureType ?? string.Empty);
             DataStatusBar.IsOpen = true;
@@ -102,6 +110,15 @@ public sealed partial class SettingsPage : Page
     {
         if (App.MainWindow is null) return;
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
+    }
+    private void OnSendTestNotification(object sender, RoutedEventArgs e)
+    {
+        var result = MilestoneReminderService.Default.SendTestNotification();
+        NotificationStatusBar.Severity = result.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Error;
+        NotificationStatusBar.Message = result.Succeeded
+            ? _localization.GetString("Notification_Test_Sent")
+            : _localization.GetFormattedString("Notification_Test_Failed", result.Diagnostic ?? result.FailureType ?? "Unknown");
+        NotificationStatusBar.IsOpen = true;
     }
     private void SetDataBusy(bool busy) { ExportButton.IsEnabled = ImportButton.IsEnabled = !busy; }
     private static string FormatBytes(long bytes) => bytes >= 1024 * 1024 ? $"{bytes / (1024d * 1024d):0.##} MB" : $"{bytes / 1024d:0.##} KB";
