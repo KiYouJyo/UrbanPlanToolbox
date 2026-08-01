@@ -10,6 +10,7 @@
   <Compile Include="../../Models/DataEnvelope.cs" Link="Models/DataEnvelope.cs" />
   <Compile Include="../../Models/DataStorageResult.cs" Link="Models/DataStorageResult.cs" />
   <Compile Include="../../Models/BackupModels.cs" Link="Models/BackupModels.cs" />
+  <Compile Include="../../Models/ColorPaletteModels.cs" Link="Models/ColorPaletteModels.cs" />
   <Compile Include="../../Services/SettingsService.cs" Link="Services/SettingsService.cs" />
   <Compile Include="../../Services/AppDataPaths.cs" Link="Services/AppDataPaths.cs" />
   <Compile Include="../../Services/IAppDataPathProvider.cs" Link="Services/IAppDataPathProvider.cs" />
@@ -24,6 +25,7 @@
   <Compile Include="../../Services/ProjectValidation.cs" Link="Services/ProjectValidation.cs" />
   <Compile Include="../../Services/ProjectStorageService.cs" Link="Services/ProjectStorageService.cs" />
   <Compile Include="../../Services/BackupDataService.cs" Link="Services/BackupDataService.cs" />
+  <Compile Include="../../Services/ColorPaletteStorageService.cs" Link="Services/ColorPaletteStorageService.cs" />
   <Compile Include="../../Services/ProjectPresentation.cs" Link="Services/ProjectPresentation.cs" />
   <Compile Include="../../Services/IProjectFolderAccessService.cs" Link="Services/IProjectFolderAccessService.cs" />
   <Compile Include="../../Helpers/NumberFormatter.cs" Link="Helpers/NumberFormatter.cs" />

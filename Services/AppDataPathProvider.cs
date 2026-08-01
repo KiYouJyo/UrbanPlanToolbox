@@ -84,6 +84,25 @@ public sealed class AppDataPathProvider : IAppDataPathProvider
     public string GetToolBackupFilePath(string toolId, string fileName) =>
         GetSafeFilePath(GetToolBackupDirectory(toolId), $"{fileName}.last-valid.bak", requireJsonExtension: false);
 
+    public string GetToolAttachmentsDirectory(string toolId)
+    {
+        ValidateRegisteredToolId(toolId);
+        var path = Path.Combine(Paths.AttachmentsDirectory, "tools", toolId);
+        Directory.CreateDirectory(path);
+        return path;
+    }
+
+    public string GetToolAttachmentDirectory(string toolId, string parentId)
+    {
+        if (!IsSafeSegment(parentId)) throw new ArgumentException("Attachment parent ID must be a safe path segment.", nameof(parentId));
+        var root = GetToolAttachmentsDirectory(toolId);
+        var path = Path.GetFullPath(Path.Combine(root, parentId));
+        if (!path.StartsWith(Path.GetFullPath(root) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("The attachment path escapes its tool directory.", nameof(parentId));
+        Directory.CreateDirectory(path);
+        return path;
+    }
+
     public string GetProjectsIndexFilePath() =>
         GetSafeFilePath(Paths.ProjectsDirectory, "index.json", requireJsonExtension: true);
 

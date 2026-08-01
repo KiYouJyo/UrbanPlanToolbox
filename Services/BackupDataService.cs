@@ -48,6 +48,8 @@ public sealed class BackupDataService
             }
             await WritePortableProjectsAsync(temporaryRoot, projects.Projects, cancellationToken).ConfigureAwait(false);
             CopyDirectory(_paths.Paths.ProjectAttachmentsDirectory, Path.Combine(temporaryRoot, "attachments", "projects"), excludeInternalFiles: false);
+            CopyDirectory(_paths.Paths.ToolsDirectory, Path.Combine(temporaryRoot, "data", "tools"), excludeInternalFiles: true);
+            CopyDirectory(Path.Combine(_paths.Paths.AttachmentsDirectory, "tools"), Path.Combine(temporaryRoot, "attachments", "tools"), excludeInternalFiles: false);
 
             var files = Directory.GetFiles(temporaryRoot, "*", SearchOption.AllDirectories)
                 .Select(path => CreateManifestFile(temporaryRoot, path)).OrderBy(file => file.RelativePath, StringComparer.Ordinal).ToList();
@@ -112,7 +114,9 @@ public sealed class BackupDataService
                     return new(BackupOperationStatus.InvalidPackage, manifest, "SettingsInvalid");
             }
             var projectValidation = await ValidateProjectsAsync(entries, cancellationToken).ConfigureAwait(false);
-            return projectValidation is null ? new(BackupOperationStatus.Success, manifest) : projectValidation;
+            if (projectValidation is not null) return projectValidation;
+            var toolValidation = await ValidateToolDataAsync(entries, cancellationToken).ConfigureAwait(false);
+            return toolValidation is null ? new(BackupOperationStatus.Success, manifest) : toolValidation;
         }
         catch (BackupLimitException exception) { return new(BackupOperationStatus.LimitExceeded, FailureType: exception.Message); }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or InvalidDataException or JsonException or NotSupportedException)
@@ -204,7 +208,9 @@ public sealed class BackupDataService
         return path == "backup-manifest.json" || path == "settings/settings.json" ||
                path == "data/projects/index.json" ||
                path.StartsWith("data/projects/", StringComparison.Ordinal) && path.EndsWith("/project.json", StringComparison.Ordinal) ||
-               path.StartsWith("attachments/projects/", StringComparison.Ordinal);
+               path.StartsWith("attachments/projects/", StringComparison.Ordinal) ||
+               path == "data/tools/color-palette-recorder/palettes.json" ||
+               path.StartsWith("attachments/tools/color-palette-recorder/", StringComparison.Ordinal);
     }
 
     private static async Task<BackupInspection?> ValidateProjectsAsync(IReadOnlyDictionary<string, ZipArchiveEntry> entries, CancellationToken cancellationToken)
@@ -222,6 +228,22 @@ public sealed class BackupDataService
             }
         }
         return null;
+    }
+
+    private static async Task<BackupInspection?> ValidateToolDataAsync(IReadOnlyDictionary<string, ZipArchiveEntry> entries, CancellationToken cancellationToken)
+    {
+        const string palettePath = "data/tools/color-palette-recorder/palettes.json";
+        if (!entries.TryGetValue(palettePath, out var entry)) return null;
+        await using var stream = entry.Open();
+        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (!document.RootElement.TryGetProperty("schemaVersion", out var version) || version.GetInt32() > ColorPaletteStorageService.ColorPaletteSchemaVersion)
+            return new(BackupOperationStatus.UnsupportedFutureVersion, FailureType: "FutureColorPaletteFormat");
+        if (version.GetInt32() < 1 || !document.RootElement.TryGetProperty("payload", out var payload))
+            return new(BackupOperationStatus.InvalidPackage, FailureType: "ColorPaletteEnvelopeInvalid");
+        var palettes = payload.Deserialize<ColorPaletteDocument>(DataStorageJson.Options);
+        return palettes is not null && ColorPaletteStorageService.TryValidateDocument(palettes, out _)
+            ? null
+            : new(BackupOperationStatus.InvalidPackage, FailureType: "ColorPaletteInvalid");
     }
 
     private void ExtractValidatedPackage(string packagePath, string staging)
@@ -263,6 +285,8 @@ public sealed class BackupDataService
         if (File.Exists(_paths.Paths.SettingsFilePath)) CopyFile(_paths.Paths.SettingsFilePath, Path.Combine(destination, "settings.json"));
         CopyDirectory(_paths.Paths.ProjectsDirectory, Path.Combine(destination, "projects"), excludeInternalFiles: true);
         CopyDirectory(_paths.Paths.ProjectAttachmentsDirectory, Path.Combine(destination, "attachments-projects"), excludeInternalFiles: false);
+        CopyDirectory(_paths.Paths.ToolsDirectory, Path.Combine(destination, "tools"), excludeInternalFiles: true);
+        CopyDirectory(Path.Combine(_paths.Paths.AttachmentsDirectory, "tools"), Path.Combine(destination, "attachments-tools"), excludeInternalFiles: false);
         return destination;
     }
 
@@ -272,6 +296,8 @@ public sealed class BackupDataService
         if (_failureInjector?.Invoke("Replace") == true) throw new IOException("InjectedReplacementFailure");
         ReplaceDirectory(Path.Combine(staging, "data", "projects"), _paths.Paths.ProjectsDirectory);
         ReplaceDirectory(Path.Combine(staging, "attachments", "projects"), _paths.Paths.ProjectAttachmentsDirectory);
+        ReplaceDirectory(Path.Combine(staging, "data", "tools"), _paths.Paths.ToolsDirectory);
+        ReplaceDirectory(Path.Combine(staging, "attachments", "tools"), Path.Combine(_paths.Paths.AttachmentsDirectory, "tools"));
     }
 
     private bool RestorePreImportBackup(string backup)
@@ -281,6 +307,8 @@ public sealed class BackupDataService
             ReplaceFile(Path.Combine(backup, "settings.json"), _paths.Paths.SettingsFilePath);
             ReplaceDirectory(Path.Combine(backup, "projects"), _paths.Paths.ProjectsDirectory);
             ReplaceDirectory(Path.Combine(backup, "attachments-projects"), _paths.Paths.ProjectAttachmentsDirectory);
+            ReplaceDirectory(Path.Combine(backup, "tools"), _paths.Paths.ToolsDirectory);
+            ReplaceDirectory(Path.Combine(backup, "attachments-tools"), Path.Combine(_paths.Paths.AttachmentsDirectory, "tools"));
             return true;
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { return false; }

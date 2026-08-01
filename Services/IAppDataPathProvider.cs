@@ -8,6 +8,8 @@ public interface IAppDataPathProvider
     string GetToolDataFilePath(string toolId, string fileName);
     string GetToolBackupDirectory(string toolId);
     string GetToolBackupFilePath(string toolId, string fileName);
+    string GetToolAttachmentsDirectory(string toolId);
+    string GetToolAttachmentDirectory(string toolId, string parentId);
     string GetProjectsIndexFilePath();
     string GetProjectsIndexBackupFilePath();
     string GetProjectDataDirectory(Guid projectId);

@@ -34,7 +34,20 @@ public sealed class ToolRegistry
             true,
             "danweiyubilichihuansuanqi",
             "D",
-            "Tool_UnitScaleConverter_Keywords")
+            "Tool_UnitScaleConverter_Keywords"),
+        new(
+            ToolIds.ColorPaletteRecorder,
+            "Tool_ColorPaletteRecorder_Name",
+            "Tool_ColorPaletteRecorder_Description",
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.DetailedDesign,
+            "\uE790",
+            typeof(Views.ColorPaletteRecorderPage),
+            30,
+            true,
+            "sekafanganjiluyiqi",
+            "S",
+            "Tool_ColorPaletteRecorder_Keywords")
     ]);
 
     public ToolRegistry(IEnumerable<ToolDefinition> tools)

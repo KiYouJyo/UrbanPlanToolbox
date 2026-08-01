@@ -18,6 +18,7 @@ public sealed class ToolSearchServiceTests
         Assert.Equal("G", calculator.PinyinInitial);
         Assert.Equal("danweiyubilichihuansuanqi", converter.PinyinSortKey);
         Assert.Equal("D", converter.PinyinInitial);
+        Assert.Equal("S", ToolRegistry.Default.GetById(ToolIds.ColorPaletteRecorder).PinyinInitial);
         Assert.All(ToolRegistry.Default.All, tool =>
         {
             Assert.False(string.IsNullOrWhiteSpace(tool.SearchKeywordsResourceKey));
@@ -36,6 +37,8 @@ public sealed class ToolSearchServiceTests
     [InlineData("planning-indicator-calculator", ToolIds.PlanningIndicatorCalculator)]
     [InlineData("单位", ToolIds.UnitScaleConverter)]
     [InlineData("dwyblchhq", ToolIds.UnitScaleConverter)]
+    [InlineData("色卡", ToolIds.ColorPaletteRecorder)]
+    [InlineData("color-palette-recorder", ToolIds.ColorPaletteRecorder)]
     public void SearchMatchesConfiguredChineseAndPinyinFields(string query, string expectedId)
     {
         Assert.Equal(expectedId, Assert.Single(Flatten(_service.Search(query, _ => false))).Id);
@@ -55,7 +58,7 @@ public sealed class ToolSearchServiceTests
     {
         var groups = _service.Search(" ", _ => false);
 
-        Assert.Equal(["D", "G"], groups.Select(group => group.Header));
+        Assert.Equal(["D", "G", "S"], groups.Select(group => group.Header));
         Assert.Equal(ToolIds.UnitScaleConverter, Assert.Single(groups[0].Tools).Id);
         Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(groups[1].Tools).Id);
     }
@@ -67,7 +70,7 @@ public sealed class ToolSearchServiceTests
 
         Assert.Equal("已收藏", groups[0].Header);
         Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(groups[0].Tools).Id);
-        Assert.Equal(["D"], groups.Skip(1).Select(group => group.Header));
+        Assert.Equal(["D", "S"], groups.Skip(1).Select(group => group.Header));
         Assert.DoesNotContain(groups.Skip(1).SelectMany(group => group.Tools), tool => tool.Id == ToolIds.PlanningIndicatorCalculator);
     }
 
