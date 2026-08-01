@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using Windows.ApplicationModel.DataTransfer;
 using UrbanPlanToolbox.Helpers;
 using UrbanPlanToolbox.Models;
+using UrbanPlanToolbox.Models.Tools;
 using UrbanPlanToolbox.Services;
 
 namespace UrbanPlanToolbox.Views;
@@ -18,6 +19,7 @@ public sealed partial class UnitScaleConverterPage : Page
     public UnitScaleConverterPage()
     {
         InitializeComponent();
+        FavoriteButton.ToolId = ToolIds.UnitScaleConverter;
         DrawingUnitBox.SelectedIndex = ActualUnitBox.SelectedIndex = ActualInputUnitBox.SelectedIndex = DrawingOutputUnitBox.SelectedIndex = 0;
         LoadUnits();
         Loaded += (_, _) => SettingsService.SettingsChanged += OnSettingsChanged;

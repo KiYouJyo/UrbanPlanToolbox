@@ -21,6 +21,7 @@ public sealed class PrimaryNavigationTests
             PrimaryNavigationIds.About
         ], ids);
         Assert.Equal(ids.Length, ids.Distinct(StringComparer.Ordinal).Count());
+        Assert.Equal("工具搜索", PrimaryNavigation.Default.All.Single(route => route.Id == PrimaryNavigationIds.CommonTools).DisplayName);
     }
 
     [Theory]

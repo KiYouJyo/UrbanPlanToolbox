@@ -9,4 +9,7 @@ public sealed record ToolDefinition(
     string IconGlyph,
     Type PageType,
     int SortOrder,
-    bool IsAvailable);
+    bool IsAvailable,
+    string PinyinSortKey,
+    string PinyinInitial,
+    IReadOnlyList<string> SearchKeywords);

@@ -90,6 +90,97 @@ public sealed class ToolRegistryTests
     }
 
     [Fact]
+    public void CategoryCatalogUsesUniqueStableIdsInRoadmapOrder()
+    {
+        Assert.Equal(
+            ["preliminary-analysis", "field-research", "design-development", "master-planning", "detailed-design"],
+            ToolCategoryCatalog.Design.Select(category => category.Id));
+        Assert.Equal(
+            ["research-preparation", "geographic-tools", "data-tools"],
+            ToolCategoryCatalog.Research.Select(category => category.Id));
+
+        var allIds = ToolCategoryCatalog.Design.Concat(ToolCategoryCatalog.Research).Select(category => category.Id).ToArray();
+        Assert.Equal(allIds.Length, allIds.Distinct(StringComparer.Ordinal).Count());
+        Assert.Equal([10, 20, 30, 40, 50], ToolCategoryCatalog.Design.Select(category => category.SortOrder));
+        Assert.Equal([10, 20, 30], ToolCategoryCatalog.Research.Select(category => category.SortOrder));
+    }
+
+    [Fact]
+    public void CategoryCatalogSafelyHandlesMissingIds()
+    {
+        Assert.True(ToolCategoryCatalog.TryGet("master-planning", out var category));
+        Assert.Equal(ToolSecondaryCategory.MasterPlanning, category!.SecondaryCategory);
+        Assert.False(ToolCategoryCatalog.TryGet("missing-category", out category));
+        Assert.Null(category);
+        Assert.False(ToolCategoryCatalog.TryGet(null, out category));
+        Assert.Null(category);
+    }
+
+    [Fact]
+    public void CombinedCategoryFilterReturnsOnlyTheExpectedDesignTools()
+    {
+        Assert.Equal(
+            ToolIds.PlanningIndicatorCalculator,
+            Assert.Single(ToolRegistry.Default.GetAvailableByCategories(
+                ToolPrimaryCategory.Design,
+                ToolSecondaryCategory.MasterPlanning)).Id);
+        Assert.Equal(
+            ToolIds.UnitScaleConverter,
+            Assert.Single(ToolRegistry.Default.GetAvailableByCategories(
+                ToolPrimaryCategory.Design,
+                ToolSecondaryCategory.DetailedDesign)).Id);
+
+        Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis));
+        Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.FieldResearch));
+        Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.DesignDevelopment));
+    }
+
+    [Fact]
+    public void ResearchCategoriesCurrentlyContainNoAvailableTools()
+    {
+        foreach (var category in ToolCategoryCatalog.Research)
+        {
+            Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(
+                ToolPrimaryCategory.Research,
+                category.SecondaryCategory));
+        }
+    }
+
+    [Fact]
+    public void InvalidCategoryCombinationReturnsNoTools()
+    {
+        Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.ResearchPreparation));
+        Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(
+            ToolPrimaryCategory.Design,
+            (ToolSecondaryCategory)999));
+    }
+
+    [Fact]
+    public void ToolCardMetadataComesFromRegisteredDefinitions()
+    {
+        var masterPlanningCard = Assert.Single(ToolRegistry.Default.GetAvailableByCategories(
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.MasterPlanning));
+        var detailedDesignCard = Assert.Single(ToolRegistry.Default.GetAvailableByCategories(
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.DetailedDesign));
+
+        Assert.Equal(ToolIds.PlanningIndicatorCalculator, masterPlanningCard.Id);
+        Assert.Equal("规划指标快速计算器", masterPlanningCard.DisplayName);
+        Assert.False(string.IsNullOrWhiteSpace(masterPlanningCard.Description));
+        Assert.False(string.IsNullOrWhiteSpace(masterPlanningCard.IconGlyph));
+        Assert.Equal(typeof(Views.PlanningCalculatorPage), masterPlanningCard.PageType);
+
+        Assert.Equal(ToolIds.UnitScaleConverter, detailedDesignCard.Id);
+        Assert.Equal("单位与比例尺换算器", detailedDesignCard.DisplayName);
+        Assert.False(string.IsNullOrWhiteSpace(detailedDesignCard.Description));
+        Assert.False(string.IsNullOrWhiteSpace(detailedDesignCard.IconGlyph));
+        Assert.Equal(typeof(Views.UnitScaleConverterPage), detailedDesignCard.PageType);
+    }
+
+    [Fact]
     public void RegistryUsesStableSortOrder()
     {
         var registry = new ToolRegistry(
@@ -119,5 +210,8 @@ public sealed class ToolRegistryTests
         "\uE10F",
         typeof(Views.PlanningCalculatorPage),
         sortOrder,
-        true);
+        true,
+        id,
+        "X",
+        [id]);
 }

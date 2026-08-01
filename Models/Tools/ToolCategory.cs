@@ -40,3 +40,43 @@ public static class ToolCategoryNames
         _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
     };
 }
+
+public sealed record ToolCategoryDefinition(
+    string Id,
+    string DisplayName,
+    ToolPrimaryCategory PrimaryCategory,
+    ToolSecondaryCategory SecondaryCategory,
+    int SortOrder);
+
+public static class ToolCategoryCatalog
+{
+    public static IReadOnlyList<ToolCategoryDefinition> Design { get; } = Array.AsReadOnly<ToolCategoryDefinition>(
+    [
+        new("preliminary-analysis", "前期分析", ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis, 10),
+        new("field-research", "实地调研", ToolPrimaryCategory.Design, ToolSecondaryCategory.FieldResearch, 20),
+        new("design-development", "方案推导", ToolPrimaryCategory.Design, ToolSecondaryCategory.DesignDevelopment, 30),
+        new("master-planning", "总体设计", ToolPrimaryCategory.Design, ToolSecondaryCategory.MasterPlanning, 40),
+        new("detailed-design", "详细设计", ToolPrimaryCategory.Design, ToolSecondaryCategory.DetailedDesign, 50)
+    ]);
+
+    public static IReadOnlyList<ToolCategoryDefinition> Research { get; } = Array.AsReadOnly<ToolCategoryDefinition>(
+    [
+        new("research-preparation", "前期工具", ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 10),
+        new("geographic-tools", "地理工具", ToolPrimaryCategory.Research, ToolSecondaryCategory.GeographicTools, 20),
+        new("data-tools", "数据工具", ToolPrimaryCategory.Research, ToolSecondaryCategory.DataTools, 30)
+    ]);
+
+    public static IReadOnlyList<ToolCategoryDefinition> GetByPrimaryCategory(ToolPrimaryCategory category) => category switch
+    {
+        ToolPrimaryCategory.Design => Design,
+        ToolPrimaryCategory.Research => Research,
+        _ => []
+    };
+
+    public static bool TryGet(string? id, out ToolCategoryDefinition? category)
+    {
+        category = Design.Concat(Research).FirstOrDefault(
+            item => string.Equals(item.Id, id, StringComparison.Ordinal));
+        return category is not null;
+    }
+}

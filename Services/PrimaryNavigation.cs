@@ -10,7 +10,7 @@ public sealed class PrimaryNavigation
     public static PrimaryNavigation Default { get; } = new(
     [
         new(PrimaryNavigationIds.Welcome, "欢迎页面", typeof(Views.HomePage)),
-        new(PrimaryNavigationIds.CommonTools, "常用功能", typeof(Views.CommonToolsPage)),
+        new(PrimaryNavigationIds.CommonTools, "工具搜索", typeof(Views.CommonToolsPage)),
         new(PrimaryNavigationIds.DesignTools, "设计工具", typeof(Views.DesignToolsPage)),
         new(PrimaryNavigationIds.ResearchTools, "科研工具", typeof(Views.ResearchToolsPage)),
         new(PrimaryNavigationIds.ProjectArchive, "项目归档", typeof(Views.ProjectArchivePage)),
