@@ -1226,10 +1226,6 @@ Latest version: {1}</value>
     <value>New project</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="ProjectHome_NewProject.Header" xml:space="preserve">
-    <value>New project</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="ProjectHome_NewProject.AutomationProperties.Name" xml:space="preserve">
     <value>New project</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1239,10 +1235,6 @@ Latest version: {1}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="ProjectWorkspace_Back.Content" xml:space="preserve">
-    <value>Back to Project Home</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="ProjectWorkspace_Back.Header" xml:space="preserve">
     <value>Back to Project Home</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1274,10 +1266,6 @@ Latest version: {1}</value>
     <value>Save changes</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="ProjectWorkspace_Save.Header" xml:space="preserve">
-    <value>Save changes</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="ProjectWorkspace_Save.AutomationProperties.Name" xml:space="preserve">
     <value>Save changes</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1303,10 +1291,6 @@ Latest version: {1}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Todo_Add.Content" xml:space="preserve">
-    <value>Add todo</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Todo_Add.Header" xml:space="preserve">
     <value>Add todo</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1338,10 +1322,6 @@ Latest version: {1}</value>
     <value>Open Planning Metrics Calculator</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Snapshot_OpenCalculator.Header" xml:space="preserve">
-    <value>Open Planning Metrics Calculator</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Snapshot_OpenCalculator.AutomationProperties.Name" xml:space="preserve">
     <value>Open Planning Metrics Calculator</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1370,10 +1350,6 @@ Latest version: {1}</value>
     <value>Select or replace folder</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Folder_Select.Header" xml:space="preserve">
-    <value>Select or replace folder</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Folder_Select.AutomationProperties.Name" xml:space="preserve">
     <value>Select or replace folder</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1386,10 +1362,6 @@ Latest version: {1}</value>
     <value>Open folder</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Folder_Open.Header" xml:space="preserve">
-    <value>Open folder</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Folder_Open.AutomationProperties.Name" xml:space="preserve">
     <value>Open folder</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1399,10 +1371,6 @@ Latest version: {1}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Folder_Clear.Content" xml:space="preserve">
-    <value>Clear folder shortcut</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Folder_Clear.Header" xml:space="preserve">
     <value>Clear folder shortcut</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1434,10 +1402,6 @@ Latest version: {1}</value>
     <value>Save to current project</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Snapshot_SaveToProject.Header" xml:space="preserve">
-    <value>Save to current project</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Snapshot_SaveToProject.AutomationProperties.Name" xml:space="preserve">
     <value>Save to current project</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1447,10 +1411,6 @@ Latest version: {1}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Snapshot_ReturnToProject.Content" xml:space="preserve">
-    <value>Return to project</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Snapshot_ReturnToProject.Header" xml:space="preserve">
     <value>Return to project</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>

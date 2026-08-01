@@ -1223,10 +1223,6 @@
     <value>新規プロジェクト</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="ProjectHome_NewProject.Header" xml:space="preserve">
-    <value>新規プロジェクト</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="ProjectHome_NewProject.AutomationProperties.Name" xml:space="preserve">
     <value>新規プロジェクト</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1236,10 +1232,6 @@
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="ProjectWorkspace_Back.Content" xml:space="preserve">
-    <value>プロジェクトホームへ戻る</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="ProjectWorkspace_Back.Header" xml:space="preserve">
     <value>プロジェクトホームへ戻る</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1271,10 +1263,6 @@
     <value>変更を保存</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="ProjectWorkspace_Save.Header" xml:space="preserve">
-    <value>変更を保存</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="ProjectWorkspace_Save.AutomationProperties.Name" xml:space="preserve">
     <value>変更を保存</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1300,10 +1288,6 @@
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Todo_Add.Content" xml:space="preserve">
-    <value>タスクを追加</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Todo_Add.Header" xml:space="preserve">
     <value>タスクを追加</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1335,10 +1319,6 @@
     <value>計画指標計算機を開く</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Snapshot_OpenCalculator.Header" xml:space="preserve">
-    <value>計画指標計算機を開く</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Snapshot_OpenCalculator.AutomationProperties.Name" xml:space="preserve">
     <value>計画指標計算機を開く</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1367,10 +1347,6 @@
     <value>フォルダーを選択・変更</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Folder_Select.Header" xml:space="preserve">
-    <value>フォルダーを選択・変更</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Folder_Select.AutomationProperties.Name" xml:space="preserve">
     <value>フォルダーを選択・変更</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1383,10 +1359,6 @@
     <value>フォルダーを開く</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Folder_Open.Header" xml:space="preserve">
-    <value>フォルダーを開く</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Folder_Open.AutomationProperties.Name" xml:space="preserve">
     <value>フォルダーを開く</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1396,10 +1368,6 @@
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Folder_Clear.Content" xml:space="preserve">
-    <value>フォルダー参照を解除</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Folder_Clear.Header" xml:space="preserve">
     <value>フォルダー参照を解除</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1431,10 +1399,6 @@
     <value>現在のプロジェクトに保存</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Snapshot_SaveToProject.Header" xml:space="preserve">
-    <value>現在のプロジェクトに保存</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Snapshot_SaveToProject.AutomationProperties.Name" xml:space="preserve">
     <value>現在のプロジェクトに保存</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1444,10 +1408,6 @@
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Snapshot_ReturnToProject.Content" xml:space="preserve">
-    <value>プロジェクトに戻る</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Snapshot_ReturnToProject.Header" xml:space="preserve">
     <value>プロジェクトに戻る</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>

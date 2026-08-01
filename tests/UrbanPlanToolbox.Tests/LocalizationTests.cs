@@ -312,6 +312,36 @@ public sealed partial class LocalizationTests
         }
     }
 
+    [Fact]
+    public void ButtonUidResourcesDoNotSetUnsupportedHeaderProperty()
+    {
+        var sourceRoot = FindRepositoryRoot();
+        var buttonUids = ExtractKeys(
+            new[]
+            {
+                Path.Combine(sourceRoot, "MainPage.xaml"),
+                Path.Combine(sourceRoot, "Views"),
+                Path.Combine(sourceRoot, "Controls")
+            }
+                .Where(path => Directory.Exists(path) || File.Exists(path))
+                .SelectMany(path => Directory.Exists(path)
+                    ? Directory.GetFiles(path, "*.xaml", SearchOption.AllDirectories)
+                    : [path]),
+            XamlButtonUidPattern);
+
+        Assert.NotEmpty(buttonUids);
+        foreach (var language in ReswCatalog.Languages)
+        {
+            var resources = ReswCatalog.Load(language);
+            foreach (var uid in buttonUids)
+            {
+                Assert.False(
+                    resources.ContainsKey($"{uid}.Header"),
+                    $"Button x:Uid '{uid}' sets unsupported Header property in {language}; use Content instead.");
+            }
+        }
+    }
+
     private static IEnumerable<LocalizedTool> Flatten(IReadOnlyList<ToolSearchGroup> groups) =>
         groups.SelectMany(group => group.Tools);
 
@@ -358,4 +388,7 @@ public sealed partial class LocalizationTests
 
     [GeneratedRegex(@"x:Uid=""([A-Za-z0-9_]+)""", RegexOptions.CultureInvariant)]
     private static partial Regex XamlUidPattern();
+
+    [GeneratedRegex(@"<Button\b[^>]*\bx:Uid=""([A-Za-z0-9_]+)""", RegexOptions.CultureInvariant)]
+    private static partial Regex XamlButtonUidPattern();
 }

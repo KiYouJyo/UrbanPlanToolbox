@@ -1229,10 +1229,6 @@ dwyblchhq</value>
     <value>新建项目</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="ProjectHome_NewProject.Header" xml:space="preserve">
-    <value>新建项目</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="ProjectHome_NewProject.AutomationProperties.Name" xml:space="preserve">
     <value>新建项目</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1242,10 +1238,6 @@ dwyblchhq</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="ProjectWorkspace_Back.Content" xml:space="preserve">
-    <value>返回项目主页</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="ProjectWorkspace_Back.Header" xml:space="preserve">
     <value>返回项目主页</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1277,10 +1269,6 @@ dwyblchhq</value>
     <value>保存修改</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="ProjectWorkspace_Save.Header" xml:space="preserve">
-    <value>保存修改</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="ProjectWorkspace_Save.AutomationProperties.Name" xml:space="preserve">
     <value>保存修改</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1306,10 +1294,6 @@ dwyblchhq</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Todo_Add.Content" xml:space="preserve">
-    <value>新增待办</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Todo_Add.Header" xml:space="preserve">
     <value>新增待办</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1341,10 +1325,6 @@ dwyblchhq</value>
     <value>打开规划指标计算器</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Snapshot_OpenCalculator.Header" xml:space="preserve">
-    <value>打开规划指标计算器</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Snapshot_OpenCalculator.AutomationProperties.Name" xml:space="preserve">
     <value>打开规划指标计算器</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1373,10 +1353,6 @@ dwyblchhq</value>
     <value>选择或更换文件夹</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Folder_Select.Header" xml:space="preserve">
-    <value>选择或更换文件夹</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Folder_Select.AutomationProperties.Name" xml:space="preserve">
     <value>选择或更换文件夹</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1389,10 +1365,6 @@ dwyblchhq</value>
     <value>打开文件夹</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Folder_Open.Header" xml:space="preserve">
-    <value>打开文件夹</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Folder_Open.AutomationProperties.Name" xml:space="preserve">
     <value>打开文件夹</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1402,10 +1374,6 @@ dwyblchhq</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Folder_Clear.Content" xml:space="preserve">
-    <value>清除文件夹入口</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Folder_Clear.Header" xml:space="preserve">
     <value>清除文件夹入口</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
@@ -1437,10 +1405,6 @@ dwyblchhq</value>
     <value>保存到当前项目</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
-  <data name="Snapshot_SaveToProject.Header" xml:space="preserve">
-    <value>保存到当前项目</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
   <data name="Snapshot_SaveToProject.AutomationProperties.Name" xml:space="preserve">
     <value>保存到当前项目</value>
     <comment>v0.3.9 project workspace resource.</comment>
@@ -1450,10 +1414,6 @@ dwyblchhq</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
   <data name="Snapshot_ReturnToProject.Content" xml:space="preserve">
-    <value>返回项目工作台</value>
-    <comment>v0.3.9 project workspace resource.</comment>
-  </data>
-  <data name="Snapshot_ReturnToProject.Header" xml:space="preserve">
     <value>返回项目工作台</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
