@@ -43,8 +43,10 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         AppDataPathProvider.Default.EnsureInfrastructureDirectories();
-        ApplyLanguagePreference();
+        var settings = new SettingsService().Load();
+        ApplyLanguagePreference(settings);
         _window = MainWindow = new MainWindow();
+        ThemePreference.Apply((FrameworkElement)_window.Content, settings.Theme);
         _window.Activate();
     }
 
@@ -52,9 +54,8 @@ public partial class App : Application
     /// Applies the persisted language preference before the MainWindow and its
     /// localized resources are created. An empty override means "follow system".
     /// </summary>
-    private static void ApplyLanguagePreference()
+    private static void ApplyLanguagePreference(Models.AppSettings settings)
     {
-        var settings = new SettingsService().Load();
         ApplicationLanguages.PrimaryLanguageOverride = LanguagePreference.ResolveEffectiveLanguage(
             settings.Language,
             GlobalizationPreferences.Languages);

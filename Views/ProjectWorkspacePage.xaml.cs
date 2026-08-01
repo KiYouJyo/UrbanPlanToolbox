@@ -119,6 +119,7 @@ public sealed partial class ProjectWorkspacePage : Page
         MetadataText.Text = $"{ProjectPresentation.GetKindName(_project.Kind, _localization)} · {MetadataText.Text}";
         StateText.Text = _localization.GetString(_project.IsArchived ? "Project_State_Archived" : "Project_State_Active");
         StateBadge.Background = (Brush)Application.Current.Resources[_project.IsArchived ? "SystemFillColorCautionBackgroundBrush" : "SystemFillColorSuccessBackgroundBrush"];
+        StateText.Foreground = (Brush)Application.Current.Resources[_project.IsArchived ? "SystemFillColorCautionTextBrush" : "SystemFillColorSuccessTextBrush"];
         NameBox.Text = _project.Name;
         CustomTypeBox.Text = _project.CustomType ?? string.Empty;
         CustomTypeBox.Visibility = _project.Type == ProjectTypeCodes.Other ? Visibility.Visible : Visibility.Collapsed;

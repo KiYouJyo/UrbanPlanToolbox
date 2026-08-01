@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace UrbanPlanToolbox.Services;
@@ -28,6 +29,10 @@ public sealed class AppDialogService : IAppDialogService
         try
         {
             if (dialog.XamlRoot is null || cancellationToken.IsCancellationRequested) return ContentDialogResult.None;
+            if (dialog.XamlRoot.Content is FrameworkElement root)
+            {
+                dialog.RequestedTheme = root.ActualTheme;
+            }
             return await dialog.ShowAsync();
         }
         catch (InvalidOperationException)

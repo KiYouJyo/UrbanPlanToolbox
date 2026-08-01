@@ -49,7 +49,7 @@ public sealed partial class SettingsPage : Page
         _isApplying = false;
         ApplyTheme(settings.Theme);
     }
-    private static void ApplyTheme(string theme) { if (App.MainWindow?.Content is FrameworkElement root) root.RequestedTheme = theme switch { "Light" => ElementTheme.Light, "Dark" => ElementTheme.Dark, _ => ElementTheme.Default }; }
+    private static void ApplyTheme(string theme) => ThemePreference.Apply(App.MainWindow?.Content as FrameworkElement, theme);
     private async void OnExport(object sender, RoutedEventArgs e)
     {
         var picker = new FileSavePicker { SuggestedFileName = $"UrbanPlanToolbox-{DateTime.Now:yyyyMMdd-HHmmss}" };

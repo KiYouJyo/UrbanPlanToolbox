@@ -6,7 +6,7 @@
     <ItemsRepeater x:Name="CardsRepeater">
         <ItemsRepeater.Layout>
             <UniformGridLayout
-                MinItemHeight="156"
+                MinItemHeight="0"
                 MinItemWidth="280"
                 ItemsJustification="Start"
                 ItemsStretch="Fill" />
@@ -38,13 +38,7 @@
                                     Style="{StaticResource BodyStrongTextBlockStyle}"
                                     TextTrimming="CharacterEllipsis"
                                     TextWrapping="Wrap" />
-                                <TextBlock
-                                    Text="{Binding Description}"
-                                    MaxLines="3"
-                                    Opacity="0.75"
-                                    TextTrimming="CharacterEllipsis"
-                                    TextWrapping="WrapWholeWords" />
-                                <TextBlock x:Uid="Action_OpenTool" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Description}" Opacity="0.75" TextWrapping="WrapWholeWords" />
                             </StackPanel>
                         </Grid>
                     </Button>
