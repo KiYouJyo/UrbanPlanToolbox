@@ -176,3 +176,6 @@ Strings/
 - 本基线译法是开发基线，不代表用户已完成最终语言审核。
 - 日语是否完全自然、英语是否达到母语软件表达、专业规划术语、文字长度与视觉层级均由用户人工审校后最终确认。
 - 如某条译文与实际功能明显不符，应保持全局一致并记录在案，等待用户审校，不应自行大范围改写术语。
+## MSIX package language verification
+
+The source manifest explicitly declares `zh-CN`, `ja-JP`, and `en-US` in that order. The single offline MSIX keeps language candidates in its main PRI by setting `AppxBundleAutoResourcePackageQualifiers` to `Scale|DXFeatureLevel`; scale packages remain permitted, while language packages are not. Source RESW presence alone is not release evidence: before a local signed package is installed, run `packaging/Test-PackagedLanguageResources.ps1` against the actual MSIX and its generated intermediate directory. It verifies the packaged `AppxManifest.xml`, PRI language qualifiers and candidates, the absence of language resource packages, and the generated split configuration.

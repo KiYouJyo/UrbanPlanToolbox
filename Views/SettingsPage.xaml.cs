@@ -18,7 +18,6 @@ public sealed partial class SettingsPage : Page
         TitleText.Text = _localization.GetString("Navigation_Settings");
         Apply(_settingsService.Load());
     }
-    private void OnSave(object sender, RoutedEventArgs e) => SaveCurrentSettings();
     private void OnRestore(object sender, RoutedEventArgs e) { var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; }); Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults"); }
     private void OnSettingChanged(object sender, object e) { if (!_isApplying) SaveCurrentSettings(); }
     private void SaveCurrentSettings()
@@ -49,7 +48,7 @@ public sealed partial class SettingsPage : Page
         _isApplying = false;
         ApplyTheme(settings.Theme);
     }
-    private static void ApplyTheme(string theme) { if (App.MainWindow?.Content is FrameworkElement root) root.RequestedTheme = theme switch { "Light" => ElementTheme.Light, "Dark" => ElementTheme.Dark, _ => ElementTheme.Default }; }
+    private static void ApplyTheme(string theme) => ThemePreference.Apply(App.MainWindow?.Content as FrameworkElement, theme);
     private async void OnExport(object sender, RoutedEventArgs e)
     {
         var picker = new FileSavePicker { SuggestedFileName = $"UrbanPlanToolbox-{DateTime.Now:yyyyMMdd-HHmmss}" };
@@ -90,7 +89,7 @@ public sealed partial class SettingsPage : Page
                 Content = _localization.GetFormattedString("DataManagement_ImportConfirmMessage", manifest.ProjectCount, manifest.ActiveProjectCount, manifest.ArchivedProjectCount),
                 PrimaryButtonText = _localization.GetString("DataManagement_ImportConfirmAction"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Close
             };
-            if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+            if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
             var result = await service.ImportAsync(file.Path);
             DataStatusBar.Severity = result.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Error;
             DataStatusBar.Message = result.Succeeded ? _localization.GetString("DataManagement_ImportSuccess") : _localization.GetFormattedString(result.RollbackSucceeded ? "DataManagement_ImportFailedRolledBack" : "DataManagement_ImportFailed", result.FailureType ?? string.Empty);

@@ -224,10 +224,6 @@
     <value>クリア</value>
     <comment>検索クリアボタン。</comment>
   </data>
-  <data name="Action_SaveSettings.Content" xml:space="preserve">
-    <value>設定を保存</value>
-    <comment>設定ページの保存ボタン。</comment>
-  </data>
   <data name="Action_RestoreDefaults.Content" xml:space="preserve">
     <value>既定に戻す</value>
     <comment>設定ページの既定に戻すボタン。</comment>
@@ -1578,4 +1574,7 @@
   <data name="ProjectValidation_ResearchSubjectTooLong" xml:space="preserve"><value>研究対象が長すぎます。</value></data>
   <data name="ProjectValidation_ResearchMethodsRequired" xml:space="preserve"><value>研究方法を入力してください。</value></data>
   <data name="ProjectValidation_ResearchMethodsTooLong" xml:space="preserve"><value>研究方法が長すぎます。</value></data>
+  <data name="Interaction_NotificationName" xml:space="preserve"><value>アプリ通知</value></data>
+  <data name="Interaction_ErrorTitle" xml:space="preserve"><value>操作に失敗しました</value></data>
+  <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作が完了しました</value></data>
 </root>

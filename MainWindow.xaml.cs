@@ -1,5 +1,8 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Windows.Graphics;
+using UrbanPlanToolbox.Models.Interaction;
+using UrbanPlanToolbox.Services;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -23,10 +26,30 @@ public sealed partial class MainWindow : Window
         var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "UrbanPlanToolbox.ico");
         AppWindow.SetIcon(iconPath);
         AppWindow.Resize(new SizeInt32(1100, 760));
+        AppNotificationService.Default.NotificationRaised += OnNotificationRaised;
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(NotificationBar, LocalizationService.Default.GetString("Interaction_NotificationName"));
 
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));
     }
 
     public void Navigate(Type pageType) => RootFrame.Navigate(pageType);
+
+    private void OnNotificationRaised(object? sender, AppNotification notification)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            NotificationBar.Title = notification.Title;
+            NotificationBar.Message = notification.Message;
+            NotificationBar.Severity = notification.Kind switch
+            {
+                AppNotificationKind.Success => InfoBarSeverity.Success,
+                AppNotificationKind.Warning => InfoBarSeverity.Warning,
+                AppNotificationKind.Error => InfoBarSeverity.Error,
+                _ => InfoBarSeverity.Informational
+            };
+            NotificationBar.IsClosable = true;
+            NotificationBar.IsOpen = true;
+        });
+    }
 }

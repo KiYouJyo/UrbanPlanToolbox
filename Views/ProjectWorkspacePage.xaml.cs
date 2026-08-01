@@ -53,7 +53,7 @@ public sealed partial class ProjectWorkspacePage : Page
             PrimaryButtonText = _localization.GetString("Action_Discard"),
             CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Close
         };
-        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        if (await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary)
         {
             _confirmedNavigation = true;
             Frame.Navigate(sourcePageType, parameter);
@@ -119,6 +119,10 @@ public sealed partial class ProjectWorkspacePage : Page
         MetadataText.Text = $"{ProjectPresentation.GetKindName(_project.Kind, _localization)} · {MetadataText.Text}";
         StateText.Text = _localization.GetString(_project.IsArchived ? "Project_State_Archived" : "Project_State_Active");
         StateBadge.Background = (Brush)Application.Current.Resources[_project.IsArchived ? "SystemFillColorCautionBackgroundBrush" : "SystemFillColorSuccessBackgroundBrush"];
+        // Use the documented semantic fill brushes for foreground text. The
+        // similarly named *TextBrush resources are not present in every
+        // Windows App SDK resource dictionary and would crash page creation.
+        StateText.Foreground = (Brush)Application.Current.Resources[_project.IsArchived ? "SystemFillColorCautionBrush" : "SystemFillColorSuccessBrush"];
         NameBox.Text = _project.Name;
         CustomTypeBox.Text = _project.CustomType ?? string.Empty;
         CustomTypeBox.Visibility = _project.Type == ProjectTypeCodes.Other ? Visibility.Visible : Visibility.Collapsed;
@@ -314,7 +318,7 @@ public sealed partial class ProjectWorkspacePage : Page
             if (includeTime.IsChecked == true && time.SelectedTime is null) { args.Cancel = true; error.Text = _localization.GetString("Milestone_Error_TimeRequired"); return; }
             result = new(title.Text, DateOnly.FromDateTime(date.Date.Value.LocalDateTime), includeTime.IsChecked == true ? TimeOnly.FromTimeSpan(time.SelectedTime!.Value) : null, notes.Text);
         };
-        return await dialog.ShowAsync() == ContentDialogResult.Primary ? result : null;
+        return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary ? result : null;
     }
 
     private async void OnSelectFolder(object sender, RoutedEventArgs e)
@@ -407,7 +411,7 @@ public sealed partial class ProjectWorkspacePage : Page
             DefaultButton = ContentDialogButton.Close, IsPrimaryButtonEnabled = false
         };
         confirmation.TextChanged += (_, _) => dialog.IsPrimaryButtonEnabled = ProjectValidation.MatchesDeleteConfirmation(projectName, confirmation.Text);
-        return await dialog.ShowAsync() == ContentDialogResult.Primary;
+        return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary;
     }
 
     private bool EnsureNoPendingEdits()
@@ -449,7 +453,7 @@ public sealed partial class ProjectWorkspacePage : Page
             XamlRoot = XamlRoot, Title = _localization.GetString(titleKey), Content = _localization.GetString(messageKey),
             PrimaryButtonText = _localization.GetString("Action_Confirm"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Close
         };
-        return await dialog.ShowAsync() == ContentDialogResult.Primary;
+        return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary;
     }
 
     private void ShowValidation(IReadOnlyList<string>? errors)
@@ -458,8 +462,18 @@ public sealed partial class ProjectWorkspacePage : Page
         StatusBar.Message = errors is null ? _localization.GetString("Project_Error_SaveFailed") : string.Join(Environment.NewLine, errors.Select(error => _localization.GetString($"ProjectValidation_{error}")));
         StatusBar.IsOpen = true;
     }
-    private void ShowError(string key) { StatusBar.Severity = InfoBarSeverity.Error; StatusBar.Message = _localization.GetString(key); StatusBar.IsOpen = true; }
-    private void ShowSuccess(string key) { StatusBar.Severity = InfoBarSeverity.Success; StatusBar.Message = _localization.GetString(key); StatusBar.IsOpen = true; }
+    private void ShowError(string key)
+    {
+        var message = _localization.GetString(key);
+        StatusBar.Severity = InfoBarSeverity.Error; StatusBar.Message = message; StatusBar.IsOpen = true;
+        AppNotificationService.Default.Notify(new(UrbanPlanToolbox.Models.Interaction.AppNotificationKind.Error, _localization.GetString("Interaction_ErrorTitle"), message, true));
+    }
+    private void ShowSuccess(string key)
+    {
+        var message = _localization.GetString(key);
+        StatusBar.Severity = InfoBarSeverity.Success; StatusBar.Message = message; StatusBar.IsOpen = true;
+        AppNotificationService.Default.Notify(new(UrbanPlanToolbox.Models.Interaction.AppNotificationKind.Success, _localization.GetString("Interaction_SuccessTitle"), message));
+    }
 
     private static bool TryParseCoordinate(string text, out decimal? value)
     {
