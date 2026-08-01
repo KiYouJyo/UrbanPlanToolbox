@@ -61,7 +61,7 @@
     <comment>欢迎页副标题。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.8 预览版。本地完成规划指标和单位比例尺换算，不上传规划数据。</value>
+    <value>v0.3.9 预览版。项目数据与规划工具数据均保留在本机。</value>
     <comment>欢迎页版本与隐私说明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -109,7 +109,7 @@
     <comment>项目归档页状态。</comment>
   </data>
   <data name="Page_ProjectArchive_Description.Text" xml:space="preserve">
-    <value>该模块将用于管理你自己的设计、规划和科研项目。</value>
+    <value>归档项目仍保存在本机，可以打开并恢复。</value>
     <comment>项目归档页说明。</comment>
   </data>
   <data name="Category_PreliminaryAnalysis" xml:space="preserve">
@@ -1464,5 +1464,77 @@ dwyblchhq</value>
   <data name="Snapshot_ReturnToProject.ToolTipService.ToolTip" xml:space="preserve">
     <value>返回项目工作台</value>
     <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="DataManagement_Title.Text" xml:space="preserve">
+    <value>数据管理</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Description.Text" xml:space="preserve">
+    <value>导出完整本地备份，或从经过校验的备份完整替换当前数据。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_BackupFileType" xml:space="preserve">
+    <value>UrbanPlanToolbox 备份</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ExportSuccess" xml:space="preserve">
+    <value>已导出 {0} 个项目，文件大小 {1}。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ExportFailed" xml:space="preserve">
+    <value>导出失败：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ValidationFailed" xml:space="preserve">
+    <value>备份校验失败：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmTitle" xml:space="preserve">
+    <value>完整替换当前应用数据？</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmMessage" xml:space="preserve">
+    <value>备份包含 {0} 个项目：{1} 个活跃、{2} 个已归档。创建自动安全备份后，当前项目和设置将被完整替换。语言和主题可能需要重启后完全生效，工作文件夹需要重新选择。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmAction" xml:space="preserve">
+    <value>替换并导入</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportSuccess" xml:space="preserve">
+    <value>导入完成。请重启应用以应用全部设置；工作文件夹需要重新选择。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportFailedRolledBack" xml:space="preserve">
+    <value>导入失败，已恢复原有数据：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportFailed" xml:space="preserve">
+    <value>导入失败，且无法确认自动恢复结果：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.Content" xml:space="preserve">
+    <value>导出数据</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.AutomationProperties.Name" xml:space="preserve">
+    <value>导出数据</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.ToolTipService.ToolTip" xml:space="preserve">
+    <value>导出数据</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.Content" xml:space="preserve">
+    <value>导入数据</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.AutomationProperties.Name" xml:space="preserve">
+    <value>导入数据</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.ToolTipService.ToolTip" xml:space="preserve">
+    <value>导入数据</value>
+    <comment>v0.3.9 data management resource.</comment>
   </data>
 </root>

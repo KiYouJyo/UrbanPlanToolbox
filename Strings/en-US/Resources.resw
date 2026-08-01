@@ -61,7 +61,7 @@
     <comment>Home page subtitle.</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.8 preview. Planning metrics and unit/scale conversions run locally; no planning data is uploaded.</value>
+    <value>v0.3.9 preview. Project data and planning tools stay on this device.</value>
     <comment>Home page version and privacy statement.</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -109,7 +109,7 @@
     <comment>Project Archive page status.</comment>
   </data>
   <data name="Page_ProjectArchive_Description.Text" xml:space="preserve">
-    <value>This module will be used to manage your own design, planning, and research projects.</value>
+    <value>Archived projects remain on this device and can be opened and restored.</value>
     <comment>Project Archive page description.</comment>
   </data>
   <data name="Category_PreliminaryAnalysis" xml:space="preserve">
@@ -1461,5 +1461,77 @@ Latest version: {1}</value>
   <data name="Snapshot_ReturnToProject.ToolTipService.ToolTip" xml:space="preserve">
     <value>Return to project</value>
     <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="DataManagement_Title.Text" xml:space="preserve">
+    <value>Data management</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Description.Text" xml:space="preserve">
+    <value>Export a complete local backup or fully replace current data from a verified backup.</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_BackupFileType" xml:space="preserve">
+    <value>UrbanPlanToolbox backup</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ExportSuccess" xml:space="preserve">
+    <value>Exported {0} project(s), {1}.</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ExportFailed" xml:space="preserve">
+    <value>Export failed: {0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ValidationFailed" xml:space="preserve">
+    <value>Backup validation failed: {0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmTitle" xml:space="preserve">
+    <value>Replace all current app data?</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmMessage" xml:space="preserve">
+    <value>This backup contains {0} project(s): {1} active and {2} archived. Current projects and settings will be replaced after an automatic safety backup. Language and theme may require a restart. Work folders must be selected again.</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmAction" xml:space="preserve">
+    <value>Replace and import</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportSuccess" xml:space="preserve">
+    <value>Import completed. Restart the app to apply all settings. Work folders must be selected again.</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportFailedRolledBack" xml:space="preserve">
+    <value>Import failed and previous data was restored: {0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportFailed" xml:space="preserve">
+    <value>Import failed; automatic restoration could not be confirmed: {0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.Content" xml:space="preserve">
+    <value>Export data</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.AutomationProperties.Name" xml:space="preserve">
+    <value>Export data</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Export data</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.Content" xml:space="preserve">
+    <value>Import data</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.AutomationProperties.Name" xml:space="preserve">
+    <value>Import data</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Import data</value>
+    <comment>v0.3.9 data management resource.</comment>
   </data>
 </root>

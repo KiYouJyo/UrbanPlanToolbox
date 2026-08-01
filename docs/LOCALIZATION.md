@@ -149,6 +149,23 @@ Strings/
 | 项目归档功能仍在规划中 | プロジェクトアーカイブは準備中です | Project Archive is planned for a future update |
 | 语言将在下次启动时生效。 | 言語の変更は次回起動時に反映されます。 | The language change will take effect the next time the app starts. |
 
+### v0.3.9 项目与数据管理
+
+| 中文 | 日本語 | English |
+| --- | --- | --- |
+| 项目主页 | プロジェクトホーム | Project Home |
+| 项目工作台 | プロジェクトワークスペース | Project Workspace |
+| 待办事项 | タスク | Todos |
+| 规划指标快照 | 計画指標スナップショット | Planning Snapshot |
+| 工作文件夹 | 作業フォルダー | Work Folder |
+| 归档项目 | プロジェクトをアーカイブ | Archive Project |
+| 恢复项目 | プロジェクトを復元 | Restore Project |
+| 数据管理 | データ管理 | Data Management |
+| 导出数据 | データをエクスポート | Export Data |
+| 导入数据 | データをインポート | Import Data |
+
+原“项目归档功能仍在规划中”属于 v0.3.7 历史基线；v0.3.9 页面已实现，实际界面使用新的归档与恢复资源键。
+
 ## 人工审校流程
 
 - 本基线译法是开发基线，不代表用户已完成最终语言审核。

@@ -7,8 +7,17 @@ public sealed class AppDataPathProvider : IAppDataPathProvider
     private readonly HashSet<string> _registeredToolIds;
 
     public static AppDataPathProvider Default { get; } = new(
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UrbanPlanToolbox"),
+        GetDefaultRootDirectory(),
         ToolRegistry.Default.All.Select(tool => tool.Id));
+
+    private static string GetDefaultRootDirectory()
+    {
+#if DEBUG
+        var isolatedTestRoot = Environment.GetEnvironmentVariable("URBANPLANTOOLBOX_TEST_DATA_ROOT");
+        if (!string.IsNullOrWhiteSpace(isolatedTestRoot)) return Path.GetFullPath(isolatedTestRoot);
+#endif
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UrbanPlanToolbox");
+    }
 
     public AppDataPathProvider(string rootDirectory, IEnumerable<string> registeredToolIds)
     {

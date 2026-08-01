@@ -17,11 +17,18 @@ UrbanPlanToolbox 将本地数据分为四类：
 UrbanPlanToolbox/
   settings.json
   data/
+    projects/
+      index.json
+      <project-guid>/
+        project.json
     tools/
       <stable-tool-id>/
         <tool-data>.json
   attachments/
+    projects/<project-guid>/
   backups/
+    projects/<project-guid>/project.json.last-valid.bak
+    pre-import/<timestamp>/
     <stable-tool-id>/
       <tool-data>.json.last-valid.bak
   cache/
@@ -42,7 +49,7 @@ UrbanPlanToolbox/
 }
 ```
 
-`schemaVersion` 是从 1 开始的整数，仅表示该业务文件的数据格式；它与应用版本 0.3.8、MSIX 版本 0.3.8.0 无关。`savedAtUtc` 必须是 UTC。字段命名和 UTF-8 JSON 选项由 `DataStorageJson` 集中管理。业务模型不得保存界面控件、临时 UI 状态、当前界面语言或不安全的多态类型标识。
+`schemaVersion` 是从 1 开始的整数，仅表示该业务文件的数据格式；它与应用版本 0.3.9、MSIX 版本 0.3.9.0 无关。首个正式项目格式为 `ProjectSchemaVersion = 1`，备份容器另用 `BackupFormatVersion = 1`。`savedAtUtc` 必须是 UTC。字段命名和 UTF-8 JSON 选项由 `DataStorageJson` 集中管理。
 
 ## 写入、备份与并发
 
@@ -71,7 +78,7 @@ UrbanPlanToolbox/
 
 迁移步骤实现 `IDataMigration`，声明稳定名称、`FromVersion`、`ToVersion` 和对 JSON payload 的转换。`DataMigrationRunner` 只接受 `N -> N+1` 步骤，拒绝重复 `FromVersion`；执行时必须从文件版本逐步走到目标版本，缺少任何中间步骤都会失败。
 
-迁移在内存中的 payload 副本上执行。所有步骤成功后，`JsonDataStorage` 才通过正常原子写入流程保存新信封并更新版本；中途失败返回 `MigrationFailed`，原文件、原版本和原数据保持可恢复。已经达到当前版本的数据不会重复迁移。v0.3.8 当前没有真实业务数据，因此生产代码只定义 `SchemaVersion = 1` 的能力，没有虚构正式迁移或业务字段；测试使用专用模型验证单步、多步、缺口、中途失败、重复读取和未来版本拒绝。
+迁移在内存中的 payload 副本上执行。所有步骤成功后，`JsonDataStorage` 才通过正常原子写入流程保存新信封并更新版本；中途失败返回 `MigrationFailed`，原文件、原版本和原数据保持可恢复。已经达到当前版本的数据不会重复迁移。v0.3.9 的首个正式项目格式直接从 `ProjectSchemaVersion = 1` 开始，没有虚构不存在的生产迁移；接口保留供未来 1→2 使用。测试继续验证单步、多步、缺口、中途失败、重复读取和未来版本拒绝。
 
 ## 日志与隐私
 
@@ -88,6 +95,12 @@ UrbanPlanToolbox/
 5. 通过 `JsonDataStorage` 读取与保存，并明确处理所有结构化状态；
 6. 将二进制附件放入附件区域，只在 JSON 中保存稳定的相对引用，不保存本机绝对路径。
 
-## v0.3.8 明确未实现
+## v0.3.9 项目域
 
-本版本没有真实业务数据模型、全局 manifest、导入/导出、用户可见的备份/恢复 UI、附件管理、数据库、云同步、账户、多设备同步、加密保险库或自动数据重置。设置页“重置偏好”与未来缓存清理也没有扩展为删除业务数据的操作。
+项目目录使用不可变 GUID，不使用项目名或本地化文字。`index.json` 只保存 ID、名称、稳定类型、归档状态和更新时间；完整正文、待办、快照和文件夹引用保存在各自 `project.json`。读取列表时逐个加载正文，单个项目损坏不会阻止其他项目。归档仅修改状态与时间，不移动或删除目录。
+
+项目正文继续通过 `JsonDataStorage` 使用 UTF-8 信封、原子写入、最后有效备份、损坏诊断与未来版本拒绝。当前没有虚构的 1→2 迁移，但保留 `IDataMigration` 接口。备份包格式与导入替换流程见 [DATA_BACKUP.md](DATA_BACKUP.md)。
+
+## 明确未实现
+
+本版本不实现数据库、云同步、账户、多设备授权迁移、项目永久删除、外部工作文件夹内容备份、备份加密或合并导入。设置页“重置偏好”仍不会删除项目数据。

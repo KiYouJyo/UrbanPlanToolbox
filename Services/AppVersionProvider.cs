@@ -5,7 +5,7 @@ namespace UrbanPlanToolbox.Services;
 public static class AppVersionProvider
 {
     /// <summary>User-facing version text shared by About and release metadata.</summary>
-    public const string DisplayVersion = "0.3.8";
+    public const string DisplayVersion = "0.3.9";
 
     public static Version GetCurrentVersion()
     {

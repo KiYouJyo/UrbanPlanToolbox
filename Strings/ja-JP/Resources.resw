@@ -61,7 +61,7 @@
     <comment>トップページのサブタイトル。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.8 プレビュー版。計画指標と単位・縮尺換算をローカルで処理し、計画データをアップロードしません。</value>
+    <value>v0.3.9 プレビュー版。プロジェクトデータと計画ツールのデータはこのデバイス内に保持されます。</value>
     <comment>トップページのバージョンとプライバシー説明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -109,7 +109,7 @@
     <comment>プロジェクトアーカイブページの状態。</comment>
   </data>
   <data name="Page_ProjectArchive_Description.Text" xml:space="preserve">
-    <value>このモジュールは、あなた自身の設計・計画・研究プロジェクトを管理するために使用されます。</value>
+    <value>アーカイブ済みプロジェクトはこのデバイスに保持され、開いて復元できます。</value>
     <comment>プロジェクトアーカイブページの説明。</comment>
   </data>
   <data name="Category_PreliminaryAnalysis" xml:space="preserve">
@@ -1458,5 +1458,77 @@
   <data name="Snapshot_ReturnToProject.ToolTipService.ToolTip" xml:space="preserve">
     <value>プロジェクトに戻る</value>
     <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="DataManagement_Title.Text" xml:space="preserve">
+    <value>データ管理</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Description.Text" xml:space="preserve">
+    <value>完全なローカルバックアップを作成するか、検証済みバックアップで現在のデータを完全に置き換えます。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_BackupFileType" xml:space="preserve">
+    <value>UrbanPlanToolbox バックアップ</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ExportSuccess" xml:space="preserve">
+    <value>{0} 件のプロジェクトをエクスポートしました（{1}）。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ExportFailed" xml:space="preserve">
+    <value>エクスポートに失敗しました：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ValidationFailed" xml:space="preserve">
+    <value>バックアップの検証に失敗しました：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmTitle" xml:space="preserve">
+    <value>現在のアプリデータをすべて置き換えますか？</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmMessage" xml:space="preserve">
+    <value>このバックアップには {0} 件（進行中 {1}、アーカイブ {2}）が含まれます。自動安全バックアップ後、現在のプロジェクトと設定を完全に置き換えます。言語とテーマは再起動後に反映される場合があり、作業フォルダーは再選択が必要です。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportConfirmAction" xml:space="preserve">
+    <value>置き換えてインポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportSuccess" xml:space="preserve">
+    <value>インポートが完了しました。すべての設定を反映するためアプリを再起動してください。作業フォルダーは再選択が必要です。</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportFailedRolledBack" xml:space="preserve">
+    <value>インポートに失敗し、以前のデータを復元しました：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_ImportFailed" xml:space="preserve">
+    <value>インポートに失敗し、自動復元を確認できませんでした：{0}</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.Content" xml:space="preserve">
+    <value>データをエクスポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.AutomationProperties.Name" xml:space="preserve">
+    <value>データをエクスポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Export.ToolTipService.ToolTip" xml:space="preserve">
+    <value>データをエクスポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.Content" xml:space="preserve">
+    <value>データをインポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.AutomationProperties.Name" xml:space="preserve">
+    <value>データをインポート</value>
+    <comment>v0.3.9 data management resource.</comment>
+  </data>
+  <data name="DataManagement_Import.ToolTipService.ToolTip" xml:space="preserve">
+    <value>データをインポート</value>
+    <comment>v0.3.9 data management resource.</comment>
   </data>
 </root>
