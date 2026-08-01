@@ -19,8 +19,9 @@ public sealed class VisualPolishPackagingTests
         var root = FindRepositoryRoot();
         var manifest = File.ReadAllText(Path.Combine(root, "Package.appxmanifest"));
         Assert.Contains("<uap:SplashScreen Image=\"Assets\\SplashScreen.png\" BackgroundColor=\"#202020\"", manifest);
-        Assert.Contains("Assets\\SplashScreen.scale-200.png", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
-        Assert.True(File.Exists(Path.Combine(root, "Assets", "SplashScreen.scale-200.png")));
+        Assert.Contains("Assets\\SplashScreen.scale-*.png", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
+        foreach (var scale in new[] { 100, 125, 150, 200, 400 })
+            Assert.True(File.Exists(Path.Combine(root, "Assets", $"SplashScreen.scale-{scale}.png")));
     }
 
     [Fact]
