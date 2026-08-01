@@ -91,6 +91,11 @@ public sealed partial class SettingsPage : Page
             };
             if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
             var result = await service.ImportAsync(file.Path);
+            if (result.Succeeded)
+            {
+                var reminders = await MilestoneReminderService.Default.RefreshAsync();
+                if (!reminders.Succeeded) DataStatusBar.Message = _localization.GetString("Milestone_Reminder_SchedulingFailed");
+            }
             DataStatusBar.Severity = result.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Error;
             DataStatusBar.Message = result.Succeeded ? _localization.GetString("DataManagement_ImportSuccess") : _localization.GetFormattedString(result.RollbackSucceeded ? "DataManagement_ImportFailedRolledBack" : "DataManagement_ImportFailed", result.FailureType ?? string.Empty);
             DataStatusBar.IsOpen = true;

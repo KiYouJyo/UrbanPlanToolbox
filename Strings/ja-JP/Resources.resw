@@ -1579,4 +1579,8 @@
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作が完了しました</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>マイルストーンのリマインダー</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}: {1} の期限は {2} です。</value></data>
+  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows リマインダー</value></data>
+  <data name="Milestone_Reminder_On" xml:space="preserve"><value>オン（ローカル通知）</value></data>
+  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>オフ</value></data>
+  <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>プロジェクトは保存されましたが、Windows がリマインダーを予約できませんでした。通知のアクセス許可を確認して再試行してください。</value></data>
 </root>

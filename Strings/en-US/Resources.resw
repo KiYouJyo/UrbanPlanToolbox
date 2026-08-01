@@ -1582,4 +1582,8 @@ Latest version: {1}</value>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>Operation completed</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>Milestone reminder</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}: {1} is due {2}.</value></data>
+  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows reminder</value></data>
+  <data name="Milestone_Reminder_On" xml:space="preserve"><value>On (local notification)</value></data>
+  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>Off</value></data>
+  <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>Project saved, but Windows could not schedule its reminder. Check notification permissions and try again.</value></data>
 </root>

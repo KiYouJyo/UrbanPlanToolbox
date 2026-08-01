@@ -25,6 +25,31 @@ public sealed class MilestoneReminderTests
         Assert.Equal(9, reminder.DueAtLocal.Hour);
     }
 
+    [Fact]
+    public async Task DisabledMilestoneIsNotScheduledAndLegacyDataDefaultsToEnabled()
+    {
+        using var scope = new ReminderScope();
+        var project = (await scope.Projects.CreateAsync("Active", ProjectTypeCodes.Coursework)).Project!;
+        await scope.Projects.AddMilestoneAsync(project.Id, "Disabled", new DateOnly(2026, 8, 2), reminderEnabled: false);
+        await scope.Projects.AddMilestoneAsync(project.Id, "Enabled", new DateOnly(2026, 8, 3));
+
+        var reminders = MilestoneReminderPlanner.Create((await scope.Projects.ListAsync(false)).Projects, new DateTimeOffset(2026, 8, 1, 8, 0, 0, TimeSpan.Zero));
+        Assert.Equal("Enabled", Assert.Single(reminders).MilestoneTitle);
+        Assert.True((await scope.Projects.ReadAsync(project.Id)).Value!.Milestones.Single(item => item.Title == "Enabled").ReminderEnabled);
+    }
+
+    [Fact]
+    public void ShellIdentityIsStableDistinctAndWithinWindowsLimit()
+    {
+        var project = Guid.Parse("11111111-2222-3333-4444-555555555555");
+        var milestone = Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+        Assert.Equal(MilestoneReminderIdentity.Group(project), MilestoneReminderIdentity.Group(project));
+        Assert.Equal(MilestoneReminderIdentity.Tag(milestone), MilestoneReminderIdentity.Tag(milestone));
+        Assert.True(MilestoneReminderIdentity.Group(project).Length <= 16);
+        Assert.True(MilestoneReminderIdentity.Tag(milestone).Length <= 16);
+        Assert.NotEqual(MilestoneReminderIdentity.Tag(milestone), MilestoneReminderIdentity.Tag(Guid.NewGuid()));
+    }
+
     private sealed class ReminderScope : IDisposable
     {
         public ReminderScope()

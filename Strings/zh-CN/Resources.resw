@@ -1585,4 +1585,8 @@ dwyblchhq</value>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作完成</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>重要时间节点提醒</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}：{1} 将于 {2} 到期。</value></data>
+  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows 提醒</value></data>
+  <data name="Milestone_Reminder_On" xml:space="preserve"><value>开启（本地通知）</value></data>
+  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>关闭</value></data>
+  <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>项目已保存，但 Windows 未能计划提醒。请检查通知权限后重试。</value></data>
 </root>

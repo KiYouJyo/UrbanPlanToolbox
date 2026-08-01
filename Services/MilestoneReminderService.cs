@@ -9,7 +9,6 @@ namespace UrbanPlanToolbox.Services;
 /// <summary>Schedules one local Windows notification for each future, active project milestone.</summary>
 public sealed class MilestoneReminderService
 {
-    private const string ReminderGroup = "UrbanPlanToolbox.Milestones";
     private readonly ProjectStorageService _projects;
     private readonly ILocalizationService _localization;
     private readonly Func<DateTimeOffset> _now;
@@ -24,7 +23,7 @@ public sealed class MilestoneReminderService
         _now = now ?? (() => DateTimeOffset.Now);
     }
 
-    public async Task RefreshAsync(CancellationToken cancellationToken = default)
+    public async Task<MilestoneReminderRefreshResult> RefreshAsync(CancellationToken cancellationToken = default)
     {
         var list = await _projects.ListAsync(false, cancellationToken).ConfigureAwait(false);
         var reminders = MilestoneReminderPlanner.Create(list.Projects, _now());
@@ -32,7 +31,7 @@ public sealed class MilestoneReminderService
         {
             EnsureRegistered();
             var notifier = ToastNotificationManager.CreateToastNotifier();
-            foreach (var scheduled in notifier.GetScheduledToastNotifications().Where(item => item.Group == ReminderGroup).ToArray())
+            foreach (var scheduled in notifier.GetScheduledToastNotifications().Where(IsOwnedSchedule).ToArray())
                 notifier.RemoveFromSchedule(scheduled);
 
             foreach (var reminder in reminders)
@@ -41,15 +40,18 @@ public sealed class MilestoneReminderService
                 document.LoadXml(BuildNotification(reminder).Payload);
                 var scheduled = new ScheduledToastNotification(document, reminder.DueAtLocal)
                 {
-                    Tag = reminder.MilestoneId.ToString("N"),
-                    Group = ReminderGroup
+                    Tag = MilestoneReminderIdentity.Tag(reminder.MilestoneId),
+                    Group = MilestoneReminderIdentity.Group(reminder.ProjectId)
                 };
                 notifier.AddToSchedule(scheduled);
             }
+            return MilestoneReminderRefreshResult.Success(reminders.Count);
         }
-        catch (Exception) when (OperatingSystem.IsWindows())
+        catch (Exception exception) when (OperatingSystem.IsWindows())
         {
-            // Notification permission or shell availability must never block project persistence or startup.
+            // Scheduling is deliberately non-blocking, but callers receive a diagnostic result.
+            System.Diagnostics.Debug.WriteLine($"Milestone reminder scheduling failed: {exception}");
+            return MilestoneReminderRefreshResult.Failure(exception);
         }
     }
 
@@ -73,4 +75,8 @@ public sealed class MilestoneReminderService
         AppNotificationManager.Default.Register();
         _registered = true;
     }
+
+    private static bool IsOwnedSchedule(ScheduledToastNotification item) =>
+        item.Group == MilestoneReminderIdentity.LegacyGroup ||
+        item.Group.StartsWith(MilestoneReminderIdentity.GroupPrefix, StringComparison.Ordinal);
 }

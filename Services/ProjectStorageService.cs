@@ -177,7 +177,7 @@ public sealed class ProjectStorageService
 
     public async Task<ProjectSaveResult> AddMilestoneAsync(
         Guid projectId, string title, DateOnly date, TimeOnly? time = null, string? notes = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, bool reminderEnabled = true)
     {
         var read = await ReadEditableAsync(projectId, cancellationToken).ConfigureAwait(false);
         if (!read.HasValue) return new(read.Status, FailureType: read.FailureType);
@@ -185,6 +185,7 @@ public sealed class ProjectStorageService
         read.Value!.Milestones.Add(new ProjectMilestone
         {
             Id = Guid.NewGuid(), Title = ProjectValidation.NormalizeRequired(title), Date = date, Time = time,
+            ReminderEnabled = reminderEnabled,
             Notes = ProjectValidation.NormalizeOptional(notes), CreatedAtUtc = now, UpdatedAtUtc = now,
             DisplayOrder = read.Value.Milestones.Count
         });
@@ -194,7 +195,7 @@ public sealed class ProjectStorageService
 
     public async Task<ProjectSaveResult> UpdateMilestoneAsync(
         Guid projectId, Guid milestoneId, string title, DateOnly date, TimeOnly? time = null, string? notes = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, bool reminderEnabled = true)
     {
         var read = await ReadEditableAsync(projectId, cancellationToken).ConfigureAwait(false);
         if (!read.HasValue) return new(read.Status, FailureType: read.FailureType);
@@ -203,6 +204,7 @@ public sealed class ProjectStorageService
         milestone.Title = ProjectValidation.NormalizeRequired(title);
         milestone.Date = date;
         milestone.Time = time;
+        milestone.ReminderEnabled = reminderEnabled;
         milestone.Notes = ProjectValidation.NormalizeOptional(notes);
         milestone.UpdatedAtUtc = DateTimeOffset.UtcNow;
         read.Value.UpdatedAtUtc = milestone.UpdatedAtUtc;
