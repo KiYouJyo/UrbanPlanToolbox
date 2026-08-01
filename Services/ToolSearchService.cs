@@ -5,10 +5,12 @@ namespace UrbanPlanToolbox.Services;
 public sealed class ToolSearchService
 {
     private readonly ToolRegistry _toolRegistry;
+    private readonly ILocalizationService _localization;
 
-    public ToolSearchService(ToolRegistry toolRegistry)
+    public ToolSearchService(ToolRegistry toolRegistry, ILocalizationService localization)
     {
         _toolRegistry = toolRegistry ?? throw new ArgumentNullException(nameof(toolRegistry));
+        _localization = localization ?? throw new ArgumentNullException(nameof(localization));
     }
 
     public IReadOnlyList<ToolSearchGroup> Search(string? query, Func<ToolDefinition, bool> isFavorite)
@@ -17,7 +19,7 @@ public sealed class ToolSearchService
 
         var normalizedQuery = query?.Trim() ?? string.Empty;
         var matchingTools = _toolRegistry.All
-            .Where(tool => tool.IsAvailable && Matches(tool, normalizedQuery))
+            .Where(tool => tool.IsAvailable && Matches(tool, normalizedQuery, _localization))
             .OrderByDescending(isFavorite)
             .ThenBy(tool => tool.PinyinSortKey, StringComparer.Ordinal)
             .ThenBy(tool => tool.Id, StringComparer.Ordinal)
@@ -27,7 +29,7 @@ public sealed class ToolSearchService
         var favorites = matchingTools.Where(isFavorite).ToArray();
         if (favorites.Length > 0)
         {
-            groups.Add(new ToolSearchGroup("已收藏", favorites, true));
+            groups.Add(new ToolSearchGroup(_localization.GetString("Search_FavoritesHeader"), Resolve(favorites), true));
         }
 
         foreach (var group in matchingTools
@@ -35,20 +37,31 @@ public sealed class ToolSearchService
             .GroupBy(GetInitial)
             .OrderBy(group => group.Key, StringComparer.Ordinal))
         {
-            groups.Add(new ToolSearchGroup(group.Key, group.ToArray(), false));
+            groups.Add(new ToolSearchGroup(group.Key, Resolve(group.ToArray()), false));
         }
 
         return groups;
     }
 
-    private static bool Matches(ToolDefinition tool, string query) =>
+    private IReadOnlyList<LocalizedTool> Resolve(IEnumerable<ToolDefinition> tools) =>
+        tools.Select(tool => new LocalizedTool(
+                tool,
+                _localization.GetString(tool.NameResourceKey),
+                _localization.GetString(tool.DescriptionResourceKey)))
+            .ToArray();
+
+    private bool Matches(ToolDefinition tool, string query, ILocalizationService localization) =>
         string.IsNullOrEmpty(query) ||
-        Contains(tool.DisplayName, query) ||
-        Contains(tool.Description, query) ||
+        Contains(localization.GetString(tool.NameResourceKey), query) ||
+        Contains(localization.GetString(tool.DescriptionResourceKey), query) ||
         Contains(tool.Id, query) ||
         Contains(tool.PinyinSortKey, query) ||
         Contains(tool.PinyinInitial, query) ||
-        tool.SearchKeywords.Any(keyword => Contains(keyword, query));
+        ResolveKeywords(tool, localization).Any(keyword => Contains(keyword, query));
+
+    private IEnumerable<string> ResolveKeywords(ToolDefinition tool, ILocalizationService localization) =>
+        localization.GetString(tool.SearchKeywordsResourceKey)
+            .Split(['\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
     private static bool Contains(string value, string query) =>
         value.Contains(query, StringComparison.OrdinalIgnoreCase);

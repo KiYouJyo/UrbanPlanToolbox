@@ -7,8 +7,8 @@ namespace UrbanPlanToolbox.Tests;
 
 public sealed class UnitAndScaleConversionTests
 {
-    private readonly UnitConversionService _units = new();
-    private readonly ScaleConversionService _scale = new();
+    private readonly UnitConversionService _units = new(TestLocalization.ZhCn);
+    private readonly ScaleConversionService _scale = new(TestLocalization.ZhCn);
     private decimal Convert(decimal value, string source, string target) => Assert.IsType<decimal>(_units.Convert(value, source, target).Value);
     private static void AssertClose(decimal expected, decimal actual) => Assert.InRange(decimal.Abs(expected - actual), 0m, 0.000000000000001m);
 
@@ -75,7 +75,7 @@ public sealed class UnitAndScaleConversionTests
     public void UnitCatalogRejectsCrossCategoryConversionsAndForbiddenUnits()
     {
         Assert.False(_units.Convert(1, "length-m", "area-m2").IsSuccess);
-        Assert.DoesNotContain(UnitConversionService.Units, unit => new[] { "gallon", "pint", "quart", "fluid ounce", "cup", "survey" }.Any(forbidden => unit.Id.Contains(forbidden, StringComparison.OrdinalIgnoreCase) || unit.DisplayName.Contains(forbidden, StringComparison.OrdinalIgnoreCase)));
+        Assert.DoesNotContain(UnitConversionService.Units, unit => new[] { "gallon", "pint", "quart", "fluid ounce", "cup", "survey" }.Any(forbidden => unit.Id.Contains(forbidden, StringComparison.OrdinalIgnoreCase) || unit.Symbol.Contains(forbidden, StringComparison.OrdinalIgnoreCase)));
     }
 
     [Fact]

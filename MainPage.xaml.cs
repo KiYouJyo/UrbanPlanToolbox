@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using UrbanPlanToolbox.Models.Navigation;
 using UrbanPlanToolbox.Services;
@@ -17,6 +18,7 @@ public sealed partial class MainPage : Page
     public MainPage()
     {
         InitializeComponent();
+        ApplyLocalizedNavigation();
         NavigateTo(typeof(Views.HomePage));
     }
 
@@ -24,11 +26,35 @@ public sealed partial class MainPage : Page
     {
         if (Navigation.SettingsItem is NavigationViewItem settingsItem)
         {
-            settingsItem.Content = "设置";
+            var settingsLabel = LocalizationService.Default.GetString("Navigation_Settings");
+            settingsItem.Content = settingsLabel;
+            AutomationProperties.SetName(settingsItem, settingsLabel);
+            ToolTipService.SetToolTip(settingsItem, settingsLabel);
         }
 
         Navigation.SelectedItem = Navigation.MenuItems[0];
         NavigateTo(typeof(Views.HomePage));
+    }
+
+    private void ApplyLocalizedNavigation()
+    {
+        ApplyNavigationItem(WelcomeItem, PrimaryNavigationIds.Welcome);
+        ApplyNavigationItem(SearchItem, PrimaryNavigationIds.CommonTools);
+        ApplyNavigationItem(DesignItem, PrimaryNavigationIds.DesignTools);
+        ApplyNavigationItem(ResearchItem, PrimaryNavigationIds.ResearchTools);
+        ApplyNavigationItem(ArchiveItem, PrimaryNavigationIds.ProjectArchive);
+        ApplyNavigationItem(AboutItem, PrimaryNavigationIds.About);
+    }
+
+    private static void ApplyNavigationItem(NavigationViewItem item, string routeId)
+    {
+        if (PrimaryNavigation.Default.TryGet(routeId, out var route) && route is not null)
+        {
+            var label = LocalizationService.Default.GetString(route.NameResourceKey);
+            item.Content = label;
+            AutomationProperties.SetName(item, label);
+            ToolTipService.SetToolTip(item, label);
+        }
     }
 
     private void OnNavigationItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)

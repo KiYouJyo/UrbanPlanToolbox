@@ -10,11 +10,11 @@ public sealed partial class ToolCardsView : UserControl
 {
     public ToolCardsView() => InitializeComponent();
 
-    public void SetTools(IReadOnlyList<ToolDefinition> tools) => CardsRepeater.ItemsSource = tools;
+    public void SetTools(IReadOnlyList<LocalizedTool> tools) => CardsRepeater.ItemsSource = tools;
 
     private void OnToolCardClick(object sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: ToolDefinition tool } && FindHostFrame() is { } frame)
+        if (sender is Button { Tag: LocalizedTool { Definition: { } tool } } && FindHostFrame() is { } frame)
         {
             ToolNavigation.Navigate(frame, tool.Id);
         }

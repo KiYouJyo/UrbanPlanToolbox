@@ -1,0 +1,868 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>UrbanPlanToolbox</value>
+    <comment>应用显示名称（MSIX 品牌名，不翻译）。</comment>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>城市规划辅助工具箱</value>
+    <comment>MSIX 包描述。</comment>
+  </data>
+  <data name="Navigation_Welcome" xml:space="preserve">
+    <value>欢迎页面</value>
+    <comment>一级导航：欢迎页面。</comment>
+  </data>
+  <data name="Navigation_Favorites" xml:space="preserve">
+    <value>常用功能</value>
+    <comment>一级导航：常用功能（预留；当前版本合并于搜索页）。</comment>
+  </data>
+  <data name="Navigation_Search" xml:space="preserve">
+    <value>搜索</value>
+    <comment>一级导航：工具搜索页。</comment>
+  </data>
+  <data name="Navigation_DesignTools" xml:space="preserve">
+    <value>设计工具</value>
+    <comment>一级导航：设计工具。</comment>
+  </data>
+  <data name="Navigation_ResearchTools" xml:space="preserve">
+    <value>科研工具</value>
+    <comment>一级导航：科研工具。</comment>
+  </data>
+  <data name="Navigation_ProjectArchive" xml:space="preserve">
+    <value>项目归档</value>
+    <comment>一级导航：项目归档。</comment>
+  </data>
+  <data name="Navigation_About" xml:space="preserve">
+    <value>关于</value>
+    <comment>一级导航：关于。</comment>
+  </data>
+  <data name="Navigation_Settings" xml:space="preserve">
+    <value>设置</value>
+    <comment>设置导航项。</comment>
+  </data>
+  <data name="Home_Title.Text" xml:space="preserve">
+    <value>规划工具箱</value>
+    <comment>欢迎页标题（产品中文名）。</comment>
+  </data>
+  <data name="Home_Subtitle.Text" xml:space="preserve">
+    <value>UrbanPlan Toolbox · 城市规划辅助工具箱</value>
+    <comment>欢迎页副标题。</comment>
+  </data>
+  <data name="Home_Version.Text" xml:space="preserve">
+    <value>v0.3.7 预览版。本地完成规划指标和单位比例尺换算，不上传规划数据。</value>
+    <comment>欢迎页版本与隐私说明。</comment>
+  </data>
+  <data name="Home_OpenCalculator.Content" xml:space="preserve">
+    <value>打开规划指标快速计算器</value>
+    <comment>欢迎页快捷入口按钮。</comment>
+  </data>
+  <data name="Home_OpenUnitScale.Content" xml:space="preserve">
+    <value>打开单位与比例尺换算</value>
+    <comment>欢迎页快捷入口按钮。</comment>
+  </data>
+  <data name="Home_UpcomingTitle.Text" xml:space="preserve">
+    <value>后续工具</value>
+    <comment>欢迎页后续工具区块标题。</comment>
+  </data>
+  <data name="Home_UpcomingLandBalance.Title" xml:space="preserve">
+    <value>用地平衡表</value>
+    <comment>后续工具名称。</comment>
+  </data>
+  <data name="Home_UpcomingLandBalance.Message" xml:space="preserve">
+    <value>敬请期待</value>
+    <comment>后续工具状态。</comment>
+  </data>
+  <data name="Home_UpcomingParking.Title" xml:space="preserve">
+    <value>停车位测算</value>
+    <comment>后续工具名称。</comment>
+  </data>
+  <data name="Home_UpcomingParking.Message" xml:space="preserve">
+    <value>敬请期待</value>
+    <comment>后续工具状态。</comment>
+  </data>
+  <data name="Page_DesignTools_Description.Text" xml:space="preserve">
+    <value>按设计阶段浏览已上线工具</value>
+    <comment>设计工具页说明。</comment>
+  </data>
+  <data name="Page_ResearchTools_Description.Text" xml:space="preserve">
+    <value>按研究环节浏览已上线工具</value>
+    <comment>科研工具页说明。</comment>
+  </data>
+  <data name="Page_Search_Description.Text" xml:space="preserve">
+    <value>浏览全部已上线工具，支持中文、拼音和关键词搜索。</value>
+    <comment>搜索页说明。</comment>
+  </data>
+  <data name="Page_ProjectArchive_Status.Text" xml:space="preserve">
+    <value>项目归档功能仍在规划中</value>
+    <comment>项目归档页状态。</comment>
+  </data>
+  <data name="Page_ProjectArchive_Description.Text" xml:space="preserve">
+    <value>该模块将用于管理你自己的设计、规划和科研项目。</value>
+    <comment>项目归档页说明。</comment>
+  </data>
+  <data name="Category_PreliminaryAnalysis" xml:space="preserve">
+    <value>前期分析</value>
+    <comment>设计二级分类：前期分析。</comment>
+  </data>
+  <data name="Category_FieldResearch" xml:space="preserve">
+    <value>实地调研</value>
+    <comment>设计二级分类：实地调研。</comment>
+  </data>
+  <data name="Category_DesignDevelopment" xml:space="preserve">
+    <value>方案推导</value>
+    <comment>设计二级分类：方案推导。</comment>
+  </data>
+  <data name="Category_MasterPlanning" xml:space="preserve">
+    <value>总体设计</value>
+    <comment>设计二级分类：总体设计。</comment>
+  </data>
+  <data name="Category_DetailedDesign" xml:space="preserve">
+    <value>详细设计</value>
+    <comment>设计二级分类：详细设计。</comment>
+  </data>
+  <data name="Category_ResearchPreparation" xml:space="preserve">
+    <value>前期工具</value>
+    <comment>科研二级分类：前期工具。</comment>
+  </data>
+  <data name="Category_GeographicTools" xml:space="preserve">
+    <value>地理工具</value>
+    <comment>科研二级分类：地理工具。</comment>
+  </data>
+  <data name="Category_DataTools" xml:space="preserve">
+    <value>数据工具</value>
+    <comment>科研二级分类：数据工具。</comment>
+  </data>
+  <data name="Category_EmptyState.Message" xml:space="preserve">
+    <value>当前分类暂无已上线工具</value>
+    <comment>分类空状态。</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Name" xml:space="preserve">
+    <value>规划指标快速计算器</value>
+    <comment>工具名称：规划指标快速计算器。</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Description" xml:space="preserve">
+    <value>用于快速计算容积率、建筑密度、绿地率及相关规划指标。</value>
+    <comment>工具简介。</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Keywords" xml:space="preserve">
+    <value>规划
+指标
+容积率
+建筑密度
+绿地率
+guihuazhibiao
+guihuazhibiaokuaisujisuanqi
+ghzbksjsq</value>
+    <comment>每行一个搜索关键词（含拼音与缩写）。</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Name" xml:space="preserve">
+    <value>单位与比例尺换算器</value>
+    <comment>工具名称：单位与比例尺换算器。</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Description" xml:space="preserve">
+    <value>用于长度、面积及常用图纸比例尺之间的快速换算。</value>
+    <comment>工具简介。</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Keywords" xml:space="preserve">
+    <value>单位
+比例尺
+长度
+面积
+换算
+danweiyubilichi
+danweiyubilichihuansuanqi
+dwyblchhq</value>
+    <comment>每行一个搜索关键词（含拼音与缩写）。</comment>
+  </data>
+  <data name="Action_OpenTool.Text" xml:space="preserve">
+    <value>打开工具</value>
+    <comment>工具卡片打开按钮。</comment>
+  </data>
+  <data name="Action_AddFavorite" xml:space="preserve">
+    <value>添加到常用功能</value>
+    <comment>收藏按钮提示。</comment>
+  </data>
+  <data name="Action_RemoveFavorite" xml:space="preserve">
+    <value>从常用功能移除</value>
+    <comment>取消收藏按钮提示。</comment>
+  </data>
+  <data name="Action_CheckForUpdates" xml:space="preserve">
+    <value>检查更新</value>
+    <comment>关于页检查更新按钮。</comment>
+  </data>
+  <data name="Action_CopyResults.Content" xml:space="preserve">
+    <value>复制结果</value>
+    <comment>复制结果按钮。</comment>
+  </data>
+  <data name="Action_Reset.Content" xml:space="preserve">
+    <value>重置</value>
+    <comment>清空输入按钮（术语基线为“重置”，待人工审校）。</comment>
+  </data>
+  <data name="Action_SwapUnits.Content" xml:space="preserve">
+    <value>交换单位</value>
+    <comment>单位互换按钮。</comment>
+  </data>
+  <data name="Action_Calculate.Content" xml:space="preserve">
+    <value>计算</value>
+    <comment>计算按钮。</comment>
+  </data>
+  <data name="Action_Convert.Content" xml:space="preserve">
+    <value>换算</value>
+    <comment>单位换算按钮。</comment>
+  </data>
+  <data name="Action_FillSample.Content" xml:space="preserve">
+    <value>填入示例</value>
+    <comment>示例数据按钮。</comment>
+  </data>
+  <data name="Action_ClearSearch.Content" xml:space="preserve">
+    <value>清除</value>
+    <comment>搜索框清除按钮。</comment>
+  </data>
+  <data name="Action_SaveSettings.Content" xml:space="preserve">
+    <value>保存设置</value>
+    <comment>设置页保存按钮。</comment>
+  </data>
+  <data name="Action_RestoreDefaults.Content" xml:space="preserve">
+    <value>恢复默认设置</value>
+    <comment>设置页恢复默认按钮。</comment>
+  </data>
+  <data name="Action_GoToDownload" xml:space="preserve">
+    <value>前往下载</value>
+    <comment>更新对话框主按钮。</comment>
+  </data>
+  <data name="Action_Later" xml:space="preserve">
+    <value>稍后</value>
+    <comment>更新对话框关闭按钮。</comment>
+  </data>
+  <data name="Dialog_Ok" xml:space="preserve">
+    <value>确定</value>
+    <comment>通用对话框确认按钮。</comment>
+  </data>
+  <data name="Dialog_UpdateTitle" xml:space="preserve">
+    <value>更新</value>
+    <comment>更新状态对话框标题。</comment>
+  </data>
+  <data name="Dialog_OpenFailedTitle" xml:space="preserve">
+    <value>打开失败</value>
+    <comment>打开失败对话框标题。</comment>
+  </data>
+  <data name="Status_SettingsSaved" xml:space="preserve">
+    <value>设置已保存。</value>
+    <comment>设置保存状态提示。</comment>
+  </data>
+  <data name="Status_RestoredDefaults" xml:space="preserve">
+    <value>已恢复默认设置。</value>
+    <comment>恢复默认状态提示。</comment>
+  </data>
+  <data name="Status_NoSearchResults.Title" xml:space="preserve">
+    <value>未找到匹配的工具</value>
+    <comment>搜索无结果标题。</comment>
+  </data>
+  <data name="Status_NoSearchResults.Message" xml:space="preserve">
+    <value>请尝试其他关键词。</value>
+    <comment>搜索无结果提示。</comment>
+  </data>
+  <data name="Search_FavoritesHeader" xml:space="preserve">
+    <value>已收藏</value>
+    <comment>搜索结果收藏分组标题。</comment>
+  </data>
+  <data name="Search_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>搜索工具</value>
+    <comment>搜索框占位文字。</comment>
+  </data>
+  <data name="Setting_Theme.Header" xml:space="preserve">
+    <value>主题</value>
+    <comment>主题设置项。</comment>
+  </data>
+  <data name="Setting_Theme_System.Content" xml:space="preserve">
+    <value>跟随系统</value>
+    <comment>主题选项：跟随系统。</comment>
+  </data>
+  <data name="Setting_Theme_Light.Content" xml:space="preserve">
+    <value>浅色</value>
+    <comment>主题选项：浅色。</comment>
+  </data>
+  <data name="Setting_Theme_Dark.Content" xml:space="preserve">
+    <value>深色</value>
+    <comment>主题选项：深色。</comment>
+  </data>
+  <data name="Setting_DecimalPlaces.Header" xml:space="preserve">
+    <value>计算结果保留小数位</value>
+    <comment>显示精度设置项。</comment>
+  </data>
+  <data name="Setting_AutoCalculate.Header" xml:space="preserve">
+    <value>输入变化时自动重新计算</value>
+    <comment>自动计算设置项。</comment>
+  </data>
+  <data name="Setting_Language.Header" xml:space="preserve">
+    <value>语言</value>
+    <comment>语言设置项。</comment>
+  </data>
+  <data name="Setting_Language_System.Content" xml:space="preserve">
+    <value>跟随系统</value>
+    <comment>语言选项：跟随系统。</comment>
+  </data>
+  <data name="Setting_Language_ZhCn.Content" xml:space="preserve">
+    <value>简体中文</value>
+    <comment>语言选项：简体中文（使用母语名称）。</comment>
+  </data>
+  <data name="Setting_Language_JaJp.Content" xml:space="preserve">
+    <value>日本語</value>
+    <comment>语言选项：日语（使用母语名称）。</comment>
+  </data>
+  <data name="Setting_Language_EnUs.Content" xml:space="preserve">
+    <value>English</value>
+    <comment>语言选项：英语（使用母语名称）。</comment>
+  </data>
+  <data name="Setting_Language_RestartHint" xml:space="preserve">
+    <value>语言将在下次启动时生效。</value>
+    <comment>语言修改后的重启提示。</comment>
+  </data>
+  <data name="Page_PlanningCalculator_Description.Text" xml:space="preserve">
+    <value>默认以地上建筑面积作为计容建筑面积；不同地区认定可能不同，请以当地现行规划管理规定为准。</value>
+    <comment>计算器页说明。</comment>
+  </data>
+  <data name="Field_SiteArea" xml:space="preserve">
+    <value>用地面积（㎡）</value>
+    <comment>输入字段名（含符号 ㎡，符号不翻译）。</comment>
+  </data>
+  <data name="Field_BuildingFootprint" xml:space="preserve">
+    <value>建筑基底面积（㎡）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_TotalBuildingArea" xml:space="preserve">
+    <value>总建筑面积（㎡）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_AboveGroundArea" xml:space="preserve">
+    <value>地上建筑面积（㎡）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_UndergroundArea" xml:space="preserve">
+    <value>地下建筑面积（㎡）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_GreenArea" xml:space="preserve">
+    <value>绿地面积（㎡）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_HouseholdCount" xml:space="preserve">
+    <value>户数（户）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_Population" xml:space="preserve">
+    <value>规划人口（人）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_PeoplePerHousehold" xml:space="preserve">
+    <value>户均人口（人/户）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_ParkingSpacesTotal" xml:space="preserve">
+    <value>机动车停车位总数（个）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_SurfaceParking" xml:space="preserve">
+    <value>地上停车位（个）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_UndergroundParking" xml:space="preserve">
+    <value>地下停车位（个）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_PublicServiceArea" xml:space="preserve">
+    <value>公共服务设施建筑面积（㎡）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_UseTotalAreaForPublicService.Content" xml:space="preserve">
+    <value>按总建筑面积计算公共服务占比</value>
+    <comment>复选框内容。</comment>
+  </data>
+  <data name="Status_ResultStaleTitle.Title" xml:space="preserve">
+    <value>结果待更新</value>
+    <comment>输入变化提示标题。</comment>
+  </data>
+  <data name="Status_ResultStaleMessage" xml:space="preserve">
+    <value>输入已变化；请点击“计算”更新结果。</value>
+    <comment>输入变化提示内容。</comment>
+  </data>
+  <data name="Status_InputIncomplete" xml:space="preserve">
+    <value>输入尚不完整，当前结果未更新。</value>
+    <comment>自动计算时输入不完整提示。</comment>
+  </data>
+  <data name="Error_InputTitle.Title" xml:space="preserve">
+    <value>输入错误</value>
+    <comment>输入错误提示标题。</comment>
+  </data>
+  <data name="Status_HintTitle.Title" xml:space="preserve">
+    <value>提示</value>
+    <comment>警告提示标题。</comment>
+  </data>
+  <data name="Result_ResultsHeader.Text" xml:space="preserve">
+    <value>计算结果</value>
+    <comment>结果区块标题。</comment>
+  </data>
+  <data name="Result_NotCalculated" xml:space="preserve">
+    <value>尚未计算</value>
+    <comment>结果占位文字。</comment>
+  </data>
+  <data name="Error_InvalidNumber" xml:space="preserve">
+    <value>{0}必须是合法数字。</value>
+    <comment>数字解析错误；{0}为字段名。</comment>
+  </data>
+  <data name="Error_EnterValidNumber" xml:space="preserve">
+    <value>请输入合法数字。</value>
+    <comment>通用数字解析错误（换算页）。</comment>
+  </data>
+  <data name="Error_NegativeValue" xml:space="preserve">
+    <value>{0}不能为负数。</value>
+    <comment>负数校验错误；{0}为字段名。</comment>
+  </data>
+  <data name="Error_SiteAreaZero" xml:space="preserve">
+    <value>用地面积不能为零。</value>
+    <comment>用地面积零值校验错误。</comment>
+  </data>
+  <data name="Error_DerivedAreaNegative" xml:space="preserve">
+    <value>推算出的建筑面积不能为负数。</value>
+    <comment>面积推算错误。</comment>
+  </data>
+  <data name="Warning_FootprintExceedsSite" xml:space="preserve">
+    <value>建筑基底面积大于用地面积，请确认输入数据。</value>
+    <comment>数据冲突警告。</comment>
+  </data>
+  <data name="Warning_GreenAreaExceedsSite" xml:space="preserve">
+    <value>绿地面积大于用地面积，请确认输入数据。</value>
+    <comment>数据冲突警告。</comment>
+  </data>
+  <data name="Warning_TotalAreaMismatch" xml:space="preserve">
+    <value>总建筑面积与地上、地下建筑面积之和不一致，未覆盖您的输入。</value>
+    <comment>面积和一致性警告。</comment>
+  </data>
+  <data name="Warning_ParkingTotalMismatch" xml:space="preserve">
+    <value>停车位总数与地上、地下停车位之和不一致，未覆盖您的输入。</value>
+    <comment>停车位和一致性警告。</comment>
+  </data>
+  <data name="Warning_PublicServiceExceedsTotal" xml:space="preserve">
+    <value>公共服务设施建筑面积大于总建筑面积，请确认输入数据。</value>
+    <comment>数据冲突警告。</comment>
+  </data>
+  <data name="Copy_PlanningResultsHeader" xml:space="preserve">
+    <value>规划指标计算结果</value>
+    <comment>复制结果剪贴板标题。</comment>
+  </data>
+  <data name="Result_FloorAreaRatio" xml:space="preserve">
+    <value>容积率：{0}</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_BuildingDensity" xml:space="preserve">
+    <value>建筑密度：{0}</value>
+    <comment>结果行；{0}为百分比数值。</comment>
+  </data>
+  <data name="Result_GreenRatio" xml:space="preserve">
+    <value>绿地率：{0}</value>
+    <comment>结果行；{0}为百分比数值。</comment>
+  </data>
+  <data name="Result_Population" xml:space="preserve">
+    <value>规划人口：{0} 人</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_PerCapitaSiteArea" xml:space="preserve">
+    <value>人均用地面积：{0} ㎡/人</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_PerHouseholdSiteArea" xml:space="preserve">
+    <value>户均用地面积：{0} ㎡/户</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_ParkingPerHousehold" xml:space="preserve">
+    <value>户均停车位：{0} 个/户</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_ParkingPer100Households" xml:space="preserve">
+    <value>每100户停车位：{0} 个</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_TotalBuildingArea" xml:space="preserve">
+    <value>总建筑面积：{0} ㎡</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_AboveGroundArea" xml:space="preserve">
+    <value>地上建筑面积：{0} ㎡</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_UndergroundArea" xml:space="preserve">
+    <value>地下建筑面积：{0} ㎡</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_UndergroundAreaRatio" xml:space="preserve">
+    <value>地下建筑面积占比：{0}</value>
+    <comment>结果行；{0}为百分比数值。</comment>
+  </data>
+  <data name="Result_PublicServiceAreaRatio" xml:space="preserve">
+    <value>公共服务设施面积占比：{0}</value>
+    <comment>结果行；{0}为百分比数值。</comment>
+  </data>
+  <data name="Result_PublicServiceAreaPerHousehold" xml:space="preserve">
+    <value>户均公共服务设施面积：{0} ㎡/户</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Result_PublicServiceAreaPerCapita" xml:space="preserve">
+    <value>人均公共服务设施面积：{0} ㎡/人</value>
+    <comment>结果行；{0}为数值。</comment>
+  </data>
+  <data name="Page_UnitScaleConverter_Description.Text" xml:space="preserve">
+    <value>用于城乡规划、建筑设计和工程量估算。英美几何单位采用国际英尺定义；不包含 U.S. survey foot 或液体容量单位。</value>
+    <comment>换算器页说明。</comment>
+  </data>
+  <data name="Pivot_Length.Header" xml:space="preserve">
+    <value>长度</value>
+    <comment>类别页签：长度。</comment>
+  </data>
+  <data name="Pivot_Area.Header" xml:space="preserve">
+    <value>面积</value>
+    <comment>类别页签：面积。</comment>
+  </data>
+  <data name="Pivot_Volume.Header" xml:space="preserve">
+    <value>体积</value>
+    <comment>类别页签：体积。</comment>
+  </data>
+  <data name="Pivot_Scale.Header" xml:space="preserve">
+    <value>比例尺</value>
+    <comment>类别页签：比例尺。</comment>
+  </data>
+  <data name="Scale_ForwardTitle.Text" xml:space="preserve">
+    <value>图上长度 → 实际长度</value>
+    <comment>比例尺正向换算标题。</comment>
+  </data>
+  <data name="Scale_ReverseTitle.Text" xml:space="preserve">
+    <value>实际长度 → 图上长度</value>
+    <comment>比例尺反向换算标题。</comment>
+  </data>
+  <data name="Field_ScaleDenominator" xml:space="preserve">
+    <value>比例尺分母 N（1 : N）</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_DrawingLength" xml:space="preserve">
+    <value>图上长度</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_DrawingLengthUnit" xml:space="preserve">
+    <value>图上长度单位</value>
+    <comment>单位选择字段名。</comment>
+  </data>
+  <data name="Field_ActualLengthOutputUnit" xml:space="preserve">
+    <value>实际长度输出单位</value>
+    <comment>单位选择字段名。</comment>
+  </data>
+  <data name="Field_ActualLength" xml:space="preserve">
+    <value>实际长度</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_ActualLengthUnit" xml:space="preserve">
+    <value>实际长度单位</value>
+    <comment>单位选择字段名。</comment>
+  </data>
+  <data name="Field_DrawingLengthOutputUnit" xml:space="preserve">
+    <value>图上长度输出单位</value>
+    <comment>单位选择字段名。</comment>
+  </data>
+  <data name="Field_InputValue" xml:space="preserve">
+    <value>输入数值</value>
+    <comment>输入字段名。</comment>
+  </data>
+  <data name="Field_SourceUnit" xml:space="preserve">
+    <value>来源单位</value>
+    <comment>单位选择字段名。</comment>
+  </data>
+  <data name="Field_TargetUnit" xml:space="preserve">
+    <value>目标单位</value>
+    <comment>单位选择字段名。</comment>
+  </data>
+  <data name="Unit_ResultPlaceholder" xml:space="preserve">
+    <value>请输入数值并选择单位。</value>
+    <comment>单位换算结果占位文字。</comment>
+  </data>
+  <data name="Unit_EnterValue" xml:space="preserve">
+    <value>请输入数值。</value>
+    <comment>单位换算空值提示。</comment>
+  </data>
+  <data name="Scale_ResultPlaceholderForward" xml:space="preserve">
+    <value>请输入比例尺和图上长度。</value>
+    <comment>正向比例尺结果占位文字。</comment>
+  </data>
+  <data name="Scale_ResultPlaceholderReverse" xml:space="preserve">
+    <value>请输入比例尺和实际长度。</value>
+    <comment>反向比例尺结果占位文字。</comment>
+  </data>
+  <data name="Error_EnterScaleAndLength" xml:space="preserve">
+    <value>请输入比例尺分母和长度。</value>
+    <comment>比例尺空值提示。</comment>
+  </data>
+  <data name="Error_NoCopyableResult" xml:space="preserve">
+    <value>没有可复制的有效结果。</value>
+    <comment>复制失败提示。</comment>
+  </data>
+  <data name="UnitNote_Area" xml:space="preserve">
+    <value>亩、坪、反和町属于地区性或传统单位。日本“畳/帖”面积标准存在差异，本版本不提供固定换算。</value>
+    <comment>面积类别说明。</comment>
+  </data>
+  <data name="UnitNote_Length" xml:space="preserve">
+    <value>日本传统建筑单位：尺（しゃく）与间（けん）。请勿与中国市尺混用。</value>
+    <comment>长度类别说明。</comment>
+  </data>
+  <data name="UnitNote_Volume" xml:space="preserve">
+    <value>此处体积指建筑空间、土方、混凝土等几何体积；不提供 gallon、fluid ounce、pint、quart 或 cup。</value>
+    <comment>体积类别说明。</comment>
+  </data>
+  <data name="Scale_Note.Text" xml:space="preserve">
+    <value>实际规划建筑比例尺通常使用正整数分母；支持小数分母和长度。</value>
+    <comment>比例尺说明。</comment>
+  </data>
+  <data name="Error_NegativeInput" xml:space="preserve">
+    <value>输入数值不能为负数。</value>
+    <comment>单位换算负数错误。</comment>
+  </data>
+  <data name="Error_SelectUnits" xml:space="preserve">
+    <value>请选择来源单位和目标单位。</value>
+    <comment>单位选择错误。</comment>
+  </data>
+  <data name="Error_CrossCategoryUnits" xml:space="preserve">
+    <value>来源单位和目标单位必须属于同一类别。</value>
+    <comment>跨类别换算错误。</comment>
+  </data>
+  <data name="Error_OutOfRange" xml:space="preserve">
+    <value>数值超出可处理范围。</value>
+    <comment>溢出错误。</comment>
+  </data>
+  <data name="Error_ScaleDenominatorPositive" xml:space="preserve">
+    <value>比例尺分母必须大于 0。</value>
+    <comment>比例尺分母校验错误。</comment>
+  </data>
+  <data name="Error_NegativeLength" xml:space="preserve">
+    <value>长度不能为负数。</value>
+    <comment>长度负数错误。</comment>
+  </data>
+  <data name="Error_SelectValidLengthUnit" xml:space="preserve">
+    <value>请选择有效的长度单位。</value>
+    <comment>长度单位选择错误。</comment>
+  </data>
+  <data name="Unit_LengthMm_Name" xml:space="preserve">
+    <value>毫米（mm，公制）</value>
+    <comment>长度单位名称。</comment>
+  </data>
+  <data name="Unit_LengthCm_Name" xml:space="preserve">
+    <value>厘米（cm，公制）</value>
+    <comment>长度单位名称。</comment>
+  </data>
+  <data name="Unit_LengthM_Name" xml:space="preserve">
+    <value>米（m，公制）</value>
+    <comment>长度单位名称。</comment>
+  </data>
+  <data name="Unit_LengthKm_Name" xml:space="preserve">
+    <value>千米（km，公制）</value>
+    <comment>长度单位名称。</comment>
+  </data>
+  <data name="Unit_LengthIn_Name" xml:space="preserve">
+    <value>英寸（in，英美）</value>
+    <comment>长度单位名称。</comment>
+  </data>
+  <data name="Unit_LengthFt_Name" xml:space="preserve">
+    <value>英尺（ft，英美）</value>
+    <comment>长度单位名称。</comment>
+  </data>
+  <data name="Unit_LengthYd_Name" xml:space="preserve">
+    <value>码（yd，英美）</value>
+    <comment>长度单位名称。</comment>
+  </data>
+  <data name="Unit_LengthMi_Name" xml:space="preserve">
+    <value>英里（mi，英美）</value>
+    <comment>长度单位名称。</comment>
+  </data>
+  <data name="Unit_LengthShaku_Name" xml:space="preserve">
+    <value>尺（しゃく，日本传统建筑单位）</value>
+    <comment>日本传统长度单位。</comment>
+  </data>
+  <data name="Unit_LengthKen_Name" xml:space="preserve">
+    <value>间（けん，日本传统建筑单位）</value>
+    <comment>日本传统长度单位。</comment>
+  </data>
+  <data name="Unit_AreaMm2_Name" xml:space="preserve">
+    <value>平方毫米（mm²，公制）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaCm2_Name" xml:space="preserve">
+    <value>平方厘米（cm²，公制）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaM2_Name" xml:space="preserve">
+    <value>平方米（m²，公制）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaHa_Name" xml:space="preserve">
+    <value>公顷（ha，公制）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaKm2_Name" xml:space="preserve">
+    <value>平方千米（km²，公制）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaMu_Name" xml:space="preserve">
+    <value>亩（中国）</value>
+    <comment>中国传统面积单位。</comment>
+  </data>
+  <data name="Unit_AreaTsubo_Name" xml:space="preserve">
+    <value>坪（日本）</value>
+    <comment>日本传统面积单位。</comment>
+  </data>
+  <data name="Unit_AreaTan_Name" xml:space="preserve">
+    <value>反（日本）</value>
+    <comment>日本传统面积单位。</comment>
+  </data>
+  <data name="Unit_AreaCho_Name" xml:space="preserve">
+    <value>町（日本）</value>
+    <comment>日本传统面积单位。</comment>
+  </data>
+  <data name="Unit_AreaIn2_Name" xml:space="preserve">
+    <value>平方英寸（in²，英美）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaFt2_Name" xml:space="preserve">
+    <value>平方英尺（ft²，英美）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaYd2_Name" xml:space="preserve">
+    <value>平方码（yd²，英美）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaAcre_Name" xml:space="preserve">
+    <value>英亩（acre，英美）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_AreaMi2_Name" xml:space="preserve">
+    <value>平方英里（mi²，英美）</value>
+    <comment>面积单位名称。</comment>
+  </data>
+  <data name="Unit_VolumeMm3_Name" xml:space="preserve">
+    <value>立方毫米（mm³，公制）</value>
+    <comment>体积单位名称。</comment>
+  </data>
+  <data name="Unit_VolumeCm3_Name" xml:space="preserve">
+    <value>立方厘米（cm³，公制）</value>
+    <comment>体积单位名称。</comment>
+  </data>
+  <data name="Unit_VolumeM3_Name" xml:space="preserve">
+    <value>立方米（m³，公制）</value>
+    <comment>体积单位名称。</comment>
+  </data>
+  <data name="Unit_VolumeL_Name" xml:space="preserve">
+    <value>升（L，几何体积）</value>
+    <comment>体积单位名称。</comment>
+  </data>
+  <data name="Unit_VolumeIn3_Name" xml:space="preserve">
+    <value>立方英寸（in³，英美）</value>
+    <comment>体积单位名称。</comment>
+  </data>
+  <data name="Unit_VolumeFt3_Name" xml:space="preserve">
+    <value>立方英尺（ft³，英美）</value>
+    <comment>体积单位名称。</comment>
+  </data>
+  <data name="Unit_VolumeYd3_Name" xml:space="preserve">
+    <value>立方码（yd³，英美）</value>
+    <comment>体积单位名称。</comment>
+  </data>
+  <data name="About_Description.Text" xml:space="preserve">
+    <value>用于本地快速估算城市规划指标与单位比例尺；输入数据不会上传。</value>
+    <comment>关于页说明。</comment>
+  </data>
+  <data name="About_Technology.Text" xml:space="preserve">
+    <value>技术：C#、WinUI 3、Windows App SDK、MSIX</value>
+    <comment>技术栈说明。</comment>
+  </data>
+  <data name="About_LicenseAndRepo.Text" xml:space="preserve">
+    <value>许可证：待确定。项目仓库：</value>
+    <comment>许可证与仓库入口说明。</comment>
+  </data>
+  <data name="Page_About_Title.Text" xml:space="preserve">
+    <value>关于规划工具箱</value>
+    <comment>关于页标题。</comment>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>v{0} 预览版</value>
+    <comment>关于页版本格式；{0}为版本号。</comment>
+  </data>
+  <data name="Update_Checking" xml:space="preserve">
+    <value>正在检查…</value>
+    <comment>检查更新按钮进行中文字。</comment>
+  </data>
+  <data name="Update_AvailableTitle" xml:space="preserve">
+    <value>发现新版本 {0}</value>
+    <comment>新版本对话框标题；{0}为版本号。</comment>
+  </data>
+  <data name="Update_DialogContent" xml:space="preserve">
+    <value>当前版本：{0}
+最新版本：{1}
+
+更新内容：
+{2}</value>
+    <comment>新版本对话框内容；{0}当前版本、{1}最新版本、{2}更新说明。</comment>
+  </data>
+  <data name="Update_NoNotes" xml:space="preserve">
+    <value>该版本暂未提供更新说明</value>
+    <comment>更新说明为空时的提示。</comment>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>当前已是最新版本
+
+当前版本：{0}
+最新版本：{1}</value>
+    <comment>已是最新版本提示；{0}当前版本、{1}最新版本。</comment>
+  </data>
+  <data name="Update_LocalVersionNewer" xml:space="preserve">
+    <value>当前版本不低于最新正式版本</value>
+    <comment>本地版本不低于最新版本提示。</comment>
+  </data>
+  <data name="Update_NoRelease" xml:space="preserve">
+    <value>GitHub 尚未发布可用的正式版本。</value>
+    <comment>无 Release 提示。</comment>
+  </data>
+  <data name="Update_ConnectionFailed" xml:space="preserve">
+    <value>无法连接 GitHub，请检查网络连接后重试。</value>
+    <comment>网络错误提示。</comment>
+  </data>
+  <data name="Update_TimedOut" xml:space="preserve">
+    <value>请求超时，请稍后重试。</value>
+    <comment>超时提示。</comment>
+  </data>
+  <data name="Update_RateLimited" xml:space="preserve">
+    <value>GitHub API 请求次数受限，请稍后重试。</value>
+    <comment>限流提示。</comment>
+  </data>
+  <data name="Update_InvalidRemoteVersion" xml:space="preserve">
+    <value>无法识别远程版本号。</value>
+    <comment>远程版本解析失败提示。</comment>
+  </data>
+  <data name="Update_GenericFailure" xml:space="preserve">
+    <value>无法获取更新信息，请稍后重试。</value>
+    <comment>通用失败提示。</comment>
+  </data>
+  <data name="Error_OpenRepositoryFailed" xml:space="preserve">
+    <value>无法打开项目仓库，请检查默认浏览器设置后重试。</value>
+    <comment>打开仓库失败提示。</comment>
+  </data>
+  <data name="Error_OpenReleaseFailed" xml:space="preserve">
+    <value>无法打开 Release 页面，请检查默认浏览器设置后重试。</value>
+    <comment>打开 Release 失败提示。</comment>
+  </data>
+</root>

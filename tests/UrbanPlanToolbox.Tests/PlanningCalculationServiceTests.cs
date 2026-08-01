@@ -6,7 +6,7 @@ namespace UrbanPlanToolbox.Tests;
 
 public sealed class PlanningCalculationServiceTests
 {
- private readonly PlanningCalculationService _service = new();
+ private readonly PlanningCalculationService _service = new(TestLocalization.ZhCn);
  [Fact] public void CalculatesStandardIndicators() { var r = _service.Calculate(new PlanningInput { SiteArea = 50000, AboveGroundArea = 100000, UndergroundArea = 30000, BuildingFootprint = 12500, GreenArea = 17500, HouseholdCount = 800, PeoplePerHousehold = 2.8m, TotalParkingSpaces = 900, PublicServiceArea = 6000 }); Assert.Equal(2m, r.FloorAreaRatio); Assert.Equal(25m, r.BuildingDensity); Assert.Equal(35m, r.GreenRatio); Assert.Equal(2240m, r.Population); Assert.Equal(1.125m, r.ParkingPerHousehold); }
  [Fact] public void RejectsZeroSiteArea() => Assert.Contains("用地面积不能为零。", _service.Calculate(new PlanningInput { SiteArea = 0 }).Errors);
  [Fact] public void EmptyInputDoesNotProduceZeroes() => Assert.Null(_service.Calculate(new PlanningInput()).FloorAreaRatio);

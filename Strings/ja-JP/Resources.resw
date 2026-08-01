@@ -1,0 +1,862 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>UrbanPlanToolbox</value>
+    <comment>アプリ表示名（MSIX ブランド名。翻訳しない）。</comment>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>都市計画アシストツールボックス</value>
+    <comment>MSIX パッケージの説明。</comment>
+  </data>
+  <data name="Navigation_Welcome" xml:space="preserve">
+    <value>ホーム</value>
+    <comment>一次ナビゲーション：ホーム。</comment>
+  </data>
+  <data name="Navigation_Favorites" xml:space="preserve">
+    <value>お気に入り</value>
+    <comment>一次ナビゲーション：お気に入り（予約。現バージョンは検索ページに統合）。</comment>
+  </data>
+  <data name="Navigation_Search" xml:space="preserve">
+    <value>検索</value>
+    <comment>一次ナビゲーション：ツール検索ページ。</comment>
+  </data>
+  <data name="Navigation_DesignTools" xml:space="preserve">
+    <value>設計ツール</value>
+    <comment>一次ナビゲーション：設計ツール。</comment>
+  </data>
+  <data name="Navigation_ResearchTools" xml:space="preserve">
+    <value>研究ツール</value>
+    <comment>一次ナビゲーション：研究ツール。</comment>
+  </data>
+  <data name="Navigation_ProjectArchive" xml:space="preserve">
+    <value>プロジェクトアーカイブ</value>
+    <comment>一次ナビゲーション：プロジェクトアーカイブ。</comment>
+  </data>
+  <data name="Navigation_About" xml:space="preserve">
+    <value>このアプリについて</value>
+    <comment>一次ナビゲーション：このアプリについて。</comment>
+  </data>
+  <data name="Navigation_Settings" xml:space="preserve">
+    <value>設定</value>
+    <comment>設定ナビゲーション項目。</comment>
+  </data>
+  <data name="Home_Title.Text" xml:space="preserve">
+    <value>UrbanPlanToolbox</value>
+    <comment>トップページのタイトル（ブランド名）。</comment>
+  </data>
+  <data name="Home_Subtitle.Text" xml:space="preserve">
+    <value>UrbanPlan Toolbox・都市計画アシストツールボックス</value>
+    <comment>トップページのサブタイトル。</comment>
+  </data>
+  <data name="Home_Version.Text" xml:space="preserve">
+    <value>v0.3.7 プレビュー版。計画指標と単位・縮尺換算をローカルで処理し、計画データをアップロードしません。</value>
+    <comment>トップページのバージョンとプライバシー説明。</comment>
+  </data>
+  <data name="Home_OpenCalculator.Content" xml:space="preserve">
+    <value>計画指標計算を開く</value>
+    <comment>トップページのショートカットボタン。</comment>
+  </data>
+  <data name="Home_OpenUnitScale.Content" xml:space="preserve">
+    <value>単位・縮尺変換を開く</value>
+    <comment>トップページのショートカットボタン。</comment>
+  </data>
+  <data name="Home_UpcomingTitle.Text" xml:space="preserve">
+    <value>今後のツール</value>
+    <comment>トップページの今後のツール見出し。</comment>
+  </data>
+  <data name="Home_UpcomingLandBalance.Title" xml:space="preserve">
+    <value>用地バランス表</value>
+    <comment>今後のツール名。</comment>
+  </data>
+  <data name="Home_UpcomingLandBalance.Message" xml:space="preserve">
+    <value>近日公開予定</value>
+    <comment>今後のツールの状態。</comment>
+  </data>
+  <data name="Home_UpcomingParking.Title" xml:space="preserve">
+    <value>駐車台数試算</value>
+    <comment>今後のツール名。</comment>
+  </data>
+  <data name="Home_UpcomingParking.Message" xml:space="preserve">
+    <value>近日公開予定</value>
+    <comment>今後のツールの状態。</comment>
+  </data>
+  <data name="Page_DesignTools_Description.Text" xml:space="preserve">
+    <value>設計段階ごとに利用可能なツールを表示します</value>
+    <comment>設計ツールページの説明。</comment>
+  </data>
+  <data name="Page_ResearchTools_Description.Text" xml:space="preserve">
+    <value>研究プロセスごとに利用可能なツールを表示します</value>
+    <comment>研究ツールページの説明。</comment>
+  </data>
+  <data name="Page_Search_Description.Text" xml:space="preserve">
+    <value>利用可能なすべてのツールを検索できます。</value>
+    <comment>検索ページの説明。</comment>
+  </data>
+  <data name="Page_ProjectArchive_Status.Text" xml:space="preserve">
+    <value>プロジェクトアーカイブは準備中です</value>
+    <comment>プロジェクトアーカイブページの状態。</comment>
+  </data>
+  <data name="Page_ProjectArchive_Description.Text" xml:space="preserve">
+    <value>このモジュールは、あなた自身の設計・計画・研究プロジェクトを管理するために使用されます。</value>
+    <comment>プロジェクトアーカイブページの説明。</comment>
+  </data>
+  <data name="Category_PreliminaryAnalysis" xml:space="preserve">
+    <value>事前分析</value>
+    <comment>設計の二次分類：事前分析。</comment>
+  </data>
+  <data name="Category_FieldResearch" xml:space="preserve">
+    <value>現地調査</value>
+    <comment>設計の二次分類：現地調査。</comment>
+  </data>
+  <data name="Category_DesignDevelopment" xml:space="preserve">
+    <value>コンセプト検討</value>
+    <comment>設計の二次分類：コンセプト検討。</comment>
+  </data>
+  <data name="Category_MasterPlanning" xml:space="preserve">
+    <value>全体計画</value>
+    <comment>設計の二次分類：全体計画。</comment>
+  </data>
+  <data name="Category_DetailedDesign" xml:space="preserve">
+    <value>詳細設計</value>
+    <comment>設計の二次分類：詳細設計。</comment>
+  </data>
+  <data name="Category_ResearchPreparation" xml:space="preserve">
+    <value>研究準備</value>
+    <comment>研究の二次分類：研究準備。</comment>
+  </data>
+  <data name="Category_GeographicTools" xml:space="preserve">
+    <value>地理ツール</value>
+    <comment>研究の二次分類：地理ツール。</comment>
+  </data>
+  <data name="Category_DataTools" xml:space="preserve">
+    <value>データツール</value>
+    <comment>研究の二次分類：データツール。</comment>
+  </data>
+  <data name="Category_EmptyState.Message" xml:space="preserve">
+    <value>このカテゴリには利用可能なツールがまだありません</value>
+    <comment>カテゴリの空状態。</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Name" xml:space="preserve">
+    <value>計画指標計算</value>
+    <comment>ツール名：計画指標計算。</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Description" xml:space="preserve">
+    <value>容積率・建築密度・緑地率などの計画指標をすばやく計算します。</value>
+    <comment>ツールの説明。</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Keywords" xml:space="preserve">
+    <value>計画
+指標
+容積率
+建築密度
+緑地率</value>
+    <comment>1行につき1つの検索キーワード。</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Name" xml:space="preserve">
+    <value>単位・縮尺変換</value>
+    <comment>ツール名：単位・縮尺変換。</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Description" xml:space="preserve">
+    <value>長さ・面積・一般的な図面縮尺の間で素早く換算します。</value>
+    <comment>ツールの説明。</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Keywords" xml:space="preserve">
+    <value>単位
+縮尺
+長さ
+面積
+換算</value>
+    <comment>1行につき1つの検索キーワード。</comment>
+  </data>
+  <data name="Action_OpenTool.Text" xml:space="preserve">
+    <value>ツールを開く</value>
+    <comment>ツールカードの開くボタン。</comment>
+  </data>
+  <data name="Action_AddFavorite" xml:space="preserve">
+    <value>お気に入りに追加</value>
+    <comment>お気に入りボタンのヒント。</comment>
+  </data>
+  <data name="Action_RemoveFavorite" xml:space="preserve">
+    <value>お気に入りから削除</value>
+    <comment>お気に入り解除ボタンのヒント。</comment>
+  </data>
+  <data name="Action_CheckForUpdates" xml:space="preserve">
+    <value>更新を確認</value>
+    <comment>このアプリについてページの更新確認ボタン。</comment>
+  </data>
+  <data name="Action_CopyResults.Content" xml:space="preserve">
+    <value>結果をコピー</value>
+    <comment>結果コピーボタン。</comment>
+  </data>
+  <data name="Action_Reset.Content" xml:space="preserve">
+    <value>リセット</value>
+    <comment>入力クリアボタン（用語ベースライン「リセット」。要確認）。</comment>
+  </data>
+  <data name="Action_SwapUnits.Content" xml:space="preserve">
+    <value>単位を入れ替え</value>
+    <comment>単位入れ替えボタン。</comment>
+  </data>
+  <data name="Action_Calculate.Content" xml:space="preserve">
+    <value>計算</value>
+    <comment>計算ボタン。</comment>
+  </data>
+  <data name="Action_Convert.Content" xml:space="preserve">
+    <value>換算</value>
+    <comment>単位換算ボタン。</comment>
+  </data>
+  <data name="Action_FillSample.Content" xml:space="preserve">
+    <value>例を入力</value>
+    <comment>サンプルデータボタン。</comment>
+  </data>
+  <data name="Action_ClearSearch.Content" xml:space="preserve">
+    <value>クリア</value>
+    <comment>検索クリアボタン。</comment>
+  </data>
+  <data name="Action_SaveSettings.Content" xml:space="preserve">
+    <value>設定を保存</value>
+    <comment>設定ページの保存ボタン。</comment>
+  </data>
+  <data name="Action_RestoreDefaults.Content" xml:space="preserve">
+    <value>既定に戻す</value>
+    <comment>設定ページの既定に戻すボタン。</comment>
+  </data>
+  <data name="Action_GoToDownload" xml:space="preserve">
+    <value>ダウンロードへ</value>
+    <comment>更新ダイアログの主ボタン。</comment>
+  </data>
+  <data name="Action_Later" xml:space="preserve">
+    <value>後で</value>
+    <comment>更新ダイアログの閉じるボタン。</comment>
+  </data>
+  <data name="Dialog_Ok" xml:space="preserve">
+    <value>OK</value>
+    <comment>共通ダイアログの確認ボタン。</comment>
+  </data>
+  <data name="Dialog_UpdateTitle" xml:space="preserve">
+    <value>更新</value>
+    <comment>更新状態ダイアログのタイトル。</comment>
+  </data>
+  <data name="Dialog_OpenFailedTitle" xml:space="preserve">
+    <value>開けませんでした</value>
+    <comment>開けないダイアログのタイトル。</comment>
+  </data>
+  <data name="Status_SettingsSaved" xml:space="preserve">
+    <value>設定を保存しました。</value>
+    <comment>設定保存の状態メッセージ。</comment>
+  </data>
+  <data name="Status_RestoredDefaults" xml:space="preserve">
+    <value>既定の設定に戻しました。</value>
+    <comment>既定に戻した状態メッセージ。</comment>
+  </data>
+  <data name="Status_NoSearchResults.Title" xml:space="preserve">
+    <value>一致するツールが見つかりません</value>
+    <comment>検索結果なしのタイトル。</comment>
+  </data>
+  <data name="Status_NoSearchResults.Message" xml:space="preserve">
+    <value>別のキーワードをお試しください。</value>
+    <comment>検索結果なしのメッセージ。</comment>
+  </data>
+  <data name="Search_FavoritesHeader" xml:space="preserve">
+    <value>お気に入り</value>
+    <comment>検索結果のお気に入りグループ見出し。</comment>
+  </data>
+  <data name="Search_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>ツールを検索</value>
+    <comment>検索ボックスのプレースホルダー。</comment>
+  </data>
+  <data name="Setting_Theme.Header" xml:space="preserve">
+    <value>テーマ</value>
+    <comment>テーマ設定項目。</comment>
+  </data>
+  <data name="Setting_Theme_System.Content" xml:space="preserve">
+    <value>システム設定に従う</value>
+    <comment>テーマの選択肢：システム設定に従う。</comment>
+  </data>
+  <data name="Setting_Theme_Light.Content" xml:space="preserve">
+    <value>ライト</value>
+    <comment>テーマの選択肢：ライト。</comment>
+  </data>
+  <data name="Setting_Theme_Dark.Content" xml:space="preserve">
+    <value>ダーク</value>
+    <comment>テーマの選択肢：ダーク。</comment>
+  </data>
+  <data name="Setting_DecimalPlaces.Header" xml:space="preserve">
+    <value>計算結果の小数桁数</value>
+    <comment>表示精度の設定項目。</comment>
+  </data>
+  <data name="Setting_AutoCalculate.Header" xml:space="preserve">
+    <value>入力の変更時に自動で再計算</value>
+    <comment>自動計算の設定項目。</comment>
+  </data>
+  <data name="Setting_Language.Header" xml:space="preserve">
+    <value>言語</value>
+    <comment>言語設定項目。</comment>
+  </data>
+  <data name="Setting_Language_System.Content" xml:space="preserve">
+    <value>システム設定に従う</value>
+    <comment>言語の選択肢：システム設定に従う。</comment>
+  </data>
+  <data name="Setting_Language_ZhCn.Content" xml:space="preserve">
+    <value>简体中文</value>
+    <comment>言語の選択肢：簡体字中国語（現地表記を使用）。</comment>
+  </data>
+  <data name="Setting_Language_JaJp.Content" xml:space="preserve">
+    <value>日本語</value>
+    <comment>言語の選択肢：日本語（現地表記を使用）。</comment>
+  </data>
+  <data name="Setting_Language_EnUs.Content" xml:space="preserve">
+    <value>English</value>
+    <comment>言語の選択肢：英語（現地表記を使用）。</comment>
+  </data>
+  <data name="Setting_Language_RestartHint" xml:space="preserve">
+    <value>言語の変更は次回起動時に反映されます。</value>
+    <comment>言語変更後の再起動メッセージ。</comment>
+  </data>
+  <data name="Page_PlanningCalculator_Description.Text" xml:space="preserve">
+    <value>既定では地上建築面積を容積対象建築面積とします。地域によって扱いが異なる場合があるため、現地の現行計画管理規定に従ってください。</value>
+    <comment>計算ページの説明。</comment>
+  </data>
+  <data name="Field_SiteArea" xml:space="preserve">
+    <value>敷地面積（㎡）</value>
+    <comment>入力フィールド名（記号 ㎡ は翻訳しない）。</comment>
+  </data>
+  <data name="Field_BuildingFootprint" xml:space="preserve">
+    <value>建築面積（㎡）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_TotalBuildingArea" xml:space="preserve">
+    <value>延べ床面積（㎡）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_AboveGroundArea" xml:space="preserve">
+    <value>地上床面積（㎡）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_UndergroundArea" xml:space="preserve">
+    <value>地下床面積（㎡）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_GreenArea" xml:space="preserve">
+    <value>緑地面積（㎡）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_HouseholdCount" xml:space="preserve">
+    <value>世帯数（世帯）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_Population" xml:space="preserve">
+    <value>計画人口（人）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_PeoplePerHousehold" xml:space="preserve">
+    <value>世帯当たり人口（人/世帯）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_ParkingSpacesTotal" xml:space="preserve">
+    <value>自動車駐車台数合計（台）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_SurfaceParking" xml:space="preserve">
+    <value>地上駐車台数（台）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_UndergroundParking" xml:space="preserve">
+    <value>地下駐車台数（台）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_PublicServiceArea" xml:space="preserve">
+    <value>公共サービス施設の床面積（㎡）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_UseTotalAreaForPublicService.Content" xml:space="preserve">
+    <value>公共サービス割合を延べ床面積で計算</value>
+    <comment>チェックボックス内容。</comment>
+  </data>
+  <data name="Status_ResultStaleTitle.Title" xml:space="preserve">
+    <value>結果は未更新です</value>
+    <comment>入力変更通知のタイトル。</comment>
+  </data>
+  <data name="Status_ResultStaleMessage" xml:space="preserve">
+    <value>入力が変更されました。「計算」をクリックして結果を更新してください。</value>
+    <comment>入力変更通知の内容。</comment>
+  </data>
+  <data name="Status_InputIncomplete" xml:space="preserve">
+    <value>入力が不完全なため、結果は更新されていません。</value>
+    <comment>自動計算時に入力が不完全な場合のメッセージ。</comment>
+  </data>
+  <data name="Error_InputTitle.Title" xml:space="preserve">
+    <value>入力エラー</value>
+    <comment>入力エラーのタイトル。</comment>
+  </data>
+  <data name="Status_HintTitle.Title" xml:space="preserve">
+    <value>お知らせ</value>
+    <comment>警告のタイトル。</comment>
+  </data>
+  <data name="Result_ResultsHeader.Text" xml:space="preserve">
+    <value>計算結果</value>
+    <comment>結果セクションの見出し。</comment>
+  </data>
+  <data name="Result_NotCalculated" xml:space="preserve">
+    <value>未計算</value>
+    <comment>結果のプレースホルダー。</comment>
+  </data>
+  <data name="Error_InvalidNumber" xml:space="preserve">
+    <value>{0}は有効な数字である必要があります。</value>
+    <comment>数値解析エラー。{0}はフィールド名。</comment>
+  </data>
+  <data name="Error_EnterValidNumber" xml:space="preserve">
+    <value>有効な数字を入力してください。</value>
+    <comment>共通の数値解析エラー（変換ページ）。</comment>
+  </data>
+  <data name="Error_NegativeValue" xml:space="preserve">
+    <value>{0}は負の値にできません。</value>
+    <comment>負の数チェックエラー。{0}はフィールド名。</comment>
+  </data>
+  <data name="Error_SiteAreaZero" xml:space="preserve">
+    <value>敷地面積はゼロにできません。</value>
+    <comment>敷地面積ゼロのチェックエラー。</comment>
+  </data>
+  <data name="Error_DerivedAreaNegative" xml:space="preserve">
+    <value>算出された床面積は負の値にできません。</value>
+    <comment>面積推算エラー。</comment>
+  </data>
+  <data name="Warning_FootprintExceedsSite" xml:space="preserve">
+    <value>建築面積が敷地面積を超えています。入力データを確認してください。</value>
+    <comment>データ矛盾の警告。</comment>
+  </data>
+  <data name="Warning_GreenAreaExceedsSite" xml:space="preserve">
+    <value>緑地面積が敷地面積を超えています。入力データを確認してください。</value>
+    <comment>データ矛盾の警告。</comment>
+  </data>
+  <data name="Warning_TotalAreaMismatch" xml:space="preserve">
+    <value>延べ床面積が地上・地下床面積の合計と一致しないため、入力値を上書きしませんでした。</value>
+    <comment>面積合計の整合性警告。</comment>
+  </data>
+  <data name="Warning_ParkingTotalMismatch" xml:space="preserve">
+    <value>駐車台数合計が地上・地下の合計と一致しないため、入力値を上書きしませんでした。</value>
+    <comment>駐車台数合計の整合性警告。</comment>
+  </data>
+  <data name="Warning_PublicServiceExceedsTotal" xml:space="preserve">
+    <value>公共サービス施設の床面積が延べ床面積を超えています。入力データを確認してください。</value>
+    <comment>データ矛盾の警告。</comment>
+  </data>
+  <data name="Copy_PlanningResultsHeader" xml:space="preserve">
+    <value>計画指標の計算結果</value>
+    <comment>クリップボードの結果見出し。</comment>
+  </data>
+  <data name="Result_FloorAreaRatio" xml:space="preserve">
+    <value>容積率：{0}</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_BuildingDensity" xml:space="preserve">
+    <value>建築密度：{0}</value>
+    <comment>結果行。{0}はパーセント数値。</comment>
+  </data>
+  <data name="Result_GreenRatio" xml:space="preserve">
+    <value>緑地率：{0}</value>
+    <comment>結果行。{0}はパーセント数値。</comment>
+  </data>
+  <data name="Result_Population" xml:space="preserve">
+    <value>計画人口：{0} 人</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_PerCapitaSiteArea" xml:space="preserve">
+    <value>一人当たり敷地面積：{0} ㎡/人</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_PerHouseholdSiteArea" xml:space="preserve">
+    <value>世帯当たり敷地面積：{0} ㎡/世帯</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_ParkingPerHousehold" xml:space="preserve">
+    <value>世帯当たり駐車台数：{0} 台/世帯</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_ParkingPer100Households" xml:space="preserve">
+    <value>100世帯当たり駐車台数：{0} 台</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_TotalBuildingArea" xml:space="preserve">
+    <value>延べ床面積：{0} ㎡</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_AboveGroundArea" xml:space="preserve">
+    <value>地上床面積：{0} ㎡</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_UndergroundArea" xml:space="preserve">
+    <value>地下床面積：{0} ㎡</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_UndergroundAreaRatio" xml:space="preserve">
+    <value>地下床面積の割合：{0}</value>
+    <comment>結果行。{0}はパーセント数値。</comment>
+  </data>
+  <data name="Result_PublicServiceAreaRatio" xml:space="preserve">
+    <value>公共サービス施設面積の割合：{0}</value>
+    <comment>結果行。{0}はパーセント数値。</comment>
+  </data>
+  <data name="Result_PublicServiceAreaPerHousehold" xml:space="preserve">
+    <value>世帯当たり公共サービス施設面積：{0} ㎡/世帯</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Result_PublicServiceAreaPerCapita" xml:space="preserve">
+    <value>一人当たり公共サービス施設面積：{0} ㎡/人</value>
+    <comment>結果行。{0}は数値。</comment>
+  </data>
+  <data name="Page_UnitScaleConverter_Description.Text" xml:space="preserve">
+    <value>都市計画・建築設計・数量算出に使用します。ヤード・ポンド法の幾何単位は国際フィート定義に基づきます。U.S. survey foot や液体容量単位は含みません。</value>
+    <comment>変換ページの説明。</comment>
+  </data>
+  <data name="Pivot_Length.Header" xml:space="preserve">
+    <value>長さ</value>
+    <comment>カテゴリタブ：長さ。</comment>
+  </data>
+  <data name="Pivot_Area.Header" xml:space="preserve">
+    <value>面積</value>
+    <comment>カテゴリタブ：面積。</comment>
+  </data>
+  <data name="Pivot_Volume.Header" xml:space="preserve">
+    <value>体積</value>
+    <comment>カテゴリタブ：体積。</comment>
+  </data>
+  <data name="Pivot_Scale.Header" xml:space="preserve">
+    <value>縮尺</value>
+    <comment>カテゴリタブ：縮尺。</comment>
+  </data>
+  <data name="Scale_ForwardTitle.Text" xml:space="preserve">
+    <value>図上長さ → 実長</value>
+    <comment>縮尺の順方向変換タイトル。</comment>
+  </data>
+  <data name="Scale_ReverseTitle.Text" xml:space="preserve">
+    <value>実長 → 図上長さ</value>
+    <comment>縮尺の逆方向変換タイトル。</comment>
+  </data>
+  <data name="Field_ScaleDenominator" xml:space="preserve">
+    <value>縮尺の分母 N（1 : N）</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_DrawingLength" xml:space="preserve">
+    <value>図上長さ</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_DrawingLengthUnit" xml:space="preserve">
+    <value>図上長さの単位</value>
+    <comment>単位選択フィールド名。</comment>
+  </data>
+  <data name="Field_ActualLengthOutputUnit" xml:space="preserve">
+    <value>実長の出力単位</value>
+    <comment>単位選択フィールド名。</comment>
+  </data>
+  <data name="Field_ActualLength" xml:space="preserve">
+    <value>実長</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_ActualLengthUnit" xml:space="preserve">
+    <value>実長の単位</value>
+    <comment>単位選択フィールド名。</comment>
+  </data>
+  <data name="Field_DrawingLengthOutputUnit" xml:space="preserve">
+    <value>図上長さの出力単位</value>
+    <comment>単位選択フィールド名。</comment>
+  </data>
+  <data name="Field_InputValue" xml:space="preserve">
+    <value>数値を入力</value>
+    <comment>入力フィールド名。</comment>
+  </data>
+  <data name="Field_SourceUnit" xml:space="preserve">
+    <value>変換元単位</value>
+    <comment>単位選択フィールド名。</comment>
+  </data>
+  <data name="Field_TargetUnit" xml:space="preserve">
+    <value>変換先単位</value>
+    <comment>単位選択フィールド名。</comment>
+  </data>
+  <data name="Unit_ResultPlaceholder" xml:space="preserve">
+    <value>数値を入力し、単位を選択してください。</value>
+    <comment>単位換算結果のプレースホルダー。</comment>
+  </data>
+  <data name="Unit_EnterValue" xml:space="preserve">
+    <value>数値を入力してください。</value>
+    <comment>単位換算の空値メッセージ。</comment>
+  </data>
+  <data name="Scale_ResultPlaceholderForward" xml:space="preserve">
+    <value>縮尺と図上長さを入力してください。</value>
+    <comment>順方向縮尺結果のプレースホルダー。</comment>
+  </data>
+  <data name="Scale_ResultPlaceholderReverse" xml:space="preserve">
+    <value>縮尺と実長を入力してください。</value>
+    <comment>逆方向縮尺結果のプレースホルダー。</comment>
+  </data>
+  <data name="Error_EnterScaleAndLength" xml:space="preserve">
+    <value>縮尺の分母と長さを入力してください。</value>
+    <comment>縮尺の空値メッセージ。</comment>
+  </data>
+  <data name="Error_NoCopyableResult" xml:space="preserve">
+    <value>コピーできる有効な結果がありません。</value>
+    <comment>コピー失敗メッセージ。</comment>
+  </data>
+  <data name="UnitNote_Area" xml:space="preserve">
+    <value>畝・坪・反・町は地域的または伝統的な単位です。日本の「畳/帖」は面積基準が異なるため、本バージョンでは固定換算を提供しません。</value>
+    <comment>面積カテゴリの説明。</comment>
+  </data>
+  <data name="UnitNote_Length" xml:space="preserve">
+    <value>日本の伝統建築単位：尺（しゃく）と間（けん）。中国の市尺と混同しないでください。</value>
+    <comment>長さカテゴリの説明。</comment>
+  </data>
+  <data name="UnitNote_Volume" xml:space="preserve">
+    <value>ここでの体積は建築空間・土量・コンクリートなどの幾何体積を指します。gallon、fluid ounce、pint、quart、cup は提供しません。</value>
+    <comment>体積カテゴリの説明。</comment>
+  </data>
+  <data name="Scale_Note.Text" xml:space="preserve">
+    <value>実際の計画・建築縮尺は通常、正の整数の分母を使用します。小数の分母と長さもサポートします。</value>
+    <comment>縮尺の説明。</comment>
+  </data>
+  <data name="Error_NegativeInput" xml:space="preserve">
+    <value>入力値は負の値にできません。</value>
+    <comment>単位換算の負数エラー。</comment>
+  </data>
+  <data name="Error_SelectUnits" xml:space="preserve">
+    <value>変換元と変換先の単位を選択してください。</value>
+    <comment>単位選択エラー。</comment>
+  </data>
+  <data name="Error_CrossCategoryUnits" xml:space="preserve">
+    <value>変換元と変換先の単位は同じカテゴリである必要があります。</value>
+    <comment>カテゴリ間変換エラー。</comment>
+  </data>
+  <data name="Error_OutOfRange" xml:space="preserve">
+    <value>数値が処理可能な範囲を超えています。</value>
+    <comment>オーバーフローエラー。</comment>
+  </data>
+  <data name="Error_ScaleDenominatorPositive" xml:space="preserve">
+    <value>縮尺の分母は 0 より大きい必要があります。</value>
+    <comment>縮尺の分母チェックエラー。</comment>
+  </data>
+  <data name="Error_NegativeLength" xml:space="preserve">
+    <value>長さは負の値にできません。</value>
+    <comment>長さの負数エラー。</comment>
+  </data>
+  <data name="Error_SelectValidLengthUnit" xml:space="preserve">
+    <value>有効な長さの単位を選択してください。</value>
+    <comment>長さの単位選択エラー。</comment>
+  </data>
+  <data name="Unit_LengthMm_Name" xml:space="preserve">
+    <value>ミリメートル（mm，メートル法）</value>
+    <comment>長さの単位名。</comment>
+  </data>
+  <data name="Unit_LengthCm_Name" xml:space="preserve">
+    <value>センチメートル（cm，メートル法）</value>
+    <comment>長さの単位名。</comment>
+  </data>
+  <data name="Unit_LengthM_Name" xml:space="preserve">
+    <value>メートル（m，メートル法）</value>
+    <comment>長さの単位名。</comment>
+  </data>
+  <data name="Unit_LengthKm_Name" xml:space="preserve">
+    <value>キロメートル（km，メートル法）</value>
+    <comment>長さの単位名。</comment>
+  </data>
+  <data name="Unit_LengthIn_Name" xml:space="preserve">
+    <value>インチ（in，ヤード・ポンド法）</value>
+    <comment>長さの単位名。</comment>
+  </data>
+  <data name="Unit_LengthFt_Name" xml:space="preserve">
+    <value>フィート（ft，ヤード・ポンド法）</value>
+    <comment>長さの単位名。</comment>
+  </data>
+  <data name="Unit_LengthYd_Name" xml:space="preserve">
+    <value>ヤード（yd，ヤード・ポンド法）</value>
+    <comment>長さの単位名。</comment>
+  </data>
+  <data name="Unit_LengthMi_Name" xml:space="preserve">
+    <value>マイル（mi，ヤード・ポンド法）</value>
+    <comment>長さの単位名。</comment>
+  </data>
+  <data name="Unit_LengthShaku_Name" xml:space="preserve">
+    <value>尺（しゃく，日本の伝統建築単位）</value>
+    <comment>日本の伝統的な長さの単位。</comment>
+  </data>
+  <data name="Unit_LengthKen_Name" xml:space="preserve">
+    <value>間（けん，日本の伝統建築単位）</value>
+    <comment>日本の伝統的な長さの単位。</comment>
+  </data>
+  <data name="Unit_AreaMm2_Name" xml:space="preserve">
+    <value>平方ミリメートル（mm²，メートル法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaCm2_Name" xml:space="preserve">
+    <value>平方センチメートル（cm²，メートル法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaM2_Name" xml:space="preserve">
+    <value>平方メートル（m²，メートル法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaHa_Name" xml:space="preserve">
+    <value>ヘクタール（ha，メートル法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaKm2_Name" xml:space="preserve">
+    <value>平方キロメートル（km²，メートル法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaMu_Name" xml:space="preserve">
+    <value>畝（中国）</value>
+    <comment>中国の伝統的な面積の単位。</comment>
+  </data>
+  <data name="Unit_AreaTsubo_Name" xml:space="preserve">
+    <value>坪（日本）</value>
+    <comment>日本の伝統的な面積の単位。</comment>
+  </data>
+  <data name="Unit_AreaTan_Name" xml:space="preserve">
+    <value>反（日本）</value>
+    <comment>日本の伝統的な面積の単位。</comment>
+  </data>
+  <data name="Unit_AreaCho_Name" xml:space="preserve">
+    <value>町（日本）</value>
+    <comment>日本の伝統的な面積の単位。</comment>
+  </data>
+  <data name="Unit_AreaIn2_Name" xml:space="preserve">
+    <value>平方インチ（in²，ヤード・ポンド法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaFt2_Name" xml:space="preserve">
+    <value>平方フィート（ft²，ヤード・ポンド法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaYd2_Name" xml:space="preserve">
+    <value>平方ヤード（yd²，ヤード・ポンド法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaAcre_Name" xml:space="preserve">
+    <value>エーカー（acre，ヤード・ポンド法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_AreaMi2_Name" xml:space="preserve">
+    <value>平方マイル（mi²，ヤード・ポンド法）</value>
+    <comment>面積の単位名。</comment>
+  </data>
+  <data name="Unit_VolumeMm3_Name" xml:space="preserve">
+    <value>立方ミリメートル（mm³，メートル法）</value>
+    <comment>体積の単位名。</comment>
+  </data>
+  <data name="Unit_VolumeCm3_Name" xml:space="preserve">
+    <value>立方センチメートル（cm³，メートル法）</value>
+    <comment>体積の単位名。</comment>
+  </data>
+  <data name="Unit_VolumeM3_Name" xml:space="preserve">
+    <value>立方メートル（m³，メートル法）</value>
+    <comment>体積の単位名。</comment>
+  </data>
+  <data name="Unit_VolumeL_Name" xml:space="preserve">
+    <value>リットル（L，幾何体積）</value>
+    <comment>体積の単位名。</comment>
+  </data>
+  <data name="Unit_VolumeIn3_Name" xml:space="preserve">
+    <value>立方インチ（in³，ヤード・ポンド法）</value>
+    <comment>体積の単位名。</comment>
+  </data>
+  <data name="Unit_VolumeFt3_Name" xml:space="preserve">
+    <value>立方フィート（ft³，ヤード・ポンド法）</value>
+    <comment>体積の単位名。</comment>
+  </data>
+  <data name="Unit_VolumeYd3_Name" xml:space="preserve">
+    <value>立方ヤード（yd³，ヤード・ポンド法）</value>
+    <comment>体積の単位名。</comment>
+  </data>
+  <data name="About_Description.Text" xml:space="preserve">
+    <value>都市計画指標と単位・縮尺をローカルですばやく概算します。入力データはアップロードされません。</value>
+    <comment>このアプリについての説明。</comment>
+  </data>
+  <data name="About_Technology.Text" xml:space="preserve">
+    <value>技術：C#、WinUI 3、Windows App SDK、MSIX</value>
+    <comment>技術スタックの説明。</comment>
+  </data>
+  <data name="About_LicenseAndRepo.Text" xml:space="preserve">
+    <value>ライセンス：未定。リポジトリ：</value>
+    <comment>ライセンスとリポジトリ入口の説明。</comment>
+  </data>
+  <data name="Page_About_Title.Text" xml:space="preserve">
+    <value>このアプリについて</value>
+    <comment>このアプリについてページのタイトル。</comment>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>v{0} プレビュー版</value>
+    <comment>このアプリについてのバージョン形式。{0}はバージョン番号。</comment>
+  </data>
+  <data name="Update_Checking" xml:space="preserve">
+    <value>更新を確認中…</value>
+    <comment>更新確認ボタンの進行中テキスト。</comment>
+  </data>
+  <data name="Update_AvailableTitle" xml:space="preserve">
+    <value>新しいバージョン {0} が見つかりました</value>
+    <comment>新バージョンダイアログのタイトル。{0}はバージョン番号。</comment>
+  </data>
+  <data name="Update_DialogContent" xml:space="preserve">
+    <value>現在のバージョン：{0}
+最新バージョン：{1}
+
+更新内容：
+{2}</value>
+    <comment>新バージョンダイアログの内容。{0}現在、{1}最新、{2}更新内容。</comment>
+  </data>
+  <data name="Update_NoNotes" xml:space="preserve">
+    <value>このバージョンの更新内容はまだありません</value>
+    <comment>更新内容が空の場合のメッセージ。</comment>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>現在最新バージョンです
+
+現在のバージョン：{0}
+最新バージョン：{1}</value>
+    <comment>最新バージョンである旨のメッセージ。{0}現在、{1}最新。</comment>
+  </data>
+  <data name="Update_LocalVersionNewer" xml:space="preserve">
+    <value>現在のバージョンは最新の正式版を下回りません</value>
+    <comment>ローカルが最新以上である旨のメッセージ。</comment>
+  </data>
+  <data name="Update_NoRelease" xml:space="preserve">
+    <value>GitHub で利用可能な正式版はまだ公開されていません。</value>
+    <comment>Release が無い場合のメッセージ。</comment>
+  </data>
+  <data name="Update_ConnectionFailed" xml:space="preserve">
+    <value>GitHub に接続できません。ネットワーク接続を確認して再試行してください。</value>
+    <comment>ネットワークエラーのメッセージ。</comment>
+  </data>
+  <data name="Update_TimedOut" xml:space="preserve">
+    <value>リクエストがタイムアウトしました。しばらくしてから再試行してください。</value>
+    <comment>タイムアウトのメッセージ。</comment>
+  </data>
+  <data name="Update_RateLimited" xml:space="preserve">
+    <value>GitHub API のリクエスト回数制限に達しました。しばらくしてから再試行してください。</value>
+    <comment>レート制限のメッセージ。</comment>
+  </data>
+  <data name="Update_InvalidRemoteVersion" xml:space="preserve">
+    <value>リモートのバージョン番号を認識できません。</value>
+    <comment>リモートバージョン解析失敗のメッセージ。</comment>
+  </data>
+  <data name="Update_GenericFailure" xml:space="preserve">
+    <value>更新情報を取得できませんでした。しばらくしてから再試行してください。</value>
+    <comment>一般的な失敗のメッセージ。</comment>
+  </data>
+  <data name="Error_OpenRepositoryFailed" xml:space="preserve">
+    <value>プロジェクトリポジトリを開けませんでした。既定のブラウザ設定を確認して再試行してください。</value>
+    <comment>リポジトリを開けない場合のメッセージ。</comment>
+  </data>
+  <data name="Error_OpenReleaseFailed" xml:space="preserve">
+    <value>Release ページを開けませんでした。既定のブラウザ設定を確認して再試行してください。</value>
+    <comment>Release ページを開けない場合のメッセージ。</comment>
+  </data>
+</root>

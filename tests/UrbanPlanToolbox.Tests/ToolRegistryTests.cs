@@ -29,7 +29,7 @@ public sealed class ToolRegistryTests
     [InlineData(ToolIds.UnitScaleConverter, "单位与比例尺换算器")]
     public void FindsRegisteredToolByStableId(string id, string expectedName)
     {
-        Assert.Equal(expectedName, ToolRegistry.Default.GetById(id).DisplayName);
+        Assert.Equal(expectedName, TestLocalization.ZhCn.GetString(ToolRegistry.Default.GetById(id).NameResourceKey));
         Assert.True(ToolRegistry.Default.TryGet(id, out var tool));
         Assert.Equal(id, tool!.Id);
     }
@@ -50,8 +50,8 @@ public sealed class ToolRegistryTests
 
         Assert.Equal(ToolPrimaryCategory.Design, tool.PrimaryCategory);
         Assert.Equal(ToolSecondaryCategory.MasterPlanning, tool.SecondaryCategory);
-        Assert.Equal("设计工具", tool.PrimaryCategory.GetDisplayName());
-        Assert.Equal("总体设计", tool.SecondaryCategory.GetDisplayName());
+        Assert.Equal("Navigation_DesignTools", tool.PrimaryCategory.GetNameResourceKey());
+        Assert.Equal("Category_MasterPlanning", tool.SecondaryCategory.GetNameResourceKey());
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public sealed class ToolRegistryTests
 
         Assert.Equal(ToolPrimaryCategory.Design, tool.PrimaryCategory);
         Assert.Equal(ToolSecondaryCategory.DetailedDesign, tool.SecondaryCategory);
-        Assert.Equal("设计工具", tool.PrimaryCategory.GetDisplayName());
-        Assert.Equal("详细设计", tool.SecondaryCategory.GetDisplayName());
+        Assert.Equal("Navigation_DesignTools", tool.PrimaryCategory.GetNameResourceKey());
+        Assert.Equal("Category_DetailedDesign", tool.SecondaryCategory.GetNameResourceKey());
     }
 
     [Fact]
@@ -168,14 +168,14 @@ public sealed class ToolRegistryTests
             ToolSecondaryCategory.DetailedDesign));
 
         Assert.Equal(ToolIds.PlanningIndicatorCalculator, masterPlanningCard.Id);
-        Assert.Equal("规划指标快速计算器", masterPlanningCard.DisplayName);
-        Assert.False(string.IsNullOrWhiteSpace(masterPlanningCard.Description));
+        Assert.Equal("规划指标快速计算器", TestLocalization.ZhCn.GetString(masterPlanningCard.NameResourceKey));
+        Assert.False(string.IsNullOrWhiteSpace(TestLocalization.ZhCn.GetString(masterPlanningCard.DescriptionResourceKey)));
         Assert.False(string.IsNullOrWhiteSpace(masterPlanningCard.IconGlyph));
         Assert.Equal(typeof(Views.PlanningCalculatorPage), masterPlanningCard.PageType);
 
         Assert.Equal(ToolIds.UnitScaleConverter, detailedDesignCard.Id);
-        Assert.Equal("单位与比例尺换算器", detailedDesignCard.DisplayName);
-        Assert.False(string.IsNullOrWhiteSpace(detailedDesignCard.Description));
+        Assert.Equal("单位与比例尺换算器", TestLocalization.ZhCn.GetString(detailedDesignCard.NameResourceKey));
+        Assert.False(string.IsNullOrWhiteSpace(TestLocalization.ZhCn.GetString(detailedDesignCard.DescriptionResourceKey)));
         Assert.False(string.IsNullOrWhiteSpace(detailedDesignCard.IconGlyph));
         Assert.Equal(typeof(Views.UnitScaleConverterPage), detailedDesignCard.PageType);
     }
@@ -203,8 +203,8 @@ public sealed class ToolRegistryTests
 
     private static ToolDefinition CreateTool(string id, int sortOrder) => new(
         id,
-        id,
-        id,
+        $"{id}_Name",
+        $"{id}_Description",
         ToolPrimaryCategory.Design,
         ToolSecondaryCategory.PreliminaryAnalysis,
         "\uE10F",
@@ -213,5 +213,5 @@ public sealed class ToolRegistryTests
         true,
         id,
         "X",
-        [id]);
+        $"{id}_Keywords");
 }

@@ -18,26 +18,42 @@ public sealed partial class ToolCategoryBrowser : UserControl
         ToolSecondaryCategory defaultCategory)
     {
         _primaryCategory = primaryCategory;
-        CategoryList.ItemsSource = categories;
+        var localization = LocalizationService.Default;
+        CategoryList.ItemsSource = categories
+            .Select(category => new CategoryDisplayItem(
+                category.Id,
+                localization.GetString(category.NameResourceKey),
+                category))
+            .ToArray();
 
         var selectedCategory = SessionSelections.TryGetValue(primaryCategory, out var savedCategory)
             ? savedCategory
             : defaultCategory;
-        CategoryList.SelectedItem = categories.FirstOrDefault(category => category.SecondaryCategory == selectedCategory)
-            ?? categories.FirstOrDefault();
+        var items = CategoryList.Items.OfType<CategoryDisplayItem>().ToArray();
+        CategoryList.SelectedItem = items.FirstOrDefault(item => item.Definition.SecondaryCategory == selectedCategory)
+            ?? items.FirstOrDefault();
     }
 
     private void OnCategorySelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (CategoryList.SelectedItem is not ToolCategoryDefinition category)
+        if (CategoryList.SelectedItem is not CategoryDisplayItem { Definition: { } category })
         {
             return;
         }
 
         SessionSelections[_primaryCategory] = category.SecondaryCategory;
-        var tools = ToolRegistry.Default.GetAvailableByCategories(_primaryCategory, category.SecondaryCategory);
+        var localization = LocalizationService.Default;
+        var tools = ToolRegistry.Default
+            .GetAvailableByCategories(_primaryCategory, category.SecondaryCategory)
+            .Select(tool => new LocalizedTool(
+                tool,
+                localization.GetString(tool.NameResourceKey),
+                localization.GetString(tool.DescriptionResourceKey)))
+            .ToArray();
         ToolCards.SetTools(tools);
-        ToolCards.Visibility = tools.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
-        EmptyState.IsOpen = tools.Count == 0;
+        ToolCards.Visibility = tools.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
+        EmptyState.IsOpen = tools.Length == 0;
     }
+
+    private sealed record CategoryDisplayItem(string Id, string DisplayName, ToolCategoryDefinition Definition);
 }

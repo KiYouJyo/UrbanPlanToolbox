@@ -14,7 +14,7 @@ public sealed partial class ToolSearchList : UserControl
 
     private void OnToolItemClick(object sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: ToolDefinition tool } && FindHostFrame() is { } frame)
+        if (sender is Button { Tag: LocalizedTool { Definition: { } tool } } && FindHostFrame() is { } frame)
         {
             ToolNavigation.Navigate(frame, tool.Id);
         }

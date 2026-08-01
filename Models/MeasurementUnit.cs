@@ -2,7 +2,7 @@ namespace UrbanPlanToolbox.Models;
 
 public sealed record MeasurementUnit(
     string Id,
-    string DisplayName,
+    string DisplayNameResourceKey,
     string Symbol,
     MeasurementCategory Category,
     string System,

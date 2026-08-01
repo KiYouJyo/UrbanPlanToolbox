@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>UrbanPlanToolbox</value>
+    <comment>App display name (MSIX brand name; not translated).</comment>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>Urban planning assistant toolbox</value>
+    <comment>MSIX package description.</comment>
+  </data>
+  <data name="Navigation_Welcome" xml:space="preserve">
+    <value>Home</value>
+    <comment>Primary navigation: Home.</comment>
+  </data>
+  <data name="Navigation_Favorites" xml:space="preserve">
+    <value>Favorites</value>
+    <comment>Primary navigation: Favorites (reserved; merged into the Search page in this version).</comment>
+  </data>
+  <data name="Navigation_Search" xml:space="preserve">
+    <value>Search</value>
+    <comment>Primary navigation: tool search page.</comment>
+  </data>
+  <data name="Navigation_DesignTools" xml:space="preserve">
+    <value>Design Tools</value>
+    <comment>Primary navigation: Design Tools.</comment>
+  </data>
+  <data name="Navigation_ResearchTools" xml:space="preserve">
+    <value>Research Tools</value>
+    <comment>Primary navigation: Research Tools.</comment>
+  </data>
+  <data name="Navigation_ProjectArchive" xml:space="preserve">
+    <value>Project Archive</value>
+    <comment>Primary navigation: Project Archive.</comment>
+  </data>
+  <data name="Navigation_About" xml:space="preserve">
+    <value>About</value>
+    <comment>Primary navigation: About.</comment>
+  </data>
+  <data name="Navigation_Settings" xml:space="preserve">
+    <value>Settings</value>
+    <comment>Settings navigation item.</comment>
+  </data>
+  <data name="Home_Title.Text" xml:space="preserve">
+    <value>UrbanPlanToolbox</value>
+    <comment>Home page title (brand name).</comment>
+  </data>
+  <data name="Home_Subtitle.Text" xml:space="preserve">
+    <value>UrbanPlan Toolbox · urban planning assistant</value>
+    <comment>Home page subtitle.</comment>
+  </data>
+  <data name="Home_Version.Text" xml:space="preserve">
+    <value>v0.3.7 preview. Planning metrics and unit/scale conversions run locally; no planning data is uploaded.</value>
+    <comment>Home page version and privacy statement.</comment>
+  </data>
+  <data name="Home_OpenCalculator.Content" xml:space="preserve">
+    <value>Open Planning Metrics Calculator</value>
+    <comment>Home page shortcut button.</comment>
+  </data>
+  <data name="Home_OpenUnitScale.Content" xml:space="preserve">
+    <value>Open Unit &amp; Scale Converter</value>
+    <comment>Home page shortcut button.</comment>
+  </data>
+  <data name="Home_UpcomingTitle.Text" xml:space="preserve">
+    <value>Upcoming tools</value>
+    <comment>Home page upcoming tools heading.</comment>
+  </data>
+  <data name="Home_UpcomingLandBalance.Title" xml:space="preserve">
+    <value>Land Use Balance Table</value>
+    <comment>Upcoming tool name.</comment>
+  </data>
+  <data name="Home_UpcomingLandBalance.Message" xml:space="preserve">
+    <value>Coming soon</value>
+    <comment>Upcoming tool status.</comment>
+  </data>
+  <data name="Home_UpcomingParking.Title" xml:space="preserve">
+    <value>Parking Space Estimation</value>
+    <comment>Upcoming tool name.</comment>
+  </data>
+  <data name="Home_UpcomingParking.Message" xml:space="preserve">
+    <value>Coming soon</value>
+    <comment>Upcoming tool status.</comment>
+  </data>
+  <data name="Page_DesignTools_Description.Text" xml:space="preserve">
+    <value>Browse available tools by design stage</value>
+    <comment>Design Tools page description.</comment>
+  </data>
+  <data name="Page_ResearchTools_Description.Text" xml:space="preserve">
+    <value>Browse available tools by research stage</value>
+    <comment>Research Tools page description.</comment>
+  </data>
+  <data name="Page_Search_Description.Text" xml:space="preserve">
+    <value>Browse all available tools and search by name, description, or keywords.</value>
+    <comment>Search page description.</comment>
+  </data>
+  <data name="Page_ProjectArchive_Status.Text" xml:space="preserve">
+    <value>Project Archive is planned for a future update</value>
+    <comment>Project Archive page status.</comment>
+  </data>
+  <data name="Page_ProjectArchive_Description.Text" xml:space="preserve">
+    <value>This module will be used to manage your own design, planning, and research projects.</value>
+    <comment>Project Archive page description.</comment>
+  </data>
+  <data name="Category_PreliminaryAnalysis" xml:space="preserve">
+    <value>Preliminary Analysis</value>
+    <comment>Design secondary category: Preliminary Analysis.</comment>
+  </data>
+  <data name="Category_FieldResearch" xml:space="preserve">
+    <value>Field Research</value>
+    <comment>Design secondary category: Field Research.</comment>
+  </data>
+  <data name="Category_DesignDevelopment" xml:space="preserve">
+    <value>Concept Development</value>
+    <comment>Design secondary category: Concept Development.</comment>
+  </data>
+  <data name="Category_MasterPlanning" xml:space="preserve">
+    <value>Master Planning</value>
+    <comment>Design secondary category: Master Planning.</comment>
+  </data>
+  <data name="Category_DetailedDesign" xml:space="preserve">
+    <value>Detailed Design</value>
+    <comment>Design secondary category: Detailed Design.</comment>
+  </data>
+  <data name="Category_ResearchPreparation" xml:space="preserve">
+    <value>Research Preparation</value>
+    <comment>Research secondary category: Research Preparation.</comment>
+  </data>
+  <data name="Category_GeographicTools" xml:space="preserve">
+    <value>Geographic Tools</value>
+    <comment>Research secondary category: Geographic Tools.</comment>
+  </data>
+  <data name="Category_DataTools" xml:space="preserve">
+    <value>Data Tools</value>
+    <comment>Research secondary category: Data Tools.</comment>
+  </data>
+  <data name="Category_EmptyState.Message" xml:space="preserve">
+    <value>No tools are available in this category yet</value>
+    <comment>Category empty state.</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Name" xml:space="preserve">
+    <value>Planning Metrics Calculator</value>
+    <comment>Tool name: Planning Metrics Calculator.</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Description" xml:space="preserve">
+    <value>Quickly calculate floor area ratio, building density, green ratio, and related planning metrics.</value>
+    <comment>Tool description.</comment>
+  </data>
+  <data name="Tool_PlanningIndicator_Keywords" xml:space="preserve">
+    <value>planning
+indicator
+metrics
+floor area ratio
+building density
+green ratio
+plot ratio</value>
+    <comment>One search keyword per line.</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Name" xml:space="preserve">
+    <value>Unit &amp; Scale Converter</value>
+    <comment>Tool name: Unit &amp; Scale Converter.</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Description" xml:space="preserve">
+    <value>Quickly convert between length, area, and common drawing scales.</value>
+    <comment>Tool description.</comment>
+  </data>
+  <data name="Tool_UnitScaleConverter_Keywords" xml:space="preserve">
+    <value>unit
+scale
+converter
+length
+area
+conversion</value>
+    <comment>One search keyword per line.</comment>
+  </data>
+  <data name="Action_OpenTool.Text" xml:space="preserve">
+    <value>Open Tool</value>
+    <comment>Tool card open button.</comment>
+  </data>
+  <data name="Action_AddFavorite" xml:space="preserve">
+    <value>Add to Favorites</value>
+    <comment>Favorite button tooltip.</comment>
+  </data>
+  <data name="Action_RemoveFavorite" xml:space="preserve">
+    <value>Remove from Favorites</value>
+    <comment>Unfavorite button tooltip.</comment>
+  </data>
+  <data name="Action_CheckForUpdates" xml:space="preserve">
+    <value>Check for Updates</value>
+    <comment>About page update check button.</comment>
+  </data>
+  <data name="Action_CopyResults.Content" xml:space="preserve">
+    <value>Copy Results</value>
+    <comment>Copy results button.</comment>
+  </data>
+  <data name="Action_Reset.Content" xml:space="preserve">
+    <value>Reset</value>
+    <comment>Clear inputs button (terminology baseline "Reset"; awaiting review).</comment>
+  </data>
+  <data name="Action_SwapUnits.Content" xml:space="preserve">
+    <value>Swap Units</value>
+    <comment>Swap units button.</comment>
+  </data>
+  <data name="Action_Calculate.Content" xml:space="preserve">
+    <value>Calculate</value>
+    <comment>Calculate button.</comment>
+  </data>
+  <data name="Action_Convert.Content" xml:space="preserve">
+    <value>Convert</value>
+    <comment>Unit conversion button.</comment>
+  </data>
+  <data name="Action_FillSample.Content" xml:space="preserve">
+    <value>Fill in Example</value>
+    <comment>Sample data button.</comment>
+  </data>
+  <data name="Action_ClearSearch.Content" xml:space="preserve">
+    <value>Clear</value>
+    <comment>Search clear button.</comment>
+  </data>
+  <data name="Action_SaveSettings.Content" xml:space="preserve">
+    <value>Save Settings</value>
+    <comment>Settings page save button.</comment>
+  </data>
+  <data name="Action_RestoreDefaults.Content" xml:space="preserve">
+    <value>Restore Defaults</value>
+    <comment>Settings page restore defaults button.</comment>
+  </data>
+  <data name="Action_GoToDownload" xml:space="preserve">
+    <value>Go to Download</value>
+    <comment>Update dialog primary button.</comment>
+  </data>
+  <data name="Action_Later" xml:space="preserve">
+    <value>Later</value>
+    <comment>Update dialog close button.</comment>
+  </data>
+  <data name="Dialog_Ok" xml:space="preserve">
+    <value>OK</value>
+    <comment>Common dialog confirm button.</comment>
+  </data>
+  <data name="Dialog_UpdateTitle" xml:space="preserve">
+    <value>Update</value>
+    <comment>Update status dialog title.</comment>
+  </data>
+  <data name="Dialog_OpenFailedTitle" xml:space="preserve">
+    <value>Open Failed</value>
+    <comment>Open failed dialog title.</comment>
+  </data>
+  <data name="Status_SettingsSaved" xml:space="preserve">
+    <value>Settings saved.</value>
+    <comment>Settings saved status message.</comment>
+  </data>
+  <data name="Status_RestoredDefaults" xml:space="preserve">
+    <value>Defaults restored.</value>
+    <comment>Restore defaults status message.</comment>
+  </data>
+  <data name="Status_NoSearchResults.Title" xml:space="preserve">
+    <value>No matching tools found</value>
+    <comment>Search no-results title.</comment>
+  </data>
+  <data name="Status_NoSearchResults.Message" xml:space="preserve">
+    <value>Try a different keyword.</value>
+    <comment>Search no-results message.</comment>
+  </data>
+  <data name="Search_FavoritesHeader" xml:space="preserve">
+    <value>Favorites</value>
+    <comment>Search favorites group header.</comment>
+  </data>
+  <data name="Search_Placeholder.PlaceholderText" xml:space="preserve">
+    <value>Search tools</value>
+    <comment>Search box placeholder.</comment>
+  </data>
+  <data name="Setting_Theme.Header" xml:space="preserve">
+    <value>Theme</value>
+    <comment>Theme setting.</comment>
+  </data>
+  <data name="Setting_Theme_System.Content" xml:space="preserve">
+    <value>Use System Setting</value>
+    <comment>Theme option: follow system.</comment>
+  </data>
+  <data name="Setting_Theme_Light.Content" xml:space="preserve">
+    <value>Light</value>
+    <comment>Theme option: light.</comment>
+  </data>
+  <data name="Setting_Theme_Dark.Content" xml:space="preserve">
+    <value>Dark</value>
+    <comment>Theme option: dark.</comment>
+  </data>
+  <data name="Setting_DecimalPlaces.Header" xml:space="preserve">
+    <value>Decimal Places for Results</value>
+    <comment>Display precision setting.</comment>
+  </data>
+  <data name="Setting_AutoCalculate.Header" xml:space="preserve">
+    <value>Auto-recalculate when input changes</value>
+    <comment>Auto-calculate setting.</comment>
+  </data>
+  <data name="Setting_Language.Header" xml:space="preserve">
+    <value>Language</value>
+    <comment>Language setting.</comment>
+  </data>
+  <data name="Setting_Language_System.Content" xml:space="preserve">
+    <value>Use System Setting</value>
+    <comment>Language option: follow system.</comment>
+  </data>
+  <data name="Setting_Language_ZhCn.Content" xml:space="preserve">
+    <value>简体中文</value>
+    <comment>Language option: Simplified Chinese (native name).</comment>
+  </data>
+  <data name="Setting_Language_JaJp.Content" xml:space="preserve">
+    <value>日本語</value>
+    <comment>Language option: Japanese (native name).</comment>
+  </data>
+  <data name="Setting_Language_EnUs.Content" xml:space="preserve">
+    <value>English</value>
+    <comment>Language option: English (native name).</comment>
+  </data>
+  <data name="Setting_Language_RestartHint" xml:space="preserve">
+    <value>The language change will take effect the next time the app starts.</value>
+    <comment>Restart notice after changing the language.</comment>
+  </data>
+  <data name="Page_PlanningCalculator_Description.Text" xml:space="preserve">
+    <value>By default, above-ground floor area is used as the floor-area-ratio base; local regulations may differ, so follow current local planning rules.</value>
+    <comment>Calculator page description.</comment>
+  </data>
+  <data name="Field_SiteArea" xml:space="preserve">
+    <value>Site area (m²)</value>
+    <comment>Input field name (symbol m² is not translated).</comment>
+  </data>
+  <data name="Field_BuildingFootprint" xml:space="preserve">
+    <value>Building footprint (m²)</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_TotalBuildingArea" xml:space="preserve">
+    <value>Total floor area (m²)</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_AboveGroundArea" xml:space="preserve">
+    <value>Above-ground floor area (m²)</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_UndergroundArea" xml:space="preserve">
+    <value>Underground floor area (m²)</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_GreenArea" xml:space="preserve">
+    <value>Green area (m²)</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_HouseholdCount" xml:space="preserve">
+    <value>Households</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_Population" xml:space="preserve">
+    <value>Planned population</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_PeoplePerHousehold" xml:space="preserve">
+    <value>People per household</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_ParkingSpacesTotal" xml:space="preserve">
+    <value>Total parking spaces</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_SurfaceParking" xml:space="preserve">
+    <value>Surface parking spaces</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_UndergroundParking" xml:space="preserve">
+    <value>Underground parking spaces</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_PublicServiceArea" xml:space="preserve">
+    <value>Public service facility floor area (m²)</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_UseTotalAreaForPublicService.Content" xml:space="preserve">
+    <value>Calculate public service ratio using total floor area</value>
+    <comment>Check box content.</comment>
+  </data>
+  <data name="Status_ResultStaleTitle.Title" xml:space="preserve">
+    <value>Results need updating</value>
+    <comment>Stale results title.</comment>
+  </data>
+  <data name="Status_ResultStaleMessage" xml:space="preserve">
+    <value>Input changed; click Calculate to update the results.</value>
+    <comment>Stale results message.</comment>
+  </data>
+  <data name="Status_InputIncomplete" xml:space="preserve">
+    <value>Input is incomplete; results were not updated.</value>
+    <comment>Incomplete input message during auto-calculate.</comment>
+  </data>
+  <data name="Error_InputTitle.Title" xml:space="preserve">
+    <value>Input Error</value>
+    <comment>Input error title.</comment>
+  </data>
+  <data name="Status_HintTitle.Title" xml:space="preserve">
+    <value>Notice</value>
+    <comment>Warning title.</comment>
+  </data>
+  <data name="Result_ResultsHeader.Text" xml:space="preserve">
+    <value>Results</value>
+    <comment>Results section heading.</comment>
+  </data>
+  <data name="Result_NotCalculated" xml:space="preserve">
+    <value>Not calculated yet</value>
+    <comment>Results placeholder.</comment>
+  </data>
+  <data name="Error_InvalidNumber" xml:space="preserve">
+    <value>{0} must be a valid number.</value>
+    <comment>Number parse error; {0} is the field name.</comment>
+  </data>
+  <data name="Error_EnterValidNumber" xml:space="preserve">
+    <value>Enter a valid number.</value>
+    <comment>Common number parse error (converter page).</comment>
+  </data>
+  <data name="Error_NegativeValue" xml:space="preserve">
+    <value>{0} cannot be negative.</value>
+    <comment>Negative value validation error; {0} is the field name.</comment>
+  </data>
+  <data name="Error_SiteAreaZero" xml:space="preserve">
+    <value>Site area cannot be zero.</value>
+    <comment>Zero site area validation error.</comment>
+  </data>
+  <data name="Error_DerivedAreaNegative" xml:space="preserve">
+    <value>Derived floor area cannot be negative.</value>
+    <comment>Derived area error.</comment>
+  </data>
+  <data name="Warning_FootprintExceedsSite" xml:space="preserve">
+    <value>Building footprint exceeds site area; please verify the input.</value>
+    <comment>Data conflict warning.</comment>
+  </data>
+  <data name="Warning_GreenAreaExceedsSite" xml:space="preserve">
+    <value>Green area exceeds site area; please verify the input.</value>
+    <comment>Data conflict warning.</comment>
+  </data>
+  <data name="Warning_TotalAreaMismatch" xml:space="preserve">
+    <value>Total floor area does not match above- and below-ground areas; your input was not overwritten.</value>
+    <comment>Area sum consistency warning.</comment>
+  </data>
+  <data name="Warning_ParkingTotalMismatch" xml:space="preserve">
+    <value>Total parking does not match surface and underground parking; your input was not overwritten.</value>
+    <comment>Parking sum consistency warning.</comment>
+  </data>
+  <data name="Warning_PublicServiceExceedsTotal" xml:space="preserve">
+    <value>Public service floor area exceeds total floor area; please verify the input.</value>
+    <comment>Data conflict warning.</comment>
+  </data>
+  <data name="Copy_PlanningResultsHeader" xml:space="preserve">
+    <value>Planning Metrics Calculation Results</value>
+    <comment>Clipboard results header.</comment>
+  </data>
+  <data name="Result_FloorAreaRatio" xml:space="preserve">
+    <value>Floor area ratio: {0}</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_BuildingDensity" xml:space="preserve">
+    <value>Building density: {0}</value>
+    <comment>Result line; {0} is the percentage value.</comment>
+  </data>
+  <data name="Result_GreenRatio" xml:space="preserve">
+    <value>Green ratio: {0}</value>
+    <comment>Result line; {0} is the percentage value.</comment>
+  </data>
+  <data name="Result_Population" xml:space="preserve">
+    <value>Planned population: {0}</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_PerCapitaSiteArea" xml:space="preserve">
+    <value>Site area per capita: {0} m²/person</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_PerHouseholdSiteArea" xml:space="preserve">
+    <value>Site area per household: {0} m²/household</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_ParkingPerHousehold" xml:space="preserve">
+    <value>Parking spaces per household: {0}</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_ParkingPer100Households" xml:space="preserve">
+    <value>Parking spaces per 100 households: {0}</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_TotalBuildingArea" xml:space="preserve">
+    <value>Total floor area: {0} m²</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_AboveGroundArea" xml:space="preserve">
+    <value>Above-ground floor area: {0} m²</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_UndergroundArea" xml:space="preserve">
+    <value>Underground floor area: {0} m²</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_UndergroundAreaRatio" xml:space="preserve">
+    <value>Underground floor area ratio: {0}</value>
+    <comment>Result line; {0} is the percentage value.</comment>
+  </data>
+  <data name="Result_PublicServiceAreaRatio" xml:space="preserve">
+    <value>Public service area ratio: {0}</value>
+    <comment>Result line; {0} is the percentage value.</comment>
+  </data>
+  <data name="Result_PublicServiceAreaPerHousehold" xml:space="preserve">
+    <value>Public service area per household: {0} m²/household</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Result_PublicServiceAreaPerCapita" xml:space="preserve">
+    <value>Public service area per capita: {0} m²/person</value>
+    <comment>Result line; {0} is the value.</comment>
+  </data>
+  <data name="Page_UnitScaleConverter_Description.Text" xml:space="preserve">
+    <value>For urban planning, architectural design, and quantity estimation. Imperial geometric units use the international foot; U.S. survey foot and liquid capacity units are not included.</value>
+    <comment>Converter page description.</comment>
+  </data>
+  <data name="Pivot_Length.Header" xml:space="preserve">
+    <value>Length</value>
+    <comment>Category tab: Length.</comment>
+  </data>
+  <data name="Pivot_Area.Header" xml:space="preserve">
+    <value>Area</value>
+    <comment>Category tab: Area.</comment>
+  </data>
+  <data name="Pivot_Volume.Header" xml:space="preserve">
+    <value>Volume</value>
+    <comment>Category tab: Volume.</comment>
+  </data>
+  <data name="Pivot_Scale.Header" xml:space="preserve">
+    <value>Scale</value>
+    <comment>Category tab: Scale.</comment>
+  </data>
+  <data name="Scale_ForwardTitle.Text" xml:space="preserve">
+    <value>Drawing length → Actual length</value>
+    <comment>Forward scale conversion title.</comment>
+  </data>
+  <data name="Scale_ReverseTitle.Text" xml:space="preserve">
+    <value>Actual length → Drawing length</value>
+    <comment>Reverse scale conversion title.</comment>
+  </data>
+  <data name="Field_ScaleDenominator" xml:space="preserve">
+    <value>Scale denominator N (1 : N)</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_DrawingLength" xml:space="preserve">
+    <value>Drawing length</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_DrawingLengthUnit" xml:space="preserve">
+    <value>Drawing length unit</value>
+    <comment>Unit selection field name.</comment>
+  </data>
+  <data name="Field_ActualLengthOutputUnit" xml:space="preserve">
+    <value>Actual length output unit</value>
+    <comment>Unit selection field name.</comment>
+  </data>
+  <data name="Field_ActualLength" xml:space="preserve">
+    <value>Actual length</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_ActualLengthUnit" xml:space="preserve">
+    <value>Actual length unit</value>
+    <comment>Unit selection field name.</comment>
+  </data>
+  <data name="Field_DrawingLengthOutputUnit" xml:space="preserve">
+    <value>Drawing length output unit</value>
+    <comment>Unit selection field name.</comment>
+  </data>
+  <data name="Field_InputValue" xml:space="preserve">
+    <value>Input value</value>
+    <comment>Input field name.</comment>
+  </data>
+  <data name="Field_SourceUnit" xml:space="preserve">
+    <value>Source unit</value>
+    <comment>Unit selection field name.</comment>
+  </data>
+  <data name="Field_TargetUnit" xml:space="preserve">
+    <value>Target unit</value>
+    <comment>Unit selection field name.</comment>
+  </data>
+  <data name="Unit_ResultPlaceholder" xml:space="preserve">
+    <value>Enter a value and select units.</value>
+    <comment>Unit conversion result placeholder.</comment>
+  </data>
+  <data name="Unit_EnterValue" xml:space="preserve">
+    <value>Enter a value.</value>
+    <comment>Unit conversion empty value message.</comment>
+  </data>
+  <data name="Scale_ResultPlaceholderForward" xml:space="preserve">
+    <value>Enter the scale and drawing length.</value>
+    <comment>Forward scale result placeholder.</comment>
+  </data>
+  <data name="Scale_ResultPlaceholderReverse" xml:space="preserve">
+    <value>Enter the scale and actual length.</value>
+    <comment>Reverse scale result placeholder.</comment>
+  </data>
+  <data name="Error_EnterScaleAndLength" xml:space="preserve">
+    <value>Enter the scale denominator and length.</value>
+    <comment>Scale empty value message.</comment>
+  </data>
+  <data name="Error_NoCopyableResult" xml:space="preserve">
+    <value>No valid result to copy.</value>
+    <comment>Copy failure message.</comment>
+  </data>
+  <data name="UnitNote_Area" xml:space="preserve">
+    <value>Mu, tsubo, tan, and cho are regional or traditional units. Japanese tatami sizes vary, so no fixed conversion is provided in this version.</value>
+    <comment>Area category note.</comment>
+  </data>
+  <data name="UnitNote_Length" xml:space="preserve">
+    <value>Japanese traditional units: shaku and ken. Do not confuse them with the Chinese chi.</value>
+    <comment>Length category note.</comment>
+  </data>
+  <data name="UnitNote_Volume" xml:space="preserve">
+    <value>Volume here means geometric volume such as building space, earthwork, or concrete; gallon, fluid ounce, pint, quart, and cup are not provided.</value>
+    <comment>Volume category note.</comment>
+  </data>
+  <data name="Scale_Note.Text" xml:space="preserve">
+    <value>Real planning and building scales normally use a positive integer denominator; decimal denominators and lengths are supported.</value>
+    <comment>Scale note.</comment>
+  </data>
+  <data name="Error_NegativeInput" xml:space="preserve">
+    <value>The input value cannot be negative.</value>
+    <comment>Unit conversion negative input error.</comment>
+  </data>
+  <data name="Error_SelectUnits" xml:space="preserve">
+    <value>Select both source and target units.</value>
+    <comment>Unit selection error.</comment>
+  </data>
+  <data name="Error_CrossCategoryUnits" xml:space="preserve">
+    <value>Source and target units must be in the same category.</value>
+    <comment>Cross-category conversion error.</comment>
+  </data>
+  <data name="Error_OutOfRange" xml:space="preserve">
+    <value>The value is outside the supported range.</value>
+    <comment>Overflow error.</comment>
+  </data>
+  <data name="Error_ScaleDenominatorPositive" xml:space="preserve">
+    <value>The scale denominator must be greater than 0.</value>
+    <comment>Scale denominator validation error.</comment>
+  </data>
+  <data name="Error_NegativeLength" xml:space="preserve">
+    <value>Length cannot be negative.</value>
+    <comment>Negative length error.</comment>
+  </data>
+  <data name="Error_SelectValidLengthUnit" xml:space="preserve">
+    <value>Select a valid length unit.</value>
+    <comment>Length unit selection error.</comment>
+  </data>
+  <data name="Unit_LengthMm_Name" xml:space="preserve">
+    <value>Millimeter (mm, metric)</value>
+    <comment>Length unit name.</comment>
+  </data>
+  <data name="Unit_LengthCm_Name" xml:space="preserve">
+    <value>Centimeter (cm, metric)</value>
+    <comment>Length unit name.</comment>
+  </data>
+  <data name="Unit_LengthM_Name" xml:space="preserve">
+    <value>Meter (m, metric)</value>
+    <comment>Length unit name.</comment>
+  </data>
+  <data name="Unit_LengthKm_Name" xml:space="preserve">
+    <value>Kilometer (km, metric)</value>
+    <comment>Length unit name.</comment>
+  </data>
+  <data name="Unit_LengthIn_Name" xml:space="preserve">
+    <value>Inch (in, imperial)</value>
+    <comment>Length unit name.</comment>
+  </data>
+  <data name="Unit_LengthFt_Name" xml:space="preserve">
+    <value>Foot (ft, imperial)</value>
+    <comment>Length unit name.</comment>
+  </data>
+  <data name="Unit_LengthYd_Name" xml:space="preserve">
+    <value>Yard (yd, imperial)</value>
+    <comment>Length unit name.</comment>
+  </data>
+  <data name="Unit_LengthMi_Name" xml:space="preserve">
+    <value>Mile (mi, imperial)</value>
+    <comment>Length unit name.</comment>
+  </data>
+  <data name="Unit_LengthShaku_Name" xml:space="preserve">
+    <value>Shaku (Japanese traditional unit)</value>
+    <comment>Japanese traditional length unit.</comment>
+  </data>
+  <data name="Unit_LengthKen_Name" xml:space="preserve">
+    <value>Ken (Japanese traditional unit)</value>
+    <comment>Japanese traditional length unit.</comment>
+  </data>
+  <data name="Unit_AreaMm2_Name" xml:space="preserve">
+    <value>Square millimeter (mm², metric)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaCm2_Name" xml:space="preserve">
+    <value>Square centimeter (cm², metric)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaM2_Name" xml:space="preserve">
+    <value>Square meter (m², metric)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaHa_Name" xml:space="preserve">
+    <value>Hectare (ha, metric)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaKm2_Name" xml:space="preserve">
+    <value>Square kilometer (km², metric)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaMu_Name" xml:space="preserve">
+    <value>Mu (China)</value>
+    <comment>Chinese traditional area unit.</comment>
+  </data>
+  <data name="Unit_AreaTsubo_Name" xml:space="preserve">
+    <value>Tsubo (Japan)</value>
+    <comment>Japanese traditional area unit.</comment>
+  </data>
+  <data name="Unit_AreaTan_Name" xml:space="preserve">
+    <value>Tan (Japan)</value>
+    <comment>Japanese traditional area unit.</comment>
+  </data>
+  <data name="Unit_AreaCho_Name" xml:space="preserve">
+    <value>Cho (Japan)</value>
+    <comment>Japanese traditional area unit.</comment>
+  </data>
+  <data name="Unit_AreaIn2_Name" xml:space="preserve">
+    <value>Square inch (in², imperial)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaFt2_Name" xml:space="preserve">
+    <value>Square foot (ft², imperial)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaYd2_Name" xml:space="preserve">
+    <value>Square yard (yd², imperial)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaAcre_Name" xml:space="preserve">
+    <value>Acre (imperial)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_AreaMi2_Name" xml:space="preserve">
+    <value>Square mile (mi², imperial)</value>
+    <comment>Area unit name.</comment>
+  </data>
+  <data name="Unit_VolumeMm3_Name" xml:space="preserve">
+    <value>Cubic millimeter (mm³, metric)</value>
+    <comment>Volume unit name.</comment>
+  </data>
+  <data name="Unit_VolumeCm3_Name" xml:space="preserve">
+    <value>Cubic centimeter (cm³, metric)</value>
+    <comment>Volume unit name.</comment>
+  </data>
+  <data name="Unit_VolumeM3_Name" xml:space="preserve">
+    <value>Cubic meter (m³, metric)</value>
+    <comment>Volume unit name.</comment>
+  </data>
+  <data name="Unit_VolumeL_Name" xml:space="preserve">
+    <value>Liter (L, geometric volume)</value>
+    <comment>Volume unit name.</comment>
+  </data>
+  <data name="Unit_VolumeIn3_Name" xml:space="preserve">
+    <value>Cubic inch (in³, imperial)</value>
+    <comment>Volume unit name.</comment>
+  </data>
+  <data name="Unit_VolumeFt3_Name" xml:space="preserve">
+    <value>Cubic foot (ft³, imperial)</value>
+    <comment>Volume unit name.</comment>
+  </data>
+  <data name="Unit_VolumeYd3_Name" xml:space="preserve">
+    <value>Cubic yard (yd³, imperial)</value>
+    <comment>Volume unit name.</comment>
+  </data>
+  <data name="About_Description.Text" xml:space="preserve">
+    <value>Quickly estimate urban planning metrics and unit/scale conversions locally; input data is never uploaded.</value>
+    <comment>About page description.</comment>
+  </data>
+  <data name="About_Technology.Text" xml:space="preserve">
+    <value>Technology: C#, WinUI 3, Windows App SDK, MSIX</value>
+    <comment>Technology stack.</comment>
+  </data>
+  <data name="About_LicenseAndRepo.Text" xml:space="preserve">
+    <value>License: TBD. Repository:</value>
+    <comment>License and repository link label.</comment>
+  </data>
+  <data name="Page_About_Title.Text" xml:space="preserve">
+    <value>About</value>
+    <comment>About page title.</comment>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>v{0} preview</value>
+    <comment>About page version format; {0} is the version number.</comment>
+  </data>
+  <data name="Update_Checking" xml:space="preserve">
+    <value>Checking…</value>
+    <comment>Update check button progress text.</comment>
+  </data>
+  <data name="Update_AvailableTitle" xml:space="preserve">
+    <value>New version {0} available</value>
+    <comment>New version dialog title; {0} is the version number.</comment>
+  </data>
+  <data name="Update_DialogContent" xml:space="preserve">
+    <value>Current version: {0}
+Latest version: {1}
+
+Release notes:
+{2}</value>
+    <comment>New version dialog content; {0} current, {1} latest, {2} notes.</comment>
+  </data>
+  <data name="Update_NoNotes" xml:space="preserve">
+    <value>No release notes are available for this version.</value>
+    <comment>Message when release notes are empty.</comment>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>You are up to date
+
+Current version: {0}
+Latest version: {1}</value>
+    <comment>Up-to-date message; {0} current, {1} latest.</comment>
+  </data>
+  <data name="Update_LocalVersionNewer" xml:space="preserve">
+    <value>Your version is not older than the latest release</value>
+    <comment>Local version not older than latest message.</comment>
+  </data>
+  <data name="Update_NoRelease" xml:space="preserve">
+    <value>No release is available on GitHub yet.</value>
+    <comment>No release message.</comment>
+  </data>
+  <data name="Update_ConnectionFailed" xml:space="preserve">
+    <value>Cannot reach GitHub; check your network and try again.</value>
+    <comment>Network error message.</comment>
+  </data>
+  <data name="Update_TimedOut" xml:space="preserve">
+    <value>The request timed out; try again later.</value>
+    <comment>Timeout message.</comment>
+  </data>
+  <data name="Update_RateLimited" xml:space="preserve">
+    <value>GitHub API rate limit reached; try again later.</value>
+    <comment>Rate limit message.</comment>
+  </data>
+  <data name="Update_InvalidRemoteVersion" xml:space="preserve">
+    <value>The remote version number could not be recognized.</value>
+    <comment>Remote version parse failure message.</comment>
+  </data>
+  <data name="Update_GenericFailure" xml:space="preserve">
+    <value>Update information could not be retrieved; try again later.</value>
+    <comment>Generic failure message.</comment>
+  </data>
+  <data name="Error_OpenRepositoryFailed" xml:space="preserve">
+    <value>Could not open the repository; check your default browser and try again.</value>
+    <comment>Repository open failure message.</comment>
+  </data>
+  <data name="Error_OpenReleaseFailed" xml:space="preserve">
+    <value>Could not open the release page; check your default browser and try again.</value>
+    <comment>Release page open failure message.</comment>
+  </data>
+</root>

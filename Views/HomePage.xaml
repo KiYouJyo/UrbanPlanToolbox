@@ -1,13 +1,13 @@
 <Page x:Class="UrbanPlanToolbox.Views.HomePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <ScrollViewer><StackPanel Padding="32" Spacing="16">
-    <TextBlock Text="规划工具箱" Style="{StaticResource TitleTextBlockStyle}" />
-    <TextBlock Text="UrbanPlan Toolbox · 城市规划辅助工具箱" Style="{StaticResource SubtitleTextBlockStyle}" />
-    <TextBlock Text="v0.3.6 预览版。本地完成规划指标和单位比例尺换算，不上传规划数据。" TextWrapping="Wrap" />
-    <Button Content="打开规划指标快速计算器" Click="OnOpenCalculator" HorizontalAlignment="Left" />
-    <Button Content="打开单位与比例尺换算" Click="OnOpenUnitScale" HorizontalAlignment="Left" />
-    <TextBlock Text="后续工具" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,16,0,0" />
+    <TextBlock x:Uid="Home_Title" Style="{StaticResource TitleTextBlockStyle}" />
+    <TextBlock x:Uid="Home_Subtitle" Style="{StaticResource SubtitleTextBlockStyle}" />
+    <TextBlock x:Uid="Home_Version" TextWrapping="Wrap" />
+    <Button x:Uid="Home_OpenCalculator" Click="OnOpenCalculator" HorizontalAlignment="Left" />
+    <Button x:Uid="Home_OpenUnitScale" Click="OnOpenUnitScale" HorizontalAlignment="Left" />
+    <TextBlock x:Uid="Home_UpcomingTitle" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,16,0,0" />
     <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-      <InfoBar Title="用地平衡表" Message="敬请期待" IsOpen="True" /><InfoBar Grid.Column="1" Title="停车位测算" Message="敬请期待" IsOpen="True" />
+      <InfoBar x:Uid="Home_UpcomingLandBalance" IsOpen="True" /><InfoBar x:Uid="Home_UpcomingParking" Grid.Column="1" IsOpen="True" />
     </Grid>
   </StackPanel></ScrollViewer>
 </Page>
