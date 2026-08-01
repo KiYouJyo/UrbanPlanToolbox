@@ -39,35 +39,46 @@ public sealed class JsonDataStorage
     {
         var filePath = _pathProvider.GetToolDataFilePath(toolId, fileName);
         var backupPath = _pathProvider.GetToolBackupFilePath(toolId, fileName);
+        return await ReadFileAsync<T>(toolId, fileName, filePath, backupPath, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<DataReadResult<T>> ReadFileAsync<T>(
+        string storageId,
+        string fileName,
+        string filePath,
+        string backupPath,
+        CancellationToken cancellationToken = default)
+    {
+        ValidateExplicitPaths(storageId, fileName, filePath, backupPath);
         var fileLock = FileLocks.GetOrAdd(filePath, _ => new SemaphoreSlim(1, 1));
         await fileLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
             if (!File.Exists(filePath))
             {
-                return Complete<T>(toolId, "read", DataStorageStatus.NotFound);
+                return Complete<T>(storageId, "read", DataStorageStatus.NotFound);
             }
 
             var primary = await ReadDocumentAsync(filePath, cancellationToken).ConfigureAwait(false);
             if (primary.Status == DocumentStatus.Valid)
             {
-                var materialized = await MaterializeAsync<T>(toolId, fileName, filePath, backupPath, primary.Document!, false, cancellationToken).ConfigureAwait(false);
+                var materialized = await MaterializeAsync<T>(storageId, fileName, filePath, backupPath, primary.Document!, false, cancellationToken).ConfigureAwait(false);
                 return materialized.Status == DataStorageStatus.Corrupt
-                    ? await RecoverAsync<T>(toolId, fileName, filePath, backupPath, cancellationToken).ConfigureAwait(false)
+                    ? await RecoverAsync<T>(storageId, fileName, filePath, backupPath, cancellationToken).ConfigureAwait(false)
                     : materialized;
             }
 
             if (primary.Status == DocumentStatus.FutureVersion)
             {
-                return Complete<T>(toolId, "read", DataStorageStatus.UnsupportedFutureVersion, primary.SchemaVersion);
+                return Complete<T>(storageId, "read", DataStorageStatus.UnsupportedFutureVersion, primary.SchemaVersion);
             }
 
             if (primary.Status == DocumentStatus.IoFailure)
             {
-                return Complete<T>(toolId, "read", DataStorageStatus.IoFailure, failureType: primary.FailureType);
+                return Complete<T>(storageId, "read", DataStorageStatus.IoFailure, failureType: primary.FailureType);
             }
 
-            return await RecoverAsync<T>(toolId, fileName, filePath, backupPath, cancellationToken).ConfigureAwait(false);
+            return await RecoverAsync<T>(storageId, fileName, filePath, backupPath, cancellationToken).ConfigureAwait(false);
         }
         finally
         {
@@ -84,6 +95,18 @@ public sealed class JsonDataStorage
         ArgumentNullException.ThrowIfNull(payload);
         var filePath = _pathProvider.GetToolDataFilePath(toolId, fileName);
         var backupPath = _pathProvider.GetToolBackupFilePath(toolId, fileName);
+        return await SaveFileAsync(toolId, filePath, backupPath, payload, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<DataWriteResult> SaveFileAsync<T>(
+        string storageId,
+        string filePath,
+        string backupPath,
+        T payload,
+        CancellationToken cancellationToken = default)
+    {
+        ValidateExplicitPaths(storageId, Path.GetFileName(filePath), filePath, backupPath);
+        ArgumentNullException.ThrowIfNull(payload);
         var fileLock = FileLocks.GetOrAdd(filePath, _ => new SemaphoreSlim(1, 1));
         await fileLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -93,34 +116,34 @@ public sealed class JsonDataStorage
                 var existing = await ReadDocumentAsync(filePath, cancellationToken).ConfigureAwait(false);
                 if (existing.Status == DocumentStatus.FutureVersion)
                 {
-                    return CompleteWrite(toolId, DataStorageStatus.UnsupportedFutureVersion);
+                    return CompleteWrite(storageId, DataStorageStatus.UnsupportedFutureVersion);
                 }
 
                 if (existing.Status == DocumentStatus.Corrupt)
                 {
-                    return CompleteWrite(toolId, DataStorageStatus.Corrupt, existing.FailureType);
+                    return CompleteWrite(storageId, DataStorageStatus.Corrupt, existing.FailureType);
                 }
 
                 if (existing.Status == DocumentStatus.IoFailure)
                 {
-                    return CompleteWrite(toolId, DataStorageStatus.IoFailure, existing.FailureType);
+                    return CompleteWrite(storageId, DataStorageStatus.IoFailure, existing.FailureType);
                 }
 
                 if (existing.Document!.SchemaVersion < _currentSchemaVersion)
                 {
-                    return CompleteWrite(toolId, DataStorageStatus.MigrationFailed, "MigrationRequired");
+                    return CompleteWrite(storageId, DataStorageStatus.MigrationFailed, "MigrationRequired");
                 }
 
                 try
                 {
                     if (existing.Document.Payload.Deserialize<T>(DataStorageJson.Options) is null)
                     {
-                        return CompleteWrite(toolId, DataStorageStatus.Corrupt, "NullPayload");
+                        return CompleteWrite(storageId, DataStorageStatus.Corrupt, "NullPayload");
                     }
                 }
                 catch (JsonException exception)
                 {
-                    return CompleteWrite(toolId, DataStorageStatus.Corrupt, exception.GetType().Name);
+                    return CompleteWrite(storageId, DataStorageStatus.Corrupt, exception.GetType().Name);
                 }
             }
 
@@ -130,12 +153,24 @@ public sealed class JsonDataStorage
                 SavedAtUtc = DateTimeOffset.UtcNow,
                 Payload = payload
             };
-            var result = await WriteEnvelopeAsync(toolId, filePath, backupPath, envelope, preserveExistingBackup: false, cancellationToken).ConfigureAwait(false);
-            return CompleteWrite(toolId, result.Status, result.FailureType);
+            var result = await WriteEnvelopeAsync(storageId, filePath, backupPath, envelope, preserveExistingBackup: false, cancellationToken).ConfigureAwait(false);
+            return CompleteWrite(storageId, result.Status, result.FailureType);
         }
         finally
         {
             fileLock.Release();
+        }
+    }
+
+    private static void ValidateExplicitPaths(string storageId, string fileName, string filePath, string backupPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(storageId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(backupPath);
+        if (!Path.IsPathFullyQualified(filePath) || !Path.IsPathFullyQualified(backupPath))
+        {
+            throw new ArgumentException("Storage paths must be fully qualified.");
         }
     }
 

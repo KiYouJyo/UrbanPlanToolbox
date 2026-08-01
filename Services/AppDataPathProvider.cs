@@ -28,8 +28,11 @@ public sealed class AppDataPathProvider : IAppDataPathProvider
             Path.Combine(root, "settings.json"),
             data,
             Path.Combine(data, "tools"),
+            Path.Combine(data, "projects"),
             Path.Combine(root, "attachments"),
+            Path.Combine(root, "attachments", "projects"),
             Path.Combine(root, "backups"),
+            Path.Combine(root, "backups", "projects"),
             Path.Combine(root, "cache"),
             Path.Combine(root, "logs"));
     }
@@ -40,8 +43,9 @@ public sealed class AppDataPathProvider : IAppDataPathProvider
     {
         foreach (var path in new[]
                  {
-                     Paths.RootDirectory, Paths.DataDirectory, Paths.ToolsDirectory,
-                     Paths.AttachmentsDirectory, Paths.BackupsDirectory,
+                     Paths.RootDirectory, Paths.DataDirectory, Paths.ToolsDirectory, Paths.ProjectsDirectory,
+                     Paths.AttachmentsDirectory, Paths.ProjectAttachmentsDirectory, Paths.BackupsDirectory,
+                     Paths.ProjectBackupsDirectory,
                      Paths.CacheDirectory, Paths.LogsDirectory
                  })
         {
@@ -70,6 +74,46 @@ public sealed class AppDataPathProvider : IAppDataPathProvider
 
     public string GetToolBackupFilePath(string toolId, string fileName) =>
         GetSafeFilePath(GetToolBackupDirectory(toolId), $"{fileName}.last-valid.bak", requireJsonExtension: false);
+
+    public string GetProjectsIndexFilePath() =>
+        GetSafeFilePath(Paths.ProjectsDirectory, "index.json", requireJsonExtension: true);
+
+    public string GetProjectsIndexBackupFilePath() =>
+        GetSafeFilePath(Paths.ProjectBackupsDirectory, "index.json.last-valid.bak", requireJsonExtension: false);
+
+    public string GetProjectDataDirectory(Guid projectId) =>
+        EnsureProjectDirectory(Paths.ProjectsDirectory, projectId);
+
+    public string GetProjectDataFilePath(Guid projectId) =>
+        GetSafeFilePath(GetProjectDataDirectory(projectId), "project.json", requireJsonExtension: true);
+
+    public string GetProjectBackupDirectory(Guid projectId) =>
+        EnsureProjectDirectory(Paths.ProjectBackupsDirectory, projectId);
+
+    public string GetProjectBackupFilePath(Guid projectId) =>
+        GetSafeFilePath(GetProjectBackupDirectory(projectId), "project.json.last-valid.bak", requireJsonExtension: false);
+
+    public string GetProjectAttachmentsDirectory(Guid projectId) =>
+        EnsureProjectDirectory(Paths.ProjectAttachmentsDirectory, projectId);
+
+    public string GetPreImportBackupDirectory()
+    {
+        var path = Path.Combine(Paths.BackupsDirectory, "pre-import");
+        Directory.CreateDirectory(path);
+        return path;
+    }
+
+    private static string EnsureProjectDirectory(string root, Guid projectId)
+    {
+        if (projectId == Guid.Empty)
+        {
+            throw new ArgumentException("Project ID cannot be empty.", nameof(projectId));
+        }
+
+        var path = Path.Combine(root, projectId.ToString("D"));
+        Directory.CreateDirectory(path);
+        return path;
+    }
 
     private void ValidateRegisteredToolId(string toolId)
     {

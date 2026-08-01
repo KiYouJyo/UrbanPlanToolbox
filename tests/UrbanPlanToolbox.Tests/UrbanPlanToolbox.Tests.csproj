@@ -4,6 +4,7 @@
  <ItemGroup>
   <Compile Include="../../Models/PlanningInput.cs" Link="Models/PlanningInput.cs" />
   <Compile Include="../../Models/PlanningResult.cs" Link="Models/PlanningResult.cs" />
+  <Compile Include="../../Models/Projects/ProjectModels.cs" Link="Models/Projects/ProjectModels.cs" />
   <Compile Include="../../Services/PlanningCalculationService.cs" Link="Services/PlanningCalculationService.cs" />
   <Compile Include="../../Models/AppSettings.cs" Link="Models/AppSettings.cs" />
   <Compile Include="../../Models/DataEnvelope.cs" Link="Models/DataEnvelope.cs" />
@@ -17,6 +18,8 @@
   <Compile Include="../../Services/DataMigrationRunner.cs" Link="Services/DataMigrationRunner.cs" />
   <Compile Include="../../Services/IStorageDiagnostics.cs" Link="Services/IStorageDiagnostics.cs" />
   <Compile Include="../../Services/JsonDataStorage.cs" Link="Services/JsonDataStorage.cs" />
+  <Compile Include="../../Services/ProjectValidation.cs" Link="Services/ProjectValidation.cs" />
+  <Compile Include="../../Services/ProjectStorageService.cs" Link="Services/ProjectStorageService.cs" />
   <Compile Include="../../Helpers/NumberFormatter.cs" Link="Helpers/NumberFormatter.cs" />
   <Compile Include="../../Helpers/PlanningResultFormatter.cs" Link="Helpers/PlanningResultFormatter.cs" />
   <Compile Include="../../Models/MeasurementCategory.cs" Link="Models/MeasurementCategory.cs" />
