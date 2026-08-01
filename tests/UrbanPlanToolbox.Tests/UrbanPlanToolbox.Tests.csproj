@@ -30,5 +30,12 @@
   <Compile Include="../../Services/ToolRegistry.cs" Link="Services/ToolRegistry.cs" />
   <Compile Include="../../Services/ToolSearchService.cs" Link="Services/ToolSearchService.cs" />
   <Compile Include="../../Services/FavoriteToolsService.cs" Link="Services/FavoriteToolsService.cs" />
+  <Compile Include="../../Services/ILocalizationService.cs" Link="Services/ILocalizationService.cs" />
+  <Compile Include="../../Services/LanguagePreference.cs" Link="Services/LanguagePreference.cs" />
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="../../Strings/**/*.resw" Link="Strings/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  <None Include="../../Package.appxmanifest" Link="Package.appxmanifest" CopyToOutputDirectory="PreserveNewest" />
+  <None Include="../../UrbanPlanToolbox.csproj" Link="UrbanPlanToolbox.csproj" CopyToOutputDirectory="PreserveNewest" />
  </ItemGroup>
 </Project>

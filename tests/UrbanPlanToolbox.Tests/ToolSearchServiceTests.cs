@@ -6,7 +6,7 @@ namespace UrbanPlanToolbox.Tests;
 
 public sealed class ToolSearchServiceTests
 {
-    private readonly ToolSearchService _service = new(ToolRegistry.Default);
+    private readonly ToolSearchService _service = new(ToolRegistry.Default, TestLocalization.ZhCn);
 
     [Fact]
     public void RegisteredToolsHaveStableSearchMetadata()
@@ -18,7 +18,13 @@ public sealed class ToolSearchServiceTests
         Assert.Equal("G", calculator.PinyinInitial);
         Assert.Equal("danweiyubilichihuansuanqi", converter.PinyinSortKey);
         Assert.Equal("D", converter.PinyinInitial);
-        Assert.All(ToolRegistry.Default.All, tool => Assert.NotEmpty(tool.SearchKeywords));
+        Assert.All(ToolRegistry.Default.All, tool =>
+        {
+            Assert.False(string.IsNullOrWhiteSpace(tool.SearchKeywordsResourceKey));
+            Assert.NotEmpty(
+                TestLocalization.ZhCn.GetString(tool.SearchKeywordsResourceKey)
+                    .Split(['\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        });
     }
 
     [Theory]
@@ -73,20 +79,20 @@ public sealed class ToolSearchServiceTests
             CreateTool("hash", "zeta", "?", true),
             CreateTool("hidden", "alpha", "A", false)
         ]);
-        var service = new ToolSearchService(registry);
+        var service = new ToolSearchService(registry, TestLocalization.ZhCn);
 
         var group = Assert.Single(service.Search(string.Empty, _ => false));
         Assert.Equal("#", group.Header);
         Assert.Equal("hash", Assert.Single(group.Tools).Id);
     }
 
-    private static IEnumerable<ToolDefinition> Flatten(IReadOnlyList<ToolSearchGroup> groups) =>
+    private static IEnumerable<LocalizedTool> Flatten(IReadOnlyList<ToolSearchGroup> groups) =>
         groups.SelectMany(group => group.Tools);
 
     private static ToolDefinition CreateTool(string id, string sortKey, string initial, bool available) => new(
         id,
-        id,
-        id,
+        $"{id}_Name",
+        $"{id}_Description",
         ToolPrimaryCategory.Design,
         ToolSecondaryCategory.PreliminaryAnalysis,
         "\uE10F",
@@ -95,5 +101,5 @@ public sealed class ToolSearchServiceTests
         available,
         sortKey,
         initial,
-        [id]);
+        $"{id}_Keywords");
 }

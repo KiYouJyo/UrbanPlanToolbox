@@ -137,8 +137,8 @@ public sealed class FavoriteToolsServiceTests
 
     private static ToolDefinition CreateTool(string id, int sortOrder, bool isAvailable) => new(
         id,
-        id,
-        id,
+        $"{id}_Name",
+        $"{id}_Description",
         ToolPrimaryCategory.Design,
         ToolSecondaryCategory.PreliminaryAnalysis,
         "\uE10F",
@@ -147,7 +147,7 @@ public sealed class FavoriteToolsServiceTests
         isAvailable,
         id,
         "X",
-        [id]);
+        $"{id}_Keywords");
 
     private static void WithTempSettings(Action<string> test)
     {
