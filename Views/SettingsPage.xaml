@@ -1,8 +1,9 @@
 <Page x:Class="UrbanPlanToolbox.Views.SettingsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
- <StackPanel Padding="32" Spacing="16"><TextBlock Text="设置" Style="{StaticResource TitleTextBlockStyle}" />
- <ComboBox x:Name="ThemeBox" Header="主题" SelectionChanged="OnSettingChanged"><ComboBoxItem Tag="System" Content="跟随系统" /><ComboBoxItem Tag="Light" Content="浅色" /><ComboBoxItem Tag="Dark" Content="深色" /></ComboBox>
- <ComboBox x:Name="DecimalBox" Header="计算结果保留小数位" SelectionChanged="OnSettingChanged"><ComboBoxItem Content="0" /><ComboBoxItem Content="1" /><ComboBoxItem Content="2" /><ComboBoxItem Content="3" /></ComboBox>
- <ToggleSwitch x:Name="AutoCalculateToggle" Header="输入变化时自动重新计算" Toggled="OnSettingChanged" />
- <StackPanel Orientation="Horizontal" Spacing="8"><Button Content="保存设置" Click="OnSave" /><Button Content="恢复默认设置" Click="OnRestore" /></StackPanel><TextBlock x:Name="StatusText" />
+ <StackPanel Padding="32" Spacing="16"><TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" />
+ <ComboBox x:Name="ThemeBox" x:Uid="Setting_Theme" SelectionChanged="OnSettingChanged"><ComboBoxItem Tag="System" x:Uid="Setting_Theme_System" /><ComboBoxItem Tag="Light" x:Uid="Setting_Theme_Light" /><ComboBoxItem Tag="Dark" x:Uid="Setting_Theme_Dark" /></ComboBox>
+ <ComboBox x:Name="DecimalBox" x:Uid="Setting_DecimalPlaces" SelectionChanged="OnSettingChanged"><ComboBoxItem Content="0" /><ComboBoxItem Content="1" /><ComboBoxItem Content="2" /><ComboBoxItem Content="3" /></ComboBox>
+ <ToggleSwitch x:Name="AutoCalculateToggle" x:Uid="Setting_AutoCalculate" Toggled="OnSettingChanged" />
+ <ComboBox x:Name="LanguageBox" x:Uid="Setting_Language" SelectionChanged="OnSettingChanged"><ComboBoxItem Tag="system" x:Uid="Setting_Language_System" /><ComboBoxItem Tag="zh-CN" x:Uid="Setting_Language_ZhCn" /><ComboBoxItem Tag="ja-JP" x:Uid="Setting_Language_JaJp" /><ComboBoxItem Tag="en-US" x:Uid="Setting_Language_EnUs" /></ComboBox>
+ <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Uid="Action_SaveSettings" Click="OnSave" /><Button x:Uid="Action_RestoreDefaults" Click="OnRestore" /></StackPanel><TextBlock x:Name="StatusText" />
  </StackPanel>
 </Page>

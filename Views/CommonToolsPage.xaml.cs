@@ -6,11 +6,12 @@ namespace UrbanPlanToolbox.Views;
 
 public sealed partial class CommonToolsPage : Page
 {
-    private readonly ToolSearchService _toolSearchService = new(ToolRegistry.Default);
+    private readonly ToolSearchService _toolSearchService = new(ToolRegistry.Default, LocalizationService.Default);
 
     public CommonToolsPage()
     {
         InitializeComponent();
+        TitleText.Text = LocalizationService.Default.GetString("Navigation_Search");
         NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Required;
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;

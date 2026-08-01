@@ -2,8 +2,8 @@ namespace UrbanPlanToolbox.Models.Tools;
 
 public sealed record ToolDefinition(
     string Id,
-    string DisplayName,
-    string Description,
+    string NameResourceKey,
+    string DescriptionResourceKey,
     ToolPrimaryCategory PrimaryCategory,
     ToolSecondaryCategory SecondaryCategory,
     string IconGlyph,
@@ -12,4 +12,4 @@ public sealed record ToolDefinition(
     bool IsAvailable,
     string PinyinSortKey,
     string PinyinInitial,
-    IReadOnlyList<string> SearchKeywords);
+    string SearchKeywordsResourceKey);

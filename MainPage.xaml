@@ -10,14 +10,14 @@
 
     <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True" Loaded="OnNavigationLoaded" ItemInvoked="OnNavigationItemInvoked">
         <NavigationView.MenuItems>
-            <NavigationViewItem Content="欢迎页面" Tag="welcome" Icon="Home" />
-            <NavigationViewItem Content="工具搜索" Tag="common-tools" Icon="Find" ToolTipService.ToolTip="工具搜索" AutomationProperties.Name="工具搜索" />
-            <NavigationViewItem Content="设计工具" Tag="design-tools" Icon="Edit" />
-            <NavigationViewItem Content="科研工具" Tag="research-tools" Icon="Library" />
-            <NavigationViewItem Content="项目归档" Tag="project-archive" Icon="Folder" />
+            <NavigationViewItem x:Name="WelcomeItem" Tag="welcome" Icon="Home" />
+            <NavigationViewItem x:Name="SearchItem" Tag="common-tools" Icon="Find" />
+            <NavigationViewItem x:Name="DesignItem" Tag="design-tools" Icon="Edit" />
+            <NavigationViewItem x:Name="ResearchItem" Tag="research-tools" Icon="Library" />
+            <NavigationViewItem x:Name="ArchiveItem" Tag="project-archive" Icon="Folder" />
         </NavigationView.MenuItems>
         <NavigationView.FooterMenuItems>
-            <NavigationViewItem Content="关于" Tag="about" Icon="Help" />
+            <NavigationViewItem x:Name="AboutItem" Tag="about" Icon="Help" />
         </NavigationView.FooterMenuItems>
         <Frame x:Name="ContentFrame" />
     </NavigationView>

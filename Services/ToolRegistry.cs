@@ -11,8 +11,8 @@ public sealed class ToolRegistry
     [
         new(
             ToolIds.PlanningIndicatorCalculator,
-            "规划指标快速计算器",
-            "用于快速计算容积率、建筑密度、绿地率及相关规划指标。",
+            "Tool_PlanningIndicator_Name",
+            "Tool_PlanningIndicator_Description",
             ToolPrimaryCategory.Design,
             ToolSecondaryCategory.MasterPlanning,
             "\uE8EF",
@@ -21,11 +21,11 @@ public sealed class ToolRegistry
             true,
             "guihuazhibiaokuaisujisuanqi",
             "G",
-            ["规划", "指标", "容积率", "建筑密度", "绿地率", "guihuazhibiao", "guihuazhibiaokuaisujisuanqi", "ghzbksjsq"]),
+            "Tool_PlanningIndicator_Keywords"),
         new(
             ToolIds.UnitScaleConverter,
-            "单位与比例尺换算器",
-            "用于长度、面积及常用图纸比例尺之间的快速换算。",
+            "Tool_UnitScaleConverter_Name",
+            "Tool_UnitScaleConverter_Description",
             ToolPrimaryCategory.Design,
             ToolSecondaryCategory.DetailedDesign,
             "\uE8AB",
@@ -34,7 +34,7 @@ public sealed class ToolRegistry
             true,
             "danweiyubilichihuansuanqi",
             "D",
-            ["单位", "比例尺", "长度", "面积", "换算", "danweiyubilichi", "danweiyubilichihuansuanqi", "dwyblchhq"])
+            "Tool_UnitScaleConverter_Keywords")
     ]);
 
     public ToolRegistry(IEnumerable<ToolDefinition> tools)
@@ -49,8 +49,9 @@ public sealed class ToolRegistry
 
         if (ordered.Any(tool => string.IsNullOrWhiteSpace(tool.PinyinSortKey) ||
                                 string.IsNullOrWhiteSpace(tool.PinyinInitial) ||
-                                tool.SearchKeywords is null ||
-                                tool.SearchKeywords.Any(string.IsNullOrWhiteSpace)))
+                                string.IsNullOrWhiteSpace(tool.SearchKeywordsResourceKey) ||
+                                string.IsNullOrWhiteSpace(tool.NameResourceKey) ||
+                                string.IsNullOrWhiteSpace(tool.DescriptionResourceKey)))
         {
             throw new ArgumentException("Tool search metadata must be complete.", nameof(tools));
         }

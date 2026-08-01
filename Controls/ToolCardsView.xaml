@@ -44,7 +44,7 @@
                                     Opacity="0.75"
                                     TextTrimming="CharacterEllipsis"
                                     TextWrapping="WrapWholeWords" />
-                                <TextBlock Text="打开" FontWeight="SemiBold" />
+                                <TextBlock x:Uid="Action_OpenTool" FontWeight="SemiBold" />
                             </StackPanel>
                         </Grid>
                     </Button>

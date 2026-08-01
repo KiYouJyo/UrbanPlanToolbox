@@ -20,30 +20,30 @@ public enum ToolSecondaryCategory
 
 public static class ToolCategoryNames
 {
-    public static string GetDisplayName(this ToolPrimaryCategory category) => category switch
+    public static string GetNameResourceKey(this ToolPrimaryCategory category) => category switch
     {
-        ToolPrimaryCategory.Design => "设计工具",
-        ToolPrimaryCategory.Research => "科研工具",
+        ToolPrimaryCategory.Design => "Navigation_DesignTools",
+        ToolPrimaryCategory.Research => "Navigation_ResearchTools",
         _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
     };
 
-    public static string GetDisplayName(this ToolSecondaryCategory category) => category switch
+    public static string GetNameResourceKey(this ToolSecondaryCategory category) => category switch
     {
-        ToolSecondaryCategory.PreliminaryAnalysis => "前期分析",
-        ToolSecondaryCategory.FieldResearch => "实地调研",
-        ToolSecondaryCategory.DesignDevelopment => "方案推导",
-        ToolSecondaryCategory.MasterPlanning => "总体设计",
-        ToolSecondaryCategory.DetailedDesign => "详细设计",
-        ToolSecondaryCategory.ResearchPreparation => "前期工具",
-        ToolSecondaryCategory.GeographicTools => "地理工具",
-        ToolSecondaryCategory.DataTools => "数据工具",
+        ToolSecondaryCategory.PreliminaryAnalysis => "Category_PreliminaryAnalysis",
+        ToolSecondaryCategory.FieldResearch => "Category_FieldResearch",
+        ToolSecondaryCategory.DesignDevelopment => "Category_DesignDevelopment",
+        ToolSecondaryCategory.MasterPlanning => "Category_MasterPlanning",
+        ToolSecondaryCategory.DetailedDesign => "Category_DetailedDesign",
+        ToolSecondaryCategory.ResearchPreparation => "Category_ResearchPreparation",
+        ToolSecondaryCategory.GeographicTools => "Category_GeographicTools",
+        ToolSecondaryCategory.DataTools => "Category_DataTools",
         _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
     };
 }
 
 public sealed record ToolCategoryDefinition(
     string Id,
-    string DisplayName,
+    string NameResourceKey,
     ToolPrimaryCategory PrimaryCategory,
     ToolSecondaryCategory SecondaryCategory,
     int SortOrder);
@@ -52,18 +52,18 @@ public static class ToolCategoryCatalog
 {
     public static IReadOnlyList<ToolCategoryDefinition> Design { get; } = Array.AsReadOnly<ToolCategoryDefinition>(
     [
-        new("preliminary-analysis", "前期分析", ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis, 10),
-        new("field-research", "实地调研", ToolPrimaryCategory.Design, ToolSecondaryCategory.FieldResearch, 20),
-        new("design-development", "方案推导", ToolPrimaryCategory.Design, ToolSecondaryCategory.DesignDevelopment, 30),
-        new("master-planning", "总体设计", ToolPrimaryCategory.Design, ToolSecondaryCategory.MasterPlanning, 40),
-        new("detailed-design", "详细设计", ToolPrimaryCategory.Design, ToolSecondaryCategory.DetailedDesign, 50)
+        new("preliminary-analysis", "Category_PreliminaryAnalysis", ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis, 10),
+        new("field-research", "Category_FieldResearch", ToolPrimaryCategory.Design, ToolSecondaryCategory.FieldResearch, 20),
+        new("design-development", "Category_DesignDevelopment", ToolPrimaryCategory.Design, ToolSecondaryCategory.DesignDevelopment, 30),
+        new("master-planning", "Category_MasterPlanning", ToolPrimaryCategory.Design, ToolSecondaryCategory.MasterPlanning, 40),
+        new("detailed-design", "Category_DetailedDesign", ToolPrimaryCategory.Design, ToolSecondaryCategory.DetailedDesign, 50)
     ]);
 
     public static IReadOnlyList<ToolCategoryDefinition> Research { get; } = Array.AsReadOnly<ToolCategoryDefinition>(
     [
-        new("research-preparation", "前期工具", ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 10),
-        new("geographic-tools", "地理工具", ToolPrimaryCategory.Research, ToolSecondaryCategory.GeographicTools, 20),
-        new("data-tools", "数据工具", ToolPrimaryCategory.Research, ToolSecondaryCategory.DataTools, 30)
+        new("research-preparation", "Category_ResearchPreparation", ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 10),
+        new("geographic-tools", "Category_GeographicTools", ToolPrimaryCategory.Research, ToolSecondaryCategory.GeographicTools, 20),
+        new("data-tools", "Category_DataTools", ToolPrimaryCategory.Research, ToolSecondaryCategory.DataTools, 30)
     ]);
 
     public static IReadOnlyList<ToolCategoryDefinition> GetByPrimaryCategory(ToolPrimaryCategory category) => category switch

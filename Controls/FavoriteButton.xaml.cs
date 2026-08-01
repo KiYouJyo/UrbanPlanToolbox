@@ -7,6 +7,8 @@ namespace UrbanPlanToolbox.Controls;
 
 public sealed partial class FavoriteButton : UserControl
 {
+    private readonly ILocalizationService _localization = LocalizationService.Default;
+
     public static readonly DependencyProperty ToolIdProperty = DependencyProperty.Register(
         nameof(ToolId),
         typeof(string),
@@ -53,7 +55,9 @@ public sealed partial class FavoriteButton : UserControl
         var isFavorite = FavoriteToolsService.Default.IsFavorite(ToolId);
         Toggle.IsChecked = isFavorite;
         FavoriteIcon.Glyph = isFavorite ? "\uE735" : "\uE734";
-        var label = isFavorite ? "取消收藏" : "添加收藏";
+        var label = isFavorite
+            ? _localization.GetString("Action_RemoveFavorite")
+            : _localization.GetString("Action_AddFavorite");
         ToolTipService.SetToolTip(Toggle, label);
         AutomationProperties.SetName(Toggle, label);
     }

@@ -31,7 +31,7 @@
             x:Name="EmptyState"
             IsClosable="False"
             IsOpen="False"
-            Message="当前分类暂无已上线工具。"
+            x:Uid="Category_EmptyState"
             Severity="Informational" />
     </StackPanel>
 </UserControl>

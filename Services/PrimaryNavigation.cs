@@ -9,12 +9,12 @@ public sealed class PrimaryNavigation
 
     public static PrimaryNavigation Default { get; } = new(
     [
-        new(PrimaryNavigationIds.Welcome, "欢迎页面", typeof(Views.HomePage)),
-        new(PrimaryNavigationIds.CommonTools, "工具搜索", typeof(Views.CommonToolsPage)),
-        new(PrimaryNavigationIds.DesignTools, "设计工具", typeof(Views.DesignToolsPage)),
-        new(PrimaryNavigationIds.ResearchTools, "科研工具", typeof(Views.ResearchToolsPage)),
-        new(PrimaryNavigationIds.ProjectArchive, "项目归档", typeof(Views.ProjectArchivePage)),
-        new(PrimaryNavigationIds.About, "关于", typeof(Views.AboutPage))
+        new(PrimaryNavigationIds.Welcome, "Navigation_Welcome", typeof(Views.HomePage)),
+        new(PrimaryNavigationIds.CommonTools, "Navigation_Search", typeof(Views.CommonToolsPage)),
+        new(PrimaryNavigationIds.DesignTools, "Navigation_DesignTools", typeof(Views.DesignToolsPage)),
+        new(PrimaryNavigationIds.ResearchTools, "Navigation_ResearchTools", typeof(Views.ResearchToolsPage)),
+        new(PrimaryNavigationIds.ProjectArchive, "Navigation_ProjectArchive", typeof(Views.ProjectArchivePage)),
+        new(PrimaryNavigationIds.About, "Navigation_About", typeof(Views.AboutPage))
     ]);
 
     public PrimaryNavigation(IEnumerable<PrimaryNavigationDefinition> routes)
