@@ -7,7 +7,7 @@ public sealed class SettingsService
 {
     private readonly string _filePath;
     public static event EventHandler<AppSettings>? SettingsChanged;
-    public SettingsService(string? filePath = null) => _filePath = filePath ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UrbanPlanToolbox", "settings.json");
+    public SettingsService(string? filePath = null) => _filePath = filePath ?? AppDataPathProvider.Default.Paths.SettingsFilePath;
     public AppSettings Load()
     {
         try { return File.Exists(_filePath) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(_filePath)) ?? new AppSettings() : new AppSettings(); }

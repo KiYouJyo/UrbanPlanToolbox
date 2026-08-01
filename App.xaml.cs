@@ -42,6 +42,7 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
+        AppDataPathProvider.Default.EnsureInfrastructureDirectories();
         ApplyLanguagePreference();
         _window = MainWindow = new MainWindow();
         _window.Activate();
