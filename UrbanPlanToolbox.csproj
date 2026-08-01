@@ -5,6 +5,7 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>UrbanPlanToolbox</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\UrbanPlanToolbox.ico</ApplicationIcon>
     <Platforms>x86;x64;ARM64</Platforms>
     <!-- Prefer the requested project platform over the MSBuild host process architecture. -->
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' and '$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
