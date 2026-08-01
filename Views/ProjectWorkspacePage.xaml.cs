@@ -302,14 +302,18 @@ public sealed partial class ProjectWorkspacePage : Page
         var time = new TimePicker { Header = _localization.GetString("Milestone_Field_Time"), SelectedTime = milestone?.Time?.ToTimeSpan(), Visibility = includeTime.IsChecked == true ? Visibility.Visible : Visibility.Collapsed };
         includeTime.Click += (_, _) => time.Visibility = includeTime.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         var reminder = new ToggleSwitch { Header = _localization.GetString("Milestone_Field_Reminder"), OffContent = _localization.GetString("Milestone_Reminder_Off"), OnContent = _localization.GetString("Milestone_Reminder_On"), IsOn = milestone?.ReminderEnabled ?? true };
+        var defaultTime = new TextBlock { Text = _localization.GetString("Milestone_Reminder_DefaultTime"), TextWrapping = TextWrapping.Wrap, Visibility = includeTime.IsChecked == true ? Visibility.Collapsed : Visibility.Visible };
+        var reminderOff = new TextBlock { Text = _localization.GetString("Milestone_Reminder_DisabledHint"), TextWrapping = TextWrapping.Wrap, Visibility = reminder.IsOn ? Visibility.Collapsed : Visibility.Visible };
+        includeTime.Click += (_, _) => defaultTime.Visibility = includeTime.IsChecked == true ? Visibility.Collapsed : Visibility.Visible;
+        reminder.Toggled += (_, _) => reminderOff.Visibility = reminder.IsOn ? Visibility.Collapsed : Visibility.Visible;
         var notes = new TextBox { Header = _localization.GetString("Milestone_Field_Notes"), MaxLength = ProjectValidation.MaxMilestoneNotesLength, Text = milestone?.Notes ?? string.Empty, AcceptsReturn = true, TextWrapping = TextWrapping.Wrap, MinHeight = 100 };
         var error = new TextBlock { Foreground = (Brush)Application.Current.Resources["SystemFillColorCriticalBrush"], TextWrapping = TextWrapping.Wrap };
         var panel = new StackPanel { Spacing = 10 };
-        panel.Children.Add(title); panel.Children.Add(date); panel.Children.Add(includeTime); panel.Children.Add(time); panel.Children.Add(reminder); panel.Children.Add(notes); panel.Children.Add(error);
+        panel.Children.Add(title); panel.Children.Add(date); panel.Children.Add(includeTime); panel.Children.Add(time); panel.Children.Add(defaultTime); panel.Children.Add(reminder); panel.Children.Add(reminderOff); panel.Children.Add(notes); panel.Children.Add(error);
         MilestoneEditor? result = null;
         var dialog = new ContentDialog
         {
-            XamlRoot = XamlRoot, Title = _localization.GetString(milestone is null ? "Milestone_Add_Title" : "Milestone_Edit_Title"), Content = panel,
+            XamlRoot = XamlRoot, Title = _localization.GetString(milestone is null ? "Milestone_Add_Title" : "Milestone_Edit_Title"), Content = new ScrollViewer { Content = panel, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, MaxHeight = Math.Max(240, XamlRoot.Size.Height - 240) },
             PrimaryButtonText = _localization.GetString(milestone is null ? "Action_Create" : "Project_Action_Save"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary
         };
         dialog.PrimaryButtonClick += (_, args) =>
@@ -492,7 +496,7 @@ public sealed partial class ProjectWorkspacePage : Page
     {
         var result = await MilestoneReminderService.Default.RefreshAsync();
         if (result.Succeeded) return;
-        var message = _localization.GetString("Milestone_Reminder_SchedulingFailed");
+        var message = _localization.GetFormattedString("Milestone_Reminder_SchedulingFailed", result.Diagnostic ?? result.FailureType ?? "Unknown");
         StatusBar.Severity = InfoBarSeverity.Warning; StatusBar.Message = message; StatusBar.IsOpen = true;
         AppNotificationService.Default.Notify(new(UrbanPlanToolbox.Models.Interaction.AppNotificationKind.Warning, _localization.GetString("Interaction_ErrorTitle"), message));
     }

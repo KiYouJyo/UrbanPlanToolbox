@@ -16,8 +16,8 @@ public static class MilestoneReminderIdentity
         Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant()[..length];
 }
 
-public sealed record MilestoneReminderRefreshResult(bool Succeeded, int ScheduledCount, string? FailureType = null)
+public sealed record MilestoneReminderRefreshResult(bool Succeeded, int ScheduledCount, string? FailureType = null, string? Diagnostic = null)
 {
     public static MilestoneReminderRefreshResult Success(int scheduledCount) => new(true, scheduledCount);
-    public static MilestoneReminderRefreshResult Failure(Exception exception) => new(false, 0, exception.GetType().Name);
+    public static MilestoneReminderRefreshResult Failure(Exception exception) => new(false, 0, exception.GetType().Name, $"{exception.Message} [{exception.GetType().Name}, 0x{exception.HResult:X8}]");
 }

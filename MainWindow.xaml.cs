@@ -29,8 +29,10 @@ public sealed partial class MainWindow : Window
         AppNotificationService.Default.NotificationRaised += OnNotificationRaised;
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(NotificationBar, LocalizationService.Default.GetString("Interaction_NotificationName"));
 
-        // Navigate the root frame to the main page on startup.
+        // The first page must exist before App activates this window; otherwise
+        // native splash dismissal can reveal a title-bar-only black frame.
         RootFrame.Navigate(typeof(MainPage));
+        if (RootFrame.Content is null) throw new InvalidOperationException("Main window first-frame content was not created.");
     }
 
     public void Navigate(Type pageType) => RootFrame.Navigate(pageType);

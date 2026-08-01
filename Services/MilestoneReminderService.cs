@@ -55,6 +55,25 @@ public sealed class MilestoneReminderService
         }
     }
 
+    public MilestoneReminderRefreshResult SendTestNotification()
+    {
+        try
+        {
+            EnsureRegistered();
+            AppNotificationManager.Default.Show(new AppNotificationBuilder()
+                .AddArgument("action", "testNotification")
+                .AddText(_localization.GetString("Notification_Test_Title"))
+                .AddText(_localization.GetString("Notification_Test_Body"))
+                .BuildNotification());
+            return MilestoneReminderRefreshResult.Success(1);
+        }
+        catch (Exception exception) when (OperatingSystem.IsWindows())
+        {
+            System.Diagnostics.Debug.WriteLine($"Test notification failed: {exception}");
+            return MilestoneReminderRefreshResult.Failure(exception);
+        }
+    }
+
     private AppNotification BuildNotification(MilestoneReminder reminder)
     {
         var due = reminder.HasExplicitTime
@@ -72,8 +91,23 @@ public sealed class MilestoneReminderService
     private void EnsureRegistered()
     {
         if (_registered) return;
+        if (IsElevated()) throw new InvalidOperationException("Windows app notifications are unavailable while the application is running as administrator.");
+        AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
         AppNotificationManager.Default.Register();
         _registered = true;
+    }
+
+    private static bool IsElevated()
+    {
+        using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+        return new System.Security.Principal.WindowsPrincipal(identity).IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+    }
+
+    private static void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
+    {
+        // The packaged COM activation declaration launches this EXE. App startup remains the safe
+        // destination for all notification actions; no project content is logged here.
+        System.Diagnostics.Debug.WriteLine("UrbanPlanToolbox notification activated.");
     }
 
     private static bool IsOwnedSchedule(ScheduledToastNotification item) =>

@@ -50,6 +50,15 @@ public sealed class MilestoneReminderTests
         Assert.NotEqual(MilestoneReminderIdentity.Tag(milestone), MilestoneReminderIdentity.Tag(Guid.NewGuid()));
     }
 
+    [Fact]
+    public void SchedulingFailureRetainsSpecificReasonAndHresult()
+    {
+        var result = MilestoneReminderRefreshResult.Failure(new InvalidOperationException("Manifest COM registration is missing."));
+        Assert.False(result.Succeeded);
+        Assert.Contains("Manifest COM registration is missing.", result.Diagnostic);
+        Assert.Contains("0x", result.Diagnostic);
+    }
+
     private sealed class ReminderScope : IDisposable
     {
         public ReminderScope()

@@ -1582,5 +1582,14 @@
   <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows リマインダー</value></data>
   <data name="Milestone_Reminder_On" xml:space="preserve"><value>オン（ローカル通知）</value></data>
   <data name="Milestone_Reminder_Off" xml:space="preserve"><value>オフ</value></data>
-  <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>プロジェクトは保存されましたが、Windows がリマインダーを予約できませんでした。通知のアクセス許可を確認して再試行してください。</value></data>
+  <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>プロジェクトは保存されましたが、Windows がリマインダーを予約できませんでした: {0}</value></data>
+  <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>時刻を指定しない場合、当日の現地時間 09:00 に通知します。</value></data>
+  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>このスイッチがオフの間は Windows リマインダーを作成しません。</value></data>
+  <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows 通知</value></data>
+  <data name="Notification_Settings_Description" xml:space="preserve"><value>テスト通知を送信して、Windows が UrbanPlanToolbox を認識しローカル通知を配信できることを確認します。</value></data>
+  <data name="Notification_Test_Action" xml:space="preserve"><value>テスト通知を送信</value></data>
+  <data name="Notification_Test_Title" xml:space="preserve"><value>UrbanPlanToolbox テスト通知</value></data>
+  <data name="Notification_Test_Body" xml:space="preserve"><value>このアプリの Windows ローカル通知は設定されています。</value></data>
+  <data name="Notification_Test_Sent" xml:space="preserve"><value>テスト通知を送信しました。バナーが抑制されている場合は通知センターを確認してください。</value></data>
+  <data name="Notification_Test_Failed" xml:space="preserve"><value>Windows がテスト通知を送信できませんでした: {0}</value></data>
 </root>
