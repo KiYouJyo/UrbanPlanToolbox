@@ -20,6 +20,8 @@
   <Compile Include="../../Services/JsonDataStorage.cs" Link="Services/JsonDataStorage.cs" />
   <Compile Include="../../Services/ProjectValidation.cs" Link="Services/ProjectValidation.cs" />
   <Compile Include="../../Services/ProjectStorageService.cs" Link="Services/ProjectStorageService.cs" />
+  <Compile Include="../../Services/ProjectPresentation.cs" Link="Services/ProjectPresentation.cs" />
+  <Compile Include="../../Services/IProjectFolderAccessService.cs" Link="Services/IProjectFolderAccessService.cs" />
   <Compile Include="../../Helpers/NumberFormatter.cs" Link="Helpers/NumberFormatter.cs" />
   <Compile Include="../../Helpers/PlanningResultFormatter.cs" Link="Helpers/PlanningResultFormatter.cs" />
   <Compile Include="../../Models/MeasurementCategory.cs" Link="Models/MeasurementCategory.cs" />

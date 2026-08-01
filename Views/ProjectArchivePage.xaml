@@ -1,7 +1,9 @@
 <Page x:Class="UrbanPlanToolbox.Views.ProjectArchivePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <StackPanel Padding="32" Spacing="12">
+  <ScrollViewer><StackPanel Padding="32" Spacing="12">
     <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" />
-    <TextBlock x:Uid="Page_ProjectArchive_Status" Style="{StaticResource SubtitleTextBlockStyle}" />
     <TextBlock x:Uid="Page_ProjectArchive_Description" TextWrapping="Wrap" />
-  </StackPanel>
+    <InfoBar x:Name="StatusBar" IsOpen="False" Severity="Warning" />
+    <TextBlock x:Name="EmptyText" x:Uid="ProjectArchive_Empty" TextWrapping="Wrap" Visibility="Collapsed" />
+    <ItemsControl x:Name="ProjectsList"><ItemsControl.ItemTemplate><DataTemplate><Button Tag="{Binding Project}" Click="OnOpenProject" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="16" Margin="0,0,0,10"><Grid ColumnSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock Text="{Binding Name}" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/><TextBlock Text="{Binding TypeAndArea}" TextWrapping="Wrap"/><TextBlock Text="{Binding Statistics}"/></StackPanel><TextBlock Grid.Column="1" Text="{Binding Archived}" VerticalAlignment="Center" TextWrapping="Wrap"/></Grid></Button></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+  </StackPanel></ScrollViewer>
 </Page>

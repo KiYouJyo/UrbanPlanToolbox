@@ -21,7 +21,9 @@ public sealed class PrimaryNavigationTests
             PrimaryNavigationIds.About
         ], ids);
         Assert.Equal(ids.Length, ids.Distinct(StringComparer.Ordinal).Count());
+        Assert.Equal("Navigation_Projects", PrimaryNavigation.Default.All[0].NameResourceKey);
         Assert.Equal("Navigation_Search", PrimaryNavigation.Default.All.Single(route => route.Id == PrimaryNavigationIds.CommonTools).NameResourceKey);
+        Assert.DoesNotContain(PrimaryNavigation.Default.All, route => route.Id is "favorites" or "common-tools-page");
     }
 
     [Theory]

@@ -865,4 +865,604 @@ dwyblchhq</value>
     <value>无法打开 Release 页面，请检查默认浏览器设置后重试。</value>
     <comment>打开 Release 失败提示。</comment>
   </data>
+  <data name="Navigation_Projects" xml:space="preserve">
+    <value>项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_Title.Text" xml:space="preserve">
+    <value>项目主页</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_Description.Text" xml:space="preserve">
+    <value>创建并管理保存在本机的活跃规划项目。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_Empty.Text" xml:space="preserve">
+    <value>暂无活跃项目。请新建第一个项目。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_LoadIssues" xml:space="preserve">
+    <value>有 {0} 个项目无法安全加载。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Name" xml:space="preserve">
+    <value>项目名称</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Type" xml:space="preserve">
+    <value>项目类型</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_CustomType" xml:space="preserve">
+    <value>自定义项目类型</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_AdministrativeArea" xml:space="preserve">
+    <value>行政区</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Latitude" xml:space="preserve">
+    <value>纬度</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Longitude" xml:space="preserve">
+    <value>经度</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Field_Description" xml:space="preserve">
+    <value>项目说明</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Coordinates_Wgs84.Text" xml:space="preserve">
+    <value>WGS 84 坐标</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Coursework" xml:space="preserve">
+    <value>作业</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Competition" xml:space="preserve">
+    <value>竞赛</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Research" xml:space="preserve">
+    <value>研究</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Professional" xml:space="preserve">
+    <value>实际项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Personal" xml:space="preserve">
+    <value>个人项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectType_Other" xml:space="preserve">
+    <value>其他</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_New_Title" xml:space="preserve">
+    <value>新建项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Create" xml:space="preserve">
+    <value>创建</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Cancel" xml:space="preserve">
+    <value>取消</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Confirm" xml:space="preserve">
+    <value>确认</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Discard" xml:space="preserve">
+    <value>放弃修改</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Action_Delete" xml:space="preserve">
+    <value>删除</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Error_InvalidCoordinate" xml:space="preserve">
+    <value>请输入有效的纬度和经度。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Error_SaveFailed" xml:space="preserve">
+    <value>无法保存项目，原有数据保持不变。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Error_NotFound" xml:space="preserve">
+    <value>找不到指定项目。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Error_LoadFailed" xml:space="preserve">
+    <value>无法安全加载项目。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Status_Saved" xml:space="preserve">
+    <value>项目修改已保存。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Card_Statistics" xml:space="preserve">
+    <value>待办：已完成 {0}/{1} · 快照：{2}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Card_Updated" xml:space="preserve">
+    <value>更新于 {0}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectArchive_ArchivedAt" xml:space="preserve">
+    <value>归档于 {0}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Metadata" xml:space="preserve">
+    <value>{0} · 更新于 {1}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_State_Archived" xml:space="preserve">
+    <value>已归档</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_State_Active" xml:space="preserve">
+    <value>活跃</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Action_Restore" xml:space="preserve">
+    <value>恢复项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Action_Archive" xml:space="preserve">
+    <value>归档项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Restore_Explanation" xml:space="preserve">
+    <value>恢复后可以继续编辑此项目。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Archive_Explanation" xml:space="preserve">
+    <value>归档会移动项目，但不会删除数据。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Restore_Title" xml:space="preserve">
+    <value>恢复项目？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Restore_Message" xml:space="preserve">
+    <value>项目将回到项目主页。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Archive_Title" xml:space="preserve">
+    <value>归档项目？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Archive_Message" xml:space="preserve">
+    <value>项目数据、待办、快照和文件夹引用都会保留。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Unsaved_Title" xml:space="preserve">
+    <value>放弃未保存的修改？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Project_Unsaved_Message" xml:space="preserve">
+    <value>项目概览中的修改尚未保存。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Field_Title" xml:space="preserve">
+    <value>待办标题</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Empty.Text" xml:space="preserve">
+    <value>暂无待办事项。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Accessibility_Complete" xml:space="preserve">
+    <value>将“{0}”标记为完成</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Delete_Title" xml:space="preserve">
+    <value>删除待办？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Delete_Message" xml:space="preserve">
+    <value>这条待办将被移除。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Empty.Text" xml:space="preserve">
+    <value>暂无规划指标快照。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Summary" xml:space="preserve">
+    <value>{0} · 容积率 {1} · 建筑密度 {2}% · 绿地率 {3}%</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Delete_Title" xml:space="preserve">
+    <value>删除快照？</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Delete_Message" xml:space="preserve">
+    <value>这条历史快照将被移除。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Error_ValidResultRequired" xml:space="preserve">
+    <value>请先完成一次有效计算。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Error_SaveFailed" xml:space="preserve">
+    <value>无法保存快照。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_Status_Saved" xml:space="preserve">
+    <value>快照已保存到项目。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_None" xml:space="preserve">
+    <value>尚未选择工作文件夹。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_Summary" xml:space="preserve">
+    <value>{0} / {1}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_ReselectionSummary" xml:space="preserve">
+    <value>需要重新选择：{0} / 参考路径：{1}</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_SelectionCancelled" xml:space="preserve">
+    <value>已取消选择文件夹。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_RequiresReselection" xml:space="preserve">
+    <value>需要在当前设备上重新选择此文件夹。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_OpenFailed" xml:space="preserve">
+    <value>无法打开工作文件夹。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectFolder_AccessExpired" xml:space="preserve">
+    <value>授权已失效或文件夹已移动，请重新选择。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectArchive_Empty.Text" xml:space="preserve">
+    <value>暂无归档项目。</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectIdRequired" xml:space="preserve">
+    <value>The project ID is missing.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectNameRequired" xml:space="preserve">
+    <value>Enter a project name.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectNameTooLong" xml:space="preserve">
+    <value>The project name is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectTypeInvalid" xml:space="preserve">
+    <value>Select a valid project type.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_CustomProjectTypeRequired" xml:space="preserve">
+    <value>Enter a custom project type.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_CustomProjectTypeTooLong" xml:space="preserve">
+    <value>The custom type is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_CustomProjectTypeOnlyForOther" xml:space="preserve">
+    <value>Custom text is only for Other.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_AdministrativeAreaTooLong" xml:space="preserve">
+    <value>The administrative area is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectDescriptionTooLong" xml:space="preserve">
+    <value>The description is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_CoordinatesMustBePaired" xml:space="preserve">
+    <value>Enter both latitude and longitude, or leave both blank.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_LatitudeOutOfRange" xml:space="preserve">
+    <value>Latitude must be between -90 and 90.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_LongitudeOutOfRange" xml:space="preserve">
+    <value>Longitude must be between -180 and 180.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ProjectTimestampsMustBeUtc" xml:space="preserve">
+    <value>Project timestamps are invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_ArchiveStateInvalid" xml:space="preserve">
+    <value>The archive state is invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_TodoIdRequired" xml:space="preserve">
+    <value>A todo ID is missing.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_TodoTitleRequired" xml:space="preserve">
+    <value>Todo titles cannot be blank.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_TodoTitleTooLong" xml:space="preserve">
+    <value>The todo title is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_TodoStateInvalid" xml:space="preserve">
+    <value>A todo state is invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_DuplicateTodoId" xml:space="preserve">
+    <value>Duplicate todo IDs were found.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_DuplicateSnapshotId" xml:space="preserve">
+    <value>Duplicate snapshot IDs were found.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_SnapshotIdRequired" xml:space="preserve">
+    <value>A snapshot ID is missing.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_SnapshotNameTooLong" xml:space="preserve">
+    <value>The snapshot name is too long.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_SnapshotMetadataInvalid" xml:space="preserve">
+    <value>Snapshot metadata is invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectValidation_PlanningResultInvalid" xml:space="preserve">
+    <value>The planning result is invalid.</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_NewProject.Content" xml:space="preserve">
+    <value>新建项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_NewProject.Header" xml:space="preserve">
+    <value>新建项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_NewProject.AutomationProperties.Name" xml:space="preserve">
+    <value>新建项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectHome_NewProject.ToolTipService.ToolTip" xml:space="preserve">
+    <value>新建项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Back.Content" xml:space="preserve">
+    <value>返回项目主页</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Back.Header" xml:space="preserve">
+    <value>返回项目主页</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Back.AutomationProperties.Name" xml:space="preserve">
+    <value>返回项目主页</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Back.ToolTipService.ToolTip" xml:space="preserve">
+    <value>返回项目主页</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Overview.Content" xml:space="preserve">
+    <value>项目概览</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Overview.Header" xml:space="preserve">
+    <value>项目概览</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Overview.AutomationProperties.Name" xml:space="preserve">
+    <value>项目概览</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Overview.ToolTipService.ToolTip" xml:space="preserve">
+    <value>项目概览</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Save.Content" xml:space="preserve">
+    <value>保存修改</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Save.Header" xml:space="preserve">
+    <value>保存修改</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Save.AutomationProperties.Name" xml:space="preserve">
+    <value>保存修改</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Save.ToolTipService.ToolTip" xml:space="preserve">
+    <value>保存修改</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Todos.Content" xml:space="preserve">
+    <value>待办事项</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Todos.Header" xml:space="preserve">
+    <value>待办事项</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Todos.AutomationProperties.Name" xml:space="preserve">
+    <value>待办事项</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Todos.ToolTipService.ToolTip" xml:space="preserve">
+    <value>待办事项</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Add.Content" xml:space="preserve">
+    <value>新增待办</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Add.Header" xml:space="preserve">
+    <value>新增待办</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Add.AutomationProperties.Name" xml:space="preserve">
+    <value>新增待办</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Todo_Add.ToolTipService.ToolTip" xml:space="preserve">
+    <value>新增待办</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Snapshots.Content" xml:space="preserve">
+    <value>规划指标快照</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Snapshots.Header" xml:space="preserve">
+    <value>规划指标快照</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Snapshots.AutomationProperties.Name" xml:space="preserve">
+    <value>规划指标快照</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Snapshots.ToolTipService.ToolTip" xml:space="preserve">
+    <value>规划指标快照</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_OpenCalculator.Content" xml:space="preserve">
+    <value>打开规划指标计算器</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_OpenCalculator.Header" xml:space="preserve">
+    <value>打开规划指标计算器</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_OpenCalculator.AutomationProperties.Name" xml:space="preserve">
+    <value>打开规划指标计算器</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_OpenCalculator.ToolTipService.ToolTip" xml:space="preserve">
+    <value>打开规划指标计算器</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Folder.Content" xml:space="preserve">
+    <value>工作文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Folder.Header" xml:space="preserve">
+    <value>工作文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Folder.AutomationProperties.Name" xml:space="preserve">
+    <value>工作文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Folder.ToolTipService.ToolTip" xml:space="preserve">
+    <value>工作文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Select.Content" xml:space="preserve">
+    <value>选择或更换文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Select.Header" xml:space="preserve">
+    <value>选择或更换文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Select.AutomationProperties.Name" xml:space="preserve">
+    <value>选择或更换文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Select.ToolTipService.ToolTip" xml:space="preserve">
+    <value>选择或更换文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Open.Content" xml:space="preserve">
+    <value>打开文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Open.Header" xml:space="preserve">
+    <value>打开文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Open.AutomationProperties.Name" xml:space="preserve">
+    <value>打开文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Open.ToolTipService.ToolTip" xml:space="preserve">
+    <value>打开文件夹</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Clear.Content" xml:space="preserve">
+    <value>清除文件夹入口</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Clear.Header" xml:space="preserve">
+    <value>清除文件夹入口</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Clear.AutomationProperties.Name" xml:space="preserve">
+    <value>清除文件夹入口</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Folder_Clear.ToolTipService.ToolTip" xml:space="preserve">
+    <value>清除文件夹入口</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Status.Content" xml:space="preserve">
+    <value>项目状态</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Status.Header" xml:space="preserve">
+    <value>项目状态</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Status.AutomationProperties.Name" xml:space="preserve">
+    <value>项目状态</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="ProjectWorkspace_Status.ToolTipService.ToolTip" xml:space="preserve">
+    <value>项目状态</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_SaveToProject.Content" xml:space="preserve">
+    <value>保存到当前项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_SaveToProject.Header" xml:space="preserve">
+    <value>保存到当前项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_SaveToProject.AutomationProperties.Name" xml:space="preserve">
+    <value>保存到当前项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_SaveToProject.ToolTipService.ToolTip" xml:space="preserve">
+    <value>保存到当前项目</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_ReturnToProject.Content" xml:space="preserve">
+    <value>返回项目工作台</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_ReturnToProject.Header" xml:space="preserve">
+    <value>返回项目工作台</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_ReturnToProject.AutomationProperties.Name" xml:space="preserve">
+    <value>返回项目工作台</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
+  <data name="Snapshot_ReturnToProject.ToolTipService.ToolTip" xml:space="preserve">
+    <value>返回项目工作台</value>
+    <comment>v0.3.9 project workspace resource.</comment>
+  </data>
 </root>
