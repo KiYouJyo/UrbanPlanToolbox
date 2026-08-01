@@ -245,7 +245,9 @@ public sealed partial class LocalizationTests
     {
         var manifest = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Package.appxmanifest"));
         Assert.Contains("Version=\"0.3.10.0\"", manifest);
-        Assert.Contains("<Resource Language=\"x-generate\"", manifest);
+        var languages = Regex.Matches(manifest, "<Resource Language=\\\"([^\\\"]+)\\\"")
+            .Select(match => match.Groups[1].Value).ToArray();
+        Assert.Equal(["zh-CN", "ja-JP", "en-US"], languages);
         Assert.Contains("ms-resource:AppDisplayName", manifest);
 
         var project = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "UrbanPlanToolbox.csproj"));

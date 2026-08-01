@@ -26,8 +26,9 @@
   </Dependencies>
 
   <Resources>
-    <!-- Let MSIX packaging generate the manifest language union from qualified RESW files. -->
-    <Resource Language="x-generate" />
+    <Resource Language="zh-CN" />
+    <Resource Language="ja-JP" />
+    <Resource Language="en-US" />
   </Resources>
 
   <Applications>

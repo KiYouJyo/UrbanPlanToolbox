@@ -22,7 +22,10 @@ try {
         try { $manifestText = $manifestReader.ReadToEnd() } finally { $manifestReader.Dispose() }
         $languages = @([regex]::Matches($manifestText, '<Resource\s+Language="([^"]+)"') | ForEach-Object { $_.Groups[1].Value.ToUpperInvariant() })
         $missingManifest = @($expected | Where-Object { $_ -notin $languages })
-        if ($missingManifest.Count -gt 0) { throw "MSIX manifest is missing language declarations: $($missingManifest -join ', ')" }
+        $unexpectedManifest = @($languages | Where-Object { $_ -notin $expected })
+        if ($missingManifest.Count -gt 0 -or $unexpectedManifest.Count -gt 0 -or $languages.Count -ne $expected.Count -or $languages[0] -ne 'ZH-CN') {
+            throw "MSIX manifest language validation failed. ManifestLanguages=$($languages -join ', '); MissingLanguages=$($missingManifest -join ', '); UnexpectedLanguages=$($unexpectedManifest -join ', '); DefaultLanguage=$($languages[0])."
+        }
         $priPath = Join-Path $temporaryDirectory 'resources.pri'
         $entryStream = $priEntry.Open(); $fileStream = [IO.File]::Create($priPath)
         try { $entryStream.CopyTo($fileStream) } finally { $fileStream.Dispose(); $entryStream.Dispose() }
@@ -33,9 +36,10 @@ try {
     & $MakePriPath dump /if $priPath /of $dumpPath /o | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "MakePri dump failed with exit code $LASTEXITCODE." }
     $dump = Get-Content -LiteralPath $dumpPath -Raw -Encoding Unicode
-    $missingPri = @($expected | Where-Object { $dump -notmatch ("Language-" + [regex]::Escape($_)) })
-    if ($missingPri.Count -gt 0) { throw "resources.pri is missing language candidates: $($missingPri -join ', ')" }
-    [pscustomobject]@{ MsixPath=$resolvedMsix; ManifestLanguages=$languages; PriLanguages=$expected; Succeeded=$true }
+    $priLanguages = @($expected | Where-Object { $dump -match ("Language-" + [regex]::Escape($_)) })
+    $missingPri = @($expected | Where-Object { $_ -notin $priLanguages })
+    if ($missingPri.Count -gt 0 -or $priLanguages.Count -ne $expected.Count) { throw "resources.pri language validation failed. PriLanguages=$($priLanguages -join ', '); MissingLanguages=$($missingPri -join ', ')." }
+    [pscustomobject]@{ MsixPath=$resolvedMsix; ManifestLanguages=$languages; PriLanguages=$priLanguages; MissingLanguages=@(); UnexpectedLanguages=@(); DefaultLanguage=$languages[0]; ValidationResult='Passed' }
 }
 finally {
     if (Test-Path -LiteralPath $temporaryDirectory) { [IO.Directory]::Delete($temporaryDirectory, $true) }
