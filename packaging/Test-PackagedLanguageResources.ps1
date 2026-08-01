@@ -1,13 +1,28 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$MsixPath,
-    [string]$MakePriPath = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makepri.exe'
+    [string]$MakePriPath = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makepri.exe',
+    [string]$IntermediateDirectory
 )
 
 $ErrorActionPreference = 'Stop'
 $expected = @('ZH-CN', 'JA-JP', 'EN-US')
 $resolvedMsix = (Resolve-Path -LiteralPath $MsixPath).Path
 if (-not (Test-Path -LiteralPath $MakePriPath -PathType Leaf)) { throw "MakePri.exe was not found: $MakePriPath" }
+
+if ($IntermediateDirectory) {
+    $resolvedIntermediateDirectory = (Resolve-Path -LiteralPath $IntermediateDirectory).Path
+    $splitConfigPath = Join-Path $resolvedIntermediateDirectory 'split.priconfig.xml'
+    if (-not (Test-Path -LiteralPath $splitConfigPath -PathType Leaf)) { throw "Generated split PRI configuration was not found: $splitConfigPath" }
+    $splitConfig = Get-Content -LiteralPath $splitConfigPath -Raw
+    $autoResourcePackageQualifiers = @([regex]::Matches($splitConfig, '<autoResourcePackage\s+qualifier="([^"]+)"') | ForEach-Object { $_.Groups[1].Value })
+    if ($autoResourcePackageQualifiers -contains 'Language') { throw "Language must not be an auto resource package qualifier. Actual=$($autoResourcePackageQualifiers -join ', ')." }
+    if ($autoResourcePackageQualifiers -notcontains 'Scale') { throw "Scale must remain an auto resource package qualifier. Actual=$($autoResourcePackageQualifiers -join ', ')." }
+}
+else {
+    $resolvedIntermediateDirectory = $null
+    $autoResourcePackageQualifiers = @()
+}
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $temporaryDirectory = Join-Path ([IO.Path]::GetTempPath()) ("UrbanPlanToolbox-package-language-" + [Guid]::NewGuid().ToString('N'))
@@ -35,11 +50,31 @@ try {
     $dumpPath = Join-Path $temporaryDirectory 'resources.pri.xml'
     & $MakePriPath dump /if $priPath /of $dumpPath /o | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "MakePri dump failed with exit code $LASTEXITCODE." }
-    $dump = Get-Content -LiteralPath $dumpPath -Raw -Encoding Unicode
-    $priLanguages = @($expected | Where-Object { $dump -match ("Language-" + [regex]::Escape($_)) })
+    $dump = Get-Content -LiteralPath $dumpPath -Raw
+    $priLanguageQualifierSet = @([regex]::Match($dump, '<Language>([^<]+)</Language>').Groups[1].Value.Split(',') | ForEach-Object { $_.Trim().ToUpperInvariant() } | Where-Object { $_ })
+    $priLanguages = @($expected | Where-Object { $_ -in $priLanguageQualifierSet })
     $missingPri = @($expected | Where-Object { $_ -notin $priLanguages })
-    if ($missingPri.Count -gt 0 -or $priLanguages.Count -ne $expected.Count) { throw "resources.pri language validation failed. PriLanguages=$($priLanguages -join ', '); MissingLanguages=$($missingPri -join ', ')." }
-    [pscustomobject]@{ MsixPath=$resolvedMsix; ManifestLanguages=$languages; PriLanguages=$priLanguages; MissingLanguages=@(); UnexpectedLanguages=@(); DefaultLanguage=$languages[0]; ValidationResult='Passed' }
+    $missingCandidates = @($expected | Where-Object { $dump -notmatch ('qualifiers="[^"]*Language-' + [regex]::Escape($_) + '(?:,|\")') })
+    if ($missingPri.Count -gt 0 -or $priLanguages.Count -ne $expected.Count -or $missingCandidates.Count -gt 0) { throw "resources.pri language validation failed. PriLanguages=$($priLanguages -join ', '); MissingLanguages=$($missingPri -join ', '); MissingCandidates=$($missingCandidates -join ', ')." }
+
+    $siblingPackages = Get-ChildItem -LiteralPath (Split-Path -Parent $resolvedMsix) -Filter '*.msix' -File
+    $languageResourcePackages = @($siblingPackages | Where-Object Name -match '_language-[^.]+\.msix$' | Select-Object -ExpandProperty FullName)
+    $scaleResourcePackages = @($siblingPackages | Where-Object Name -match '_scale-[^.]+\.msix$' | Select-Object -ExpandProperty FullName)
+    if ($languageResourcePackages.Count -gt 0) { throw "The release directory contains language resource packages: $($languageResourcePackages -join ', ')." }
+
+    [pscustomobject]@{
+        MainPackagePath = $resolvedMsix
+        ManifestLanguages = $languages
+        PriLanguages = $priLanguages
+        PriLanguageQualifierSet = $priLanguageQualifierSet
+        AutoResourcePackageQualifiers = $autoResourcePackageQualifiers
+        LanguageResourcePackages = $languageResourcePackages
+        ScaleResourcePackages = $scaleResourcePackages
+        MissingLanguages = @()
+        UnexpectedLanguages = @()
+        DefaultLanguage = $languages[0]
+        ValidationResult = 'Passed'
+    }
 }
 finally {
     if (Test-Path -LiteralPath $temporaryDirectory) { [IO.Directory]::Delete($temporaryDirectory, $true) }

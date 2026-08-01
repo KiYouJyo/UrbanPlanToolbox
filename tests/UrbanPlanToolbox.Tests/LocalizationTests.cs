@@ -255,6 +255,8 @@ public sealed partial class LocalizationTests
         Assert.Contains("<AssemblyVersion>0.3.10.0</AssemblyVersion>", project);
         Assert.Contains("<FileVersion>0.3.10.0</FileVersion>", project);
         Assert.Contains("<DefaultLanguage>zh-CN</DefaultLanguage>", project);
+        Assert.Contains("<AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>", project);
+        Assert.DoesNotContain("<AppxBundleAutoResourcePackageQualifiers>Language", project);
     }
 
     [Fact]
