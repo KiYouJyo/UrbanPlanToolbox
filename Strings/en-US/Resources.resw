@@ -227,10 +227,6 @@ conversion</value>
     <value>Clear</value>
     <comment>Search clear button.</comment>
   </data>
-  <data name="Action_SaveSettings.Content" xml:space="preserve">
-    <value>Save Settings</value>
-    <comment>Settings page save button.</comment>
-  </data>
   <data name="Action_RestoreDefaults.Content" xml:space="preserve">
     <value>Restore Defaults</value>
     <comment>Settings page restore defaults button.</comment>

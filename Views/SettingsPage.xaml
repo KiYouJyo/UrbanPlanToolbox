@@ -4,7 +4,7 @@
  <ComboBox x:Name="DecimalBox" x:Uid="Setting_DecimalPlaces" SelectionChanged="OnSettingChanged"><ComboBoxItem Content="0" /><ComboBoxItem Content="1" /><ComboBoxItem Content="2" /><ComboBoxItem Content="3" /></ComboBox>
  <ToggleSwitch x:Name="AutoCalculateToggle" x:Uid="Setting_AutoCalculate" Toggled="OnSettingChanged" />
  <ComboBox x:Name="LanguageBox" x:Uid="Setting_Language" SelectionChanged="OnSettingChanged"><ComboBoxItem Tag="system" x:Uid="Setting_Language_System" /><ComboBoxItem Tag="zh-CN" x:Uid="Setting_Language_ZhCn" /><ComboBoxItem Tag="ja-JP" x:Uid="Setting_Language_JaJp" /><ComboBoxItem Tag="en-US" x:Uid="Setting_Language_EnUs" /></ComboBox>
- <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Uid="Action_SaveSettings" Click="OnSave" /><Button x:Uid="Action_RestoreDefaults" Click="OnRestore" /></StackPanel><TextBlock x:Name="StatusText" />
+ <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Uid="Action_RestoreDefaults" Click="OnRestore" /></StackPanel><TextBlock x:Name="StatusText" />
  <Border Height="1" Margin="0,12" Background="{ThemeResource CardStrokeColorDefaultBrush}"/><TextBlock x:Uid="DataManagement_Title" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Uid="DataManagement_Description" TextWrapping="Wrap"/>
  <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Uid="DataManagement_Export" x:Name="ExportButton" Click="OnExport"/><Button x:Uid="DataManagement_Import" x:Name="ImportButton" Click="OnImport"/></StackPanel>
  <InfoBar x:Name="DataStatusBar" IsOpen="False"/>

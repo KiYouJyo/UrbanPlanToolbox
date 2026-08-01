@@ -18,7 +18,6 @@ public sealed partial class SettingsPage : Page
         TitleText.Text = _localization.GetString("Navigation_Settings");
         Apply(_settingsService.Load());
     }
-    private void OnSave(object sender, RoutedEventArgs e) => SaveCurrentSettings();
     private void OnRestore(object sender, RoutedEventArgs e) { var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; }); Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults"); }
     private void OnSettingChanged(object sender, object e) { if (!_isApplying) SaveCurrentSettings(); }
     private void SaveCurrentSettings()

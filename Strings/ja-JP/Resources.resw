@@ -224,10 +224,6 @@
     <value>クリア</value>
     <comment>検索クリアボタン。</comment>
   </data>
-  <data name="Action_SaveSettings.Content" xml:space="preserve">
-    <value>設定を保存</value>
-    <comment>設定ページの保存ボタン。</comment>
-  </data>
   <data name="Action_RestoreDefaults.Content" xml:space="preserve">
     <value>既定に戻す</value>
     <comment>設定ページの既定に戻すボタン。</comment>

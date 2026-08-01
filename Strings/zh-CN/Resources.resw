@@ -230,10 +230,6 @@ dwyblchhq</value>
     <value>清除</value>
     <comment>搜索框清除按钮。</comment>
   </data>
-  <data name="Action_SaveSettings.Content" xml:space="preserve">
-    <value>保存设置</value>
-    <comment>设置页保存按钮。</comment>
-  </data>
   <data name="Action_RestoreDefaults.Content" xml:space="preserve">
     <value>恢复默认设置</value>
     <comment>设置页恢复默认按钮。</comment>
