@@ -26,6 +26,14 @@ public sealed class WorkspaceLayoutTests
             .Single(element => (string?)element.Attribute(Xaml + "Name") == "CoordinatesGrid");
         Assert.NotEmpty(coordinates.Descendants(Presentation + "AdaptiveTrigger"));
         Assert.Equal(2, coordinates.Descendants(Presentation + "ColumnDefinition").Count());
+
+        var expanders = document.Descendants(Presentation + "Expander").ToArray();
+        Assert.NotEmpty(expanders);
+        Assert.All(expanders, expander =>
+        {
+            Assert.Equal("Stretch", (string?)expander.Attribute("HorizontalAlignment"));
+            Assert.Equal("Stretch", (string?)expander.Attribute("HorizontalContentAlignment"));
+        });
     }
 
     [Fact]

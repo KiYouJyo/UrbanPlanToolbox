@@ -30,7 +30,7 @@
 
       <InfoBar x:Name="StatusBar" Grid.Row="1" IsOpen="False" IsClosable="True"/>
 
-      <Expander x:Name="BasicInfoExpander" Grid.Row="2" IsExpanded="True" HorizontalAlignment="Stretch">
+      <Expander x:Name="BasicInfoExpander" Grid.Row="2" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <StackPanel Spacing="10" Padding="0,12,0,4" HorizontalAlignment="Stretch">
           <TextBox x:Name="NameBox" TextChanged="OnFieldChanged" HorizontalAlignment="Stretch"/>
           <ComboBox x:Name="TypeBox" DisplayMemberPath="Name" SelectionChanged="OnTypeChanged" HorizontalAlignment="Stretch"/>
@@ -59,12 +59,12 @@
         </StackPanel>
       </Expander>
 
-      <Expander x:Name="DescriptionExpander" Grid.Row="3" IsExpanded="True" HorizontalAlignment="Stretch">
+      <Expander x:Name="DescriptionExpander" Grid.Row="3" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <TextBox x:Name="DescriptionBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="140"
                  TextChanged="OnFieldChanged" HorizontalAlignment="Stretch"/>
       </Expander>
 
-      <Expander x:Name="RequirementsExpander" Grid.Row="4" IsExpanded="True" HorizontalAlignment="Stretch">
+      <Expander x:Name="RequirementsExpander" Grid.Row="4" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <StackPanel Spacing="10" Padding="0,12,0,4" HorizontalAlignment="Stretch">
           <TextBlock x:Name="RequirementsHelpText" TextWrapping="Wrap"/>
           <TextBox x:Name="PlanningRequirementsBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="180"
@@ -76,7 +76,7 @@
         </StackPanel>
       </Expander>
 
-      <Expander x:Name="MilestonesExpander" Grid.Row="5" IsExpanded="True" HorizontalAlignment="Stretch">
+      <Expander x:Name="MilestonesExpander" Grid.Row="5" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <StackPanel Spacing="10" Padding="0,12,0,4" HorizontalAlignment="Stretch">
           <Button x:Name="AddMilestoneButton" Click="OnAddMilestone" HorizontalAlignment="Left"/>
           <TextBlock x:Name="MilestoneEmptyText" TextWrapping="Wrap"/>
@@ -84,7 +84,7 @@
         </StackPanel>
       </Expander>
 
-      <Expander x:Name="FolderExpander" Grid.Row="6" IsExpanded="True" HorizontalAlignment="Stretch">
+      <Expander x:Name="FolderExpander" Grid.Row="6" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <StackPanel Spacing="10" Padding="0,12,0,4" HorizontalAlignment="Stretch">
           <TextBlock x:Name="FolderText" TextWrapping="Wrap"/>
           <Button x:Name="SelectFolderButton" Click="OnSelectFolder" HorizontalAlignment="Left"/>
@@ -93,7 +93,7 @@
         </StackPanel>
       </Expander>
 
-      <Expander x:Name="ManagementExpander" Grid.Row="7" IsExpanded="True" HorizontalAlignment="Stretch">
+      <Expander x:Name="ManagementExpander" Grid.Row="7" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <StackPanel Spacing="10" Padding="0,12,0,4" HorizontalAlignment="Stretch">
           <TextBlock x:Name="ManagementStateText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/>
           <TextBlock x:Name="ArchiveDetailsText" TextWrapping="Wrap"/>
