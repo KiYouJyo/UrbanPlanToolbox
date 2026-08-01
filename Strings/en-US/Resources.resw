@@ -1543,4 +1543,42 @@ Latest version: {1}</value>
   <data name="ProjectValidation_MilestoneNotesTooLong" xml:space="preserve"><value>The milestone notes are too long.</value></data>
   <data name="ProjectValidation_MilestoneDateInvalid" xml:space="preserve"><value>Select a valid milestone date.</value></data>
   <data name="ProjectValidation_MilestoneTimestampsMustBeUtc" xml:space="preserve"><value>Milestone timestamps are invalid.</value></data>
+  <data name="ProjectKind_Design" xml:space="preserve"><value>Design Projects</value></data>
+  <data name="ProjectKind_Research" xml:space="preserve"><value>Research Projects</value></data>
+  <data name="ProjectKind_DesignDescription" xml:space="preserve"><value>For planning design, design coursework, competitions, and professional projects.</value></data>
+  <data name="ProjectKind_ResearchDescription" xml:space="preserve"><value>For coursework, theses, papers, and research projects.</value></data>
+  <data name="ProjectKind_ChooseTitle" xml:space="preserve"><value>Choose a project category</value></data>
+  <data name="ProjectKind_Creating" xml:space="preserve"><value>Creating: {0}</value></data>
+  <data name="ProjectCategory_DesignWithCount" xml:space="preserve"><value>Design Projects ({0})</value></data>
+  <data name="ProjectCategory_ResearchWithCount" xml:space="preserve"><value>Research Projects ({0})</value></data>
+  <data name="ProjectHome_DesignEmpty" xml:space="preserve"><value>No design projects yet. Create one to organize design material and milestones.</value></data>
+  <data name="ProjectHome_ResearchEmpty" xml:space="preserve"><value>No research projects yet. Create one to organize the research field, subject, and methods.</value></data>
+  <data name="Project_Action_NewDesign" xml:space="preserve"><value>New Design Project</value></data>
+  <data name="Project_Action_NewResearch" xml:space="preserve"><value>New Research Project</value></data>
+  <data name="ResearchProjectType_Coursework" xml:space="preserve"><value>Coursework</value></data>
+  <data name="ResearchProjectType_Thesis" xml:space="preserve"><value>Thesis</value></data>
+  <data name="ResearchProjectType_Paper" xml:space="preserve"><value>Research Paper</value></data>
+  <data name="ResearchProjectType_ResearchProject" xml:space="preserve"><value>Research Project</value></data>
+  <data name="ResearchProjectType_Other" xml:space="preserve"><value>Other</value></data>
+  <data name="ResearchProject_Field_Type" xml:space="preserve"><value>Research Project Type</value></data>
+  <data name="ResearchProject_Field_Field" xml:space="preserve"><value>Research Field</value></data>
+  <data name="ResearchProject_Field_Subject" xml:space="preserve"><value>Research Subject</value></data>
+  <data name="ResearchProject_Field_Methods" xml:space="preserve"><value>Research Methods</value></data>
+  <data name="Project_New_DesignTitle" xml:space="preserve"><value>New Design Project</value></data>
+  <data name="Project_New_ResearchTitle" xml:space="preserve"><value>New Research Project</value></data>
+  <data name="Action_Continue" xml:space="preserve"><value>Continue</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="ResearchProjectWorkspace_Details" xml:space="preserve"><value>Research Details</value></data>
+  <data name="ProjectValidation_ProjectKindInvalid" xml:space="preserve"><value>The project category is invalid.</value></data>
+  <data name="ProjectValidation_ProjectKindImmutable" xml:space="preserve"><value>The project category cannot be changed after creation.</value></data>
+  <data name="ProjectValidation_DesignDetailsRequired" xml:space="preserve"><value>Design project details are missing.</value></data>
+  <data name="ProjectValidation_ResearchDetailsNotAllowed" xml:space="preserve"><value>A design project cannot store research-only details.</value></data>
+  <data name="ProjectValidation_DesignDetailsNotAllowed" xml:space="preserve"><value>A research project cannot store design-only details.</value></data>
+  <data name="ProjectValidation_ResearchDetailsRequired" xml:space="preserve"><value>Research project details are missing.</value></data>
+  <data name="ProjectValidation_ResearchFieldRequired" xml:space="preserve"><value>Enter a research field.</value></data>
+  <data name="ProjectValidation_ResearchFieldTooLong" xml:space="preserve"><value>The research field is too long.</value></data>
+  <data name="ProjectValidation_ResearchSubjectRequired" xml:space="preserve"><value>Enter a research subject.</value></data>
+  <data name="ProjectValidation_ResearchSubjectTooLong" xml:space="preserve"><value>The research subject is too long.</value></data>
+  <data name="ProjectValidation_ResearchMethodsRequired" xml:space="preserve"><value>Enter research methods.</value></data>
+  <data name="ProjectValidation_ResearchMethodsTooLong" xml:space="preserve"><value>The research methods are too long.</value></data>
 </root>

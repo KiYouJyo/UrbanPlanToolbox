@@ -1540,4 +1540,42 @@
   <data name="ProjectValidation_MilestoneNotesTooLong" xml:space="preserve"><value>マイルストーンのメモが長すぎます。</value></data>
   <data name="ProjectValidation_MilestoneDateInvalid" xml:space="preserve"><value>有効なマイルストーンの日付を選択してください。</value></data>
   <data name="ProjectValidation_MilestoneTimestampsMustBeUtc" xml:space="preserve"><value>マイルストーンのタイムスタンプが無効です。</value></data>
+  <data name="ProjectKind_Design" xml:space="preserve"><value>設計プロジェクト</value></data>
+  <data name="ProjectKind_Research" xml:space="preserve"><value>研究プロジェクト</value></data>
+  <data name="ProjectKind_DesignDescription" xml:space="preserve"><value>都市計画設計、授業設計、コンペ、実務プロジェクト向けです。</value></data>
+  <data name="ProjectKind_ResearchDescription" xml:space="preserve"><value>課題、論文、研究課題向けです。</value></data>
+  <data name="ProjectKind_ChooseTitle" xml:space="preserve"><value>プロジェクト種別を選択</value></data>
+  <data name="ProjectKind_Creating" xml:space="preserve"><value>作成中：{0}</value></data>
+  <data name="ProjectCategory_DesignWithCount" xml:space="preserve"><value>設計プロジェクト（{0}）</value></data>
+  <data name="ProjectCategory_ResearchWithCount" xml:space="preserve"><value>研究プロジェクト（{0}）</value></data>
+  <data name="ProjectHome_DesignEmpty" xml:space="preserve"><value>設計プロジェクトはまだありません。設計資料とマイルストーンを整理するプロジェクトを作成できます。</value></data>
+  <data name="ProjectHome_ResearchEmpty" xml:space="preserve"><value>研究プロジェクトはまだありません。研究分野、対象、方法を整理するプロジェクトを作成できます。</value></data>
+  <data name="Project_Action_NewDesign" xml:space="preserve"><value>設計プロジェクトを新規作成</value></data>
+  <data name="Project_Action_NewResearch" xml:space="preserve"><value>研究プロジェクトを新規作成</value></data>
+  <data name="ResearchProjectType_Coursework" xml:space="preserve"><value>課題</value></data>
+  <data name="ResearchProjectType_Thesis" xml:space="preserve"><value>学位論文</value></data>
+  <data name="ResearchProjectType_Paper" xml:space="preserve"><value>研究論文</value></data>
+  <data name="ResearchProjectType_ResearchProject" xml:space="preserve"><value>研究課題</value></data>
+  <data name="ResearchProjectType_Other" xml:space="preserve"><value>その他</value></data>
+  <data name="ResearchProject_Field_Type" xml:space="preserve"><value>研究プロジェクトの種類</value></data>
+  <data name="ResearchProject_Field_Field" xml:space="preserve"><value>研究分野</value></data>
+  <data name="ResearchProject_Field_Subject" xml:space="preserve"><value>研究対象</value></data>
+  <data name="ResearchProject_Field_Methods" xml:space="preserve"><value>研究方法</value></data>
+  <data name="Project_New_DesignTitle" xml:space="preserve"><value>設計プロジェクトを新規作成</value></data>
+  <data name="Project_New_ResearchTitle" xml:space="preserve"><value>研究プロジェクトを新規作成</value></data>
+  <data name="Action_Continue" xml:space="preserve"><value>続行</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>前のステップに戻る</value></data>
+  <data name="ResearchProjectWorkspace_Details" xml:space="preserve"><value>研究内容</value></data>
+  <data name="ProjectValidation_ProjectKindInvalid" xml:space="preserve"><value>プロジェクト種別が無効です。</value></data>
+  <data name="ProjectValidation_ProjectKindImmutable" xml:space="preserve"><value>作成後にプロジェクト種別を変更することはできません。</value></data>
+  <data name="ProjectValidation_DesignDetailsRequired" xml:space="preserve"><value>設計プロジェクトのデータがありません。</value></data>
+  <data name="ProjectValidation_ResearchDetailsNotAllowed" xml:space="preserve"><value>設計プロジェクトには研究専用データを保存できません。</value></data>
+  <data name="ProjectValidation_DesignDetailsNotAllowed" xml:space="preserve"><value>研究プロジェクトには設計専用データを保存できません。</value></data>
+  <data name="ProjectValidation_ResearchDetailsRequired" xml:space="preserve"><value>研究プロジェクトのデータがありません。</value></data>
+  <data name="ProjectValidation_ResearchFieldRequired" xml:space="preserve"><value>研究分野を入力してください。</value></data>
+  <data name="ProjectValidation_ResearchFieldTooLong" xml:space="preserve"><value>研究分野が長すぎます。</value></data>
+  <data name="ProjectValidation_ResearchSubjectRequired" xml:space="preserve"><value>研究対象を入力してください。</value></data>
+  <data name="ProjectValidation_ResearchSubjectTooLong" xml:space="preserve"><value>研究対象が長すぎます。</value></data>
+  <data name="ProjectValidation_ResearchMethodsRequired" xml:space="preserve"><value>研究方法を入力してください。</value></data>
+  <data name="ProjectValidation_ResearchMethodsTooLong" xml:space="preserve"><value>研究方法が長すぎます。</value></data>
 </root>

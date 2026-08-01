@@ -29,11 +29,13 @@ public sealed partial class ProjectArchivePage : Page
         if ((sender as Button)?.Tag is ProjectRecord project) Frame.Navigate(typeof(ProjectWorkspacePage), project.Id);
     }
 
-    private sealed record ArchiveCard(ProjectRecord Project, string Name, string TypeAndArea, string Statistics, string Archived)
+    private sealed record ArchiveCard(ProjectRecord Project, string Name, string Kind, string TypeAndArea, string Statistics, string Archived)
     {
         public ArchiveCard(ProjectRecord project, ILocalizationService localization) : this(
-            project, project.Name,
-            string.IsNullOrWhiteSpace(project.AdministrativeArea) ? ProjectPresentation.GetTypeName(project, localization) : $"{ProjectPresentation.GetTypeName(project, localization)} · {project.AdministrativeArea}",
+            project, project.Name, ProjectPresentation.GetKindName(project.Kind, localization),
+            project.Kind == ProjectKindCodes.Research
+                ? string.Join(" · ", new[] { ProjectPresentation.GetTypeName(project, localization), project.ResearchDetails?.ResearchField }.Where(value => !string.IsNullOrWhiteSpace(value)))
+                : string.IsNullOrWhiteSpace(project.AdministrativeArea) ? ProjectPresentation.GetTypeName(project, localization) : $"{ProjectPresentation.GetTypeName(project, localization)} · {project.AdministrativeArea}",
             localization.GetFormattedString("Project_Card_Milestones", project.Milestones.Count),
             localization.GetFormattedString("ProjectArchive_ArchivedAt", project.ArchivedAtUtc?.ToLocalTime().ToString("g") ?? "—")) { }
     }

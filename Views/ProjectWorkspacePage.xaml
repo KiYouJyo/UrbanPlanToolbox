@@ -59,6 +59,18 @@
         </StackPanel>
       </Expander>
 
+      <Expander x:Name="ResearchDetailsExpander" Grid.Row="3" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Visibility="Collapsed">
+        <StackPanel Spacing="10" Padding="0,12,0,4" HorizontalAlignment="Stretch">
+          <TextBox x:Name="ResearchFieldBox" TextChanged="OnFieldChanged" HorizontalAlignment="Stretch"/>
+          <TextBox x:Name="ResearchSubjectBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="160" TextChanged="OnFieldChanged" HorizontalAlignment="Stretch"/>
+          <TextBox x:Name="ResearchMethodsBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="160" TextChanged="OnFieldChanged" HorizontalAlignment="Stretch"/>
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+            <Button x:Name="ResearchSaveButton" Click="OnSave"/>
+            <Button x:Name="ResearchResetButton" Click="OnReset"/>
+          </StackPanel>
+        </StackPanel>
+      </Expander>
+
       <Expander x:Name="DescriptionExpander" Grid.Row="3" IsExpanded="True" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
         <TextBox x:Name="DescriptionBox" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="140"
                  TextChanged="OnFieldChanged" HorizontalAlignment="Stretch"/>

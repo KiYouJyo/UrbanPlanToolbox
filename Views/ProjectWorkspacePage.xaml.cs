@@ -63,6 +63,7 @@ public sealed partial class ProjectWorkspacePage : Page
     private void ConfigureUi()
     {
         BasicInfoExpander.Header = _localization.GetString("ProjectWorkspace_BasicInformation");
+        ResearchDetailsExpander.Header = _localization.GetString("ResearchProjectWorkspace_Details");
         DescriptionExpander.Header = _localization.GetString("ProjectWorkspace_Description");
         RequirementsExpander.Header = _localization.GetString("ProjectWorkspace_PlanningRequirements");
         MilestonesExpander.Header = _localization.GetString("ProjectWorkspace_Milestones");
@@ -81,12 +82,17 @@ public sealed partial class ProjectWorkspacePage : Page
         LatitudeBox.Header = _localization.GetString("Project_Field_Latitude"); LongitudeBox.Header = _localization.GetString("Project_Field_Longitude");
         DescriptionBox.Header = _localization.GetString("Project_Field_Description"); DescriptionBox.MaxLength = ProjectValidation.MaxDescriptionLength;
         PlanningRequirementsBox.Header = _localization.GetString("Project_Field_PlanningRequirements"); PlanningRequirementsBox.MaxLength = ProjectValidation.MaxPlanningRequirementsLength;
+        ResearchFieldBox.Header = _localization.GetString("ResearchProject_Field_Field"); ResearchFieldBox.MaxLength = ProjectValidation.MaxResearchFieldLength;
+        ResearchSubjectBox.Header = _localization.GetString("ResearchProject_Field_Subject"); ResearchSubjectBox.MaxLength = ProjectValidation.MaxResearchSubjectLength;
+        ResearchMethodsBox.Header = _localization.GetString("ResearchProject_Field_Methods"); ResearchMethodsBox.MaxLength = ProjectValidation.MaxResearchMethodsLength;
 
-        foreach (var control in new Control[] { NameBox, TypeBox, CustomTypeBox, AreaBox, LatitudeBox, LongitudeBox, DescriptionBox, PlanningRequirementsBox })
+        foreach (var control in new Control[] { NameBox, TypeBox, CustomTypeBox, AreaBox, LatitudeBox, LongitudeBox, DescriptionBox, PlanningRequirementsBox, ResearchFieldBox, ResearchSubjectBox, ResearchMethodsBox })
             AutomationProperties.SetName(control, control is TextBox text ? text.Header?.ToString() ?? string.Empty : ((ComboBox)control).Header?.ToString() ?? string.Empty);
 
         ConfigureButton(SaveButton, "Project_Action_Save");
         ConfigureButton(ResetButton, "Project_Action_Reset");
+        ConfigureButton(ResearchSaveButton, "Project_Action_Save");
+        ConfigureButton(ResearchResetButton, "Project_Action_Reset");
         ConfigureButton(AddMilestoneButton, "Milestone_Action_Add");
         ConfigureButton(SelectFolderButton, "Folder_Action_Select");
         ConfigureButton(OpenFolderButton, "Folder_Action_Open");
@@ -110,17 +116,31 @@ public sealed partial class ProjectWorkspacePage : Page
         TitleText.Text = _project.Name;
         ToolTipService.SetToolTip(TitleText, _project.Name);
         MetadataText.Text = _localization.GetFormattedString("ProjectWorkspace_Metadata", ProjectPresentation.GetTypeName(_project, _localization), _project.UpdatedAtUtc.ToLocalTime().ToString("g"));
+        MetadataText.Text = $"{ProjectPresentation.GetKindName(_project.Kind, _localization)} · {MetadataText.Text}";
         StateText.Text = _localization.GetString(_project.IsArchived ? "Project_State_Archived" : "Project_State_Active");
         StateBadge.Background = (Brush)Application.Current.Resources[_project.IsArchived ? "SystemFillColorCautionBackgroundBrush" : "SystemFillColorSuccessBackgroundBrush"];
         NameBox.Text = _project.Name;
-        TypeBox.SelectedItem = TypeBox.Items.Cast<ProjectTypeOption>().First(item => item.Code == _project.Type);
         CustomTypeBox.Text = _project.CustomType ?? string.Empty;
         CustomTypeBox.Visibility = _project.Type == ProjectTypeCodes.Other ? Visibility.Visible : Visibility.Collapsed;
+        var isResearch = _project.Kind == ProjectKindCodes.Research;
+        TypeBox.Header = _localization.GetString(isResearch ? "ResearchProject_Field_Type" : "Project_Field_Type");
+        TypeBox.ItemsSource = (isResearch ? ResearchProjectTypeCodes.All : ProjectTypeCodes.All)
+            .Select(code => new ProjectTypeOption(code, isResearch ? ProjectPresentation.GetResearchTypeName(code, _localization) : ProjectPresentation.GetDesignTypeName(code, _localization))).ToArray();
+        TypeBox.SelectedItem = TypeBox.Items.Cast<ProjectTypeOption>().First(item => item.Code == _project.Type);
         AreaBox.Text = _project.AdministrativeArea ?? string.Empty;
         LatitudeBox.Text = _project.Latitude?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
         LongitudeBox.Text = _project.Longitude?.ToString(CultureInfo.CurrentCulture) ?? string.Empty;
         DescriptionBox.Text = _project.Description ?? string.Empty;
         PlanningRequirementsBox.Text = _project.PlanningRequirements ?? string.Empty;
+        ResearchFieldBox.Text = _project.ResearchDetails?.ResearchField ?? string.Empty;
+        ResearchSubjectBox.Text = _project.ResearchDetails?.ResearchSubject ?? string.Empty;
+        ResearchMethodsBox.Text = _project.ResearchDetails?.ResearchMethods ?? string.Empty;
+        AreaBox.Visibility = isResearch ? Visibility.Collapsed : Visibility.Visible;
+        CoordinatesLabel.Visibility = isResearch ? Visibility.Collapsed : Visibility.Visible;
+        CoordinatesGrid.Visibility = isResearch ? Visibility.Collapsed : Visibility.Visible;
+        DescriptionExpander.Visibility = isResearch ? Visibility.Collapsed : Visibility.Visible;
+        RequirementsExpander.Visibility = isResearch ? Visibility.Collapsed : Visibility.Visible;
+        ResearchDetailsExpander.Visibility = isResearch ? Visibility.Visible : Visibility.Collapsed;
         SetEditingEnabled(!_project.IsArchived);
         RenderMilestones();
         RenderFolder();
@@ -132,10 +152,12 @@ public sealed partial class ProjectWorkspacePage : Page
 
     private void SetEditingEnabled(bool enabled)
     {
-        foreach (var box in new[] { NameBox, CustomTypeBox, AreaBox, LatitudeBox, LongitudeBox, DescriptionBox, PlanningRequirementsBox }) box.IsReadOnly = !enabled;
+        foreach (var box in new[] { NameBox, CustomTypeBox, AreaBox, LatitudeBox, LongitudeBox, DescriptionBox, PlanningRequirementsBox, ResearchFieldBox, ResearchSubjectBox, ResearchMethodsBox }) box.IsReadOnly = !enabled;
         TypeBox.IsEnabled = enabled;
         SaveButton.IsEnabled = enabled && !_busy;
         ResetButton.IsEnabled = enabled && !_busy;
+        ResearchSaveButton.IsEnabled = enabled && !_busy;
+        ResearchResetButton.IsEnabled = enabled && !_busy;
         AddMilestoneButton.IsEnabled = enabled && !_busy;
         SelectFolderButton.IsEnabled = enabled && !_busy;
         ClearFolderButton.IsEnabled = enabled && !_busy && _project?.WorkFolder is not null;
@@ -211,17 +233,24 @@ public sealed partial class ProjectWorkspacePage : Page
     private bool TryCreateCandidate(out ProjectRecord candidate)
     {
         candidate = null!;
-        if (_project is null || !TryParseCoordinate(LatitudeBox.Text, out var latitude) || !TryParseCoordinate(LongitudeBox.Text, out var longitude))
+        if (_project is null || _project.Kind == ProjectKindCodes.Design && (!TryParseCoordinate(LatitudeBox.Text, out _) || !TryParseCoordinate(LongitudeBox.Text, out _)))
         { ShowError("Project_Error_InvalidCoordinate"); return false; }
         candidate = JsonSerializer.Deserialize<ProjectRecord>(JsonSerializer.Serialize(_project, DataStorageJson.Options), DataStorageJson.Options)!;
         candidate.Name = NameBox.Text;
         candidate.Type = (TypeBox.SelectedItem as ProjectTypeOption)?.Code ?? string.Empty;
         candidate.CustomType = candidate.Type == ProjectTypeCodes.Other ? CustomTypeBox.Text : null;
-        candidate.AdministrativeArea = AreaBox.Text;
-        candidate.Latitude = latitude;
-        candidate.Longitude = longitude;
-        candidate.Description = DescriptionBox.Text;
-        candidate.PlanningRequirements = PlanningRequirementsBox.Text;
+        if (candidate.Kind == ProjectKindCodes.Design)
+        {
+            TryParseCoordinate(LatitudeBox.Text, out var latitude); TryParseCoordinate(LongitudeBox.Text, out var longitude);
+            candidate.AdministrativeArea = AreaBox.Text; candidate.Latitude = latitude; candidate.Longitude = longitude;
+            candidate.Description = DescriptionBox.Text; candidate.PlanningRequirements = PlanningRequirementsBox.Text;
+        }
+        else
+        {
+            candidate.ResearchDetails!.ResearchField = ResearchFieldBox.Text;
+            candidate.ResearchDetails.ResearchSubject = ResearchSubjectBox.Text;
+            candidate.ResearchDetails.ResearchMethods = ResearchMethodsBox.Text;
+        }
         var errors = ProjectValidation.Validate(candidate);
         if (errors.Count == 0) return true;
         ShowValidation(errors);

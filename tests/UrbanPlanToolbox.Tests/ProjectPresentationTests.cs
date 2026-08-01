@@ -36,6 +36,32 @@ public sealed class ProjectPresentationTests
         Assert.Equal(ProjectTypeCodes.Other, project.Type);
     }
 
+    [Theory]
+    [InlineData(ResearchProjectTypeCodes.Coursework, "Coursework")]
+    [InlineData(ResearchProjectTypeCodes.Thesis, "Thesis")]
+    [InlineData(ResearchProjectTypeCodes.Paper, "Paper")]
+    [InlineData(ResearchProjectTypeCodes.ResearchProject, "Project")]
+    [InlineData(ResearchProjectTypeCodes.Other, "Other")]
+    public void ResearchTypeCodesResolveIndependently(string code, string expected)
+    {
+        var localization = new DictionaryLocalizationService(new Dictionary<string, string>
+        {
+            ["ResearchProjectType_Coursework"] = "Coursework", ["ResearchProjectType_Thesis"] = "Thesis",
+            ["ResearchProjectType_Paper"] = "Paper", ["ResearchProjectType_ResearchProject"] = "Project",
+            ["ResearchProjectType_Other"] = "Other"
+        });
+        Assert.Equal(expected, ProjectPresentation.GetResearchTypeName(code, localization));
+    }
+
+    [Fact]
+    public void ResearchSubjectSummaryNormalizesWhitespaceAndTruncates()
+    {
+        Assert.Equal("A B", ProjectPresentation.CreateResearchSubjectSummary(" A\r\n B "));
+        var summary = ProjectPresentation.CreateResearchSubjectSummary(new string('x', 130));
+        Assert.Equal(120, summary.Length);
+        Assert.EndsWith("…", summary);
+    }
+
     [Fact]
     public async Task FolderAccessContractKeepsTokenSeparateAndSupportsExpiredAccess()
     {

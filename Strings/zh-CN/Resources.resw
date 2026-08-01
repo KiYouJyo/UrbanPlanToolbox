@@ -1546,4 +1546,42 @@ dwyblchhq</value>
   <data name="ProjectValidation_MilestoneNotesTooLong" xml:space="preserve"><value>时间节点备注过长。</value></data>
   <data name="ProjectValidation_MilestoneDateInvalid" xml:space="preserve"><value>请选择有效的时间节点日期。</value></data>
   <data name="ProjectValidation_MilestoneTimestampsMustBeUtc" xml:space="preserve"><value>时间节点的时间戳无效。</value></data>
+  <data name="ProjectKind_Design" xml:space="preserve"><value>设计项目</value></data>
+  <data name="ProjectKind_Research" xml:space="preserve"><value>研究项目</value></data>
+  <data name="ProjectKind_DesignDescription" xml:space="preserve"><value>适用于规划设计、课程设计、竞赛和实际项目。</value></data>
+  <data name="ProjectKind_ResearchDescription" xml:space="preserve"><value>适用于作业、论文和研究课题。</value></data>
+  <data name="ProjectKind_ChooseTitle" xml:space="preserve"><value>选择项目类别</value></data>
+  <data name="ProjectKind_Creating" xml:space="preserve"><value>正在创建：{0}</value></data>
+  <data name="ProjectCategory_DesignWithCount" xml:space="preserve"><value>设计项目（{0}）</value></data>
+  <data name="ProjectCategory_ResearchWithCount" xml:space="preserve"><value>研究项目（{0}）</value></data>
+  <data name="ProjectHome_DesignEmpty" xml:space="preserve"><value>还没有设计项目。可以创建一个项目来整理设计资料和时间节点。</value></data>
+  <data name="ProjectHome_ResearchEmpty" xml:space="preserve"><value>还没有研究项目。可以创建一个项目来整理研究领域、对象和方法。</value></data>
+  <data name="Project_Action_NewDesign" xml:space="preserve"><value>新建设计项目</value></data>
+  <data name="Project_Action_NewResearch" xml:space="preserve"><value>新建研究项目</value></data>
+  <data name="ResearchProjectType_Coursework" xml:space="preserve"><value>作业</value></data>
+  <data name="ResearchProjectType_Thesis" xml:space="preserve"><value>学位论文</value></data>
+  <data name="ResearchProjectType_Paper" xml:space="preserve"><value>研究论文</value></data>
+  <data name="ResearchProjectType_ResearchProject" xml:space="preserve"><value>研究课题</value></data>
+  <data name="ResearchProjectType_Other" xml:space="preserve"><value>其他</value></data>
+  <data name="ResearchProject_Field_Type" xml:space="preserve"><value>研究项目类型</value></data>
+  <data name="ResearchProject_Field_Field" xml:space="preserve"><value>研究领域</value></data>
+  <data name="ResearchProject_Field_Subject" xml:space="preserve"><value>研究对象</value></data>
+  <data name="ResearchProject_Field_Methods" xml:space="preserve"><value>研究方法</value></data>
+  <data name="Project_New_DesignTitle" xml:space="preserve"><value>新建设计项目</value></data>
+  <data name="Project_New_ResearchTitle" xml:space="preserve"><value>新建研究项目</value></data>
+  <data name="Action_Continue" xml:space="preserve"><value>继续</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>返回上一步</value></data>
+  <data name="ResearchProjectWorkspace_Details" xml:space="preserve"><value>研究内容</value></data>
+  <data name="ProjectValidation_ProjectKindInvalid" xml:space="preserve"><value>项目类别无效。</value></data>
+  <data name="ProjectValidation_ProjectKindImmutable" xml:space="preserve"><value>项目创建后不能更改项目类别。</value></data>
+  <data name="ProjectValidation_DesignDetailsRequired" xml:space="preserve"><value>设计项目数据缺失。</value></data>
+  <data name="ProjectValidation_ResearchDetailsNotAllowed" xml:space="preserve"><value>设计项目不能保存研究项目专属数据。</value></data>
+  <data name="ProjectValidation_DesignDetailsNotAllowed" xml:space="preserve"><value>研究项目不能保存设计项目专属数据。</value></data>
+  <data name="ProjectValidation_ResearchDetailsRequired" xml:space="preserve"><value>研究项目数据缺失。</value></data>
+  <data name="ProjectValidation_ResearchFieldRequired" xml:space="preserve"><value>请输入研究领域。</value></data>
+  <data name="ProjectValidation_ResearchFieldTooLong" xml:space="preserve"><value>研究领域过长。</value></data>
+  <data name="ProjectValidation_ResearchSubjectRequired" xml:space="preserve"><value>请输入研究对象。</value></data>
+  <data name="ProjectValidation_ResearchSubjectTooLong" xml:space="preserve"><value>研究对象过长。</value></data>
+  <data name="ProjectValidation_ResearchMethodsRequired" xml:space="preserve"><value>请输入研究方法。</value></data>
+  <data name="ProjectValidation_ResearchMethodsTooLong" xml:space="preserve"><value>研究方法过长。</value></data>
 </root>

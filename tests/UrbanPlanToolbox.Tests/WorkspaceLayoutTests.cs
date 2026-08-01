@@ -48,6 +48,10 @@ public sealed class WorkspaceLayoutTests
         Assert.Contains("BasicInfoExpander", names);
         Assert.Contains("DescriptionBox", names);
         Assert.Contains("PlanningRequirementsBox", names);
+        Assert.Contains("ResearchDetailsExpander", names);
+        Assert.Contains("ResearchFieldBox", names);
+        Assert.Contains("ResearchSubjectBox", names);
+        Assert.Contains("ResearchMethodsBox", names);
         Assert.Contains("MilestoneList", names);
         Assert.Contains("FolderExpander", names);
         Assert.Contains("ManagementExpander", names);
