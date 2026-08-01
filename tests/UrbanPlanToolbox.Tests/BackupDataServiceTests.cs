@@ -57,6 +57,11 @@ public sealed class BackupDataServiceTests
         var project = await scope.CreateProjectAsync(withFolder: true);
         await scope.Projects.AddTodoAsync(project.Id, "Review plan");
         await scope.Projects.AddSnapshotAsync(project.Id, new PlanningInput { SiteArea = 3m }, new PlanningResult { FloorAreaRatio = 1m / 3m });
+        project = (await scope.Projects.ReadAsync(project.Id)).Value!;
+        project.PlanningRequirements = "Preserve the historic street wall.";
+        project.UpdatedAtUtc = DateTimeOffset.UtcNow;
+        await scope.Projects.SaveAsync(project);
+        await scope.Projects.AddMilestoneAsync(project.Id, "Public review", new DateOnly(2026, 9, 1), new TimeOnly(14, 0), "Council hall");
         await scope.Projects.ArchiveAsync(project.Id, true);
         new SettingsService(scope.Provider.Paths.SettingsFilePath).Save(new AppSettings { Theme = "Dark", Language = "ja-JP", FavoriteToolIds = [ToolIds.UnitScaleConverter] });
         var output = scope.Path("roundtrip.uptbackup"); await scope.Backup.ExportAsync(output);
@@ -72,6 +77,11 @@ public sealed class BackupDataServiceTests
         Assert.Equal(project.Id, archived.Projects[0].Id);
         Assert.Single(archived.Projects[0].Todos);
         Assert.Single(archived.Projects[0].PlanningSnapshots);
+        Assert.Equal("Preserve the historic street wall.", archived.Projects[0].PlanningRequirements);
+        var milestone = Assert.Single(archived.Projects[0].Milestones);
+        Assert.Equal("Public review", milestone.Title);
+        Assert.Equal(new DateOnly(2026, 9, 1), milestone.Date);
+        Assert.Equal(new TimeOnly(14, 0), milestone.Time);
         var folder = Assert.IsType<ProjectFolderReference>(archived.Projects[0].WorkFolder);
         Assert.Null(folder.AccessToken);
         Assert.True(folder.RequiresReselection);
@@ -136,10 +146,34 @@ public sealed class BackupDataServiceTests
         MutateExtractedPackage(package, root =>
         {
             var relative = $"data/projects/{project.Id:D}/project.json"; var path = System.IO.Path.Combine(root, relative.Replace('/', System.IO.Path.DirectorySeparatorChar));
-            var json = File.ReadAllText(path).Replace("\"schemaVersion\": 1", "\"schemaVersion\": 2"); File.WriteAllText(path, json);
+            var json = File.ReadAllText(path).Replace("\"schemaVersion\": 2", "\"schemaVersion\": 3"); File.WriteAllText(path, json);
             RefreshManifestFile(root, relative);
         });
         Assert.Equal("FutureProjectFormat", (await scope.Backup.InspectAsync(package)).FailureType);
+    }
+
+    [Fact]
+    public async Task SchemaOneProjectInBackupIsAcceptedAndMigratedOnImport()
+    {
+        using var scope = new BackupScope();
+        var project = await scope.CreateProjectAsync();
+        await scope.Projects.AddTodoAsync(project.Id, "Legacy backup todo");
+        var package = scope.Path("schema-one.uptbackup");
+        await scope.Backup.ExportAsync(package);
+        MutateExtractedPackage(package, root =>
+        {
+            var relative = $"data/projects/{project.Id:D}/project.json";
+            var path = System.IO.Path.Combine(root, relative.Replace('/', System.IO.Path.DirectorySeparatorChar));
+            File.WriteAllText(path, File.ReadAllText(path).Replace("\"schemaVersion\": 2", "\"schemaVersion\": 1"));
+            RefreshManifestFile(root, relative);
+        });
+
+        Assert.True((await scope.Backup.InspectAsync(package)).Succeeded);
+        Assert.True((await scope.Backup.ImportAsync(package)).Succeeded);
+        var read = await scope.Projects.ReadAsync(project.Id);
+        Assert.Equal(2, read.SchemaVersion);
+        Assert.Equal("Legacy backup todo", Assert.Single(read.Value!.Todos).Title);
+        Assert.Empty(read.Value.Milestones);
     }
 
     [Fact]

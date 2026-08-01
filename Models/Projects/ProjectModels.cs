@@ -25,6 +25,9 @@ public sealed class ProjectRecord
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
     public string? Description { get; set; }
+    public string? PlanningRequirements { get; set; }
+    public List<ProjectMilestone> Milestones { get; init; } = [];
+    // Retained for schema-v1 compatibility. These legacy collections are no longer shown in Project Workspace.
     public List<ProjectTodoItem> Todos { get; init; } = [];
     public List<PlanningSnapshot> PlanningSnapshots { get; init; } = [];
     public ProjectFolderReference? WorkFolder { get; set; }
@@ -32,6 +35,18 @@ public sealed class ProjectRecord
     public required DateTimeOffset CreatedAtUtc { get; init; }
     public required DateTimeOffset UpdatedAtUtc { get; set; }
     public DateTimeOffset? ArchivedAtUtc { get; set; }
+}
+
+public sealed class ProjectMilestone
+{
+    public required Guid Id { get; init; }
+    public required string Title { get; set; }
+    public required DateOnly Date { get; set; }
+    public TimeOnly? Time { get; set; }
+    public string? Notes { get; set; }
+    public required DateTimeOffset CreatedAtUtc { get; init; }
+    public required DateTimeOffset UpdatedAtUtc { get; set; }
+    public int DisplayOrder { get; set; }
 }
 
 public sealed class ProjectTodoItem
@@ -90,4 +105,9 @@ public sealed record ProjectSaveResult(
     string? FailureType = null)
 {
     public bool Succeeded => Status == DataStorageStatus.Success && ValidationErrors is null;
+}
+
+public sealed record ProjectDeleteResult(DataStorageStatus Status, string? FailureType = null)
+{
+    public bool Succeeded => Status == DataStorageStatus.Success;
 }

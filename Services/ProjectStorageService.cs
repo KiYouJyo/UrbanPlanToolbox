@@ -5,10 +5,11 @@ namespace UrbanPlanToolbox.Services;
 
 public sealed class ProjectStorageService
 {
-    public const int ProjectSchemaVersion = 1;
+    public const int ProjectSchemaVersion = 2;
     private const string IndexStorageId = "projects:index";
     private readonly IAppDataPathProvider _paths;
     private readonly JsonDataStorage _storage;
+    private readonly Func<string, bool>? _deleteFailureInjector;
     private readonly SemaphoreSlim _mutationLock = new(1, 1);
 
     public static ProjectStorageService Default { get; } = new(AppDataPathProvider.Default);
@@ -16,10 +17,12 @@ public sealed class ProjectStorageService
     public ProjectStorageService(
         IAppDataPathProvider paths,
         IEnumerable<IDataMigration>? projectMigrations = null,
-        IStorageDiagnostics? diagnostics = null)
+        IStorageDiagnostics? diagnostics = null,
+        Func<string, bool>? deleteFailureInjector = null)
     {
         _paths = paths ?? throw new ArgumentNullException(nameof(paths));
-        _storage = new JsonDataStorage(paths, ProjectSchemaVersion, projectMigrations, diagnostics);
+        _storage = new JsonDataStorage(paths, ProjectSchemaVersion, projectMigrations ?? [new ProjectV1ToV2Migration()], diagnostics);
+        _deleteFailureInjector = deleteFailureInjector;
     }
 
     public async Task<ProjectSaveResult> CreateAsync(
@@ -52,6 +55,12 @@ public sealed class ProjectStorageService
         project.CustomType = ProjectValidation.NormalizeOptional(project.CustomType);
         project.AdministrativeArea = ProjectValidation.NormalizeOptional(project.AdministrativeArea);
         project.Description = ProjectValidation.NormalizeOptional(project.Description);
+        project.PlanningRequirements = ProjectValidation.NormalizeOptional(project.PlanningRequirements);
+        foreach (var milestone in project.Milestones)
+        {
+            milestone.Title = ProjectValidation.NormalizeRequired(milestone.Title);
+            milestone.Notes = ProjectValidation.NormalizeOptional(milestone.Notes);
+        }
         var validation = ProjectValidation.Validate(project);
         if (validation.Count > 0) return new(DataStorageStatus.Corrupt, ValidationErrors: validation);
 
@@ -105,7 +114,10 @@ public sealed class ProjectStorageService
             else issues.Add(new(item.Id, read.Status, read.FailureType));
         }
 
-        return new(projects.OrderByDescending(project => project.UpdatedAtUtc).ToArray(), issues);
+        var ordered = archived
+            ? projects.OrderByDescending(project => project.ArchivedAtUtc ?? project.UpdatedAtUtc)
+            : projects.OrderByDescending(project => project.UpdatedAtUtc);
+        return new(ordered.ToArray(), issues);
     }
 
     public async Task<ProjectSaveResult> ArchiveAsync(Guid projectId, bool archived, CancellationToken cancellationToken = default)
@@ -116,6 +128,122 @@ public sealed class ProjectStorageService
         read.Value.ArchivedAtUtc = archived ? DateTimeOffset.UtcNow : null;
         read.Value.UpdatedAtUtc = DateTimeOffset.UtcNow;
         return await SaveAsync(read.Value, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<ProjectSaveResult> AddMilestoneAsync(
+        Guid projectId, string title, DateOnly date, TimeOnly? time = null, string? notes = null,
+        CancellationToken cancellationToken = default)
+    {
+        var read = await ReadEditableAsync(projectId, cancellationToken).ConfigureAwait(false);
+        if (!read.HasValue) return new(read.Status, FailureType: read.FailureType);
+        var now = DateTimeOffset.UtcNow;
+        read.Value!.Milestones.Add(new ProjectMilestone
+        {
+            Id = Guid.NewGuid(), Title = ProjectValidation.NormalizeRequired(title), Date = date, Time = time,
+            Notes = ProjectValidation.NormalizeOptional(notes), CreatedAtUtc = now, UpdatedAtUtc = now,
+            DisplayOrder = read.Value.Milestones.Count
+        });
+        read.Value.UpdatedAtUtc = now;
+        return await SaveAsync(read.Value, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<ProjectSaveResult> UpdateMilestoneAsync(
+        Guid projectId, Guid milestoneId, string title, DateOnly date, TimeOnly? time = null, string? notes = null,
+        CancellationToken cancellationToken = default)
+    {
+        var read = await ReadEditableAsync(projectId, cancellationToken).ConfigureAwait(false);
+        if (!read.HasValue) return new(read.Status, FailureType: read.FailureType);
+        var milestone = read.Value!.Milestones.FirstOrDefault(item => item.Id == milestoneId);
+        if (milestone is null) return new(DataStorageStatus.NotFound, FailureType: "MilestoneNotFound");
+        milestone.Title = ProjectValidation.NormalizeRequired(title);
+        milestone.Date = date;
+        milestone.Time = time;
+        milestone.Notes = ProjectValidation.NormalizeOptional(notes);
+        milestone.UpdatedAtUtc = DateTimeOffset.UtcNow;
+        read.Value.UpdatedAtUtc = milestone.UpdatedAtUtc;
+        return await SaveAsync(read.Value, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<ProjectSaveResult> DeleteMilestoneAsync(
+        Guid projectId, Guid milestoneId, CancellationToken cancellationToken = default)
+    {
+        var read = await ReadEditableAsync(projectId, cancellationToken).ConfigureAwait(false);
+        if (!read.HasValue) return new(read.Status, FailureType: read.FailureType);
+        if (read.Value!.Milestones.RemoveAll(item => item.Id == milestoneId) == 0)
+            return new(DataStorageStatus.NotFound, FailureType: "MilestoneNotFound");
+        for (var index = 0; index < read.Value.Milestones.Count; index++)
+            read.Value.Milestones[index].DisplayOrder = index;
+        read.Value.UpdatedAtUtc = DateTimeOffset.UtcNow;
+        return await SaveAsync(read.Value, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<ProjectDeleteResult> DeleteAsync(
+        Guid projectId, IProjectFolderAccessService? folderAccess = null,
+        CancellationToken cancellationToken = default)
+    {
+        var read = await ReadAsync(projectId, cancellationToken).ConfigureAwait(false);
+        if (!read.HasValue) return new(read.Status, read.FailureType);
+
+        await _mutationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        var tombstone = Path.Combine(_paths.Paths.RootDirectory, $".delete-{projectId:N}-{Guid.NewGuid():N}");
+        var moved = new List<(string Source, string Destination)>();
+        ProjectIndex? indexToRestore = null;
+        ProjectIndexEntry? removedEntry = null;
+        try
+        {
+            var indexRead = await ReadIndexAsync(cancellationToken).ConfigureAwait(false);
+            if (!indexRead.HasValue) return new(indexRead.Status, indexRead.FailureType);
+            if (_deleteFailureInjector?.Invoke("BeforeStage") == true) throw new IOException("InjectedDeleteFailure");
+
+            Directory.CreateDirectory(tombstone);
+            StageDirectory(Path.Combine(_paths.Paths.ProjectsDirectory, projectId.ToString("D")), Path.Combine(tombstone, "data"), moved);
+            StageDirectory(Path.Combine(_paths.Paths.ProjectBackupsDirectory, projectId.ToString("D")), Path.Combine(tombstone, "backups"), moved);
+            StageDirectory(Path.Combine(_paths.Paths.ProjectAttachmentsDirectory, projectId.ToString("D")), Path.Combine(tombstone, "attachments"), moved);
+            if (_deleteFailureInjector?.Invoke("AfterStage") == true) throw new IOException("InjectedDeleteFailure");
+
+            var index = indexRead.Value!;
+            removedEntry = index.Projects.FirstOrDefault(item => item.Id == projectId);
+            if (removedEntry is null)
+            {
+                RestoreStagedDirectories(moved);
+                return new(DataStorageStatus.NotFound, "ProjectIndexEntryNotFound");
+            }
+            index.Projects.Remove(removedEntry);
+
+            var indexWrite = await SaveIndexAsync(index, cancellationToken).ConfigureAwait(false);
+            if (!indexWrite.Succeeded)
+            {
+                RestoreStagedDirectories(moved);
+                return new(indexWrite.Status, indexWrite.FailureType);
+            }
+            indexToRestore = index;
+            if (_deleteFailureInjector?.Invoke("AfterIndex") == true) throw new IOException("InjectedDeleteFailure");
+
+            Directory.Delete(tombstone, recursive: true);
+
+            try
+            {
+                folderAccess?.Clear(read.Value!.WorkFolder);
+            }
+            catch (Exception exception) when (exception is not OutOfMemoryException)
+            {
+                // Project data is already gone. A stale platform token must not
+                // turn the completed deletion into an unrecoverable half-failure.
+            }
+            return new(DataStorageStatus.Success);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            RestoreStagedDirectories(moved);
+            if (indexToRestore is not null && removedEntry is not null && indexToRestore.Projects.All(item => item.Id != removedEntry.Id))
+            {
+                indexToRestore.Projects.Add(removedEntry);
+                await SaveIndexAsync(indexToRestore, cancellationToken).ConfigureAwait(false);
+            }
+            TryDeleteDirectory(tombstone);
+            return new(DataStorageStatus.IoFailure, exception.GetType().Name);
+        }
+        finally { _mutationLock.Release(); }
     }
 
     public async Task<ProjectSaveResult> AddTodoAsync(Guid projectId, string title, CancellationToken cancellationToken = default)
@@ -203,4 +331,29 @@ public sealed class ProjectStorageService
         Id = project.Id, Name = project.Name, Type = project.Type, IsArchived = project.IsArchived,
         UpdatedAtUtc = project.UpdatedAtUtc, ArchivedAtUtc = project.ArchivedAtUtc
     };
+
+    private static void StageDirectory(string source, string destination, ICollection<(string Source, string Destination)> moved)
+    {
+        if (!Directory.Exists(source)) return;
+        Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+        Directory.Move(source, destination);
+        moved.Add((source, destination));
+    }
+
+    private static void RestoreStagedDirectories(IEnumerable<(string Source, string Destination)> moved)
+    {
+        foreach (var item in moved.Reverse())
+        {
+            if (!Directory.Exists(item.Destination) || Directory.Exists(item.Source)) continue;
+            Directory.CreateDirectory(Path.GetDirectoryName(item.Source)!);
+            Directory.Move(item.Destination, item.Source);
+        }
+    }
+
+    private static void TryDeleteDirectory(string path)
+    {
+        try { if (Directory.Exists(path)) Directory.Delete(path, recursive: true); }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+    }
 }

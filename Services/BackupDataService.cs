@@ -213,7 +213,7 @@ public sealed class BackupDataService
             await using var stream = entry.Open();
             using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
             if (!document.RootElement.TryGetProperty("schemaVersion", out var version) || version.GetInt32() > ProjectStorageService.ProjectSchemaVersion) return new(BackupOperationStatus.UnsupportedFutureVersion, FailureType: "FutureProjectFormat");
-            if (version.GetInt32() != ProjectStorageService.ProjectSchemaVersion || !document.RootElement.TryGetProperty("payload", out _)) return new(BackupOperationStatus.InvalidPackage, FailureType: "ProjectEnvelopeInvalid");
+            if (version.GetInt32() < 1 || !document.RootElement.TryGetProperty("payload", out _)) return new(BackupOperationStatus.InvalidPackage, FailureType: "ProjectEnvelopeInvalid");
             if (path != "data/projects/index.json")
             {
                 var idSegment = path.Split('/')[2];

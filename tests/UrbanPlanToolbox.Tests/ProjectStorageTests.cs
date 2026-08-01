@@ -166,7 +166,7 @@ public sealed class ProjectStorageTests
         using var scope = new ProjectScope();
         var id = Guid.NewGuid();
         var path = scope.Provider.GetProjectDataFilePath(id);
-        var future = new DataEnvelope<object> { SchemaVersion = 2, SavedAtUtc = DateTimeOffset.UtcNow, Payload = new { id, name = "Future" } };
+        var future = new DataEnvelope<object> { SchemaVersion = 3, SavedAtUtc = DateTimeOffset.UtcNow, Payload = new { id, name = "Future" } };
         await File.WriteAllTextAsync(path, JsonSerializer.Serialize(future, DataStorageJson.Options), new UTF8Encoding(false));
         var before = await File.ReadAllBytesAsync(path);
         var read = await scope.Service.ReadAsync(id);
@@ -208,6 +208,179 @@ public sealed class ProjectStorageTests
         Assert.Single((await scope.Service.ListAsync(false)).Projects);
         Assert.Null((await scope.Service.ReadAsync(project.Id)).Value!.ArchivedAtUtc);
     }
+
+    [Fact]
+    public async Task ArchivedProjectsAreSortedByArchiveTimeDescending()
+    {
+        using var scope = new ProjectScope();
+        var first = (await scope.Service.CreateAsync("First", ProjectTypeCodes.Research)).Project!;
+        var second = (await scope.Service.CreateAsync("Second", ProjectTypeCodes.Research)).Project!;
+        await scope.Service.ArchiveAsync(first.Id, true);
+        await scope.Service.ArchiveAsync(second.Id, true);
+        first = (await scope.Service.ReadAsync(first.Id)).Value!;
+        first.ArchivedAtUtc = DateTimeOffset.UtcNow.AddHours(1);
+        await scope.Service.SaveAsync(first);
+        Assert.Equal(["First", "Second"], (await scope.Service.ListAsync(true)).Projects.Select(item => item.Name));
+    }
+
+    [Fact]
+    public async Task PlanningRequirementsAndLegacyCollectionsRoundTripTogether()
+    {
+        using var scope = new ProjectScope();
+        var project = (await scope.Service.CreateAsync("Requirements", ProjectTypeCodes.Research)).Project!;
+        await scope.Service.AddTodoAsync(project.Id, "legacy todo");
+        var current = (await scope.Service.ReadAsync(project.Id)).Value!;
+        current.PlanningRequirements = "  Protect the canal edge.  ";
+        current.UpdatedAtUtc = DateTimeOffset.UtcNow;
+
+        var saved = await scope.Service.SaveAsync(current);
+        var read = (await scope.Service.ReadAsync(project.Id)).Value!;
+
+        Assert.True(saved.Succeeded);
+        Assert.Equal("Protect the canal edge.", read.PlanningRequirements);
+        Assert.Single(read.Todos);
+        Assert.Equal("legacy todo", read.Todos[0].Title);
+    }
+
+    [Fact]
+    public async Task MilestoneLifecycleKeepsStableIdOrderAndArchivedReadOnlyState()
+    {
+        using var scope = new ProjectScope();
+        var project = (await scope.Service.CreateAsync("Milestones", ProjectTypeCodes.Professional)).Project!;
+        var invalid = await scope.Service.AddMilestoneAsync(project.Id, "   ", new DateOnly(2026, 8, 2));
+        Assert.Contains("MilestoneTitleRequired", invalid.ValidationErrors!);
+        Assert.Empty((await scope.Service.ReadAsync(project.Id)).Value!.Milestones);
+
+        var first = await scope.Service.AddMilestoneAsync(project.Id, "Review", new DateOnly(2026, 8, 2), new TimeOnly(9, 30), "Room A");
+        var firstId = first.Project!.Milestones[0].Id;
+        var second = await scope.Service.AddMilestoneAsync(project.Id, "Submission", new DateOnly(2026, 8, 5));
+        var secondId = second.Project!.Milestones[1].Id;
+        var edited = await scope.Service.UpdateMilestoneAsync(project.Id, firstId, "Public review", new DateOnly(2026, 8, 3), notes: "Updated");
+        Assert.Equal(firstId, edited.Project!.Milestones[0].Id);
+        Assert.Equal("Public review", edited.Project.Milestones[0].Title);
+        Assert.Null(edited.Project.Milestones[0].Time);
+
+        await scope.Service.ArchiveAsync(project.Id, true);
+        Assert.Equal("ArchivedProjectReadOnly", (await scope.Service.DeleteMilestoneAsync(project.Id, firstId)).FailureType);
+        await scope.Service.ArchiveAsync(project.Id, false);
+        await scope.Service.DeleteMilestoneAsync(project.Id, firstId);
+        var read = (await scope.Service.ReadAsync(project.Id)).Value!;
+        Assert.Single(read.Milestones);
+        Assert.Equal(secondId, read.Milestones[0].Id);
+        Assert.Equal(0, read.Milestones[0].DisplayOrder);
+    }
+
+    [Fact]
+    public async Task SchemaOneProjectMigratesToTwoWithoutLosingLegacyData()
+    {
+        using var scope = new ProjectScope();
+        var id = Guid.NewGuid();
+        var now = DateTimeOffset.UtcNow;
+        var legacy = new DataEnvelope<object>
+        {
+            SchemaVersion = 1,
+            SavedAtUtc = now,
+            Payload = new
+            {
+                id, name = "Legacy", type = ProjectTypeCodes.Research,
+                todos = new[] { new { id = Guid.NewGuid(), title = "Keep me", isCompleted = false, createdAtUtc = now, completedAtUtc = (DateTimeOffset?)null, displayOrder = 0 } },
+                planningSnapshots = Array.Empty<object>(), isArchived = false,
+                createdAtUtc = now, updatedAtUtc = now, archivedAtUtc = (DateTimeOffset?)null
+            }
+        };
+        var path = scope.Provider.GetProjectDataFilePath(id);
+        await File.WriteAllTextAsync(path, JsonSerializer.Serialize(legacy, DataStorageJson.Options), new UTF8Encoding(false));
+
+        var read = await scope.Service.ReadAsync(id);
+        var migratedJson = await File.ReadAllTextAsync(path);
+        var backupJson = await File.ReadAllTextAsync(scope.Provider.GetProjectBackupFilePath(id));
+
+        Assert.Equal(DataStorageStatus.Success, read.Status);
+        Assert.Equal(2, read.SchemaVersion);
+        Assert.Null(read.Value!.PlanningRequirements);
+        Assert.Empty(read.Value.Milestones);
+        Assert.Single(read.Value.Todos);
+        Assert.Contains("\"schemaVersion\": 2", migratedJson);
+        Assert.Contains("\"planningRequirements\": null", migratedJson);
+        Assert.Contains("\"milestones\": []", migratedJson);
+        Assert.Contains("\"schemaVersion\": 1", backupJson);
+        Assert.Contains("Keep me", backupJson);
+    }
+
+    [Fact]
+    public async Task MissingSchemaMigrationFailsWithoutChangingLegacyFile()
+    {
+        using var scope = new ProjectScope();
+        var id = Guid.NewGuid();
+        var now = DateTimeOffset.UtcNow;
+        var envelope = new DataEnvelope<object> { SchemaVersion = 1, SavedAtUtc = now, Payload = new { id, name = "Legacy", type = ProjectTypeCodes.Research, createdAtUtc = now, updatedAtUtc = now } };
+        var path = scope.Provider.GetProjectDataFilePath(id);
+        await File.WriteAllTextAsync(path, JsonSerializer.Serialize(envelope, DataStorageJson.Options), new UTF8Encoding(false));
+        var before = await File.ReadAllBytesAsync(path);
+        var service = new ProjectStorageService(scope.Provider, Array.Empty<IDataMigration>());
+
+        var read = await service.ReadAsync(id);
+
+        Assert.Equal(DataStorageStatus.MigrationFailed, read.Status);
+        Assert.Equal(before, await File.ReadAllBytesAsync(path));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task PermanentDeleteRemovesOnlyOwnedDataAndClearsFolderToken(bool archived)
+    {
+        using var scope = new ProjectScope();
+        var survivor = (await scope.Service.CreateAsync("Survivor", ProjectTypeCodes.Personal)).Project!;
+        var project = (await scope.Service.CreateAsync("Delete", ProjectTypeCodes.Research)).Project!;
+        var external = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-external-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(external);
+        await File.WriteAllTextAsync(Path.Combine(external, "keep.txt"), "keep");
+        try
+        {
+            project.WorkFolder = new ProjectFolderReference { AccessToken = "token", DisplayName = "External", DisplayPath = external };
+            project.UpdatedAtUtc = DateTimeOffset.UtcNow;
+            await scope.Service.SaveAsync(project);
+            await File.WriteAllTextAsync(Path.Combine(scope.Provider.GetProjectAttachmentsDirectory(project.Id), "inside.txt"), "delete");
+            if (archived) await scope.Service.ArchiveAsync(project.Id, true);
+            var folderAccess = new RecordingFolderAccess();
+
+            var deleted = await scope.Service.DeleteAsync(project.Id, folderAccess);
+
+            Assert.True(deleted.Succeeded);
+            Assert.False(Directory.Exists(Path.Combine(scope.Provider.Paths.ProjectsDirectory, project.Id.ToString("D"))));
+            Assert.False(Directory.Exists(Path.Combine(scope.Provider.Paths.ProjectBackupsDirectory, project.Id.ToString("D"))));
+            Assert.False(Directory.Exists(Path.Combine(scope.Provider.Paths.ProjectAttachmentsDirectory, project.Id.ToString("D"))));
+            Assert.True(File.Exists(Path.Combine(external, "keep.txt")));
+            Assert.Equal("token", folderAccess.ClearedToken);
+            Assert.Equal(survivor.Id, Assert.Single((await scope.Service.ListAsync(false)).Projects).Id);
+        }
+        finally { if (Directory.Exists(external)) Directory.Delete(external, true); }
+    }
+
+    [Fact]
+    public async Task PermanentDeleteFailureAfterStagingRollsBackProjectAndIndex()
+    {
+        using var scope = new ProjectScope();
+        var project = (await scope.Service.CreateAsync("Rollback", ProjectTypeCodes.Research)).Project!;
+        await File.WriteAllTextAsync(Path.Combine(scope.Provider.GetProjectAttachmentsDirectory(project.Id), "inside.txt"), "keep");
+        var failing = new ProjectStorageService(scope.Provider, deleteFailureInjector: step => step == "AfterIndex");
+
+        var deleted = await failing.DeleteAsync(project.Id);
+
+        Assert.Equal(DataStorageStatus.IoFailure, deleted.Status);
+        Assert.True(File.Exists(scope.Provider.GetProjectDataFilePath(project.Id)));
+        Assert.True(File.Exists(Path.Combine(scope.Provider.GetProjectAttachmentsDirectory(project.Id), "inside.txt")));
+        Assert.Equal(project.Id, Assert.Single((await scope.Service.ListAsync(false)).Projects).Id);
+    }
+
+    [Theory]
+    [InlineData("Canal Study", "Canal Study", true)]
+    [InlineData("Canal Study", "  Canal Study  ", true)]
+    [InlineData("Canal Study", "canal study", false)]
+    [InlineData("Canal Study", "", false)]
+    public void PermanentDeleteConfirmationRequiresExactProjectName(string projectName, string confirmation, bool expected) =>
+        Assert.Equal(expected, ProjectValidation.MatchesDeleteConfirmation(projectName, confirmation));
 
     [Fact]
     public async Task ValidPlanningSnapshotKeepsExactValuesNullsAndStableId()
@@ -269,5 +442,13 @@ public sealed class ProjectStorageTests
         public AppDataPathProvider Provider { get; }
         public ProjectStorageService Service { get; }
         public void Dispose() { if (Directory.Exists(Root)) Directory.Delete(Root, true); }
+    }
+
+    private sealed class RecordingFolderAccess : IProjectFolderAccessService
+    {
+        public string? ClearedToken { get; private set; }
+        public Task<ProjectFolderAccessResult> SelectAsync(Guid projectId, ProjectFolderReference? current = null) => throw new NotSupportedException();
+        public Task<ProjectFolderAccessResult> OpenAsync(ProjectFolderReference reference) => throw new NotSupportedException();
+        public void Clear(ProjectFolderReference? reference) => ClearedToken = reference?.AccessToken;
     }
 }

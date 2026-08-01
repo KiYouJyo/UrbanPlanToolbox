@@ -8,6 +8,9 @@ public static class ProjectValidation
     public const int MaxTypeLength = 80;
     public const int MaxAdministrativeAreaLength = 300;
     public const int MaxDescriptionLength = 10_000;
+    public const int MaxPlanningRequirementsLength = 20_000;
+    public const int MaxMilestoneTitleLength = 300;
+    public const int MaxMilestoneNotesLength = 5_000;
     public const int MaxTodoTitleLength = 500;
     public const int MaxSnapshotNameLength = 160;
 
@@ -24,6 +27,7 @@ public static class ProjectValidation
             errors.Add("CustomProjectTypeOnlyForOther");
         ValidateOptionalText(project.AdministrativeArea, MaxAdministrativeAreaLength, "AdministrativeArea", errors);
         ValidateOptionalText(project.Description, MaxDescriptionLength, "ProjectDescription", errors);
+        ValidateOptionalText(project.PlanningRequirements, MaxPlanningRequirementsLength, "PlanningRequirements", errors);
 
         if (project.Latitude.HasValue != project.Longitude.HasValue) errors.Add("CoordinatesMustBePaired");
         if (project.Latitude is < -90m or > 90m) errors.Add("LatitudeOutOfRange");
@@ -49,11 +53,24 @@ public static class ProjectValidation
             if (snapshot.CreatedAtUtc.Offset != TimeSpan.Zero || string.IsNullOrWhiteSpace(snapshot.CalculationModel)) errors.Add("SnapshotMetadataInvalid");
         }
 
+        if (project.Milestones.Select(item => item.Id).Distinct().Count() != project.Milestones.Count) errors.Add("DuplicateMilestoneId");
+        foreach (var milestone in project.Milestones)
+        {
+            if (milestone.Id == Guid.Empty) errors.Add("MilestoneIdRequired");
+            ValidateRequiredText(milestone.Title, MaxMilestoneTitleLength, "MilestoneTitle", errors);
+            ValidateOptionalText(milestone.Notes, MaxMilestoneNotesLength, "MilestoneNotes", errors);
+            if (milestone.Date == default) errors.Add("MilestoneDateInvalid");
+            if (milestone.CreatedAtUtc.Offset != TimeSpan.Zero || milestone.UpdatedAtUtc.Offset != TimeSpan.Zero)
+                errors.Add("MilestoneTimestampsMustBeUtc");
+        }
+
         return errors.Distinct(StringComparer.Ordinal).ToArray();
     }
 
     public static string NormalizeRequired(string value) => value.Trim();
     public static string? NormalizeOptional(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    public static bool MatchesDeleteConfirmation(string projectName, string? confirmation) =>
+        string.Equals(projectName, confirmation?.Trim(), StringComparison.Ordinal);
 
     private static void ValidateRequiredText(string? value, int maxLength, string key, ICollection<string> errors)
     {

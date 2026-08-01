@@ -19,8 +19,7 @@ public sealed class WindowsProjectFolderAccessService : IProjectFolderAccessServ
         var folder = await picker.PickSingleFolderAsync();
         if (folder is null) return new(false, ErrorKey: "ProjectFolder_SelectionCancelled");
 
-        var token = projectId.ToString("N");
-        StorageApplicationPermissions.FutureAccessList.AddOrReplace(token, folder);
+        var token = StorageApplicationPermissions.FutureAccessList.Add(folder, $"project-{projectId:N}");
         return new(true, new ProjectFolderReference
         {
             AccessToken = token,
