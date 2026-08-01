@@ -40,7 +40,7 @@ public sealed partial class AboutPage : Page
         {
             var notes = string.IsNullOrWhiteSpace(result.Release.Body) ? _localization.GetString("Update_NoNotes") : Truncate(result.Release.Body, 800);
             var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetFormattedString("Update_AvailableTitle", ToDisplayVersion(result.RemoteVersion)), Content = _localization.GetFormattedString("Update_DialogContent", local, ToDisplayVersion(result.RemoteVersion), notes), PrimaryButtonText = _localization.GetString("Action_GoToDownload"), CloseButtonText = _localization.GetString("Action_Later") };
-            if (await dialog.ShowAsync() == ContentDialogResult.Primary && !await Launcher.LaunchUriAsync(result.Release.HtmlUrl)) await ShowMessageAsync(_localization.GetString("Error_OpenReleaseFailed"), _localization.GetString("Dialog_OpenFailedTitle"));
+            if (await AppDialogService.Default.ShowAsync(dialog, _pageLifetime.Token) == ContentDialogResult.Primary && !await Launcher.LaunchUriAsync(result.Release.HtmlUrl)) await ShowMessageAsync(_localization.GetString("Error_OpenReleaseFailed"), _localization.GetString("Dialog_OpenFailedTitle"));
             return;
         }
 
@@ -58,7 +58,7 @@ public sealed partial class AboutPage : Page
         await ShowMessageAsync(message, _localization.GetString("Dialog_UpdateTitle"));
     }
 
-    private Task ShowMessageAsync(string message, string title) => new ContentDialog { XamlRoot = XamlRoot, Title = title, Content = message, CloseButtonText = _localization.GetString("Dialog_Ok") }.ShowAsync().AsTask();
+    private Task ShowMessageAsync(string message, string title) => AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = title, Content = message, CloseButtonText = _localization.GetString("Dialog_Ok") }, _pageLifetime.Token);
     private static string ToDisplayVersion(Version version) => $"{version.Major}.{version.Minor}.{version.Build}";
     private static string Truncate(string value, int maxLength) => value.Length <= maxLength ? value : $"{value[..maxLength]}…";
 }

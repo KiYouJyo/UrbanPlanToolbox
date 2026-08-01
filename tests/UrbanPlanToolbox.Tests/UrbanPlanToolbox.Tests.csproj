@@ -51,6 +51,10 @@
   <Compile Include="../../Services/FavoriteToolsService.cs" Link="Services/FavoriteToolsService.cs" />
   <Compile Include="../../Services/ILocalizationService.cs" Link="Services/ILocalizationService.cs" />
   <Compile Include="../../Services/LanguagePreference.cs" Link="Services/LanguagePreference.cs" />
+  <Compile Include="../../Models/Interaction/InteractionModels.cs" Link="Models/Interaction/InteractionModels.cs" />
+  <Compile Include="../../Services/AsyncOperationRunner.cs" Link="Services/AsyncOperationRunner.cs" />
+  <Compile Include="../../Services/UnsavedChangesGuard.cs" Link="Services/UnsavedChangesGuard.cs" />
+  <Compile Include="../../Services/AppNotificationService.cs" Link="Services/AppNotificationService.cs" />
  </ItemGroup>
  <ItemGroup>
   <None Include="../../Strings/**/*.resw" Link="Strings/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />

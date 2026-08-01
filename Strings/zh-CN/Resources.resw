@@ -1584,4 +1584,7 @@ dwyblchhq</value>
   <data name="ProjectValidation_ResearchSubjectTooLong" xml:space="preserve"><value>研究对象过长。</value></data>
   <data name="ProjectValidation_ResearchMethodsRequired" xml:space="preserve"><value>请输入研究方法。</value></data>
   <data name="ProjectValidation_ResearchMethodsTooLong" xml:space="preserve"><value>研究方法过长。</value></data>
+  <data name="Interaction_NotificationName" xml:space="preserve"><value>应用通知</value></data>
+  <data name="Interaction_ErrorTitle" xml:space="preserve"><value>操作失败</value></data>
+  <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作完成</value></data>
 </root>

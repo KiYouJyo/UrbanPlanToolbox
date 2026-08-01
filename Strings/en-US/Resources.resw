@@ -1581,4 +1581,7 @@ Latest version: {1}</value>
   <data name="ProjectValidation_ResearchSubjectTooLong" xml:space="preserve"><value>The research subject is too long.</value></data>
   <data name="ProjectValidation_ResearchMethodsRequired" xml:space="preserve"><value>Enter research methods.</value></data>
   <data name="ProjectValidation_ResearchMethodsTooLong" xml:space="preserve"><value>The research methods are too long.</value></data>
+  <data name="Interaction_NotificationName" xml:space="preserve"><value>Application notification</value></data>
+  <data name="Interaction_ErrorTitle" xml:space="preserve"><value>Operation failed</value></data>
+  <data name="Interaction_SuccessTitle" xml:space="preserve"><value>Operation completed</value></data>
 </root>

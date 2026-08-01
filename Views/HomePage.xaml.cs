@@ -85,7 +85,7 @@ public sealed partial class HomePage : Page
         selection.ItemTemplate = (DataTemplate)XamlReader.Load("<DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'><Border Padding='16' Margin='0,0,0,8' BorderThickness='1' BorderBrush='{ThemeResource CardStrokeColorDefaultBrush}' CornerRadius='8'><StackPanel Spacing='6'><TextBlock Text='{Binding Name}' Style='{StaticResource SubtitleTextBlockStyle}'/><TextBlock Text='{Binding Description}' TextWrapping='Wrap'/></StackPanel></Border></DataTemplate>");
         var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString("ProjectKind_ChooseTitle"), Content = selection, PrimaryButtonText = _localization.GetString("Action_Continue"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary, IsPrimaryButtonEnabled = false };
         selection.SelectionChanged += (_, _) => dialog.IsPrimaryButtonEnabled = selection.SelectedItem is not null;
-        return await dialog.ShowAsync() == ContentDialogResult.Primary ? (selection.SelectedItem as KindChoice)?.Kind : null;
+        return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary ? (selection.SelectedItem as KindChoice)?.Kind : null;
     }
 
     private async Task ShowCreateDialogAsync(string kind)
@@ -143,7 +143,7 @@ public sealed partial class HomePage : Page
             }
             finally { deferral.Complete(); }
         };
-        var dialogResult = await dialog.ShowAsync();
+        var dialogResult = await AppDialogService.Default.ShowAsync(dialog);
         if (dialogResult == ContentDialogResult.Secondary)
         {
             var newKind = await ChooseKindAsync();

@@ -90,7 +90,7 @@ public sealed partial class SettingsPage : Page
                 Content = _localization.GetFormattedString("DataManagement_ImportConfirmMessage", manifest.ProjectCount, manifest.ActiveProjectCount, manifest.ArchivedProjectCount),
                 PrimaryButtonText = _localization.GetString("DataManagement_ImportConfirmAction"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Close
             };
-            if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+            if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
             var result = await service.ImportAsync(file.Path);
             DataStatusBar.Severity = result.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Error;
             DataStatusBar.Message = result.Succeeded ? _localization.GetString("DataManagement_ImportSuccess") : _localization.GetFormattedString(result.RollbackSucceeded ? "DataManagement_ImportFailedRolledBack" : "DataManagement_ImportFailed", result.FailureType ?? string.Empty);
