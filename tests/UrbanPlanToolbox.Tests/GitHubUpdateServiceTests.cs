@@ -59,11 +59,25 @@ public sealed class GitHubUpdateServiceTests
     [InlineData(HttpStatusCode.TooManyRequests, UpdateCheckStatus.RateLimited)]
     public async Task NonSuccessResponsesAreNotReportedAsUpToDate(HttpStatusCode statusCode, UpdateCheckStatus expected) => Assert.Equal(expected, (await CreateService(statusCode, "{}").CheckForUpdatesAsync(new Version(0, 3, 0, 0))).Status);
 
+    [Fact]
+    public async Task SendsCurrentApplicationUserAgent()
+    {
+        var handler = new StubHandler(HttpStatusCode.OK, ReleaseJson("v0.3.8"));
+        await new GitHubUpdateService(new HttpClient(handler)).CheckForUpdatesAsync(new Version(0, 3, 8, 0));
+        Assert.Equal("UrbanPlanToolbox/0.3.8", handler.UserAgent);
+    }
+
     private static GitHubUpdateService CreateService(HttpStatusCode statusCode, string content) => new(new HttpClient(new StubHandler(statusCode, content)));
     private static string ReleaseJson(string tag, string? body = "Notes") => $"{{\"tag_name\":\"{tag}\",\"name\":\"{tag}\",\"body\":{(body is null ? "null" : $"\"{body}\"")},\"html_url\":\"https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/{tag}\",\"published_at\":\"2026-07-30T00:00:00Z\"}}";
 
     private sealed class StubHandler(HttpStatusCode statusCode, string content) : HttpMessageHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) => Task.FromResult(new HttpResponseMessage(statusCode) { Content = new StringContent(content, Encoding.UTF8, "application/json") });
+        public string? UserAgent { get; private set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            UserAgent = request.Headers.UserAgent.ToString();
+            return Task.FromResult(new HttpResponseMessage(statusCode) { Content = new StringContent(content, Encoding.UTF8, "application/json") });
+        }
     }
 }

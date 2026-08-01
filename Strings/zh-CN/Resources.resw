@@ -61,7 +61,7 @@
     <comment>欢迎页副标题。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.7 预览版。本地完成规划指标和单位比例尺换算，不上传规划数据。</value>
+    <value>v0.3.8 预览版。本地完成规划指标和单位比例尺换算，不上传规划数据。</value>
     <comment>欢迎页版本与隐私说明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">

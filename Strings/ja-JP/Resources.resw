@@ -61,7 +61,7 @@
     <comment>トップページのサブタイトル。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.7 プレビュー版。計画指標と単位・縮尺換算をローカルで処理し、計画データをアップロードしません。</value>
+    <value>v0.3.8 プレビュー版。計画指標と単位・縮尺換算をローカルで処理し、計画データをアップロードしません。</value>
     <comment>トップページのバージョンとプライバシー説明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">

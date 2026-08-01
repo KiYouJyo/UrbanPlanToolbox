@@ -61,7 +61,7 @@
     <comment>Home page subtitle.</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.7 preview. Planning metrics and unit/scale conversions run locally; no planning data is uploaded.</value>
+    <value>v0.3.8 preview. Planning metrics and unit/scale conversions run locally; no planning data is uploaded.</value>
     <comment>Home page version and privacy statement.</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
