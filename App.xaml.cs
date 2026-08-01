@@ -10,6 +10,9 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using UrbanPlanToolbox.Services;
+using Microsoft.Windows.Globalization;
+using Windows.System.UserProfile;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,7 +42,20 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
+        ApplyLanguagePreference();
         _window = MainWindow = new MainWindow();
         _window.Activate();
+    }
+
+    /// <summary>
+    /// Applies the persisted language preference before the MainWindow and its
+    /// localized resources are created. An empty override means "follow system".
+    /// </summary>
+    private static void ApplyLanguagePreference()
+    {
+        var settings = new SettingsService().Load();
+        ApplicationLanguages.PrimaryLanguageOverride = LanguagePreference.ResolveEffectiveLanguage(
+            settings.Language,
+            GlobalizationPreferences.Languages);
     }
 }
