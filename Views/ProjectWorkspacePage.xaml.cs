@@ -119,7 +119,10 @@ public sealed partial class ProjectWorkspacePage : Page
         MetadataText.Text = $"{ProjectPresentation.GetKindName(_project.Kind, _localization)} · {MetadataText.Text}";
         StateText.Text = _localization.GetString(_project.IsArchived ? "Project_State_Archived" : "Project_State_Active");
         StateBadge.Background = (Brush)Application.Current.Resources[_project.IsArchived ? "SystemFillColorCautionBackgroundBrush" : "SystemFillColorSuccessBackgroundBrush"];
-        StateText.Foreground = (Brush)Application.Current.Resources[_project.IsArchived ? "SystemFillColorCautionTextBrush" : "SystemFillColorSuccessTextBrush"];
+        // Use the documented semantic fill brushes for foreground text. The
+        // similarly named *TextBrush resources are not present in every
+        // Windows App SDK resource dictionary and would crash page creation.
+        StateText.Foreground = (Brush)Application.Current.Resources[_project.IsArchived ? "SystemFillColorCautionBrush" : "SystemFillColorSuccessBrush"];
         NameBox.Text = _project.Name;
         CustomTypeBox.Text = _project.CustomType ?? string.Empty;
         CustomTypeBox.Visibility = _project.Type == ProjectTypeCodes.Other ? Visibility.Visible : Visibility.Collapsed;
