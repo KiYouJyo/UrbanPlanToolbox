@@ -18,7 +18,10 @@ public sealed class ToolRegistry
             "\uE8EF",
             typeof(Views.PlanningCalculatorPage),
             10,
-            true),
+            true,
+            "guihuazhibiaokuaisujisuanqi",
+            "G",
+            ["规划", "指标", "容积率", "建筑密度", "绿地率", "guihuazhibiao", "guihuazhibiaokuaisujisuanqi", "ghzbksjsq"]),
         new(
             ToolIds.UnitScaleConverter,
             "单位与比例尺换算器",
@@ -28,7 +31,10 @@ public sealed class ToolRegistry
             "\uE8AB",
             typeof(Views.UnitScaleConverterPage),
             20,
-            true)
+            true,
+            "danweiyubilichihuansuanqi",
+            "D",
+            ["单位", "比例尺", "长度", "面积", "换算", "danweiyubilichi", "danweiyubilichihuansuanqi", "dwyblchhq"])
     ]);
 
     public ToolRegistry(IEnumerable<ToolDefinition> tools)
@@ -39,6 +45,14 @@ public sealed class ToolRegistry
         if (ordered.Any(tool => string.IsNullOrWhiteSpace(tool.Id)))
         {
             throw new ArgumentException("Tool IDs cannot be empty.", nameof(tools));
+        }
+
+        if (ordered.Any(tool => string.IsNullOrWhiteSpace(tool.PinyinSortKey) ||
+                                string.IsNullOrWhiteSpace(tool.PinyinInitial) ||
+                                tool.SearchKeywords is null ||
+                                tool.SearchKeywords.Any(string.IsNullOrWhiteSpace)))
+        {
+            throw new ArgumentException("Tool search metadata must be complete.", nameof(tools));
         }
 
         var duplicateId = ordered

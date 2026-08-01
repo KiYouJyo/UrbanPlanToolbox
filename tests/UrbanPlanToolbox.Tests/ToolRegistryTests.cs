@@ -210,5 +210,8 @@ public sealed class ToolRegistryTests
         "\uE10F",
         typeof(Views.PlanningCalculatorPage),
         sortOrder,
-        true);
+        true,
+        id,
+        "X",
+        [id]);
 }

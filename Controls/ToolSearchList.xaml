@@ -1,0 +1,34 @@
+<UserControl
+    x:Class="UrbanPlanToolbox.Controls.ToolSearchList"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:UrbanPlanToolbox.Controls">
+    <ItemsRepeater x:Name="GroupsRepeater">
+        <ItemsRepeater.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="{Binding Header}" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <ItemsRepeater ItemsSource="{Binding Tools}">
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,4">
+                                    <Button AutomationProperties.Name="{Binding DisplayName}" Click="OnToolItemClick" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="12" Tag="{Binding}">
+                                        <Grid ColumnSpacing="12" Padding="0,0,40,0">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                            <FontIcon Glyph="{Binding IconGlyph}" FontSize="22" VerticalAlignment="Top" />
+                                            <StackPanel Grid.Column="1" Spacing="4">
+                                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding Description}" MaxLines="2" Opacity="0.75" TextTrimming="CharacterEllipsis" TextWrapping="WrapWholeWords" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Button>
+                                    <controls:FavoriteButton ToolId="{Binding Id}" HorizontalAlignment="Right" Margin="0,4,4,0" VerticalAlignment="Top" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </StackPanel>
+            </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+    </ItemsRepeater>
+</UserControl>

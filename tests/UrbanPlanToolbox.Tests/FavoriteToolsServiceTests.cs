@@ -144,7 +144,10 @@ public sealed class FavoriteToolsServiceTests
         "\uE10F",
         typeof(Views.PlanningCalculatorPage),
         sortOrder,
-        isAvailable);
+        isAvailable,
+        id,
+        "X",
+        [id]);
 
     private static void WithTempSettings(Action<string> test)
     {

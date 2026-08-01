@@ -25,8 +25,10 @@
   <Compile Include="../../Services/PrimaryNavigation.cs" Link="Services/PrimaryNavigation.cs" />
   <Compile Include="../../Models/Tools/ToolCategory.cs" Link="Models/Tools/ToolCategory.cs" />
   <Compile Include="../../Models/Tools/ToolDefinition.cs" Link="Models/Tools/ToolDefinition.cs" />
+  <Compile Include="../../Models/Tools/ToolSearchGroup.cs" Link="Models/Tools/ToolSearchGroup.cs" />
   <Compile Include="../../Models/Tools/ToolIds.cs" Link="Models/Tools/ToolIds.cs" />
   <Compile Include="../../Services/ToolRegistry.cs" Link="Services/ToolRegistry.cs" />
+  <Compile Include="../../Services/ToolSearchService.cs" Link="Services/ToolSearchService.cs" />
   <Compile Include="../../Services/FavoriteToolsService.cs" Link="Services/FavoriteToolsService.cs" />
  </ItemGroup>
 </Project>
