@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Models.Projects;
 
@@ -158,7 +159,7 @@ public sealed class BackupDataService
 
     private async Task WritePortableProjectsAsync(string root, IReadOnlyList<ProjectRecord> projects, CancellationToken cancellationToken)
     {
-        var index = new ProjectIndex { Projects = projects.Select(project => new ProjectIndexEntry { Id = project.Id, Name = project.Name, Type = project.Type, IsArchived = project.IsArchived, UpdatedAtUtc = project.UpdatedAtUtc, ArchivedAtUtc = project.ArchivedAtUtc }).ToList() };
+        var index = new ProjectIndex { Projects = projects.Select(project => new ProjectIndexEntry { Id = project.Id, Kind = project.Kind, Name = project.Name, Type = project.Type, IsArchived = project.IsArchived, UpdatedAtUtc = project.UpdatedAtUtc, ArchivedAtUtc = project.ArchivedAtUtc }).ToList() };
         await WriteEnvelopeAsync(Path.Combine(root, "data", "projects", "index.json"), index, cancellationToken).ConfigureAwait(false);
         foreach (var source in projects)
         {
@@ -243,9 +244,13 @@ public sealed class BackupDataService
         if (!Directory.Exists(projectRoot)) return;
         foreach (var path in Directory.GetFiles(projectRoot, "project.json", SearchOption.AllDirectories))
         {
-            var envelope = JsonSerializer.Deserialize<DataEnvelope<ProjectRecord>>(File.ReadAllText(path), DataStorageJson.Options)!;
-            if (envelope.Payload.WorkFolder is not null) { envelope.Payload.WorkFolder.AccessToken = null; envelope.Payload.WorkFolder.RequiresReselection = true; }
-            File.WriteAllText(path, JsonSerializer.Serialize(envelope, DataStorageJson.Options), new UTF8Encoding(false));
+            var document = JsonNode.Parse(File.ReadAllText(path))?.AsObject() ?? throw new InvalidDataException("ProjectEnvelopeInvalid");
+            if (document["payload"] is JsonObject payload && payload["workFolder"] is JsonObject folder)
+            {
+                folder["accessToken"] = null;
+                folder["requiresReselection"] = true;
+            }
+            File.WriteAllText(path, document.ToJsonString(DataStorageJson.Options), new UTF8Encoding(false));
         }
     }
 

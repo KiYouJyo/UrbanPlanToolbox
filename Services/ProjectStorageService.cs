@@ -5,7 +5,7 @@ namespace UrbanPlanToolbox.Services;
 
 public sealed class ProjectStorageService
 {
-    public const int ProjectSchemaVersion = 2;
+    public const int ProjectSchemaVersion = 3;
     private const string IndexStorageId = "projects:index";
     private readonly IAppDataPathProvider _paths;
     private readonly JsonDataStorage _storage;
@@ -21,7 +21,7 @@ public sealed class ProjectStorageService
         Func<string, bool>? deleteFailureInjector = null)
     {
         _paths = paths ?? throw new ArgumentNullException(nameof(paths));
-        _storage = new JsonDataStorage(paths, ProjectSchemaVersion, projectMigrations ?? [new ProjectV1ToV2Migration()], diagnostics);
+        _storage = new JsonDataStorage(paths, ProjectSchemaVersion, projectMigrations ?? [new ProjectV1ToV2Migration(), new ProjectV2ToV3Migration()], diagnostics);
         _deleteFailureInjector = deleteFailureInjector;
     }
 
@@ -33,16 +33,43 @@ public sealed class ProjectStorageService
         decimal? latitude = null,
         decimal? longitude = null,
         string? description = null,
+        string? planningRequirements = null,
         CancellationToken cancellationToken = default)
     {
         var now = DateTimeOffset.UtcNow;
         var project = new ProjectRecord
         {
-            Id = Guid.NewGuid(), Name = ProjectValidation.NormalizeRequired(name), Type = type,
+            Id = Guid.NewGuid(), Kind = ProjectKindCodes.Design, Name = ProjectValidation.NormalizeRequired(name), Type = type,
             CustomType = ProjectValidation.NormalizeOptional(customType),
-            AdministrativeArea = ProjectValidation.NormalizeOptional(administrativeArea),
-            Latitude = latitude, Longitude = longitude,
-            Description = ProjectValidation.NormalizeOptional(description),
+            DesignDetails = new()
+            {
+                AdministrativeRegion = ProjectValidation.NormalizeOptional(administrativeArea),
+                Latitude = latitude, Longitude = longitude,
+                Description = ProjectValidation.NormalizeOptional(description),
+                PlanningRequirements = ProjectValidation.NormalizeOptional(planningRequirements)
+            },
+            CreatedAtUtc = now, UpdatedAtUtc = now
+        };
+        return await SaveAsync(project, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<ProjectSaveResult> CreateResearchAsync(
+        string name, string type, string? customType, string? researchField,
+        string? researchSubject, string? researchMethods,
+        CancellationToken cancellationToken = default)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var project = new ProjectRecord
+        {
+            Id = Guid.NewGuid(), Kind = ProjectKindCodes.Research,
+            Name = ProjectValidation.NormalizeRequired(name), Type = type,
+            CustomType = ProjectValidation.NormalizeOptional(customType),
+            ResearchDetails = new()
+            {
+                ResearchField = ProjectValidation.NormalizeOptional(researchField),
+                ResearchSubject = ProjectValidation.NormalizeOptional(researchSubject),
+                ResearchMethods = ProjectValidation.NormalizeOptional(researchMethods)
+            },
             CreatedAtUtc = now, UpdatedAtUtc = now
         };
         return await SaveAsync(project, cancellationToken).ConfigureAwait(false);
@@ -53,9 +80,18 @@ public sealed class ProjectStorageService
         ArgumentNullException.ThrowIfNull(project);
         project.Name = ProjectValidation.NormalizeRequired(project.Name);
         project.CustomType = ProjectValidation.NormalizeOptional(project.CustomType);
-        project.AdministrativeArea = ProjectValidation.NormalizeOptional(project.AdministrativeArea);
-        project.Description = ProjectValidation.NormalizeOptional(project.Description);
-        project.PlanningRequirements = ProjectValidation.NormalizeOptional(project.PlanningRequirements);
+        if (project.Kind == ProjectKindCodes.Design && project.DesignDetails is not null)
+        {
+            project.DesignDetails.AdministrativeRegion = ProjectValidation.NormalizeOptional(project.DesignDetails.AdministrativeRegion);
+            project.DesignDetails.Description = ProjectValidation.NormalizeOptional(project.DesignDetails.Description);
+            project.DesignDetails.PlanningRequirements = ProjectValidation.NormalizeOptional(project.DesignDetails.PlanningRequirements);
+        }
+        if (project.Kind == ProjectKindCodes.Research && project.ResearchDetails is not null)
+        {
+            project.ResearchDetails.ResearchField = ProjectValidation.NormalizeOptional(project.ResearchDetails.ResearchField);
+            project.ResearchDetails.ResearchSubject = ProjectValidation.NormalizeOptional(project.ResearchDetails.ResearchSubject);
+            project.ResearchDetails.ResearchMethods = ProjectValidation.NormalizeOptional(project.ResearchDetails.ResearchMethods);
+        }
         foreach (var milestone in project.Milestones)
         {
             milestone.Title = ProjectValidation.NormalizeRequired(milestone.Title);
@@ -63,6 +99,15 @@ public sealed class ProjectStorageService
         }
         var validation = ProjectValidation.Validate(project);
         if (validation.Count > 0) return new(DataStorageStatus.Corrupt, ValidationErrors: validation);
+
+        var existingPath = _paths.GetProjectDataFilePath(project.Id);
+        if (File.Exists(existingPath))
+        {
+            var existing = await ReadAsync(project.Id, cancellationToken).ConfigureAwait(false);
+            if (!existing.HasValue) return new(existing.Status, FailureType: existing.FailureType);
+            if (!string.Equals(existing.Value!.Kind, project.Kind, StringComparison.Ordinal))
+                return new(DataStorageStatus.Corrupt, ValidationErrors: ["ProjectKindImmutable"]);
+        }
 
         await _mutationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
@@ -83,7 +128,7 @@ public sealed class ProjectStorageService
             }
             else
             {
-                existing.Name = project.Name; existing.Type = project.Type; existing.IsArchived = project.IsArchived;
+                existing.Kind = project.Kind; existing.Name = project.Name; existing.Type = project.Type; existing.IsArchived = project.IsArchived;
                 existing.UpdatedAtUtc = project.UpdatedAtUtc; existing.ArchivedAtUtc = project.ArchivedAtUtc;
             }
 
@@ -328,7 +373,7 @@ public sealed class ProjectStorageService
 
     private static ProjectIndexEntry ToIndexEntry(ProjectRecord project) => new()
     {
-        Id = project.Id, Name = project.Name, Type = project.Type, IsArchived = project.IsArchived,
+        Id = project.Id, Kind = project.Kind, Name = project.Name, Type = project.Type, IsArchived = project.IsArchived,
         UpdatedAtUtc = project.UpdatedAtUtc, ArchivedAtUtc = project.ArchivedAtUtc
     };
 

@@ -91,6 +91,36 @@ public sealed class BackupDataServiceTests
     }
 
     [Fact]
+    public async Task RoundTripRestoresDesignAndResearchKindsAndResearchDetails()
+    {
+        using var scope = new BackupScope();
+        var design = await scope.CreateProjectAsync();
+        var research = (await scope.Projects.CreateResearchAsync(
+            "Transit study", ResearchProjectTypeCodes.Paper, null,
+            "Urban planning", "Station-area neighborhoods", "GIS, interviews, and comparison")).Project!;
+        await scope.Projects.AddMilestoneAsync(research.Id, "Draft", new DateOnly(2026, 10, 2));
+        var output = scope.Path("both-kinds.uptbackup");
+        Assert.True((await scope.Backup.ExportAsync(output)).Succeeded);
+
+        research = (await scope.Projects.ReadAsync(research.Id)).Value!;
+        research.ResearchDetails!.ResearchMethods = "Changed";
+        research.UpdatedAtUtc = DateTimeOffset.UtcNow;
+        await scope.Projects.SaveAsync(research);
+        Assert.True((await scope.Backup.ImportAsync(output)).Succeeded);
+
+        var restored = (await scope.Projects.ListAsync(false)).Projects;
+        Assert.Equal(2, restored.Count);
+        Assert.Equal(ProjectKindCodes.Design, restored.Single(item => item.Id == design.Id).Kind);
+        var restoredResearch = restored.Single(item => item.Id == research.Id);
+        Assert.Equal(ProjectKindCodes.Research, restoredResearch.Kind);
+        Assert.Null(restoredResearch.DesignDetails);
+        Assert.Equal("Urban planning", restoredResearch.ResearchDetails!.ResearchField);
+        Assert.Equal("Station-area neighborhoods", restoredResearch.ResearchDetails.ResearchSubject);
+        Assert.Equal("GIS, interviews, and comparison", restoredResearch.ResearchDetails.ResearchMethods);
+        Assert.Single(restoredResearch.Milestones);
+    }
+
+    [Fact]
     public async Task CorruptZipAndChecksumMismatchAreRejectedWithoutChangingData()
     {
         using var scope = new BackupScope();
@@ -146,7 +176,7 @@ public sealed class BackupDataServiceTests
         MutateExtractedPackage(package, root =>
         {
             var relative = $"data/projects/{project.Id:D}/project.json"; var path = System.IO.Path.Combine(root, relative.Replace('/', System.IO.Path.DirectorySeparatorChar));
-            var json = File.ReadAllText(path).Replace("\"schemaVersion\": 2", "\"schemaVersion\": 3"); File.WriteAllText(path, json);
+            var json = File.ReadAllText(path).Replace("\"schemaVersion\": 3", "\"schemaVersion\": 4"); File.WriteAllText(path, json);
             RefreshManifestFile(root, relative);
         });
         Assert.Equal("FutureProjectFormat", (await scope.Backup.InspectAsync(package)).FailureType);
@@ -164,15 +194,16 @@ public sealed class BackupDataServiceTests
         {
             var relative = $"data/projects/{project.Id:D}/project.json";
             var path = System.IO.Path.Combine(root, relative.Replace('/', System.IO.Path.DirectorySeparatorChar));
-            File.WriteAllText(path, File.ReadAllText(path).Replace("\"schemaVersion\": 2", "\"schemaVersion\": 1"));
+            File.WriteAllText(path, File.ReadAllText(path).Replace("\"schemaVersion\": 3", "\"schemaVersion\": 1"));
             RefreshManifestFile(root, relative);
         });
 
         Assert.True((await scope.Backup.InspectAsync(package)).Succeeded);
         Assert.True((await scope.Backup.ImportAsync(package)).Succeeded);
         var read = await scope.Projects.ReadAsync(project.Id);
-        Assert.Equal(2, read.SchemaVersion);
-        Assert.Equal("Legacy backup todo", Assert.Single(read.Value!.Todos).Title);
+        Assert.Equal(3, read.SchemaVersion);
+        Assert.Equal(ProjectKindCodes.Design, read.Value!.Kind);
+        Assert.Equal("Legacy backup todo", Assert.Single(read.Value.Todos).Title);
         Assert.Empty(read.Value.Milestones);
     }
 

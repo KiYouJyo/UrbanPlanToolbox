@@ -166,7 +166,7 @@ public sealed class ProjectStorageTests
         using var scope = new ProjectScope();
         var id = Guid.NewGuid();
         var path = scope.Provider.GetProjectDataFilePath(id);
-        var future = new DataEnvelope<object> { SchemaVersion = 3, SavedAtUtc = DateTimeOffset.UtcNow, Payload = new { id, name = "Future" } };
+        var future = new DataEnvelope<object> { SchemaVersion = 4, SavedAtUtc = DateTimeOffset.UtcNow, Payload = new { id, name = "Future" } };
         await File.WriteAllTextAsync(path, JsonSerializer.Serialize(future, DataStorageJson.Options), new UTF8Encoding(false));
         var before = await File.ReadAllBytesAsync(path);
         var read = await scope.Service.ReadAsync(id);
@@ -271,7 +271,7 @@ public sealed class ProjectStorageTests
     }
 
     [Fact]
-    public async Task SchemaOneProjectMigratesToTwoWithoutLosingLegacyData()
+    public async Task SchemaOneProjectMigratesThroughThreeWithoutLosingLegacyData()
     {
         using var scope = new ProjectScope();
         var id = Guid.NewGuid();
@@ -296,12 +296,16 @@ public sealed class ProjectStorageTests
         var backupJson = await File.ReadAllTextAsync(scope.Provider.GetProjectBackupFilePath(id));
 
         Assert.Equal(DataStorageStatus.Success, read.Status);
-        Assert.Equal(2, read.SchemaVersion);
-        Assert.Null(read.Value!.PlanningRequirements);
+        Assert.Equal(3, read.SchemaVersion);
+        Assert.Equal(ProjectKindCodes.Design, read.Value!.Kind);
+        Assert.NotNull(read.Value.DesignDetails);
+        Assert.Null(read.Value.ResearchDetails);
+        Assert.Null(read.Value.PlanningRequirements);
         Assert.Empty(read.Value.Milestones);
         Assert.Single(read.Value.Todos);
-        Assert.Contains("\"schemaVersion\": 2", migratedJson);
-        Assert.Contains("\"planningRequirements\": null", migratedJson);
+        Assert.Contains("\"schemaVersion\": 3", migratedJson);
+        Assert.Contains("\"kind\": \"design\"", migratedJson);
+        Assert.Contains("\"designDetails\"", migratedJson);
         Assert.Contains("\"milestones\": []", migratedJson);
         Assert.Contains("\"schemaVersion\": 1", backupJson);
         Assert.Contains("Keep me", backupJson);
@@ -323,6 +327,104 @@ public sealed class ProjectStorageTests
 
         Assert.Equal(DataStorageStatus.MigrationFailed, read.Status);
         Assert.Equal(before, await File.ReadAllBytesAsync(path));
+    }
+
+    [Fact]
+    public async Task SchemaTwoProjectMigratesToDesignDetailsAndKeepsIdentityLifecycleAndFolder()
+    {
+        using var scope = new ProjectScope();
+        var id = Guid.NewGuid(); var now = DateTimeOffset.UtcNow;
+        var milestoneId = Guid.NewGuid();
+        var envelope = new DataEnvelope<object>
+        {
+            SchemaVersion = 2, SavedAtUtc = now,
+            Payload = new
+            {
+                id, name = "Legacy design", type = ProjectTypeCodes.Competition, customType = (string?)null,
+                administrativeArea = "Hangzhou", latitude = 30.25m, longitude = 120.5m,
+                description = "Keep description", planningRequirements = "Keep requirements",
+                milestones = new[] { new { id = milestoneId, title = "Review", date = "2026-08-04", time = (string?)null, notes = "Keep", createdAtUtc = now, updatedAtUtc = now, displayOrder = 0 } },
+                todos = Array.Empty<object>(), planningSnapshots = Array.Empty<object>(),
+                workFolder = new { accessToken = "token", displayName = "Work", displayPath = "C:\\Work", requiresReselection = false },
+                isArchived = true, createdAtUtc = now, updatedAtUtc = now, archivedAtUtc = now
+            }
+        };
+        var path = scope.Provider.GetProjectDataFilePath(id);
+        await File.WriteAllTextAsync(path, JsonSerializer.Serialize(envelope, DataStorageJson.Options), new UTF8Encoding(false));
+
+        var read = await scope.Service.ReadAsync(id);
+
+        Assert.Equal(3, read.SchemaVersion);
+        Assert.Equal(ProjectKindCodes.Design, read.Value!.Kind);
+        Assert.Equal(id, read.Value.Id);
+        Assert.Equal("Hangzhou", read.Value.DesignDetails!.AdministrativeRegion);
+        Assert.Equal("Keep requirements", read.Value.DesignDetails.PlanningRequirements);
+        Assert.Equal(milestoneId, Assert.Single(read.Value.Milestones).Id);
+        Assert.True(read.Value.IsArchived);
+        Assert.Equal("token", read.Value.WorkFolder!.AccessToken);
+        var migrated = await File.ReadAllTextAsync(path);
+        Assert.DoesNotContain("\"administrativeArea\"", migrated);
+        Assert.Contains("\"designDetails\"", migrated);
+        Assert.Contains("\"researchDetails\": null", migrated);
+    }
+
+    [Fact]
+    public async Task ResearchProjectRoundTripsAndRejectsDesignDataOrType()
+    {
+        using var scope = new ProjectScope();
+        var created = await scope.Service.CreateResearchAsync("  Study  ", ResearchProjectTypeCodes.Thesis, null, " Planning ", " Canal districts ", " GIS and interviews ");
+        Assert.True(created.Succeeded);
+        Assert.Equal(ProjectKindCodes.Research, created.Project!.Kind);
+        Assert.Null(created.Project.DesignDetails);
+        Assert.Equal("Planning", created.Project.ResearchDetails!.ResearchField);
+
+        created.Project.DesignDetails = new();
+        Assert.Contains("DesignDetailsNotAllowed", (await scope.Service.SaveAsync(created.Project)).ValidationErrors!);
+        created.Project.DesignDetails = null;
+        created.Project.Type = ProjectTypeCodes.Competition;
+        Assert.Contains("ProjectTypeInvalid", (await scope.Service.SaveAsync(created.Project)).ValidationErrors!);
+    }
+
+    [Fact]
+    public async Task DesignProjectRejectsResearchDetailsAndResearchOnlyType()
+    {
+        using var scope = new ProjectScope();
+        var project = (await scope.Service.CreateAsync("Design", ProjectTypeCodes.Professional)).Project!;
+        project.ResearchDetails = new() { ResearchField = "F", ResearchSubject = "S", ResearchMethods = "M" };
+        Assert.Contains("ResearchDetailsNotAllowed", (await scope.Service.SaveAsync(project)).ValidationErrors!);
+        project.ResearchDetails = null;
+        project.Type = ResearchProjectTypeCodes.Thesis;
+        Assert.Contains("ProjectTypeInvalid", (await scope.Service.SaveAsync(project)).ValidationErrors!);
+    }
+
+    [Fact]
+    public async Task ResearchOtherRequiresCustomTypeAndArchivedLifecycleStaysResearch()
+    {
+        using var scope = new ProjectScope();
+        var invalid = await scope.Service.CreateResearchAsync("Study", ResearchProjectTypeCodes.Other, null, "F", "S", "M");
+        Assert.Contains("CustomProjectTypeRequired", invalid.ValidationErrors!);
+        var valid = await scope.Service.CreateResearchAsync("Study", ResearchProjectTypeCodes.Other, "Monograph", "F", "S", "M");
+        await scope.Service.ArchiveAsync(valid.Project!.Id, true);
+        Assert.Equal(ProjectKindCodes.Research, Assert.Single((await scope.Service.ListAsync(true)).Projects).Kind);
+        await scope.Service.ArchiveAsync(valid.Project.Id, false);
+        Assert.Equal(ProjectKindCodes.Research, Assert.Single((await scope.Service.ListAsync(false)).Projects).Kind);
+    }
+
+    [Fact]
+    public async Task ProjectKindCannotBeChangedAfterCreation()
+    {
+        using var scope = new ProjectScope();
+        var original = (await scope.Service.CreateAsync("Design", ProjectTypeCodes.Coursework)).Project!;
+        var replacement = new ProjectRecord
+        {
+            Id = original.Id, Kind = ProjectKindCodes.Research, Name = original.Name,
+            Type = ResearchProjectTypeCodes.Coursework,
+            ResearchDetails = new() { ResearchField = "F", ResearchSubject = "S", ResearchMethods = "M" },
+            CreatedAtUtc = original.CreatedAtUtc, UpdatedAtUtc = DateTimeOffset.UtcNow
+        };
+        var saved = await scope.Service.SaveAsync(replacement);
+        Assert.Contains("ProjectKindImmutable", saved.ValidationErrors!);
+        Assert.Equal(ProjectKindCodes.Design, (await scope.Service.ReadAsync(original.Id)).Value!.Kind);
     }
 
     [Theory]
@@ -425,7 +527,7 @@ public sealed class ProjectStorageTests
     private static ProjectRecord SampleProject(Guid id, string name)
     {
         var now = DateTimeOffset.UtcNow;
-        return new() { Id = id, Name = name, Type = ProjectTypeCodes.Research, CreatedAtUtc = now, UpdatedAtUtc = now };
+        return new() { Id = id, Name = name, Type = ProjectTypeCodes.Research, DesignDetails = new(), CreatedAtUtc = now, UpdatedAtUtc = now };
     }
 
     private sealed class ProjectScope : IDisposable
