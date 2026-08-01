@@ -155,6 +155,11 @@ Strings/
 | --- | --- | --- |
 | 项目主页 | プロジェクトホーム | Project Home |
 | 项目工作台 | プロジェクトワークスペース | Project Workspace |
+| 设计项目 | 設計プロジェクト | Design Projects |
+| 研究项目 | 研究プロジェクト | Research Projects |
+| 研究领域 | 研究分野 | Research Field |
+| 研究对象 | 研究対象 | Research Subject |
+| 研究方法 | 研究方法 | Research Methods |
 | 待办事项 | タスク | Todos |
 | 规划指标快照 | 計画指標スナップショット | Planning Snapshot |
 | 工作文件夹 | 作業フォルダー | Work Folder |
