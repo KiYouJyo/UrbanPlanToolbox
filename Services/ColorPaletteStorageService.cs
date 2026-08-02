@@ -98,7 +98,7 @@ public sealed class ColorPaletteStorageService
         CreatedAtUtc = source.CreatedAtUtc,
         UpdatedAtUtc = source.UpdatedAtUtc,
         Images = source.Images.Select(image => new ColorPaletteImage { ImageId = image.ImageId, RelativePath = image.RelativePath, OriginalFileName = image.OriginalFileName, ContentType = image.ContentType, SortOrder = image.SortOrder }).ToList(),
-        Colors = source.Colors.Select(color => new ColorPaletteColor { ColorId = color.ColorId, Name = color.Name, Hex = color.Hex, SortOrder = color.SortOrder }).ToList()
+        Colors = source.Colors.Select(color => new ColorPaletteColor { ColorId = color.ColorId, ColorRole = color.ColorRole, Hex = color.Hex, SortOrder = color.SortOrder }).ToList()
     };
 
     public static ColorEditorDraft CreateColorEditorDraft(ColorPaletteColor source)
@@ -107,7 +107,7 @@ public sealed class ColorPaletteStorageService
         return new ColorEditorDraft
         {
             ColorId = source.ColorId,
-            Name = source.Name,
+            ColorRole = source.ColorRole,
             Hex = TryNormalizeHex(source.Hex, out var hex) ? hex : "#000000",
             SortOrder = source.SortOrder
         };
@@ -124,7 +124,7 @@ public sealed class ColorPaletteStorageService
         scheme.Colors[index] = new ColorPaletteColor
         {
             ColorId = draft.ColorId,
-            Name = NormalizeText(draft.Name),
+            ColorRole = NormalizeText(draft.ColorRole),
             Hex = hex,
             SortOrder = draft.SortOrder
         };
@@ -140,7 +140,7 @@ public sealed class ColorPaletteStorageService
             NormalizeText(scheme.Category),
             NormalizeText(scheme.CustomCategoryName),
             scheme.Images.OrderBy(image => image.SortOrder).ThenBy(image => image.ImageId).Select(image => new ColorPaletteImageEditSnapshot(image.ImageId, NormalizePath(image.RelativePath), NormalizeText(image.OriginalFileName), NormalizeText(image.ContentType), image.SortOrder)).ToArray(),
-            scheme.Colors.OrderBy(color => color.SortOrder).ThenBy(color => color.ColorId).Select(color => new ColorPaletteColorEditSnapshot(color.ColorId, NormalizeText(color.Name), NormalizeHexForSnapshot(color.Hex), color.SortOrder)).ToArray());
+            scheme.Colors.OrderBy(color => color.SortOrder).ThenBy(color => color.ColorId).Select(color => new ColorPaletteColorEditSnapshot(color.ColorId, NormalizeText(color.ColorRole), NormalizeHexForSnapshot(color.Hex), color.SortOrder)).ToArray());
     }
 
     public static IReadOnlyList<string> DescribeEditDifferences(ColorPaletteEditSnapshot baseline, ColorPaletteEditSnapshot current)

@@ -117,7 +117,8 @@ public sealed partial class ColorPaletteRecorderPage : Page
             var card = new Border { Width = 360, Padding = new Thickness(10), Margin = new Thickness(0, 0, 10, 10), CornerRadius = new CornerRadius(8), BorderThickness = new Thickness(1), BorderBrush = (Brush)Application.Current.Resources["CardStrokeColorDefaultBrush"] };
             var row = new Grid(); row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(56) }); row.ColumnDefinitions.Add(new ColumnDefinition()); row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var edit = new Button { Background = new SolidColorBrush(ParseColor(color.Hex)), Width = 48, Height = 48, Tag = color }; edit.Click += async (sender, _) => await EditColorAsync((ColorPaletteColor)((Button)sender).Tag); Grid.SetColumn(edit, 0); row.Children.Add(edit);
-            var details = new StackPanel { Spacing = 2 }; details.Children.Add(new TextBlock { Text = string.IsNullOrWhiteSpace(color.Name) ? T("Palette_UnnamedColor") : color.Name, TextWrapping = TextWrapping.Wrap }); details.Children.Add(new TextBlock { Text = color.Hex }); details.Children.Add(new TextBlock { Text = RgbSummary(color.Hex) }); Grid.SetColumn(details, 1); row.Children.Add(details);
+            var role = string.IsNullOrWhiteSpace(color.ColorRole) ? T("Palette_NoColorRole") : color.ColorRole;
+            var details = new StackPanel { Spacing = 2 }; details.Children.Add(new TextBlock { Text = $"{T("Palette_ColorRole")}: {role}", TextWrapping = TextWrapping.Wrap }); details.Children.Add(new TextBlock { Text = color.Hex }); details.Children.Add(new TextBlock { Text = RgbSummary(color.Hex) }); Grid.SetColumn(details, 1); row.Children.Add(details);
             var actions = new StackPanel { Spacing = 4 }; var editAction = new Button { Content = T("Palette_EditColor"), Tag = color }; editAction.Click += async (sender, _) => await EditColorAsync((ColorPaletteColor)((Button)sender).Tag); var remove = new Button { Content = T("Action_Delete"), Tag = color }; remove.Click += (sender, _) => { _editing!.Colors.Remove((ColorPaletteColor)((Button)sender).Tag); UpdateDirtyState(); RenderColors(); }; actions.Children.Add(editAction); actions.Children.Add(remove); Grid.SetColumn(actions, 2); row.Children.Add(actions);
             card.Child = row; ColorsPanel.Items.Add(card);
         }
@@ -148,11 +149,10 @@ public sealed partial class ColorPaletteRecorderPage : Page
             IsColorChannelTextInputVisible = true,
             IsHexInputVisible = true
         };
-        var name = new TextBox { Header = T("Palette_ColorName"), Text = draft.Name ?? "" };
-        var hex = new TextBox { Header = "HEX", Text = draft.Hex };
+        var role = new TextBox { Header = T("Palette_ColorRole"), PlaceholderText = T("Palette_ColorRolePlaceholder"), Text = draft.ColorRole ?? "" };
         var rgb = new TextBlock { Text = RgbSummary(draft.Hex) };
         var error = new TextBlock { Foreground = new SolidColorBrush(Colors.IndianRed) };
-        var panel = new StackPanel { Spacing = 8 }; panel.Children.Add(picker); panel.Children.Add(name); panel.Children.Add(hex); panel.Children.Add(rgb); panel.Children.Add(error);
+        var panel = new StackPanel { Spacing = 8 }; panel.Children.Add(picker); panel.Children.Add(role); panel.Children.Add(rgb); panel.Children.Add(error);
         // A nested ScrollViewer intercepts ColorSpectrum pointer drags. Keep the picker directly
         // in the dialog at normal heights; only introduce scrolling where the window is too short.
         object content = XamlRoot.Size.Height < 680
@@ -160,36 +160,21 @@ public sealed partial class ColorPaletteRecorderPage : Page
             : panel;
         var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_EditColor"), Content = content, PrimaryButtonText = T("Palette_Save"), CloseButtonText = T("Action_Cancel") };
         var synchronizing = false;
-        var lastEditSource = ColorEditSource.None;
         void CopyPickerColorToDraft(Color pickedColor)
         {
             if (synchronizing) return;
             synchronizing = true;
-            draft.Hex = ToHex(pickedColor); lastEditSource = ColorEditSource.Picker;
-            hex.Text = draft.Hex; rgb.Text = RgbSummary(draft.Hex); error.Text = "";
+            draft.Hex = ToHex(pickedColor);
+            rgb.Text = RgbSummary(draft.Hex); error.Text = "";
             synchronizing = false;
         }
         picker.ColorChanged += (_, args) => CopyPickerColorToDraft(args.NewColor);
         // The dependency-property callback covers ColorPicker interaction paths that do not
         // raise ColorChanged reliably in a ContentDialog on the current Windows App SDK.
         picker.RegisterPropertyChangedCallback(ColorPicker.ColorProperty, (_, _) => CopyPickerColorToDraft(picker.Color));
-        hex.TextChanged += (_, _) =>
-        {
-            if (synchronizing) return;
-            if (ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var normalized))
-            {
-                synchronizing = true;
-                draft.Hex = normalized; lastEditSource = ColorEditSource.Hex;
-                picker.Color = ParseColor(normalized); rgb.Text = RgbSummary(normalized); error.Text = "";
-                synchronizing = false;
-            }
-            else if (!string.IsNullOrWhiteSpace(hex.Text)) error.Text = T("Palette_InvalidHex");
-        };
         if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
-        // Use the picker value for picker-originated edits even if its event was delayed; HEX is
-        // the only source permitted to override it after a valid direct HEX edit.
-        if (lastEditSource != ColorEditSource.Hex) draft.Hex = ToHex(picker.Color);
-        draft.Name = name.Text;
+        draft.Hex = ToHex(picker.Color);
+        draft.ColorRole = role.Text;
         if (!ColorPaletteStorageService.TryApplyColorEditorDraft(_editing, draft, out _)) { Show(EditorStatus, T("Palette_InvalidHex")); return; }
         UpdateDirtyState(); RenderColors();
     }
@@ -225,5 +210,4 @@ public sealed partial class ColorPaletteRecorderPage : Page
     }
     private void Show(InfoBar bar, string message) { bar.Message = message; bar.IsOpen = true; }
     private sealed record Choice(string Id, string Name) { public override string ToString() => Name; }
-    private enum ColorEditSource { None, Picker, Hex }
 }

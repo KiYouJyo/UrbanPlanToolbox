@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace UrbanPlanToolbox.Models;
 
 public static class ColorPaletteCategories
@@ -41,7 +43,12 @@ public sealed class ColorPaletteImage
 public sealed class ColorPaletteColor
 {
     public Guid ColorId { get; init; } = Guid.NewGuid();
-    public string? Name { get; set; }
+    // Keep the established "name" JSON field for existing data and exports, while making the
+    // business meaning explicit in code and accepting the short-lived "colorName" variant.
+    [JsonPropertyName("name")]
+    public string? ColorRole { get; set; }
+    [JsonPropertyName("colorName")]
+    public string? LegacyColorName { set { if (string.IsNullOrWhiteSpace(ColorRole)) ColorRole = value; } }
     public string Hex { get; set; } = "#000000";
     public int SortOrder { get; init; }
 }
@@ -50,7 +57,7 @@ public sealed class ColorPaletteColor
 public sealed class ColorEditorDraft
 {
     public Guid ColorId { get; init; }
-    public string? Name { get; set; }
+    public string? ColorRole { get; set; }
     public string Hex { get; set; } = "#000000";
     public int SortOrder { get; init; }
 }
@@ -66,4 +73,4 @@ public sealed record ColorPaletteEditSnapshot(
 
 public sealed record ColorPaletteImageEditSnapshot(Guid ImageId, string RelativePath, string OriginalFileName, string ContentType, int SortOrder);
 
-public sealed record ColorPaletteColorEditSnapshot(Guid ColorId, string Name, string Hex, int SortOrder);
+public sealed record ColorPaletteColorEditSnapshot(Guid ColorId, string ColorRole, string Hex, int SortOrder);

@@ -21,7 +21,7 @@ public sealed class ColorPaletteStorageServiceTests : IDisposable
     public async Task SchemesRoundTripWithStableIdsAndIndependentSchema()
     {
         var scheme = new ColorPaletteScheme { Name = "Courtyard", Category = ColorPaletteCategories.Warm };
-        scheme.Colors.Add(new ColorPaletteColor { Name = "Brick", Hex = "#ab1030", SortOrder = 0 });
+        scheme.Colors.Add(new ColorPaletteColor { ColorRole = "Brick", Hex = "#ab1030", SortOrder = 0 });
         var document = new ColorPaletteDocument { Schemes = [scheme] };
 
         Assert.True((await _service.SaveAsync(document)).Succeeded);
@@ -70,7 +70,7 @@ public sealed class ColorPaletteStorageServiceTests : IDisposable
     {
         var original = new ColorPaletteScheme { Name = "Saved", Category = ColorPaletteCategories.Cool };
         original.Images.Add(new ColorPaletteImage { RelativePath = $"{original.SchemeId:D}/first.png", OriginalFileName = "first.png", ContentType = "image/png", SortOrder = 0 });
-        original.Colors.Add(new ColorPaletteColor { Name = "Blue", Hex = "#001122", SortOrder = 0 });
+        original.Colors.Add(new ColorPaletteColor { ColorRole = "Blue", Hex = "#001122", SortOrder = 0 });
         await _service.SaveAsync(new ColorPaletteDocument { Schemes = [original] });
 
         var draft = ColorPaletteStorageService.CloneScheme(original);
@@ -145,12 +145,12 @@ public sealed class ColorPaletteStorageServiceTests : IDisposable
     [Fact]
     public void CancellingColorEditorDraftLeavesOriginalColorUntouched()
     {
-        var original = new ColorPaletteColor { Hex = "#112233", Name = "Saved", SortOrder = 0 };
+        var original = new ColorPaletteColor { Hex = "#112233", ColorRole = "Saved", SortOrder = 0 };
         var draft = ColorPaletteStorageService.CreateColorEditorDraft(original);
-        draft.Hex = "#FF0000"; draft.Name = "Discarded";
+        draft.Hex = "#FF0000"; draft.ColorRole = "Discarded";
 
         Assert.Equal("#112233", original.Hex);
-        Assert.Equal("Saved", original.Name);
+        Assert.Equal("Saved", original.ColorRole);
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public sealed class ColorPaletteStorageServiceTests : IDisposable
     {
         var scheme = new ColorPaletteScheme { Name = "  Saved  ", Category = ColorPaletteCategories.Cool, CustomCategoryName = null };
         scheme.Images.Add(new ColorPaletteImage { RelativePath = $"{scheme.SchemeId:D}\\first.png", OriginalFileName = " first.png ", ContentType = "image/png", SortOrder = 0 });
-        scheme.Colors.Add(new ColorPaletteColor { Name = null, Hex = "#aabbcc", SortOrder = 0 });
+        scheme.Colors.Add(new ColorPaletteColor { ColorRole = null, Hex = "#aabbcc", SortOrder = 0 });
         var baseline = ColorPaletteStorageService.CreateEditSnapshot(scheme);
 
         scheme.CustomCategoryName = ""; scheme.Images[0] = new ColorPaletteImage { ImageId = scheme.Images[0].ImageId, RelativePath = $"{scheme.SchemeId:D}/first.png", OriginalFileName = "first.png", ContentType = "image/png", SortOrder = 0 }; scheme.Colors[0].Hex = "AABBCC";
@@ -167,6 +167,31 @@ public sealed class ColorPaletteStorageServiceTests : IDisposable
         scheme.Colors[0].Hex = "#FF0000";
         var differences = ColorPaletteStorageService.DescribeEditDifferences(baseline, ColorPaletteStorageService.CreateEditSnapshot(scheme));
         Assert.Single(differences); Assert.StartsWith("Colors[0]", differences[0]);
+    }
+
+    [Fact]
+    public async Task ColorRoleUsesExistingNameFieldAndReadsLegacyColorName()
+    {
+        var path = _paths.GetToolDataFilePath(ToolIds.ColorPaletteRecorder, ColorPaletteStorageService.DataFileName);
+        var colorId = Guid.NewGuid(); var schemeId = Guid.NewGuid();
+        var legacy = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            schemaVersion = 1,
+            savedAtUtc = "2026-01-01T00:00:00+00:00",
+            payload = new
+            {
+                schemes = new[] { new { schemeId, name = "Legacy", category = "neutral", images = Array.Empty<object>(), colors = new[] { new { colorId, colorName = "Accent", hex = "#3CBBCC", sortOrder = 0 } } } }
+            }
+        });
+        await File.WriteAllTextAsync(path, legacy);
+
+        var loaded = await _service.ReadAsync();
+        var color = Assert.Single(Assert.Single(loaded.Value!.Schemes).Colors);
+        Assert.Equal("Accent", color.ColorRole);
+        Assert.True((await _service.SaveAsync(loaded.Value!)).Succeeded);
+        var json = await File.ReadAllTextAsync(path);
+        Assert.Contains("\"name\": \"Accent\"", json);
+        Assert.DoesNotContain("colorName", json);
     }
 
     [Theory]
