@@ -7,9 +7,11 @@ v0.5.0 continues the offline-first, non-account product direction. See [PRIVACY.
 ### 版本与发行渠道
 
 - 产品显示版本：`0.5.0 Preview`；这是应用内主页、关于页和 User-Agent 使用的产品语义版本。
-- 当前旁加载人工审阅包：`0.5.0.1`；本轮修复后的新审阅包为 `0.5.0.2`。这两个版本仅用于本机自签名旁加载审阅，不得直接提交 Microsoft Store。
-- 计划中的 Microsoft Store 首次提交包：`0.5.0.0`。它将在关联 Partner Center Identity 和 Publisher 后重新构建，当前仓库尚未关联正式商店身份。
+- 当前旁加载人工审阅包：`0.5.0.1` 为历史审阅包，`0.5.0.2` 为最终旁加载审阅包；两者仅用于本机自签名旁加载审阅，不得直接提交 Microsoft Store。
+- Microsoft Store 首次候选包技术版本：`1.0.0.0`。它使用独立的 Store Identity/Publisher，并在 Partner Center 关联后构建；当前仓库尚未关联 Partner Center 的正式提交流程。
 - 当前 `CN=AppPublisher` 只用于自签名旁加载渠道；GitHub 侧载版和 Microsoft Store 版保持独立发行身份及更新渠道。
+
+Store 身份字段必须逐字符保持为 `Name=JoKiy.UrbanPlanToolbox`、`Publisher=CN=C4E4B33A-7B77-4121-897C-7D720A5471F8`、`PublisherDisplayName=Jo Kiyō`。Store 产品入口使用产品 ID `9MWDPJG1BHKW`；应用内不会自动打开该入口，也不会在 Store 渠道调用 GitHub 更新。
 
 > 已知限制：在部分冷启动环境中，原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响已验收功能，将在后续版本单独处理。
 

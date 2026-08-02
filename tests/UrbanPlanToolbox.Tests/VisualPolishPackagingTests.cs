@@ -25,6 +25,23 @@ public sealed class VisualPolishPackagingTests
     }
 
     [Fact]
+    public void StoreManifestUsesOfficialIdentityAndTechnicalVersion()
+    {
+        var root = FindRepositoryRoot();
+        var manifest = File.ReadAllText(Path.Combine(root, "Package.Store.appxmanifest"));
+        Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", manifest);
+        Assert.Contains("Publisher=\"CN=C4E4B33A-7B77-4121-897C-7D720A5471F8\"", manifest);
+        Assert.Contains("Version=\"1.0.0.0\"", manifest);
+        Assert.Contains("<PublisherDisplayName>Jo Kiyō</PublisherDisplayName>", manifest);
+        Assert.DoesNotContain("556F80C5-C4D4-452B-93B4-00DE3FA7AC29", manifest, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("PhoneIdentity", manifest, StringComparison.Ordinal);
+
+        var project = File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj"));
+        Assert.Contains("'$(DistributionChannel)' == 'Store'", project);
+        Assert.Contains("Package.Store.appxmanifest", project);
+    }
+
+    [Fact]
     public void SharedVisualResourcesAreUsedWithoutAnInAppSplashOverlay()
     {
         var root = FindRepositoryRoot();
