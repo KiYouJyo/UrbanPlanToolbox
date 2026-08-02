@@ -27,7 +27,7 @@ public sealed partial class ColorPaletteRecorderPage : Page
     {
         InitializeComponent();
         TitleText.Text = T("Tool_ColorPaletteRecorder_Name"); DescriptionText.Text = T("Tool_ColorPaletteRecorder_Description");
-        NewButton.Content = T("Palette_New"); BackButton.Content = T("Action_Back"); AddImagesButton.Content = T("Palette_AddImages"); AddColorButton.Content = T("Palette_AddColor"); SaveButton.Content = T("Palette_Save"); ResetButton.Content = T("Palette_Reset");
+        NewButton.Content = T("Palette_New"); BackButton.Content = T("Action_Back"); AddImagesButton.Content = T("Palette_AddImages"); AddColorButton.Content = T("Palette_AddColor"); SaveButton.Content = T("Palette_Save"); ResetButton.Content = T("Palette_Reset"); DeleteSchemeButton.Content = T("Action_Delete");
         ImagesTitle.Text = T("Palette_Images"); ColorsTitle.Text = T("Palette_Colors");
         CategoryFilter.Items.Add(new Choice("", T("Palette_AllCategories")));
         CategoryBox.Items.Add(new Choice(ColorPaletteCategories.Warm, T("Palette_CategoryWarm"))); CategoryBox.Items.Add(new Choice(ColorPaletteCategories.Cool, T("Palette_CategoryCool"))); CategoryBox.Items.Add(new Choice(ColorPaletteCategories.Neutral, T("Palette_CategoryNeutral"))); CategoryBox.Items.Add(new Choice(ColorPaletteCategories.Monochrome, T("Palette_CategoryMonochrome"))); CategoryBox.Items.Add(new Choice(ColorPaletteCategories.Mixed, T("Palette_CategoryMixed"))); CategoryBox.Items.Add(new Choice(ColorPaletteCategories.Custom, T("Palette_CategoryCustom")));
@@ -54,13 +54,15 @@ public sealed partial class ColorPaletteRecorderPage : Page
         if (schemes.Length == 0) { CardsPanel.Children.Add(new TextBlock { Text = T("Palette_Empty"), TextWrapping = TextWrapping.Wrap }); return; }
         foreach (var scheme in schemes)
         {
-            var card = new Border { Padding = new Thickness(14), CornerRadius = new CornerRadius(8), BorderThickness = new Thickness(1), BorderBrush = (Brush)Application.Current.Resources["CardStrokeColorDefaultBrush"] };
-            var row = new Grid(); row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); row.ColumnDefinitions.Add(new ColumnDefinition()); row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var card = new Button { HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch, Tag = scheme };
+            card.Click += (sender, _) => OpenEditor((ColorPaletteScheme)((Button)sender).Tag);
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(card, scheme.Name);
+            var border = new Border { Padding = new Thickness(14), CornerRadius = new CornerRadius(8), BorderThickness = new Thickness(1), BorderBrush = (Brush)Application.Current.Resources["CardStrokeColorDefaultBrush"] };
+            var row = new Grid(); row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); row.ColumnDefinitions.Add(new ColumnDefinition());
             var preview = CreateCardPreview(scheme);
             Grid.SetColumn(preview, 0); row.Children.Add(preview);
             var details = new StackPanel { Spacing = 3 }; details.Children.Add(new TextBlock { Text = scheme.Name, Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"], TextWrapping = TextWrapping.Wrap }); details.Children.Add(new TextBlock { Text = $"{CategoryName(scheme)} · {T("Palette_ImageCount", scheme.Images.Count)} · {T("Palette_ColorCount", scheme.Colors.Count)}", TextWrapping = TextWrapping.Wrap }); Grid.SetColumn(details, 1); row.Children.Add(details);
-            var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 }; var edit = new Button { Content = T("Palette_Edit"), Tag = scheme }; edit.Click += (sender, _) => OpenEditor((ColorPaletteScheme)((Button)sender).Tag); var delete = new Button { Content = T("Action_Delete"), Tag = scheme }; delete.Click += async (sender, _) => await DeleteAsync((ColorPaletteScheme)((Button)sender).Tag); actions.Children.Add(edit); actions.Children.Add(delete); Grid.SetColumn(actions, 2); row.Children.Add(actions);
-            card.Child = row; card.Tapped += (_, _) => OpenEditor(scheme); CardsPanel.Children.Add(card);
+            border.Child = row; card.Content = border; CardsPanel.Children.Add(card);
         }
     }
 
@@ -98,21 +100,48 @@ public sealed partial class ColorPaletteRecorderPage : Page
     private void OnAddColor(object sender, RoutedEventArgs e) { if (_editing is null) return; _editing.Colors.Add(new ColorPaletteColor { Hex = "#000000", SortOrder = _editing.Colors.Count }); _dirty = true; RenderColors(); }
     private void RenderColors()
     {
-        ColorsPanel.Children.Clear(); if (_editing is null) return;
+        ColorsPanel.Items.Clear(); if (_editing is null) return;
         foreach (var color in _editing.Colors.OrderBy(x => x.SortOrder))
         {
-            var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 }; var swatch = new Border { Width = 32, Height = 32, Background = new SolidColorBrush(ParseColor(color.Hex)) }; var picker = new ColorPicker { Color = ParseColor(color.Hex), Width = 180 }; var name = new TextBox { Text = color.Name ?? "", PlaceholderText = T("Palette_ColorName"), Width = 180 }; var hex = new TextBox { Text = color.Hex, Width = 120 }; var error = new TextBlock { Foreground = new SolidColorBrush(Colors.IndianRed), VerticalAlignment = VerticalAlignment.Center };
-            name.TextChanged += (_, _) => { color.Name = name.Text; _dirty = true; }; hex.TextChanged += (_, _) => { if (ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var value)) { color.Hex = value; swatch.Background = new SolidColorBrush(ParseColor(value)); error.Text = ""; _dirty = true; } else error.Text = T("Palette_InvalidHex"); };
-            picker.ColorChanged += (_, args) => { var value = $"#{args.NewColor.R:X2}{args.NewColor.G:X2}{args.NewColor.B:X2}"; color.Hex = value; hex.Text = value; swatch.Background = new SolidColorBrush(args.NewColor); error.Text = ""; _dirty = true; };
-            var remove = new Button { Content = T("Action_Delete") }; remove.Click += (_, _) => { _editing.Colors.Remove(color); _dirty = true; RenderColors(); }; row.Children.Add(swatch); row.Children.Add(picker); row.Children.Add(name); row.Children.Add(hex); row.Children.Add(error); row.Children.Add(remove); ColorsPanel.Children.Add(row);
+            var card = new Border { Width = 360, Padding = new Thickness(10), Margin = new Thickness(0, 0, 10, 10), CornerRadius = new CornerRadius(8), BorderThickness = new Thickness(1), BorderBrush = (Brush)Application.Current.Resources["CardStrokeColorDefaultBrush"] };
+            var row = new Grid(); row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(56) }); row.ColumnDefinitions.Add(new ColumnDefinition()); row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var edit = new Button { Background = new SolidColorBrush(ParseColor(color.Hex)), Width = 48, Height = 48, Tag = color }; edit.Click += async (sender, _) => await EditColorAsync((ColorPaletteColor)((Button)sender).Tag); Grid.SetColumn(edit, 0); row.Children.Add(edit);
+            var details = new StackPanel { Spacing = 2 }; details.Children.Add(new TextBlock { Text = string.IsNullOrWhiteSpace(color.Name) ? T("Palette_UnnamedColor") : color.Name, TextWrapping = TextWrapping.Wrap }); details.Children.Add(new TextBlock { Text = color.Hex }); details.Children.Add(new TextBlock { Text = RgbSummary(color.Hex) }); Grid.SetColumn(details, 1); row.Children.Add(details);
+            var actions = new StackPanel { Spacing = 4 }; var editAction = new Button { Content = T("Palette_EditColor"), Tag = color }; editAction.Click += async (sender, _) => await EditColorAsync((ColorPaletteColor)((Button)sender).Tag); var remove = new Button { Content = T("Action_Delete"), Tag = color }; remove.Click += (sender, _) => { _editing!.Colors.Remove((ColorPaletteColor)((Button)sender).Tag); _dirty = true; RenderColors(); }; actions.Children.Add(editAction); actions.Children.Add(remove); Grid.SetColumn(actions, 2); row.Children.Add(actions);
+            card.Child = row; ColorsPanel.Items.Add(card);
         }
     }
     private async void OnSave(object sender, RoutedEventArgs e) { if (_editing is null) return; _editing.Name = SchemeNameBox.Text.Trim(); _editing.UpdatedAtUtc = DateTimeOffset.UtcNow; foreach (var color in _editing.Colors) if (!ColorPaletteStorageService.TryNormalizeHex(color.Hex, out var hex)) { Show(EditorStatus, T("Palette_InvalidHex")); return; } else color.Hex = hex; var next = ColorPaletteStorageService.CloneDocument(_document); var index = next.Schemes.FindIndex(s => s.SchemeId == _editing.SchemeId); if (index < 0) next.Schemes.Add(ColorPaletteStorageService.CloneScheme(_editing)); else next.Schemes[index] = ColorPaletteStorageService.CloneScheme(_editing); var result = await _storage.SaveAsync(next); if (!result.Succeeded) { Show(EditorStatus, T("Palette_SaveFailed")); return; } foreach (var image in _pendingImageDeletes) _storage.DeleteManagedImage(image); _pendingImageDeletes.Clear(); _newImages.Clear(); _document = next; _isNew = false; _dirty = false; Show(EditorStatus, T("Palette_Saved")); RenderCards(); }
     private void OnReset(object sender, RoutedEventArgs e) { if (_editing is null) return; DiscardDraft(); var saved = _document.Schemes.FirstOrDefault(s => s.SchemeId == _editing.SchemeId); if (saved is null) OpenEditor(new ColorPaletteScheme { SchemeId = _editing.SchemeId, Name = T("Palette_NewScheme") }, true); else OpenEditor(saved); }
     private async Task DeleteAsync(ColorPaletteScheme scheme) { var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_DeleteTitle"), Content = T("Palette_DeleteMessage"), PrimaryButtonText = T("Action_Delete"), CloseButtonText = T("Action_Cancel") }; if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return; var next = ColorPaletteStorageService.CloneDocument(_document); next.Schemes.RemoveAll(s => s.SchemeId == scheme.SchemeId); var result = await _storage.SaveAsync(next); if (!result.Succeeded) { Show(ListStatus, T("Palette_SaveFailed")); return; } _storage.DeleteSchemeAttachments(scheme.SchemeId); _document = next; RenderCards(); }
+    private async void OnDeleteScheme(object sender, RoutedEventArgs e)
+    {
+        if (_editing is null) return;
+        if (_isNew) { DiscardDraft(); await ReturnToListAsync(); return; }
+        await DeleteAsync(_document.Schemes.First(scheme => scheme.SchemeId == _editing.SchemeId));
+        if (!_document.Schemes.Any(scheme => scheme.SchemeId == _editing.SchemeId)) await ReturnToListAsync();
+    }
+    private Task ReturnToListAsync() { _editing = null; _dirty = false; EditorPanel.Visibility = Visibility.Collapsed; ListPanel.Visibility = Visibility.Visible; RenderCards(); return Task.CompletedTask; }
+    private async Task EditColorAsync(ColorPaletteColor color)
+    {
+        var draft = new ColorPaletteColor { ColorId = color.ColorId, Name = color.Name, Hex = color.Hex, SortOrder = color.SortOrder };
+        var picker = new ColorPicker { Color = ParseColor(draft.Hex), Width = 280, Height = 280 };
+        var name = new TextBox { Header = T("Palette_ColorName"), Text = draft.Name ?? "" };
+        var hex = new TextBox { Header = "HEX", Text = draft.Hex };
+        var rgb = new TextBlock { Text = RgbSummary(draft.Hex) };
+        var error = new TextBlock { Foreground = new SolidColorBrush(Colors.IndianRed) };
+        var panel = new StackPanel { Spacing = 8 }; panel.Children.Add(picker); panel.Children.Add(name); panel.Children.Add(hex); panel.Children.Add(rgb); panel.Children.Add(error);
+        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_EditColor"), Content = new ScrollViewer { Content = panel, MaxHeight = 620 }, PrimaryButtonText = T("Palette_Save"), CloseButtonText = T("Action_Cancel") };
+        picker.ColorChanged += (_, args) => { draft.Hex = $"#{args.NewColor.R:X2}{args.NewColor.G:X2}{args.NewColor.B:X2}"; hex.Text = draft.Hex; rgb.Text = RgbSummary(draft.Hex); error.Text = ""; };
+        hex.TextChanged += (_, _) => { if (ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var normalized)) { draft.Hex = normalized; picker.Color = ParseColor(normalized); rgb.Text = RgbSummary(normalized); error.Text = ""; } else if (!string.IsNullOrWhiteSpace(hex.Text)) error.Text = T("Palette_InvalidHex"); };
+        if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
+        if (!ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var value)) { Show(EditorStatus, T("Palette_InvalidHex")); return; }
+        color.Name = name.Text.Trim(); color.Hex = value; _dirty = true; RenderColors();
+    }
     private async Task<bool> ConfirmDiscardAsync() { var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_UnsavedTitle"), Content = T("Palette_UnsavedMessage"), PrimaryButtonText = T("Action_Discard"), CloseButtonText = T("Action_Cancel") }; return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary; }
     private string CategoryName(ColorPaletteScheme scheme) => scheme.Category == ColorPaletteCategories.Custom ? scheme.CustomCategoryName ?? T("Palette_CategoryCustom") : CategoryBox.Items.OfType<Choice>().First(x => x.Id == scheme.Category).Name;
     private static Color ParseColor(string hex) => ColorPaletteStorageService.TryNormalizeHex(hex, out var normalized) ? ColorHelper.FromArgb(255, Convert.ToByte(normalized[1..3], 16), Convert.ToByte(normalized[3..5], 16), Convert.ToByte(normalized[5..7], 16)) : Colors.Gray;
+    private static string RgbSummary(string hex) { var color = ParseColor(hex); return $"RGB {color.R}, {color.G}, {color.B}"; }
     private Border CreateCardPreview(ColorPaletteScheme scheme)
     {
         var preview = new Border { Width = 88, Height = 68, Background = new SolidColorBrush(ParseColor(scheme.Colors.FirstOrDefault()?.Hex ?? "#808080")), CornerRadius = new CornerRadius(6), Margin = new Thickness(0, 0, 12, 0) };
