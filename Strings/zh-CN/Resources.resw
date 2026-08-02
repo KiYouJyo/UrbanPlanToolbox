@@ -779,7 +779,7 @@ dwyblchhq</value>
     <comment>体积单位名称。</comment>
   </data>
   <data name="About_Description.Text" xml:space="preserve">
-    <value>用于本地快速估算城市规划指标与单位比例尺；输入数据不会上传。</value>
+    <value>面向建筑、城乡规划、设计与研究的离线工具箱：支持项目与归档、工具搜索与收藏、规划指标计算、单位与比例尺换算、配色记录、流程审核、法规索引和设计理念词典；项目与工具数据优先保存在本机，并支持安全备份、导入导出和本地时间节点提醒。</value>
     <comment>关于页说明。</comment>
   </data>
   <data name="About_Technology.Text" xml:space="preserve">

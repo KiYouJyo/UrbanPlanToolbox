@@ -776,7 +776,7 @@ conversion</value>
     <comment>Volume unit name.</comment>
   </data>
   <data name="About_Description.Text" xml:space="preserve">
-    <value>Quickly estimate urban planning metrics and unit/scale conversions locally; input data is never uploaded.</value>
+    <value>An offline toolbox for architecture, urban and regional planning, design, and research. It supports projects and archives, tool search and favorites, planning metrics, unit and scale conversion, palette recording, workflow review, a regulations index, and a design-concept dictionary. Project and tool data is kept primarily on this device, with secure backup, import/export, and local milestone reminders.</value>
     <comment>About page description.</comment>
   </data>
   <data name="About_Technology.Text" xml:space="preserve">

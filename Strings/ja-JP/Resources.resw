@@ -773,7 +773,7 @@
     <comment>体積の単位名。</comment>
   </data>
   <data name="About_Description.Text" xml:space="preserve">
-    <value>都市計画指標と単位・縮尺をローカルですばやく概算します。入力データはアップロードされません。</value>
+    <value>建築、都市・地域計画、設計、研究のためのオフラインツールボックスです。プロジェクトとアーカイブ、ツール検索とお気に入り、計画指標計算、単位・縮尺変換、配色記録、ワークフロー確認、法規インデックス、設計理念辞書に対応し、プロジェクトとツールデータは主に本機へ保存します。安全なバックアップ、インポート・エクスポート、ローカルの予定通知も利用できます。</value>
     <comment>このアプリについての説明。</comment>
   </data>
   <data name="About_Technology.Text" xml:space="preserve">
