@@ -1,6 +1,8 @@
 # 规划工具箱（UrbanPlan Toolbox）
 
-> 当前版本：`v0.4.3`（MSIX `0.4.3.0`）。面向 Windows 的城市规划辅助工具箱，项目、设置与规划输入均在本地处理。
+> 当前版本：`v0.5.0 Preview`（MSIX `0.5.0.0`）。面向 Windows 的城市规划辅助工具箱，项目、设置与规划输入均在本地处理。
+
+v0.5.0 continues the offline-first, non-account product direction. See [PRIVACY.md](PRIVACY.md), [SUPPORT.md](SUPPORT.md), and [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for offline-readable product information.
 
 > 已知限制：在部分冷启动环境中，原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响已验收功能，将在后续版本单独处理。
 

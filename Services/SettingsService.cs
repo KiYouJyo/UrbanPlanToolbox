@@ -15,7 +15,20 @@ public sealed class SettingsService
         catch (IOException) { return new AppSettings(); }
         catch (UnauthorizedAccessException) { return new AppSettings(); }
     }
-    public void Save(AppSettings settings) { Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!); File.WriteAllText(_filePath, JsonSerializer.Serialize(settings)); SettingsChanged?.Invoke(this, settings); }
+    public void Save(AppSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        settings.SchemaVersion = 1;
+        Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!);
+        var temporary = $"{_filePath}.{Guid.NewGuid():N}.tmp";
+        try
+        {
+            File.WriteAllText(temporary, JsonSerializer.Serialize(settings));
+            File.Move(temporary, _filePath, overwrite: true);
+            SettingsChanged?.Invoke(this, settings);
+        }
+        finally { if (File.Exists(temporary)) File.Delete(temporary); }
+    }
     public AppSettings Update(Action<AppSettings> update)
     {
         ArgumentNullException.ThrowIfNull(update);

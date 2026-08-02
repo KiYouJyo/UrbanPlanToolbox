@@ -14,7 +14,7 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 
 ## MSIX
 
-在 Visual Studio 中选择 `Release|x64`，使用“发布 -> 创建应用包”。当前显示版本为 `0.4.3`，MSIX 版本为 `0.4.3.0`；每次发布都须同步更新项目、清单、关于页、README 和 CHANGELOG。
+在 Visual Studio 中选择 `Release|x64`，使用“发布 -> 创建应用包”。v0.5.0 的显示版本为 `0.5.0 Preview`，MSIX 版本为 `0.5.0.0`；每次发布都须同步更新项目、清单、关于页、README 和 CHANGELOG。正式发布仍需单独授权。
 
 当前 CI/本地构建生成的是**未签名测试 MSIX**。它不能直接作为可安装发布包分发；v0.1.1 的自签名候选包须从合并后的准确提交或标签重新构建，不能复用人工验收样品。
 

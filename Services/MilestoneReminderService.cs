@@ -74,6 +74,17 @@ public sealed class MilestoneReminderService
         }
     }
 
+    public void ClearOwnedSchedules()
+    {
+        try
+        {
+            EnsureRegistered();
+            var notifier = ToastNotificationManager.CreateToastNotifier();
+            foreach (var scheduled in notifier.GetScheduledToastNotifications().Where(IsOwnedSchedule).ToArray()) notifier.RemoveFromSchedule(scheduled);
+        }
+        catch (Exception exception) when (OperatingSystem.IsWindows()) { System.Diagnostics.Debug.WriteLine($"Clearing reminders failed: {exception}"); }
+    }
+
     private AppNotification BuildNotification(MilestoneReminder reminder)
     {
         var due = reminder.HasExplicitTime
