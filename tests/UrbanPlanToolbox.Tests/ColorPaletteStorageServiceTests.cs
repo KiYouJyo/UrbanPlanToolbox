@@ -101,6 +101,23 @@ public sealed class ColorPaletteStorageServiceTests : IDisposable
         Assert.True(File.Exists(fresh.ResolveManagedImagePath(image.RelativePath)));
     }
 
+    [Fact]
+    public async Task MultipleColorsHaveIndependentIdsAndPersistDifferentHexValues()
+    {
+        var scheme = new ColorPaletteScheme { Name = "Three colors", Category = ColorPaletteCategories.Mixed };
+        scheme.Colors.Add(new ColorPaletteColor { Hex = "#112233", SortOrder = 0 });
+        scheme.Colors.Add(new ColorPaletteColor { Hex = "#445566", SortOrder = 1 });
+        scheme.Colors.Add(new ColorPaletteColor { Hex = "#778899", SortOrder = 2 });
+        Assert.True((await _service.SaveAsync(new ColorPaletteDocument { Schemes = [scheme] })).Succeeded);
+
+        var restored = Assert.Single((await _service.ReadAsync()).Value!.Schemes).Colors.OrderBy(color => color.SortOrder).ToArray();
+        Assert.Equal(3, restored.Select(color => color.ColorId).Distinct().Count());
+        Assert.Equal(["#112233", "#445566", "#778899"], restored.Select(color => color.Hex));
+        restored[1].Hex = "#AABBCC";
+        Assert.Equal("#112233", restored[0].Hex);
+        Assert.Equal("#778899", restored[2].Hex);
+    }
+
     [Theory]
     [InlineData("../escape.png")]
     [InlineData("C:/escape.png")]

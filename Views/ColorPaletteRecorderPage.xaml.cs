@@ -22,6 +22,7 @@ public sealed partial class ColorPaletteRecorderPage : Page
     private readonly List<ColorPaletteImage> _pendingImageDeletes = [];
     private readonly List<ColorPaletteImage> _newImages = [];
     private bool _dirty;
+    private bool _initializingEditor;
 
     public ColorPaletteRecorderPage()
     {
@@ -54,7 +55,7 @@ public sealed partial class ColorPaletteRecorderPage : Page
         if (schemes.Length == 0) { CardsPanel.Children.Add(new TextBlock { Text = T("Palette_Empty"), TextWrapping = TextWrapping.Wrap }); return; }
         foreach (var scheme in schemes)
         {
-            var card = new Button { HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch, Tag = scheme };
+            var card = new Button { HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch, Tag = scheme, Background = new SolidColorBrush(Colors.Transparent), BorderBrush = new SolidColorBrush(Colors.Transparent), BorderThickness = new Thickness(0), Padding = new Thickness(0) };
             card.Click += (sender, _) => OpenEditor((ColorPaletteScheme)((Button)sender).Tag);
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(card, scheme.Name);
             var border = new Border { Padding = new Thickness(14), CornerRadius = new CornerRadius(8), BorderThickness = new Thickness(1), BorderBrush = (Brush)Application.Current.Resources["CardStrokeColorDefaultBrush"] };
@@ -70,16 +71,17 @@ public sealed partial class ColorPaletteRecorderPage : Page
     private void OnNew(object sender, RoutedEventArgs e) { OpenEditor(new ColorPaletteScheme { Name = T("Palette_NewScheme") }, true); }
     private void OpenEditor(ColorPaletteScheme scheme, bool isNew = false)
     {
+        _initializingEditor = true;
         _editing = ColorPaletteStorageService.CloneScheme(scheme); _isNew = isNew; _pendingImageDeletes.Clear(); _newImages.Clear(); _dirty = false; EditorStatus.IsOpen = false; ListPanel.Visibility = Visibility.Collapsed; EditorPanel.Visibility = Visibility.Visible; EditorTitle.Text = scheme.Name; SchemeNameBox.Header = T("Palette_Name"); SchemeNameBox.Text = scheme.Name; CustomCategoryBox.Header = T("Palette_CustomCategory");
-        CategoryBox.SelectedItem = CategoryBox.Items.OfType<Choice>().First(x => x.Id == scheme.Category); CustomCategoryBox.Text = scheme.CustomCategoryName ?? ""; RenderImages(); RenderColors();
+        CategoryBox.SelectedItem = CategoryBox.Items.OfType<Choice>().First(x => x.Id == scheme.Category); CustomCategoryBox.Text = scheme.CustomCategoryName ?? ""; RenderImages(); RenderColors(); _initializingEditor = false; _dirty = false;
     }
     private async void OnBack(object sender, RoutedEventArgs e)
     {
         if (_dirty && !await ConfirmDiscardAsync()) return;
         DiscardDraft(); _editing = null; _dirty = false; EditorPanel.Visibility = Visibility.Collapsed; ListPanel.Visibility = Visibility.Visible; RenderCards();
     }
-    private void OnChanged(object sender, TextChangedEventArgs e) { if (_editing is null) return; _editing.Name = SchemeNameBox.Text.Trim(); _editing.CustomCategoryName = CustomCategoryBox.Text.Trim(); _dirty = true; }
-    private void OnCategoryChanged(object sender, SelectionChangedEventArgs e) { if (_editing is null || CategoryBox.SelectedItem is not Choice choice) return; _editing.Category = choice.Id; CustomCategoryBox.Visibility = choice.Id == ColorPaletteCategories.Custom ? Visibility.Visible : Visibility.Collapsed; _dirty = true; }
+    private void OnChanged(object sender, TextChangedEventArgs e) { if (_initializingEditor || _editing is null) return; _editing.Name = SchemeNameBox.Text.Trim(); _editing.CustomCategoryName = CustomCategoryBox.Text.Trim(); _dirty = true; }
+    private void OnCategoryChanged(object sender, SelectionChangedEventArgs e) { if (_editing is null || CategoryBox.SelectedItem is not Choice choice) return; _editing.Category = choice.Id; CustomCategoryBox.Visibility = choice.Id == ColorPaletteCategories.Custom ? Visibility.Visible : Visibility.Collapsed; if (!_initializingEditor) _dirty = true; }
     private async void OnAddImages(object sender, RoutedEventArgs e)
     {
         if (_editing is null || App.MainWindow is null) return;
@@ -132,10 +134,11 @@ public sealed partial class ColorPaletteRecorderPage : Page
         var error = new TextBlock { Foreground = new SolidColorBrush(Colors.IndianRed) };
         var panel = new StackPanel { Spacing = 8 }; panel.Children.Add(picker); panel.Children.Add(name); panel.Children.Add(hex); panel.Children.Add(rgb); panel.Children.Add(error);
         var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_EditColor"), Content = new ScrollViewer { Content = panel, MaxHeight = 620 }, PrimaryButtonText = T("Palette_Save"), CloseButtonText = T("Action_Cancel") };
-        picker.ColorChanged += (_, args) => { draft.Hex = $"#{args.NewColor.R:X2}{args.NewColor.G:X2}{args.NewColor.B:X2}"; hex.Text = draft.Hex; rgb.Text = RgbSummary(draft.Hex); error.Text = ""; };
-        hex.TextChanged += (_, _) => { if (ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var normalized)) { draft.Hex = normalized; picker.Color = ParseColor(normalized); rgb.Text = RgbSummary(normalized); error.Text = ""; } else if (!string.IsNullOrWhiteSpace(hex.Text)) error.Text = T("Palette_InvalidHex"); };
+        var synchronizing = false;
+        picker.ColorChanged += (_, args) => { if (synchronizing) return; synchronizing = true; draft.Hex = $"#{args.NewColor.R:X2}{args.NewColor.G:X2}{args.NewColor.B:X2}"; hex.Text = draft.Hex; rgb.Text = RgbSummary(draft.Hex); error.Text = ""; synchronizing = false; };
+        hex.TextChanged += (_, _) => { if (synchronizing) return; if (ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var normalized)) { synchronizing = true; draft.Hex = normalized; picker.Color = ParseColor(normalized); rgb.Text = RgbSummary(normalized); error.Text = ""; synchronizing = false; } else if (!string.IsNullOrWhiteSpace(hex.Text)) error.Text = T("Palette_InvalidHex"); };
         if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
-        if (!ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var value)) { Show(EditorStatus, T("Palette_InvalidHex")); return; }
+        if (!ColorPaletteStorageService.TryNormalizeHex(draft.Hex, out var value)) { Show(EditorStatus, T("Palette_InvalidHex")); return; }
         color.Name = name.Text.Trim(); color.Hex = value; _dirty = true; RenderColors();
     }
     private async Task<bool> ConfirmDiscardAsync() { var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_UnsavedTitle"), Content = T("Palette_UnsavedMessage"), PrimaryButtonText = T("Action_Discard"), CloseButtonText = T("Action_Cancel") }; return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary; }
