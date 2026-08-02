@@ -60,6 +60,7 @@ public sealed class RegulationsIndexTests
         Assert.Contains("<ListView x:Name=\"EntriesList\"", xaml);
         Assert.Contains("<ListView.ItemTemplate>", xaml);
         Assert.Contains("IsTabStop\" Value=\"False\"", xaml);
+        Assert.Contains("UseSystemFocusVisuals\" Value=\"False\"", xaml);
         Assert.Contains("TextWrapping=\"Wrap\"", xaml);
         Assert.Contains("<ListView x:Name=\"PortalsList\"", xaml);
         foreach (var language in new[] { "zh-CN", "ja-JP", "en-US" })
