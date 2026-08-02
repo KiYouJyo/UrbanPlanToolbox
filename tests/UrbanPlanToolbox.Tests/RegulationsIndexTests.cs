@@ -63,8 +63,9 @@ public sealed class RegulationsIndexTests
         Assert.Contains("UseSystemFocusVisuals\" Value=\"False\"", xaml);
         Assert.Contains("FocusVisualMargin=\"0\"", xaml);
         Assert.Contains("FocusVisualSecondaryThickness=\"0\"", xaml);
-        Assert.Contains("Property=\"CornerRadius\" Value=\"{StaticResource CardCornerRadius}\"", xaml);
+        Assert.Contains("CornerRadius=\"{StaticResource CardFocusCornerRadius}\"", xaml);
         Assert.Contains("CornerRadius=\"{StaticResource CardCornerRadius}\"", xaml);
+        Assert.Contains("CardFocusCornerRadius", xaml);
         Assert.Contains("TextWrapping=\"Wrap\"", xaml);
         Assert.Contains("<ListView x:Name=\"PortalsList\"", xaml);
         foreach (var language in new[] { "zh-CN", "ja-JP", "en-US" })
