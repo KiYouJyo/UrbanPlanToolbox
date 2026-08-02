@@ -19,16 +19,12 @@ public sealed partial class RegulationsIndexPage : Page
         InitializeComponent();
         TitleText.Text = T("Tool_RegulationsIndex_Name");
         DescriptionText.Text = T("Tool_RegulationsIndex_Description");
-        FavoriteButton.Content = T("Regulations_Favorite");
-        FavoriteButton.Click += OnFavoriteClick;
         SearchBox.PlaceholderText = T("Regulations_SearchPlaceholder");
         Loaded += OnLoaded;
     }
 
     private string T(string key) => _localization.GetString(key);
     private string T(string key, params object[] args) => string.Format(_localization.GetString(key), args);
-    private void OnFavoriteClick(object sender, RoutedEventArgs e) => FavoriteToolsService.Default.Toggle(ToolIds.RegulationsIndex);
-
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         if (_loaded) return;

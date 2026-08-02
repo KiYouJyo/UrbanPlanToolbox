@@ -23,7 +23,6 @@ public sealed partial class UnitScaleConverterPage : Page
         InitializeComponent();
         _unitService = new UnitConversionService(_localization);
         _scaleService = new ScaleConversionService(_localization);
-        FavoriteButton.ToolId = ToolIds.UnitScaleConverter;
         TitleText.Text = _localization.GetString("Tool_UnitScaleConverter_Name");
         ForwardDenominatorBox.Header = _localization.GetString("Field_ScaleDenominator");
         DrawingLengthBox.Header = _localization.GetString("Field_DrawingLength");

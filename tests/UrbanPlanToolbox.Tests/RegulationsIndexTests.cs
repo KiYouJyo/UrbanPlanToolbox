@@ -59,6 +59,7 @@ public sealed class RegulationsIndexTests
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "RegulationsIndexPage.xaml"));
         Assert.Contains("<ListView x:Name=\"EntriesList\"", xaml);
         Assert.Contains("<ListView.ItemTemplate>", xaml);
+        Assert.Contains("IsTabStop\" Value=\"False\"", xaml);
         Assert.Contains("TextWrapping=\"Wrap\"", xaml);
         Assert.Contains("<ListView x:Name=\"PortalsList\"", xaml);
         foreach (var language in new[] { "zh-CN", "ja-JP", "en-US" })
@@ -67,6 +68,25 @@ public sealed class RegulationsIndexTests
             Assert.Contains("Regulations_OpenOfficial", resources);
             Assert.Contains("Regulations_OpenFailed", resources);
         }
+    }
+
+    [Fact]
+    public void ToolPagesDoNotDuplicatePageLevelFavorites()
+    {
+        var root = FindRepositoryRoot();
+        foreach (var page in new[]
+        {
+            "Views/RegulationsIndexPage.xaml",
+            "Views/PlanningCalculatorPage.xaml",
+            "Views/UnitScaleConverterPage.xaml"
+        })
+        {
+            var xaml = File.ReadAllText(Path.Combine(root, page));
+            Assert.DoesNotContain("FavoriteButton", xaml);
+        }
+
+        var toolCards = File.ReadAllText(Path.Combine(root, "Controls", "ToolCardsView.xaml"));
+        Assert.Contains("FavoriteButton", toolCards);
     }
 
     private static string FindRepositoryRoot()
