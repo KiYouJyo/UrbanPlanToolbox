@@ -10,7 +10,7 @@
       <ListView x:Name="EntriesList" IsItemClickEnabled="True" ItemClick="OnEntryClick" SelectionMode="None" MaxHeight="560" HorizontalContentAlignment="Stretch">
         <ListView.ItemContainerStyle><Style TargetType="ListViewItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0"/><Setter Property="IsTabStop" Value="False"/><Setter Property="UseSystemFocusVisuals" Value="False"/><Setter Property="FocusVisualPrimaryBrush" Value="Transparent"/><Setter Property="FocusVisualSecondaryBrush" Value="Transparent"/></Style></ListView.ItemContainerStyle>
         <ListView.ItemTemplate><DataTemplate>
-          <Button Tag="{Binding}" Click="OnRegulationButtonClick" Style="{StaticResource CardActionButtonStyle}" Margin="0,0,0,8" Padding="{StaticResource CardContentPadding}" AutomationProperties.Name="{Binding AutomationName}">
+          <Button Tag="{Binding}" Click="OnRegulationButtonClick" Style="{StaticResource CardActionButtonStyle}" Margin="0,0,0,8" Padding="{StaticResource CardContentPadding}" FocusVisualMargin="0" FocusVisualPrimaryThickness="1" FocusVisualSecondaryThickness="0" AutomationProperties.Name="{Binding AutomationName}">
             <StackPanel Spacing="8" HorizontalAlignment="Stretch">
               <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap"/>
               <TextBlock Text="{Binding Metadata}" FontSize="13" Opacity="0.75" TextWrapping="Wrap"/>
