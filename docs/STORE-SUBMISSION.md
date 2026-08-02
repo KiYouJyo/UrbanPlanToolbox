@@ -21,3 +21,5 @@
 应用保留 `runFullTrust`，因为 WinUI 3 桌面应用需要以桌面进程身份启动，并使用 Windows App SDK 的桌面运行时、系统通知 COM 激活和本地文件/用户数据能力。应用不以此能力执行后台常驻、服务安装、驱动安装或远程代码加载；用户数据和规划输入仍在本机处理。
 
 正式提交前应在 Partner Center 完成身份确认、公开隐私政策 URL、Store 元数据和 WACK。当前仓库未发现可供提交的公共 HTTPS 隐私政策 URL；这是当前 Partner Center 提交阻断项，不能用仓库内离线 `PRIVACY.md` 冒充公开 URL。当前仓库仅生成 Store 候选包，不代表已经上传或提交 Microsoft Store。
+
+可选的 Partner Center 粘贴文本位于 `docs/store/PRIVACY-PARTNER-CENTER.md`。如果选择公开页面，静态源码位于 `docs/privacy/index.html` 和 `docs/support/index.html`；GitHub Pages 尚未启用，部署时应选择仓库分支中的静态文件源，并在部署后用实际 HTTPS 地址更新 Partner Center，不能预先使用猜测的 URL。
