@@ -137,7 +137,17 @@ public sealed partial class ColorPaletteRecorderPage : Page
     {
         if (_editing is null) return;
         var draft = ColorPaletteStorageService.CreateColorEditorDraft(color);
-        var picker = new ColorPicker { Color = ParseColor(draft.Hex), Width = 280, Height = 280 };
+        // ColorPicker owns a spectrum, brightness slider, and channel editors. A fixed 280px
+        // height clips that template and leaves the spectrum non-interactive on WinUI 3.
+        var picker = new ColorPicker
+        {
+            Color = ParseColor(draft.Hex),
+            Width = 340,
+            IsAlphaEnabled = false,
+            IsColorPreviewVisible = true,
+            IsColorChannelTextInputVisible = true,
+            IsHexInputVisible = true
+        };
         var name = new TextBox { Header = T("Palette_ColorName"), Text = draft.Name ?? "" };
         var hex = new TextBox { Header = "HEX", Text = draft.Hex };
         var rgb = new TextBlock { Text = RgbSummary(draft.Hex) };
