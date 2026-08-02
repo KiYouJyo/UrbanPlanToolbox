@@ -27,6 +27,18 @@ public sealed class RegulationsIndexTests
         Assert.Contains(tool.GetPlacements(), placement => placement.PrimaryCategory == ToolPrimaryCategory.Research && placement.SecondaryCategory == ToolSecondaryCategory.ResearchPreparation);
     }
 
+    [Theory]
+    [InlineData("https://example.com", true)]
+    [InlineData(" http://example.com/path ", true)]
+    [InlineData("file:///C:/secret.txt", false)]
+    [InlineData("javascript:alert(1)", false)]
+    [InlineData("not a uri", false)]
+    public void ExternalLinksOnlyAllowTrimmedHttpAndHttps(string value, bool expected)
+    {
+        Assert.Equal(expected, ExternalLinkService.IsSafeHttpUri(value, out var uri));
+        if (expected) Assert.NotNull(uri); else Assert.Null(uri);
+    }
+
     [Fact]
     public void PackagedJsonSnapshotDeserializesAndPassesRuntimeValidation()
     {
@@ -38,6 +50,30 @@ public sealed class RegulationsIndexTests
         Assert.Equal(1, data.DataVersion);
         Assert.Equal(221, data.Entries.Count);
         Assert.Equal(20, data.OfficialPortals.Count);
+    }
+
+    [Fact]
+    public void RegulationsPageUsesVirtualizedListTemplatesAndTriLanguageLinkResources()
+    {
+        var root = FindRepositoryRoot();
+        var xaml = File.ReadAllText(Path.Combine(root, "Views", "RegulationsIndexPage.xaml"));
+        Assert.Contains("<ListView x:Name=\"EntriesList\"", xaml);
+        Assert.Contains("<ListView.ItemTemplate>", xaml);
+        Assert.Contains("TextWrapping=\"Wrap\"", xaml);
+        Assert.Contains("<ListView x:Name=\"PortalsList\"", xaml);
+        foreach (var language in new[] { "zh-CN", "ja-JP", "en-US" })
+        {
+            var resources = File.ReadAllText(Path.Combine(root, "Strings", language, "Resources.resw"));
+            Assert.Contains("Regulations_OpenOfficial", resources);
+            Assert.Contains("Regulations_OpenFailed", resources);
+        }
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && (!File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.csproj")) || !Directory.Exists(Path.Combine(directory.FullName, "Views")))) directory = directory.Parent;
+        return directory?.FullName ?? throw new DirectoryNotFoundException("Repository root not found.");
     }
 
     private static RegulationsIndexDocument CreateData() => new()

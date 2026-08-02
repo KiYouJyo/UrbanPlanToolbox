@@ -52,6 +52,7 @@
   <Compile Include="../../Models/Tools/ToolIds.cs" Link="Models/Tools/ToolIds.cs" />
   <Compile Include="../../Models/RegulationsIndexModels.cs" Link="Models/RegulationsIndexModels.cs" />
   <Compile Include="../../Services/RegulationsIndexService.cs" Link="Services/RegulationsIndexService.cs" />
+  <Compile Include="../../Services/ExternalLinkService.cs" Link="Services/ExternalLinkService.cs" />
   <Compile Include="../../Services/ToolRegistry.cs" Link="Services/ToolRegistry.cs" />
   <Compile Include="../../Services/ToolSearchService.cs" Link="Services/ToolSearchService.cs" />
   <Compile Include="../../Services/FavoriteToolsService.cs" Link="Services/FavoriteToolsService.cs" />
