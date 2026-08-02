@@ -8,6 +8,10 @@ public sealed class RegulationsIndexService
     public const int RegulationsIndexDataVersion = 1;
     public const string DataFileName = "regulations-index.v1.json";
     private readonly RegulationsIndexDocument _data;
+    private static readonly JsonSerializerOptions IndexJsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public RegulationsIndexService(RegulationsIndexDocument data)
     {
@@ -18,9 +22,12 @@ public sealed class RegulationsIndexService
     public static RegulationsIndexService LoadPackaged()
     {
         var path = Path.Combine(AppContext.BaseDirectory, "Assets", "Data", "RegulationsIndex", DataFileName);
-        return new(JsonSerializer.Deserialize<RegulationsIndexDocument>(File.ReadAllText(path), DataStorageJson.Options)
-            ?? throw new InvalidDataException("Regulations index JSON is empty."));
+        return new(Deserialize(File.ReadAllText(path)));
     }
+
+    public static RegulationsIndexDocument Deserialize(string json) =>
+        JsonSerializer.Deserialize<RegulationsIndexDocument>(json, IndexJsonOptions)
+        ?? throw new InvalidDataException("Regulations index JSON is empty.");
 
     public RegulationsIndexDocument Data => _data;
 

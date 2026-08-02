@@ -27,6 +27,19 @@ public sealed class RegulationsIndexTests
         Assert.Contains(tool.GetPlacements(), placement => placement.PrimaryCategory == ToolPrimaryCategory.Research && placement.SecondaryCategory == ToolSecondaryCategory.ResearchPreparation);
     }
 
+    [Fact]
+    public void PackagedJsonSnapshotDeserializesAndPassesRuntimeValidation()
+    {
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root is not null && !Directory.Exists(Path.Combine(root.FullName, "Assets", "Data", "RegulationsIndex"))) root = root.Parent;
+        var path = Path.Combine(root?.FullName ?? string.Empty, "Assets", "Data", "RegulationsIndex", RegulationsIndexService.DataFileName);
+        Assert.True(File.Exists(path), path);
+        var data = RegulationsIndexService.Deserialize(File.ReadAllText(path));
+        Assert.Equal(1, data.DataVersion);
+        Assert.Equal(221, data.Entries.Count);
+        Assert.Equal(20, data.OfficialPortals.Count);
+    }
+
     private static RegulationsIndexDocument CreateData() => new()
     {
         DataVersion = 1,
