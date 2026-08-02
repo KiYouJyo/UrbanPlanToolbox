@@ -13,7 +13,8 @@ public sealed class ToolRegistryTests
             ToolRegistry.Default.All,
             tool => Assert.Equal(ToolIds.PlanningIndicatorCalculator, tool.Id),
             tool => Assert.Equal(ToolIds.UnitScaleConverter, tool.Id),
-            tool => Assert.Equal(ToolIds.ColorPaletteRecorder, tool.Id));
+            tool => Assert.Equal(ToolIds.ColorPaletteRecorder, tool.Id),
+            tool => Assert.Equal(ToolIds.WorkflowReviewChecklist, tool.Id));
         Assert.All(ToolRegistry.Default.All, tool => Assert.True(tool.IsAvailable));
     }
 
@@ -86,12 +87,12 @@ public sealed class ToolRegistryTests
     [Fact]
     public void CategoryFiltersReturnMatchingTools()
     {
-        Assert.Equal(3, ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Design).Count);
-        Assert.Empty(ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Research));
+        Assert.Equal(4, ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Design).Count);
+        Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist], ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Research).Select(tool => tool.Id));
         Assert.Equal(
-            [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder],
+            [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist],
             ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Design).Select(tool => tool.Id));
-        Assert.Empty(ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Research));
+        Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist], ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Research).Select(tool => tool.Id));
         Assert.Equal(
             ToolIds.PlanningIndicatorCalculator,
             Assert.Single(ToolRegistry.Default.GetBySecondaryCategory(ToolSecondaryCategory.MasterPlanning)).Id);
@@ -136,19 +137,20 @@ public sealed class ToolRegistryTests
         Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder], ToolRegistry.Default.GetAvailableByCategories(
                 ToolPrimaryCategory.Design, ToolSecondaryCategory.DetailedDesign).Select(tool => tool.Id));
 
-        Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis));
+        Assert.Equal(ToolIds.WorkflowReviewChecklist, Assert.Single(ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis)).Id);
         Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.FieldResearch));
         Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.DesignDevelopment));
     }
 
     [Fact]
-    public void ResearchCategoriesCurrentlyContainNoAvailableTools()
+    public void ResearchCategoriesExposeSharedToolsWithoutDuplicatingStableIds()
     {
         foreach (var category in ToolCategoryCatalog.Research)
         {
-            Assert.Empty(ToolRegistry.Default.GetAvailableByCategories(
-                ToolPrimaryCategory.Research,
-                category.SecondaryCategory));
+            var tools = ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Research, category.SecondaryCategory);
+            if (category.SecondaryCategory == ToolSecondaryCategory.ResearchPreparation)
+                Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist], tools.Select(tool => tool.Id));
+            else Assert.Empty(tools);
         }
     }
 

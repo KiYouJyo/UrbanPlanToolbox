@@ -9,3 +9,4 @@ public sealed class DesignToolsPage;
 public sealed class ResearchToolsPage;
 public sealed class ProjectArchivePage;
 public sealed class AboutPage;
+public sealed class WorkflowReviewChecklistPage;

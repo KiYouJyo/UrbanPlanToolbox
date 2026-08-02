@@ -5,4 +5,5 @@ public static class ToolIds
     public const string PlanningIndicatorCalculator = "planning-indicator-calculator";
     public const string UnitScaleConverter = "unit-scale-converter";
     public const string ColorPaletteRecorder = "color-palette-recorder";
+    public const string WorkflowReviewChecklist = "workflow-review-checklist";
 }

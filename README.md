@@ -50,6 +50,14 @@
 
 该自签名包用于测试预览，不是正式受信任代码签名；完整构建、测试与打包说明见 [docs/RELEASE.md](docs/RELEASE.md) 与 [packaging/README.md](packaging/README.md)。
 
+## v0.4.1 流程审核清单
+
+- 新增 `workflow-review-checklist`，同一个 Stable ID 同时出现在设计工具→前期分析与科研工具→前期工具。
+- 两个入口共享同一离线页面和 `data/tools/workflow-review-checklist/checklists.json` 数据；搜索与收藏只产生一个工具记录。
+- 支持清单、流程阶段、审核项、四种审核状态、重点项、备注、筛选、统计、复制、排序和导入导出兼容。
+- 使用独立 `WorkflowReviewChecklistSchemaVersion = 1`，不改变 `ProjectSchemaVersion` 或 `BackupFormatVersion = 1`。
+- 当前仍为预览版本；Splash 后短暂黑色窗口属于既有已知限制。
+
 ## 技术与系统要求
 
 C#、.NET 10、WinUI 3、Windows App SDK 和单项目 MSIX。支持 Windows 10 17763+，优先 Windows 11 x64。开发需要 Visual Studio 2026 的 WinUI 工作负载、Windows SDK 10.0.26100.0 和 .NET SDK 10。

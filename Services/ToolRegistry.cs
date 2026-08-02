@@ -48,6 +48,29 @@ public sealed class ToolRegistry
             "sekafanganjiluyiqi",
             "S",
             "Tool_ColorPaletteRecorder_Keywords")
+        {
+            CategoryPlacements = [
+                new(ToolPrimaryCategory.Design, ToolSecondaryCategory.DetailedDesign, 30),
+                new(ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 30)]
+        },
+        new(
+            ToolIds.WorkflowReviewChecklist,
+            "Tool_WorkflowReviewChecklist_Name",
+            "Tool_WorkflowReviewChecklist_Description",
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.PreliminaryAnalysis,
+            "\uE8FD",
+            typeof(Views.WorkflowReviewChecklistPage),
+            40,
+            true,
+            "liuchengshenheqingdan",
+            "L",
+            "Tool_WorkflowReviewChecklist_Keywords")
+        {
+            CategoryPlacements = [
+                new(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis, 40),
+                new(ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 40)]
+        }
     ]);
 
     public ToolRegistry(IEnumerable<ToolDefinition> tools)
@@ -101,20 +124,19 @@ public sealed class ToolRegistry
     }
 
     public IReadOnlyList<ToolDefinition> GetByPrimaryCategory(ToolPrimaryCategory category) =>
-        All.Where(tool => tool.PrimaryCategory == category).ToArray();
+        All.Where(tool => tool.GetPlacements().Any(placement => placement.PrimaryCategory == category)).ToArray();
 
     public IReadOnlyList<ToolDefinition> GetAvailableByPrimaryCategory(ToolPrimaryCategory category) =>
-        All.Where(tool => tool.PrimaryCategory == category && tool.IsAvailable).ToArray();
+        All.Where(tool => tool.IsAvailable && tool.GetPlacements().Any(placement => placement.PrimaryCategory == category)).ToArray();
 
     public IReadOnlyList<ToolDefinition> GetBySecondaryCategory(ToolSecondaryCategory category) =>
-        All.Where(tool => tool.SecondaryCategory == category).ToArray();
+        All.Where(tool => tool.GetPlacements().Any(placement => placement.SecondaryCategory == category)).ToArray();
 
     public IReadOnlyList<ToolDefinition> GetAvailableByCategories(
         ToolPrimaryCategory primaryCategory,
         ToolSecondaryCategory secondaryCategory) =>
-        All.Where(tool =>
-                tool.PrimaryCategory == primaryCategory &&
-                tool.SecondaryCategory == secondaryCategory &&
-                tool.IsAvailable)
+        All.Where(tool => tool.IsAvailable && tool.GetPlacements().Any(placement =>
+                placement.PrimaryCategory == primaryCategory &&
+                placement.SecondaryCategory == secondaryCategory))
             .ToArray();
 }

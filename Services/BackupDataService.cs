@@ -232,6 +232,19 @@ public sealed class BackupDataService
 
     private static async Task<BackupInspection?> ValidateToolDataAsync(IReadOnlyDictionary<string, ZipArchiveEntry> entries, CancellationToken cancellationToken)
     {
+        const string checklistPath = "data/tools/workflow-review-checklist/checklists.json";
+        if (entries.TryGetValue(checklistPath, out var checklistEntry))
+        {
+            await using var checklistStream = checklistEntry.Open();
+            using var checklistDocument = await JsonDocument.ParseAsync(checklistStream, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (!checklistDocument.RootElement.TryGetProperty("schemaVersion", out var checklistVersion) || checklistVersion.GetInt32() > WorkflowReviewChecklistService.WorkflowReviewChecklistSchemaVersion)
+                return new(BackupOperationStatus.UnsupportedFutureVersion, FailureType: "FutureWorkflowChecklistFormat");
+            if (checklistVersion.GetInt32() < 1 || !checklistDocument.RootElement.TryGetProperty("payload", out var checklistPayload))
+                return new(BackupOperationStatus.InvalidPackage, FailureType: "WorkflowChecklistEnvelopeInvalid");
+            var checklists = checklistPayload.Deserialize<List<WorkflowReviewChecklistDocument>>(DataStorageJson.Options);
+            if (checklists is null || !WorkflowReviewChecklistService.TryValidateDocuments(checklists, out _))
+                return new(BackupOperationStatus.InvalidPackage, FailureType: "WorkflowChecklistInvalid");
+        }
         const string palettePath = "data/tools/color-palette-recorder/palettes.json";
         if (!entries.TryGetValue(palettePath, out var entry)) return null;
         await using var stream = entry.Open();
