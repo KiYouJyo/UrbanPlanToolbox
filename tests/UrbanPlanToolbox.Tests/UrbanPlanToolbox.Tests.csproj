@@ -43,6 +43,10 @@
   <Compile Include="../../Services/RepositoryLinks.cs" Link="Services/RepositoryLinks.cs" />
   <Compile Include="../../Services/VersionParser.cs" Link="Services/VersionParser.cs" />
   <Compile Include="../../Services/GitHubUpdateService.cs" Link="Services/GitHubUpdateService.cs" />
+  <Compile Include="../../Services/AppVersionProvider.cs" Link="Services/AppVersionProvider.cs" />
+  <Compile Include="../../Services/DistributionChannel.cs" Link="Services/DistributionChannel.cs" />
+  <Compile Include="../../Services/DiagnosticsInfoService.cs" Link="Services/DiagnosticsInfoService.cs" />
+  <Compile Include="../../Services/LocalDataResetService.cs" Link="Services/LocalDataResetService.cs" />
   <Compile Include="../../Models/Navigation/PrimaryNavigationDefinition.cs" Link="Models/Navigation/PrimaryNavigationDefinition.cs" />
   <Compile Include="../../Models/Navigation/PrimaryNavigationIds.cs" Link="Models/Navigation/PrimaryNavigationIds.cs" />
   <Compile Include="../../Services/PrimaryNavigation.cs" Link="Services/PrimaryNavigation.cs" />

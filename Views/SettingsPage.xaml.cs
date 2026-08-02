@@ -17,6 +17,7 @@ public sealed partial class SettingsPage : Page
         InitializeComponent();
         TitleText.Text = _localization.GetString("Navigation_Settings");
         Apply(_settingsService.Load());
+        ClearDataButton.Content = _localization.GetString("DataManagement_Clear");
     }
     private void OnRestore(object sender, RoutedEventArgs e) { var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; }); Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults"); }
     private void OnSettingChanged(object sender, object e) { if (!_isApplying) SaveCurrentSettings(); }
@@ -103,11 +104,26 @@ public sealed partial class SettingsPage : Page
         finally { SetDataBusy(false); }
     }
 
+    private async void OnClearData(object sender, RoutedEventArgs e)
+    {
+        var first = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString("DataManagement_ClearTitle"), Content = _localization.GetString("DataManagement_ClearMessage"), PrimaryButtonText = _localization.GetString("DataManagement_ClearContinue"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Close };
+        if (await AppDialogService.Default.ShowAsync(first) != ContentDialogResult.Primary) return;
+        var second = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString("DataManagement_ClearConfirmTitle"), Content = _localization.GetString("DataManagement_ClearConfirmMessage"), PrimaryButtonText = _localization.GetString("DataManagement_Clear"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Close };
+        if (await AppDialogService.Default.ShowAsync(second) != ContentDialogResult.Primary) return;
+        SetDataBusy(true);
+        var success = await new LocalDataResetService(AppDataPathProvider.Default).ResetAsync();
+        if (success) { MilestoneReminderService.Default.ClearOwnedSchedules(); Apply(new AppSettings()); }
+        DataStatusBar.Severity = success ? InfoBarSeverity.Success : InfoBarSeverity.Error;
+        DataStatusBar.Message = _localization.GetString(success ? "DataManagement_ClearSuccess" : "DataManagement_ClearFailed");
+        DataStatusBar.IsOpen = true;
+        SetDataBusy(false);
+    }
+
     private static void InitializePicker(object picker)
     {
         if (App.MainWindow is null) return;
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
     }
-    private void SetDataBusy(bool busy) { ExportButton.IsEnabled = ImportButton.IsEnabled = !busy; }
+    private void SetDataBusy(bool busy) { ExportButton.IsEnabled = ImportButton.IsEnabled = ClearDataButton.IsEnabled = !busy; }
     private static string FormatBytes(long bytes) => bytes >= 1024 * 1024 ? $"{bytes / (1024d * 1024d):0.##} MB" : $"{bytes / 1024d:0.##} KB";
 }

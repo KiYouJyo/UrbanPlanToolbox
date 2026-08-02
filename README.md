@@ -1,6 +1,15 @@
 # 规划工具箱（UrbanPlan Toolbox）
 
-> 当前版本：`v0.4.3`（MSIX `0.4.3.0`）。面向 Windows 的城市规划辅助工具箱，项目、设置与规划输入均在本地处理。
+> 当前产品显示版本：`0.5.0 Preview`。面向 Windows 的城市规划辅助工具箱，项目、设置与规划输入均在本地处理。
+
+v0.5.0 continues the offline-first, non-account product direction. See [PRIVACY.md](PRIVACY.md), [SUPPORT.md](SUPPORT.md), and [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for offline-readable product information.
+
+### 版本与发行渠道
+
+- 产品显示版本：`0.5.0 Preview`；这是应用内主页、关于页和 User-Agent 使用的产品语义版本。
+- 当前旁加载人工审阅包：`0.5.0.1`；本轮修复后的新审阅包为 `0.5.0.2`。这两个版本仅用于本机自签名旁加载审阅，不得直接提交 Microsoft Store。
+- 计划中的 Microsoft Store 首次提交包：`0.5.0.0`。它将在关联 Partner Center Identity 和 Publisher 后重新构建，当前仓库尚未关联正式商店身份。
+- 当前 `CN=AppPublisher` 只用于自签名旁加载渠道；GitHub 侧载版和 Microsoft Store 版保持独立发行身份及更新渠道。
 
 > 已知限制：在部分冷启动环境中，原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响已验收功能，将在后续版本单独处理。
 
@@ -39,7 +48,7 @@
 
 ## 安装
 
-正式发布为 x64 framework-dependent 自签名测试安装包（MSIX），通过 GitHub Releases 提供。安装步骤：
+GitHub 侧载渠道提供 x64 framework-dependent 自签名测试安装包（MSIX）；当前旁加载审阅包不是正式 Store 包。安装步骤：
 
 1. 从 [Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) 下载最新 `UrbanPlanToolbox-vX.Y.Z-x64-framework-dependent-self-signed.zip` 与 `SHA256SUMS.txt`。
 2. 核对 SHA-256 后，将整个 ZIP 完整解压到同一文件夹（不要在压缩包预览中直接运行）。

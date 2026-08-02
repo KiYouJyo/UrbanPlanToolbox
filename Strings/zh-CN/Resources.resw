@@ -61,7 +61,7 @@
     <comment>欢迎页副标题。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.9 预览版。项目数据与规划工具数据均保留在本机。</value>
+    <value>0.5.0 Preview。项目数据与工具数据均保留在本机。</value>
     <comment>欢迎页版本与隐私说明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -779,7 +779,7 @@ dwyblchhq</value>
     <comment>体积单位名称。</comment>
   </data>
   <data name="About_Description.Text" xml:space="preserve">
-    <value>用于本地快速估算城市规划指标与单位比例尺；输入数据不会上传。</value>
+    <value>面向建筑、城乡规划、设计与研究的离线工具箱：支持项目与归档、工具搜索与收藏、规划指标计算、单位与比例尺换算、配色记录、流程审核、法规索引和设计理念词典；项目与工具数据优先保存在本机，并支持安全备份、导入导出和本地时间节点提醒。</value>
     <comment>关于页说明。</comment>
   </data>
   <data name="About_Technology.Text" xml:space="preserve">
@@ -1624,4 +1624,16 @@ dwyblchhq</value>
   <data name="Concept_Name" xml:space="preserve"><value>理念名称</value></data><data name="Concept_Definition" xml:space="preserve"><value>理念定义</value></data><data name="Concept_ProjectTypes" xml:space="preserve"><value>适用项目类型</value></data><data name="Concept_Tags" xml:space="preserve"><value>关键词标签</value></data><data name="Concept_Source" xml:space="preserve"><value>来源或参考</value></data><data name="Concept_Notes" xml:space="preserve"><value>补充说明</value></data><data name="Concept_Add" xml:space="preserve"><value>添加</value></data><data name="Concept_ProjectTypePlaceholder" xml:space="preserve"><value>输入项目类型后按 Enter</value></data><data name="Concept_TagPlaceholder" xml:space="preserve"><value>输入标签后按 Enter</value></data>
   <data name="Concept_Save" xml:space="preserve"><value>保存修改</value></data><data name="Concept_Reset" xml:space="preserve"><value>重置未保存修改</value></data><data name="Concept_Copy" xml:space="preserve"><value>复制理念</value></data><data name="Concept_Delete" xml:space="preserve"><value>删除理念</value></data><data name="Concept_Timestamps" xml:space="preserve"><value>创建：{0}；最后修改：{1}</value></data><data name="Concept_Saved" xml:space="preserve"><value>理念已保存。</value></data><data name="Concept_Copied" xml:space="preserve"><value>理念副本已创建。</value></data><data name="Concept_SaveFailed" xml:space="preserve"><value>理念无法安全保存。</value></data><data name="Concept_DeleteFailed" xml:space="preserve"><value>理念无法安全删除。</value></data>
   <data name="Concept_NameRequired" xml:space="preserve"><value>理念名称不能为空。</value></data><data name="Concept_DefinitionRequired" xml:space="preserve"><value>理念定义不能为空。</value></data><data name="Concept_DeleteTitle" xml:space="preserve"><value>删除理念？</value></data><data name="Concept_DeleteMessage" xml:space="preserve"><value>确定删除“{0}”吗？此操作不会影响其他理念。</value></data><data name="Concept_UnsavedTitle" xml:space="preserve"><value>放弃未保存的修改？</value></data><data name="Concept_UnsavedMessage" xml:space="preserve"><value>当前修改尚未保存。</value></data><data name="Concept_Discard" xml:space="preserve"><value>放弃修改</value></data><data name="Concept_CopySuffix" xml:space="preserve"><value>副本</value></data>
+  <data name="About_Channel" xml:space="preserve"><value>发行渠道：{0}</value></data>
+  <data name="About_OfflineFirst.Text" xml:space="preserve"><value>离线优先：本地功能无需账户或联网；更新检查和外部网页仅在你主动操作时访问。</value></data>
+  <data name="Action_Support" xml:space="preserve"><value>帮助与支持</value></data>
+  <data name="Action_Privacy" xml:space="preserve"><value>隐私政策</value></data>
+  <data name="Action_ThirdPartyNotices" xml:space="preserve"><value>第三方许可与数据来源</value></data>
+  <data name="Action_CopyDiagnostics" xml:space="preserve"><value>复制诊断信息</value></data>
+  <data name="Diagnostics_Copied" xml:space="preserve"><value>诊断信息已复制。提交前请再次检查内容。</value></data>
+  <data name="Error_OpenDocumentFailed" xml:space="preserve"><value>无法读取离线文档。</value></data>
+  <data name="Update_StoreManaged" xml:space="preserve"><value>此版本由 Microsoft Store 管理更新。</value></data>
+  <data name="Update_StoreManagedNoProduct" xml:space="preserve"><value>此版本由 Microsoft Store 管理更新；商店产品信息尚未配置。</value></data>
+  <data name="Action_OpenStore" xml:space="preserve"><value>打开 Microsoft Store</value></data>
+  <data name="DataManagement_Clear" xml:space="preserve"><value>清除本地数据</value></data><data name="DataManagement_ClearTitle" xml:space="preserve"><value>清除本地数据？</value></data><data name="DataManagement_ClearMessage" xml:space="preserve"><value>将删除应用管理的项目、设置、收藏、工具数据、附件、备份和日志；不会删除你自己创建的外部工作文件夹。</value></data><data name="DataManagement_ClearContinue" xml:space="preserve"><value>继续确认</value></data><data name="DataManagement_ClearConfirmTitle" xml:space="preserve"><value>再次确认清除</value></data><data name="DataManagement_ClearConfirmMessage" xml:space="preserve"><value>此操作不可撤销。确定恢复为初始状态吗？</value></data><data name="DataManagement_ClearSuccess" xml:space="preserve"><value>本地数据已清除，应用已恢复为初始状态。</value></data><data name="DataManagement_ClearFailed" xml:space="preserve"><value>本地数据未能完整清除；现有数据未被主动覆盖。</value></data>
 </root>

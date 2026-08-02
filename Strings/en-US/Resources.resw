@@ -61,7 +61,7 @@
     <comment>Home page subtitle.</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.9 preview. Project data and planning tools stay on this device.</value>
+    <value>0.5.0 Preview. Project data and tool data stay on this device.</value>
     <comment>Home page version and privacy statement.</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -776,7 +776,7 @@ conversion</value>
     <comment>Volume unit name.</comment>
   </data>
   <data name="About_Description.Text" xml:space="preserve">
-    <value>Quickly estimate urban planning metrics and unit/scale conversions locally; input data is never uploaded.</value>
+    <value>An offline toolbox for architecture, urban and regional planning, design, and research. It supports projects and archives, tool search and favorites, planning metrics, unit and scale conversion, palette recording, workflow review, a regulations index, and a design-concept dictionary. Project and tool data is kept primarily on this device, with secure backup, import/export, and local milestone reminders.</value>
     <comment>About page description.</comment>
   </data>
   <data name="About_Technology.Text" xml:space="preserve">
@@ -1623,4 +1623,16 @@ Latest version: {1}</value>
   <data name="Concept_Name" xml:space="preserve"><value>Concept name</value></data><data name="Concept_Definition" xml:space="preserve"><value>Definition</value></data><data name="Concept_ProjectTypes" xml:space="preserve"><value>Applicable project types</value></data><data name="Concept_Tags" xml:space="preserve"><value>Keyword tags</value></data><data name="Concept_Source" xml:space="preserve"><value>Source or reference</value></data><data name="Concept_Notes" xml:space="preserve"><value>Additional notes</value></data><data name="Concept_Add" xml:space="preserve"><value>Add</value></data><data name="Concept_ProjectTypePlaceholder" xml:space="preserve"><value>Type a project type and press Enter</value></data><data name="Concept_TagPlaceholder" xml:space="preserve"><value>Type a tag and press Enter</value></data>
   <data name="Concept_Save" xml:space="preserve"><value>Save changes</value></data><data name="Concept_Reset" xml:space="preserve"><value>Reset unsaved changes</value></data><data name="Concept_Copy" xml:space="preserve"><value>Copy concept</value></data><data name="Concept_Delete" xml:space="preserve"><value>Delete concept</value></data><data name="Concept_Timestamps" xml:space="preserve"><value>Created: {0}; last modified: {1}</value></data><data name="Concept_Saved" xml:space="preserve"><value>Concept saved.</value></data><data name="Concept_Copied" xml:space="preserve"><value>Concept copy created.</value></data><data name="Concept_SaveFailed" xml:space="preserve"><value>The concept could not be saved safely.</value></data><data name="Concept_DeleteFailed" xml:space="preserve"><value>The concept could not be deleted safely.</value></data>
   <data name="Concept_NameRequired" xml:space="preserve"><value>A concept name is required.</value></data><data name="Concept_DefinitionRequired" xml:space="preserve"><value>A definition is required.</value></data><data name="Concept_DeleteTitle" xml:space="preserve"><value>Delete concept?</value></data><data name="Concept_DeleteMessage" xml:space="preserve"><value>Delete “{0}”? Other concepts will not be affected.</value></data><data name="Concept_UnsavedTitle" xml:space="preserve"><value>Discard unsaved changes?</value></data><data name="Concept_UnsavedMessage" xml:space="preserve"><value>Your changes have not been saved.</value></data><data name="Concept_Discard" xml:space="preserve"><value>Discard changes</value></data><data name="Concept_CopySuffix" xml:space="preserve"><value>copy</value></data>
+  <data name="About_Channel" xml:space="preserve"><value>Distribution channel: {0}</value></data>
+  <data name="About_OfflineFirst.Text" xml:space="preserve"><value>Offline-first: local features need no account or connection; update checks and external pages are opened only after your action.</value></data>
+  <data name="Action_Support" xml:space="preserve"><value>Help and support</value></data>
+  <data name="Action_Privacy" xml:space="preserve"><value>Privacy policy</value></data>
+  <data name="Action_ThirdPartyNotices" xml:space="preserve"><value>Third-party notices and data sources</value></data>
+  <data name="Action_CopyDiagnostics" xml:space="preserve"><value>Copy diagnostics</value></data>
+  <data name="Diagnostics_Copied" xml:space="preserve"><value>Diagnostics copied. Review the content before sharing.</value></data>
+  <data name="Error_OpenDocumentFailed" xml:space="preserve"><value>The offline document could not be read.</value></data>
+  <data name="Update_StoreManaged" xml:space="preserve"><value>Updates for this version are managed by Microsoft Store.</value></data>
+  <data name="Update_StoreManagedNoProduct" xml:space="preserve"><value>Updates for this version are managed by Microsoft Store; Store product information is not configured.</value></data>
+  <data name="Action_OpenStore" xml:space="preserve"><value>Open Microsoft Store</value></data>
+  <data name="DataManagement_Clear" xml:space="preserve"><value>Clear local data</value></data><data name="DataManagement_ClearTitle" xml:space="preserve"><value>Clear local data?</value></data><data name="DataManagement_ClearMessage" xml:space="preserve"><value>This removes app-managed projects, settings, favorites, tool data, attachments, backups, and logs. It does not remove external work folders you created.</value></data><data name="DataManagement_ClearContinue" xml:space="preserve"><value>Continue to confirm</value></data><data name="DataManagement_ClearConfirmTitle" xml:space="preserve"><value>Confirm clearing again</value></data><data name="DataManagement_ClearConfirmMessage" xml:space="preserve"><value>This cannot be undone. Restore the initial state?</value></data><data name="DataManagement_ClearSuccess" xml:space="preserve"><value>Local data was cleared and the app returned to its initial state.</value></data><data name="DataManagement_ClearFailed" xml:space="preserve"><value>Local data could not be cleared completely; existing data was not intentionally overwritten.</value></data>
 </root>

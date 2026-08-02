@@ -61,7 +61,7 @@
     <comment>トップページのサブタイトル。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.9 プレビュー版。プロジェクトデータと計画ツールのデータはこのデバイス内に保持されます。</value>
+    <value>0.5.0 Preview。プロジェクトデータとツールデータはこのデバイス内に保持されます。</value>
     <comment>トップページのバージョンとプライバシー説明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -773,7 +773,7 @@
     <comment>体積の単位名。</comment>
   </data>
   <data name="About_Description.Text" xml:space="preserve">
-    <value>都市計画指標と単位・縮尺をローカルですばやく概算します。入力データはアップロードされません。</value>
+    <value>建築、都市・地域計画、設計、研究のためのオフラインツールボックスです。プロジェクトとアーカイブ、ツール検索とお気に入り、計画指標計算、単位・縮尺変換、配色記録、ワークフロー確認、法規インデックス、設計理念辞書に対応し、プロジェクトとツールデータは主に本機へ保存します。安全なバックアップ、インポート・エクスポート、ローカルの予定通知も利用できます。</value>
     <comment>このアプリについての説明。</comment>
   </data>
   <data name="About_Technology.Text" xml:space="preserve">
@@ -1618,4 +1618,16 @@
   <data name="Concept_Name" xml:space="preserve"><value>理念名</value></data><data name="Concept_Definition" xml:space="preserve"><value>理念の定義</value></data><data name="Concept_ProjectTypes" xml:space="preserve"><value>適用プロジェクト種別</value></data><data name="Concept_Tags" xml:space="preserve"><value>キーワードタグ</value></data><data name="Concept_Source" xml:space="preserve"><value>出典または参考</value></data><data name="Concept_Notes" xml:space="preserve"><value>補足メモ</value></data><data name="Concept_Add" xml:space="preserve"><value>追加</value></data><data name="Concept_ProjectTypePlaceholder" xml:space="preserve"><value>種別を入力して Enter</value></data><data name="Concept_TagPlaceholder" xml:space="preserve"><value>タグを入力して Enter</value></data>
   <data name="Concept_Save" xml:space="preserve"><value>変更を保存</value></data><data name="Concept_Reset" xml:space="preserve"><value>未保存の変更をリセット</value></data><data name="Concept_Copy" xml:space="preserve"><value>理念を複製</value></data><data name="Concept_Delete" xml:space="preserve"><value>理念を削除</value></data><data name="Concept_Timestamps" xml:space="preserve"><value>作成：{0}、最終更新：{1}</value></data><data name="Concept_Saved" xml:space="preserve"><value>理念を保存しました。</value></data><data name="Concept_Copied" xml:space="preserve"><value>理念の複製を作成しました。</value></data><data name="Concept_SaveFailed" xml:space="preserve"><value>理念を安全に保存できませんでした。</value></data><data name="Concept_DeleteFailed" xml:space="preserve"><value>理念を安全に削除できませんでした。</value></data>
   <data name="Concept_NameRequired" xml:space="preserve"><value>理念名を入力してください。</value></data><data name="Concept_DefinitionRequired" xml:space="preserve"><value>定義を入力してください。</value></data><data name="Concept_DeleteTitle" xml:space="preserve"><value>理念を削除しますか？</value></data><data name="Concept_DeleteMessage" xml:space="preserve"><value>「{0}」を削除しますか？他の理念には影響しません。</value></data><data name="Concept_UnsavedTitle" xml:space="preserve"><value>未保存の変更を破棄しますか？</value></data><data name="Concept_UnsavedMessage" xml:space="preserve"><value>変更はまだ保存されていません。</value></data><data name="Concept_Discard" xml:space="preserve"><value>変更を破棄</value></data><data name="Concept_CopySuffix" xml:space="preserve"><value>の複製</value></data>
+  <data name="About_Channel" xml:space="preserve"><value>配布チャンネル：{0}</value></data>
+  <data name="About_OfflineFirst.Text" xml:space="preserve"><value>オフライン優先：ローカル機能にアカウントや接続は不要です。更新確認と外部ページはユーザー操作時だけ行います。</value></data>
+  <data name="Action_Support" xml:space="preserve"><value>ヘルプとサポート</value></data>
+  <data name="Action_Privacy" xml:space="preserve"><value>プライバシーポリシー</value></data>
+  <data name="Action_ThirdPartyNotices" xml:space="preserve"><value>第三者ライセンスとデータソース</value></data>
+  <data name="Action_CopyDiagnostics" xml:space="preserve"><value>診断情報をコピー</value></data>
+  <data name="Diagnostics_Copied" xml:space="preserve"><value>診断情報をコピーしました。送信前に内容を確認してください。</value></data>
+  <data name="Error_OpenDocumentFailed" xml:space="preserve"><value>オフライン文書を読み込めません。</value></data>
+  <data name="Update_StoreManaged" xml:space="preserve"><value>このバージョンの更新は Microsoft Store が管理します。</value></data>
+  <data name="Update_StoreManagedNoProduct" xml:space="preserve"><value>このバージョンの更新は Microsoft Store が管理します。ストア製品情報は未設定です。</value></data>
+  <data name="Action_OpenStore" xml:space="preserve"><value>Microsoft Store を開く</value></data>
+  <data name="DataManagement_Clear" xml:space="preserve"><value>ローカルデータを消去</value></data><data name="DataManagement_ClearTitle" xml:space="preserve"><value>ローカルデータを消去しますか？</value></data><data name="DataManagement_ClearMessage" xml:space="preserve"><value>アプリが管理するプロジェクト、設定、お気に入り、ツールデータ、添付ファイル、バックアップ、ログを消去します。ユーザーが作成した外部の作業フォルダーは消去しません。</value></data><data name="DataManagement_ClearContinue" xml:space="preserve"><value>続行して確認</value></data><data name="DataManagement_ClearConfirmTitle" xml:space="preserve"><value>消去を再確認</value></data><data name="DataManagement_ClearConfirmMessage" xml:space="preserve"><value>この操作は元に戻せません。初期状態に戻しますか？</value></data><data name="DataManagement_ClearSuccess" xml:space="preserve"><value>ローカルデータを消去し、初期状態に戻しました。</value></data><data name="DataManagement_ClearFailed" xml:space="preserve"><value>ローカルデータを完全には消去できませんでした。既存データは上書きしていません。</value></data>
 </root>

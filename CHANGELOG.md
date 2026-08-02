@@ -270,3 +270,10 @@
 
 - Added the offline, read-only Architecture & Planning Regulations Index with 221 catalog entries, 20 official portals, source notes, filters, and official-link navigation.
 - Source data is generated from the approved workbook at development time; the packaged app does not access Excel or online caches.
+## 0.5.0（预览版，发布准备）
+
+- 统一应用、程序集、MSIX、关于页、诊断信息和 GitHub 更新 User-Agent 使用 `0.5.0`；0.x 版本继续显示 Preview。
+- 增加编译期 GitHub/ Microsoft Store 发行渠道隔离；Store Product ID 未配置时不生成虚假商店地址，也不调用 GitHub 更新流程。
+- 增加离线可读的隐私、支持和第三方声明入口，支持复制脱敏诊断信息。
+- 设置采用临时文件替换保存，并增加二次确认的本地数据清除；外部工作文件夹不在清除范围内。
+- 本版本仅为发布准备，不创建 Tag、GitHub Release 或执行正式发布。

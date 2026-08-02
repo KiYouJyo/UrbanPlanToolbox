@@ -3,6 +3,8 @@ using Microsoft.UI.Xaml.Controls;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
 using Windows.System;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 
 namespace UrbanPlanToolbox.Views;
 public sealed partial class AboutPage : Page
@@ -15,6 +17,11 @@ public sealed partial class AboutPage : Page
     {
         InitializeComponent();
         VersionText.Text = _localization.GetFormattedString("About_Version", AppVersionProvider.DisplayVersion);
+        ChannelText.Text = _localization.GetFormattedString("About_Channel", DiagnosticsInfoService.GetChannelLabel(DistributionChannelProvider.Current));
+        SupportButton.Content = _localization.GetString("Action_Support");
+        PrivacyButton.Content = _localization.GetString("Action_Privacy");
+        NoticesButton.Content = _localization.GetString("Action_ThirdPartyNotices");
+        DiagnosticsButton.Content = _localization.GetString("Action_CopyDiagnostics");
         CheckUpdateButton.Content = _localization.GetString("Action_CheckForUpdates");
         Unloaded += (_, _) => _pageLifetime.Cancel();
     }
@@ -24,8 +31,39 @@ public sealed partial class AboutPage : Page
         if (!await Launcher.LaunchUriAsync(RepositoryLinks.Repository)) await ShowMessageAsync(_localization.GetString("Error_OpenRepositoryFailed"), _localization.GetString("Dialog_OpenFailedTitle"));
     }
 
+    private async void OnOpenSupport(object sender, RoutedEventArgs e) => await OpenDocumentAsync("SUPPORT.md");
+    private async void OnOpenPrivacy(object sender, RoutedEventArgs e) => await OpenDocumentAsync("PRIVACY.md");
+    private async void OnOpenNotices(object sender, RoutedEventArgs e) => await OpenDocumentAsync("THIRD-PARTY-NOTICES.md");
+
+    private async void OnCopyDiagnostics(object sender, RoutedEventArgs e)
+    {
+        var data = new DataPackage();
+        data.SetText(DiagnosticsInfoService.Create());
+        Clipboard.SetContent(data);
+        await ShowMessageAsync(_localization.GetString("Diagnostics_Copied"), _localization.GetString("Dialog_Ok"));
+    }
+
+    private async Task OpenDocumentAsync(string fileName)
+    {
+        try
+        {
+            var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri($"ms-appx:///{fileName}"));
+            var text = await FileIO.ReadTextAsync(file);
+            await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = fileName, Content = new ScrollViewer { Content = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap } }, CloseButtonText = _localization.GetString("Dialog_Ok") }, _pageLifetime.Token);
+        }
+        catch (Exception) { await ShowMessageAsync(_localization.GetString("Error_OpenDocumentFailed"), _localization.GetString("Dialog_OpenFailedTitle")); }
+    }
+
     private async void OnCheckUpdate(object sender, RoutedEventArgs e)
     {
+        if (!DistributionChannelProvider.UsesGitHubUpdates)
+        {
+            var message = RepositoryLinks.StoreProductUri is null ? _localization.GetString("Update_StoreManagedNoProduct") : _localization.GetString("Update_StoreManaged");
+            if (RepositoryLinks.StoreProductUri is not null && await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString("Dialog_UpdateTitle"), Content = message, PrimaryButtonText = _localization.GetString("Action_OpenStore"), CloseButtonText = _localization.GetString("Action_Later") }, _pageLifetime.Token) == ContentDialogResult.Primary)
+                await Launcher.LaunchUriAsync(RepositoryLinks.StoreProductUri);
+            else await ShowMessageAsync(message, _localization.GetString("Dialog_UpdateTitle"));
+            return;
+        }
         CheckUpdateButton.IsEnabled = false;
         CheckUpdateButton.Content = _localization.GetString("Update_Checking");
         try { await ShowUpdateResultAsync(await _updateService.CheckForUpdatesAsync(AppVersionProvider.GetCurrentVersion(), _pageLifetime.Token)); }

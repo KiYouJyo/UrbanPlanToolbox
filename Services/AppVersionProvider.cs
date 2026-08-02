@@ -4,8 +4,9 @@ namespace UrbanPlanToolbox.Services;
 
 public static class AppVersionProvider
 {
-    /// <summary>User-facing version text shared by About and release metadata.</summary>
-    public const string DisplayVersion = "0.4.3";
+    public const string Version = "0.5.0";
+    public const string DisplayVersion = "0.5.0 Preview";
+    public const int DataSchemaVersion = 1;
 
     public static Version GetCurrentVersion()
     {
@@ -16,7 +17,7 @@ public static class AppVersionProvider
         }
         catch (Exception) when (OperatingSystem.IsWindows())
         {
-            return VersionParser.Normalize(typeof(AppVersionProvider).Assembly.GetName().Version ?? new Version(0, 3, 11, 1));
+            return VersionParser.Normalize(typeof(AppVersionProvider).Assembly.GetName().Version ?? new Version(0, 5, 0, 0));
         }
     }
 }
