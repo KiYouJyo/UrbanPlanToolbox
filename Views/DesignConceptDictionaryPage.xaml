@@ -19,24 +19,12 @@
 
           <StackPanel x:Name="ListPanel" Spacing="12">
             <Grid x:Name="FilterPanel" ColumnSpacing="8" RowSpacing="8">
-              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-              <TextBox x:Name="SearchBox" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" TextChanged="OnSearchChanged"/>
-              <ComboBox x:Name="ProjectTypeFilter" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
-              <ComboBox x:Name="TagFilter" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
-              <ComboBox x:Name="SortBox" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
-              <VisualStateManager.VisualStateGroups>
-                <VisualStateGroup>
-                  <VisualState x:Name="NarrowFilters"/>
-                  <VisualState x:Name="WideFilters">
-                    <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="720"/></VisualState.StateTriggers>
-                    <VisualState.Setters>
-                      <Setter Target="SearchBox.(Grid.ColumnSpan)" Value="1"/><Setter Target="ProjectTypeFilter.(Grid.Row)" Value="0"/><Setter Target="ProjectTypeFilter.(Grid.Column)" Value="1"/><Setter Target="ProjectTypeFilter.(Grid.ColumnSpan)" Value="1"/>
-                      <Setter Target="TagFilter.(Grid.Row)" Value="0"/><Setter Target="TagFilter.(Grid.Column)" Value="2"/><Setter Target="TagFilter.(Grid.ColumnSpan)" Value="1"/><Setter Target="SortBox.(Grid.Row)" Value="0"/><Setter Target="SortBox.(Grid.Column)" Value="3"/><Setter Target="SortBox.(Grid.ColumnSpan)" Value="1"/>
-                    </VisualState.Setters>
-                  </VisualState>
-                </VisualStateGroup>
-              </VisualStateManager.VisualStateGroups>
+              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+              <TextBox x:Name="SearchBox" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" TextChanged="OnSearchChanged"/>
+              <ComboBox x:Name="ProjectTypeFilter" Grid.Row="1" Grid.Column="0" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
+              <ComboBox x:Name="TagFilter" Grid.Row="1" Grid.Column="1" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
+              <ComboBox x:Name="SortBox" Grid.Row="1" Grid.Column="2" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
             </Grid>
             <TextBlock x:Name="CountText" TextWrapping="Wrap"/>
             <TextBlock x:Name="ListStatus" TextWrapping="Wrap"/>

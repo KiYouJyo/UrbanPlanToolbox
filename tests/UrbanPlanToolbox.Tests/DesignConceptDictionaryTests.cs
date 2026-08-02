@@ -111,6 +111,9 @@ public sealed class DesignConceptDictionaryTests : IDisposable
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml"));
         Assert.Equal(3, Count(xaml, "DisplayMemberPath=\"Display\""));
         Assert.Equal(3, Count(xaml, "SelectedValuePath=\"Value\""));
+        Assert.Contains("ProjectTypeFilter\" Grid.Row=\"1\" Grid.Column=\"0\"", xaml);
+        Assert.Contains("TagFilter\" Grid.Row=\"1\" Grid.Column=\"1\"", xaml);
+        Assert.Contains("SortBox\" Grid.Row=\"1\" Grid.Column=\"2\"", xaml);
         Assert.Contains("HorizontalContentAlignment=\"Stretch\"", xaml);
         Assert.Contains("x:Name=\"ContentPanel\"", xaml);
         Assert.Contains("HorizontalAlignment=\"Stretch\"", xaml);
@@ -122,6 +125,10 @@ public sealed class DesignConceptDictionaryTests : IDisposable
         var code = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml.cs"));
         Assert.Contains("NewButton.Visibility = Visibility.Collapsed", code);
         Assert.Contains("NewButton.Visibility = Visibility.Visible", code);
+        var settingsXaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
+        var settingsCode = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml.cs"));
+        Assert.DoesNotContain("TestNotificationButton", settingsXaml);
+        Assert.DoesNotContain("OnSendTestNotification", settingsCode);
     }
 
     [Fact]
