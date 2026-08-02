@@ -235,3 +235,21 @@
 - Windows/MSIX native splash screen reuses the existing official logo; no in-app splash or artificial startup delay.
 - Shared page spacing, card actions, status badges, and less-truncated long tool text.
 - ProjectSchemaVersion remains 3 and BackupFormatVersion remains 1.
+
+## 0.4.0（开发完成，待发布）
+
+### Added
+
+- 新增“色卡方案记录器”（`color-palette-recorder`）：独立工具数据域、稳定工具 ID、三语界面和响应式方案卡片。
+- 方案支持色系、颜色类型、多个独立颜色、HEX/RGB 编辑、首张图片封面及应用内部多图附件；不修改用户上传图片源文件。
+- 色卡方案及其受管附件已纳入 `.uptbackup` 导入导出闭环，并使用独立 `ToolSchemaVersion` 与现有原子写入、恢复和未来版本保护。
+- 将色卡方案记录器固化为后续新增工具的首个真实模板实现，覆盖稳定 ID、独立存储、附件、三语、响应式、可访问性、备份与验收要求。
+
+### Changed
+
+- 颜色编辑统一为单一 HEX 输入和完整 ColorPicker；颜色用途统一命名为“颜色类型 / 色の用途 / Color role”，兼容既有颜色名称数据。
+
+### Notes
+
+- v0.4.0 为待发布的开发完成版本；Draft PR #17 保持未合并状态。
+- 已知限制：自 v0.3.11.1 延续，部分冷启动环境在原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响本版本已验收功能，后续版本单独处理。

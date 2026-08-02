@@ -64,7 +64,7 @@ public sealed class GitHubUpdateServiceTests
     {
         var handler = new StubHandler(HttpStatusCode.OK, ReleaseJson("v0.3.9"));
         await new GitHubUpdateService(new HttpClient(handler)).CheckForUpdatesAsync(new Version(0, 3, 8, 0));
-        Assert.Equal("UrbanPlanToolbox/0.3.11.1", handler.UserAgent);
+        Assert.Equal("UrbanPlanToolbox/0.4.0", handler.UserAgent);
     }
 
     private static GitHubUpdateService CreateService(HttpStatusCode statusCode, string content) => new(new HttpClient(new StubHandler(statusCode, content)));
