@@ -259,6 +259,13 @@
 
 - v0.4.0 为待发布的开发完成版本；Draft PR #17 保持未合并状态。
 - 已知限制：自 v0.3.11.1 延续，部分冷启动环境在原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响本版本已验收功能，后续版本单独处理。
+## 0.4.3（预览版）
+
+- 新增 `design-concept-dictionary` 设计理念词典，支持离线新增、编辑、重置、复制、删除、搜索、项目类型/标签筛选和排序。
+- 使用独立 `DesignConceptDictionarySchemaVersion = 1`，数据位于 `data/tools/design-concept-dictionary/concepts.json`，复用原子保存、最后有效备份和未来版本保护。
+- 将词典数据纳入现有 `.uptbackup` 校验与导入回滚流程；不新增附件，也不修改 `BackupFormatVersion`。
+- 增加中文、日语和英文资源，以及工具注册、搜索、数据、复制和响应式页面回归测试。
+
 ## 0.4.2
 
 - Added the offline, read-only Architecture & Planning Regulations Index with 221 catalog entries, 20 official portals, source notes, filters, and official-link navigation.

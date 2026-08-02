@@ -73,6 +73,10 @@ C#、.NET 10、WinUI 3、Windows App SDK 和单项目 MSIX。支持 Windows 10 1
 ## 后续计划
 
 版本路线图与版本/发布政策见 [docs/ROADMAP.md](docs/ROADMAP.md)。
+## v0.4.3 设计理念词典
+
+v0.4.3 adds the offline `design-concept-dictionary` tool under Design → Design Development. Concepts are stored at `%LocalAppData%\\UrbanPlanToolbox\\data\\tools\\design-concept-dictionary\\concepts.json` with independent schema version 1, atomic writes, last-valid recovery, future-schema protection, search/filter/sort, editable project-type and tag lists, and validated backup/import support. No attachments or external concept sources are bundled.
+
 ## Regulations index data
 
 Version 0.4.2 packages a deterministic JSON snapshot at `Assets/Data/RegulationsIndex/regulations-index.v1.json`. It is an offline research index and official-portal directory, not legal advice, a complete legal corpus, a standards/PDF repository, or a compliance decision engine. Currentness, local adoption, paid standards, and applicable project requirements must be checked at the official source.

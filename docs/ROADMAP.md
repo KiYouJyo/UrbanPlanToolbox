@@ -56,6 +56,10 @@ UrbanPlanToolbox 将逐步发展为面向建筑设计、城乡规划和空间研
 
 - 完善原生启动资源，并为项目重要时间节点提供 Windows 本地计划通知；保持 Schema 3 和备份格式 1。
 
+## v0.4.3 设计理念词典（当前开发）
+
+本版本将 `design-concept-dictionary` 接入“设计工具 → 方案推导”，提供本地优先的设计理念记录与复用。数据使用独立 schema version 1，支持搜索、筛选、排序、标签编辑、复制、删除、通用备份导入导出和三语界面；不改变项目数据、既有工具 schema 或 `BackupFormatVersion`。
+
 ## v0.3.11
 
 - Native startup presentation and focused visual/responsive layout polish; no in-app splash, data migration, or new tools.

@@ -88,6 +88,22 @@ public sealed class ToolRegistry
             CategoryPlacements = [
                 new(ToolPrimaryCategory.Design, ToolSecondaryCategory.MasterPlanning, 50),
                 new(ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 50)]
+        },
+        new(
+            ToolIds.DesignConceptDictionary,
+            "Tool_DesignConceptDictionary_Name",
+            "Tool_DesignConceptDictionary_Description",
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.DesignDevelopment,
+            "\uE8A4",
+            typeof(Views.DesignConceptDictionaryPage),
+            60,
+            true,
+            "shejilinian cidian",
+            "D",
+            "Tool_DesignConceptDictionary_Keywords")
+        {
+            CategoryPlacements = [new(ToolPrimaryCategory.Design, ToolSecondaryCategory.DesignDevelopment, 60)]
         }
     ]);
 

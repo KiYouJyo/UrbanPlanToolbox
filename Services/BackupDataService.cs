@@ -210,7 +210,8 @@ public sealed class BackupDataService
                path.StartsWith("data/projects/", StringComparison.Ordinal) && path.EndsWith("/project.json", StringComparison.Ordinal) ||
                path.StartsWith("attachments/projects/", StringComparison.Ordinal) ||
                path == "data/tools/color-palette-recorder/palettes.json" ||
-               path.StartsWith("attachments/tools/color-palette-recorder/", StringComparison.Ordinal);
+               path.StartsWith("attachments/tools/color-palette-recorder/", StringComparison.Ordinal) ||
+               path == "data/tools/design-concept-dictionary/concepts.json";
     }
 
     private static async Task<BackupInspection?> ValidateProjectsAsync(IReadOnlyDictionary<string, ZipArchiveEntry> entries, CancellationToken cancellationToken)
@@ -246,7 +247,7 @@ public sealed class BackupDataService
                 return new(BackupOperationStatus.InvalidPackage, FailureType: "WorkflowChecklistInvalid");
         }
         const string palettePath = "data/tools/color-palette-recorder/palettes.json";
-        if (!entries.TryGetValue(palettePath, out var entry)) return null;
+        if (!entries.TryGetValue(palettePath, out var entry)) return await ValidateDesignConceptDataAsync(entries, cancellationToken).ConfigureAwait(false);
         await using var stream = entry.Open();
         using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
         if (!document.RootElement.TryGetProperty("schemaVersion", out var version) || version.GetInt32() > ColorPaletteStorageService.ColorPaletteSchemaVersion)
@@ -255,8 +256,24 @@ public sealed class BackupDataService
             return new(BackupOperationStatus.InvalidPackage, FailureType: "ColorPaletteEnvelopeInvalid");
         var palettes = payload.Deserialize<ColorPaletteDocument>(DataStorageJson.Options);
         return palettes is not null && ColorPaletteStorageService.TryValidateDocument(palettes, out _)
-            ? null
+            ? await ValidateDesignConceptDataAsync(entries, cancellationToken).ConfigureAwait(false)
             : new(BackupOperationStatus.InvalidPackage, FailureType: "ColorPaletteInvalid");
+    }
+
+    private static async Task<BackupInspection?> ValidateDesignConceptDataAsync(IReadOnlyDictionary<string, ZipArchiveEntry> entries, CancellationToken cancellationToken)
+    {
+        const string path = "data/tools/design-concept-dictionary/concepts.json";
+        if (!entries.TryGetValue(path, out var entry)) return null;
+        await using var stream = entry.Open();
+        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (!document.RootElement.TryGetProperty("schemaVersion", out var version) || version.GetInt32() > DesignConceptDictionaryService.DesignConceptDictionarySchemaVersion)
+            return new(BackupOperationStatus.UnsupportedFutureVersion, FailureType: "FutureDesignConceptDictionaryFormat");
+        if (version.GetInt32() < 1 || !document.RootElement.TryGetProperty("payload", out var payload))
+            return new(BackupOperationStatus.InvalidPackage, FailureType: "DesignConceptEnvelopeInvalid");
+        var concepts = payload.Deserialize<DesignConceptDictionaryDocument>(DataStorageJson.Options);
+        return concepts is not null && DesignConceptDictionaryService.TryValidateDocument(concepts, out _)
+            ? null
+            : new(BackupOperationStatus.InvalidPackage, FailureType: "DesignConceptDictionaryInvalid");
     }
 
     private void ExtractValidatedPackage(string packagePath, string staging)

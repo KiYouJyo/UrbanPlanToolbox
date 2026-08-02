@@ -1,0 +1,26 @@
+<Page x:Class="UrbanPlanToolbox.Views.DesignConceptDictionaryPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:UrbanPlanToolbox.Controls">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Style="{StaticResource PageContentStackPanelStyle}" MaxWidth="1400" HorizontalAlignment="Center">
+      <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"/><Button x:Name="NewButton" Grid.Column="1" Click="OnNewClick" VerticalAlignment="Top"/></Grid>
+      <TextBlock x:Name="DescriptionText" TextWrapping="Wrap"/>
+      <StackPanel x:Name="ListPanel" Spacing="12">
+        <Grid ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBox x:Name="SearchBox" Grid.Column="0" TextChanged="OnSearchChanged"/><ComboBox x:Name="ProjectTypeFilter" Grid.Column="1" SelectionChanged="OnSelectionFilterChanged"/><ComboBox x:Name="TagFilter" Grid.Column="2" SelectionChanged="OnSelectionFilterChanged"/><ComboBox x:Name="SortBox" Grid.Column="3" SelectionChanged="OnSelectionFilterChanged"/></Grid>
+        <TextBlock x:Name="CountText" TextWrapping="Wrap"/><TextBlock x:Name="ListStatus" TextWrapping="Wrap"/>
+        <ListView x:Name="ConceptsList" SelectionMode="None" IsItemClickEnabled="False" HorizontalContentAlignment="Stretch"><ListView.ItemTemplate><DataTemplate><Button Tag="{Binding}" Click="OnConceptClick" Style="{StaticResource CardActionButtonStyle}" Margin="0,0,0,8" Padding="{StaticResource CardContentPadding}" AutomationProperties.Name="{Binding AutomationName}"><StackPanel Spacing="6"><TextBlock Text="{Binding Name}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding Definition}" FontSize="14" TextWrapping="WrapWholeWords" MaxLines="4"/><TextBlock Text="{Binding ProjectTypesText}" Opacity="0.8" TextWrapping="Wrap"/><TextBlock Text="{Binding TagsText}" Opacity="0.8" TextWrapping="Wrap"/><TextBlock Text="{Binding UpdatedText}" FontSize="12" Opacity="0.7"/></StackPanel></Button></DataTemplate></ListView.ItemTemplate></ListView>
+      </StackPanel>
+      <StackPanel x:Name="EditorPanel" Visibility="Collapsed" Spacing="12">
+        <Button x:Name="BackButton" Click="OnBackClick" HorizontalAlignment="Left"/>
+        <TextBlock x:Name="EditorTitle" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/>
+        <TextBox x:Name="NameBox" TextChanged="OnEditorChanged" TextWrapping="Wrap"/>
+        <TextBox x:Name="DefinitionBox" TextChanged="OnEditorChanged" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="120"/>
+        <controls:EditableTagList x:Name="ProjectTypesEditor" ValuesChanged="OnTagValuesChanged"/>
+        <controls:EditableTagList x:Name="TagsEditor" ValuesChanged="OnTagValuesChanged"/>
+        <TextBox x:Name="SourceBox" TextChanged="OnEditorChanged" TextWrapping="Wrap"/>
+        <TextBox x:Name="NotesBox" TextChanged="OnEditorChanged" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="100"/>
+        <TextBlock x:Name="TimestampsText" TextWrapping="Wrap" Opacity="0.75"/>
+        <InfoBar x:Name="EditorStatus" IsOpen="False" IsClosable="True"/>
+        <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Name="SaveButton" Click="OnSaveClick"/><Button x:Name="ResetButton" Click="OnResetClick"/><Button x:Name="CopyButton" Click="OnCopyClick"/><Button x:Name="DeleteButton" Click="OnDeleteClick"/></StackPanel>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

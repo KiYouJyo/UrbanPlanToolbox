@@ -16,3 +16,5 @@ Each production tool must be implemented through this checklist; do not add an u
 12. Validate Debug/Release x64, a signed non-development MSIX, and manual UI/data-loop acceptance before release.
 
 `color-palette-recorder` is the first real implementation of this template. `workflow-review-checklist` is the second real sample and validates a pure structured-data tool with multiple placements. `architecture-planning-regulations-index` is the third sample and validates a read-only packaged catalog with development-time import and official-link boundaries. Both schemas are intentionally separate from `ProjectSchemaVersion`; the portable container remains `BackupFormatVersion = 1`.
+
+`design-concept-dictionary` is the fourth sample: it validates an offline editable dictionary with independent schema version 1, deep-copy editing/duplication, generic editable tag lists, and backup validation without attachments.
