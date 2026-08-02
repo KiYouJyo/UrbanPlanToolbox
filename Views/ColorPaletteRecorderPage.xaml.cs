@@ -146,14 +146,18 @@ public sealed partial class ColorPaletteRecorderPage : Page
         var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_EditColor"), Content = new ScrollViewer { Content = panel, MaxHeight = 620 }, PrimaryButtonText = T("Palette_Save"), CloseButtonText = T("Action_Cancel") };
         var synchronizing = false;
         var lastEditSource = ColorEditSource.None;
-        picker.ColorChanged += (_, args) =>
+        void CopyPickerColorToDraft(Color pickedColor)
         {
             if (synchronizing) return;
             synchronizing = true;
-            draft.Hex = ToHex(args.NewColor); lastEditSource = ColorEditSource.Picker;
+            draft.Hex = ToHex(pickedColor); lastEditSource = ColorEditSource.Picker;
             hex.Text = draft.Hex; rgb.Text = RgbSummary(draft.Hex); error.Text = "";
             synchronizing = false;
-        };
+        }
+        picker.ColorChanged += (_, args) => CopyPickerColorToDraft(args.NewColor);
+        // The dependency-property callback covers ColorPicker interaction paths that do not
+        // raise ColorChanged reliably in a ContentDialog on the current Windows App SDK.
+        picker.RegisterPropertyChangedCallback(ColorPicker.ColorProperty, (_, _) => CopyPickerColorToDraft(picker.Color));
         hex.TextChanged += (_, _) =>
         {
             if (synchronizing) return;
@@ -167,9 +171,9 @@ public sealed partial class ColorPaletteRecorderPage : Page
             else if (!string.IsNullOrWhiteSpace(hex.Text)) error.Text = T("Palette_InvalidHex");
         };
         if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
-        // Reading the picker only for a picker-originated edit closes the event-timing gap without
-        // letting an earlier HEX field value overwrite the user's last picker selection.
-        if (lastEditSource == ColorEditSource.Picker) draft.Hex = ToHex(picker.Color);
+        // Use the picker value for picker-originated edits even if its event was delayed; HEX is
+        // the only source permitted to override it after a valid direct HEX edit.
+        if (lastEditSource != ColorEditSource.Hex) draft.Hex = ToHex(picker.Color);
         draft.Name = name.Text;
         if (!ColorPaletteStorageService.TryApplyColorEditorDraft(_editing, draft, out _)) { Show(EditorStatus, T("Palette_InvalidHex")); return; }
         UpdateDirtyState(); RenderColors();
