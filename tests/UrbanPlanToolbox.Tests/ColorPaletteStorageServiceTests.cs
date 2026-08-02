@@ -65,6 +65,42 @@ public sealed class ColorPaletteStorageServiceTests : IDisposable
         Assert.False(File.Exists(_service.ResolveManagedImagePath(first.RelativePath)));
     }
 
+    [Fact]
+    public async Task EditingCopyDoesNotMutatePersistedSchemeUntilSave()
+    {
+        var original = new ColorPaletteScheme { Name = "Saved", Category = ColorPaletteCategories.Cool };
+        original.Images.Add(new ColorPaletteImage { RelativePath = $"{original.SchemeId:D}/first.png", OriginalFileName = "first.png", ContentType = "image/png", SortOrder = 0 });
+        original.Colors.Add(new ColorPaletteColor { Name = "Blue", Hex = "#001122", SortOrder = 0 });
+        await _service.SaveAsync(new ColorPaletteDocument { Schemes = [original] });
+
+        var draft = ColorPaletteStorageService.CloneScheme(original);
+        draft.Name = "Discarded";
+        draft.Images.Clear();
+        draft.Colors[0].Hex = "#FFFFFF";
+
+        var loaded = await _service.ReadAsync();
+        var persisted = Assert.Single(loaded.Value!.Schemes);
+        Assert.Equal("Saved", persisted.Name);
+        Assert.Single(persisted.Images);
+        Assert.Equal("#001122", persisted.Colors[0].Hex);
+    }
+
+    [Fact]
+    public async Task SavedImageRecordAndManagedFileSurviveFreshServiceRead()
+    {
+        Directory.CreateDirectory(_root);
+        var source = Path.Combine(_root, "reference.png");
+        await File.WriteAllBytesAsync(source, [9, 8, 7]);
+        var scheme = new ColorPaletteScheme { Name = "Persisted", Category = ColorPaletteCategories.Neutral };
+        scheme.Images.Add(await _service.CopyImageAsync(scheme.SchemeId, source, 0));
+        await _service.SaveAsync(new ColorPaletteDocument { Schemes = [scheme] });
+
+        var fresh = new ColorPaletteStorageService(_paths);
+        var restored = Assert.Single((await fresh.ReadAsync()).Value!.Schemes);
+        var image = Assert.Single(restored.Images);
+        Assert.True(File.Exists(fresh.ResolveManagedImagePath(image.RelativePath)));
+    }
+
     [Theory]
     [InlineData("../escape.png")]
     [InlineData("C:/escape.png")]

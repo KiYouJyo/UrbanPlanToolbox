@@ -5,10 +5,11 @@
   <ScrollViewer>
     <StackPanel Style="{StaticResource PageContentStackPanelStyle}" Spacing="16">
       <StackPanel x:Name="ListPanel" Spacing="12">
-        <StackPanel Orientation="Horizontal" Spacing="12">
-          <StackPanel Width="620"><TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}"/><TextBlock x:Name="DescriptionText" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/></StackPanel>
-          <Button x:Name="NewButton" Click="OnNew" VerticalAlignment="Bottom" />
-        </StackPanel>
+        <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+          <StackPanel><TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}"/><TextBlock x:Name="DescriptionText" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/></StackPanel>
+          <Button x:Name="NewButton" Click="OnNew" Grid.Column="1" VerticalAlignment="Bottom" />
+          <VisualStateManager.VisualStateGroups><VisualStateGroup><VisualState x:Name="Narrow"><VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="0"/></VisualState.StateTriggers><VisualState.Setters><Setter Target="NewButton.(Grid.Column)" Value="0"/><Setter Target="NewButton.(Grid.Row)" Value="1"/></VisualState.Setters></VisualState><VisualState x:Name="Wide"><VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="640"/></VisualState.StateTriggers></VisualState></VisualStateGroup></VisualStateManager.VisualStateGroups>
+        </Grid>
         <ComboBox x:Name="CategoryFilter" SelectionChanged="OnFilterChanged" />
         <InfoBar x:Name="ListStatus" IsOpen="False" IsClosable="True" />
         <StackPanel x:Name="CardsPanel" Spacing="10" />

@@ -84,6 +84,23 @@ public sealed class ColorPaletteStorageService
         return true;
     }
 
+    public static ColorPaletteDocument CloneDocument(ColorPaletteDocument source) => new()
+    {
+        Schemes = source.Schemes.Select(CloneScheme).ToList()
+    };
+
+    public static ColorPaletteScheme CloneScheme(ColorPaletteScheme source) => new()
+    {
+        SchemeId = source.SchemeId,
+        Name = source.Name,
+        Category = source.Category,
+        CustomCategoryName = source.CustomCategoryName,
+        CreatedAtUtc = source.CreatedAtUtc,
+        UpdatedAtUtc = source.UpdatedAtUtc,
+        Images = source.Images.Select(image => new ColorPaletteImage { ImageId = image.ImageId, RelativePath = image.RelativePath, OriginalFileName = image.OriginalFileName, ContentType = image.ContentType, SortOrder = image.SortOrder }).ToList(),
+        Colors = source.Colors.Select(color => new ColorPaletteColor { ColorId = color.ColorId, Name = color.Name, Hex = color.Hex, SortOrder = color.SortOrder }).ToList()
+    };
+
     public static bool TryValidateDocument(ColorPaletteDocument document, out string? error)
     {
         error = null;
