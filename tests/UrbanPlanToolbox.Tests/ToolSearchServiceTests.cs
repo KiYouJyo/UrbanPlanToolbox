@@ -41,7 +41,9 @@ public sealed class ToolSearchServiceTests
     [InlineData("color-palette-recorder", ToolIds.ColorPaletteRecorder)]
     public void SearchMatchesConfiguredChineseAndPinyinFields(string query, string expectedId)
     {
-        Assert.Equal(expectedId, Assert.Single(Flatten(_service.Search(query, _ => false))).Id);
+        var results = Flatten(_service.Search(query, _ => false)).ToArray();
+        if (query == "规划") Assert.Contains(expectedId, results.Select(tool => tool.Id));
+        else Assert.Equal(expectedId, Assert.Single(results).Id);
     }
 
     [Fact]
@@ -58,8 +60,8 @@ public sealed class ToolSearchServiceTests
     {
         var groups = _service.Search(" ", _ => false);
 
-        Assert.Equal(["D", "G", "S"], groups.Select(group => group.Header));
-        Assert.Equal(ToolIds.UnitScaleConverter, Assert.Single(groups[0].Tools).Id);
+        Assert.Equal(["D", "G", "L", "S", "X"], groups.Select(group => group.Header));
+        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.DesignConceptDictionary], groups[0].Tools.Select(tool => tool.Id));
         Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(groups[1].Tools).Id);
     }
 
@@ -70,7 +72,7 @@ public sealed class ToolSearchServiceTests
 
         Assert.Equal("已收藏", groups[0].Header);
         Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(groups[0].Tools).Id);
-        Assert.Equal(["D", "S"], groups.Skip(1).Select(group => group.Header));
+        Assert.Equal(["D", "L", "S", "X"], groups.Skip(1).Select(group => group.Header));
         Assert.DoesNotContain(groups.Skip(1).SelectMany(group => group.Tools), tool => tool.Id == ToolIds.PlanningIndicatorCalculator);
     }
 

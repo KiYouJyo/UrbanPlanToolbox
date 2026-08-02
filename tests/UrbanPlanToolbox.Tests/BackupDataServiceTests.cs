@@ -32,6 +32,23 @@ public sealed class BackupDataServiceTests
     }
 
     [Fact]
+    public async Task ExportIncludesAndValidatesDesignConceptDictionaryData()
+    {
+        using var scope = new BackupScope();
+        var concept = new DesignConcept { Name = "三生空间", Definition = "关系优先", CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow };
+        var concepts = new DesignConceptDictionaryService(scope.Provider);
+        Assert.True((await concepts.SaveAsync(new DesignConceptDictionaryDocument { Concepts = [concept] })).Succeeded);
+
+        var output = scope.Path("concepts.uptbackup");
+        var exported = await scope.Backup.ExportAsync(output);
+        using var archive = ZipFile.OpenRead(output);
+
+        Assert.True(exported.Succeeded);
+        Assert.Contains(archive.Entries, entry => entry.FullName == "data/tools/design-concept-dictionary/concepts.json");
+        Assert.True((await scope.Backup.InspectAsync(output)).Succeeded);
+    }
+
+    [Fact]
     public async Task ExportExcludesCacheLogsRecoveryFilesAndFolderTokens()
     {
         using var scope = new BackupScope();
@@ -265,7 +282,7 @@ public sealed class BackupDataServiceTests
     {
         public BackupScope()
         {
-            Root = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"UrbanPlanToolbox-backup-{Guid.NewGuid():N}"); Provider = new AppDataPathProvider(System.IO.Path.Combine(Root, "app"), [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter]); Provider.EnsureInfrastructureDirectories(); Projects = new ProjectStorageService(Provider); Backup = new BackupDataService(Provider, "0.3.9");
+            Root = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"UrbanPlanToolbox-backup-{Guid.NewGuid():N}"); Provider = new AppDataPathProvider(System.IO.Path.Combine(Root, "app"), [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter, ToolIds.DesignConceptDictionary]); Provider.EnsureInfrastructureDirectories(); Projects = new ProjectStorageService(Provider); Backup = new BackupDataService(Provider, "0.3.9");
         }
         public string Root { get; } public AppDataPathProvider Provider { get; } public ProjectStorageService Projects { get; } public BackupDataService Backup { get; }
         public string Path(string name) => System.IO.Path.Combine(Root, name);

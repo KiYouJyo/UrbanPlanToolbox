@@ -198,9 +198,9 @@ public sealed partial class LocalizationTests
         var ja = new ToolSearchService(ToolRegistry.Default, TestLocalization.JaJp);
         var en = new ToolSearchService(ToolRegistry.Default, TestLocalization.EnUs);
 
-        Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(Flatten(zh.Search("规划", _ => false))).Id);
+        Assert.Contains(ToolIds.PlanningIndicatorCalculator, Flatten(zh.Search("规划", _ => false)).Select(tool => tool.Id));
         Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(Flatten(ja.Search("容積率", _ => false))).Id);
-        Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(Flatten(en.Search("planning", _ => false))).Id);
+        Assert.Contains(ToolIds.PlanningIndicatorCalculator, Flatten(en.Search("planning", _ => false)).Select(tool => tool.Id));
         Assert.Equal(ToolIds.UnitScaleConverter, Assert.Single(Flatten(ja.Search("縮尺", _ => false))).Id);
         Assert.Equal(ToolIds.UnitScaleConverter, Assert.Single(Flatten(en.Search("scale", _ => false))).Id);
 
@@ -217,7 +217,7 @@ public sealed partial class LocalizationTests
         {
             var service = new ToolSearchService(ToolRegistry.Default, TestLocalization.For(language));
             var ids = Flatten(service.Search(string.Empty, _ => false)).Select(tool => tool.Id).ToArray();
-            Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.PlanningIndicatorCalculator, ToolIds.ColorPaletteRecorder], ids);
+            Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.DesignConceptDictionary, ToolIds.PlanningIndicatorCalculator, ToolIds.WorkflowReviewChecklist, ToolIds.ColorPaletteRecorder, ToolIds.RegulationsIndex], ids);
         }
     }
 
@@ -244,16 +244,16 @@ public sealed partial class LocalizationTests
     public void VersionConfigurationIs040()
     {
         var manifest = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Package.appxmanifest"));
-        Assert.Contains("Version=\"0.4.0.0\"", manifest);
+        Assert.Contains("Version=\"0.4.3.0\"", manifest);
         var languages = Regex.Matches(manifest, "<Resource Language=\\\"([^\\\"]+)\\\"")
             .Select(match => match.Groups[1].Value).ToArray();
         Assert.Equal(["zh-CN", "ja-JP", "en-US"], languages);
         Assert.Contains("ms-resource:AppDisplayName", manifest);
 
         var project = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "UrbanPlanToolbox.csproj"));
-        Assert.Contains("<Version>0.4.0</Version>", project);
-        Assert.Contains("<AssemblyVersion>0.4.0</AssemblyVersion>", project);
-        Assert.Contains("<FileVersion>0.4.0</FileVersion>", project);
+        Assert.Contains("<Version>0.4.3</Version>", project);
+        Assert.Contains("<AssemblyVersion>0.4.3</AssemblyVersion>", project);
+        Assert.Contains("<FileVersion>0.4.3</FileVersion>", project);
         Assert.Contains("<DefaultLanguage>zh-CN</DefaultLanguage>", project);
         Assert.Contains("<AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>", project);
         Assert.DoesNotContain("<AppxBundleAutoResourcePackageQualifiers>Language", project);

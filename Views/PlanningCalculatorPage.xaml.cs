@@ -26,7 +26,6 @@ public sealed partial class PlanningCalculatorPage : Page
     {
         InitializeComponent();
         _calculator = new PlanningCalculationService(_localization);
-        FavoriteButton.ToolId = ToolIds.PlanningIndicatorCalculator;
         TitleText.Text = _localization.GetString("Tool_PlanningIndicator_Name");
         SiteAreaBox.Header = _localization.GetString("Field_SiteArea");
         FootprintBox.Header = _localization.GetString("Field_BuildingFootprint");

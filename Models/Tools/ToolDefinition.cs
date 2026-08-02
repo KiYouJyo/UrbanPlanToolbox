@@ -12,4 +12,20 @@ public sealed record ToolDefinition(
     bool IsAvailable,
     string PinyinSortKey,
     string PinyinInitial,
-    string SearchKeywordsResourceKey);
+    string SearchKeywordsResourceKey)
+{
+    public IReadOnlyList<ToolPlacement> CategoryPlacements { get; init; } = [];
+}
+
+public sealed record ToolPlacement(
+    ToolPrimaryCategory PrimaryCategory,
+    ToolSecondaryCategory SecondaryCategory,
+    int SortOrder);
+
+public static class ToolDefinitionExtensions
+{
+    public static IReadOnlyList<ToolPlacement> GetPlacements(this ToolDefinition tool) =>
+        tool.CategoryPlacements.Count > 0
+            ? tool.CategoryPlacements
+            : [new ToolPlacement(tool.PrimaryCategory, tool.SecondaryCategory, tool.SortOrder)];
+}

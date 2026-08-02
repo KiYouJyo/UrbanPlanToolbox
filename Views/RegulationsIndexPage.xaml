@@ -1,0 +1,39 @@
+<Page x:Class="UrbanPlanToolbox.Views.RegulationsIndexPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Style="{StaticResource PageContentStackPanelStyle}" MaxWidth="1400" HorizontalAlignment="Center">
+      <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
+      <TextBlock x:Name="DescriptionText" TextWrapping="Wrap" FontSize="14"/>
+      <TextBlock x:Name="StatsText" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/>
+      <TextBlock x:Name="NoticeText" TextWrapping="Wrap" FontSize="14"/>
+      <Grid ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBox x:Name="SearchBox" Grid.Column="0" TextChanged="OnTextChanged"/><ComboBox x:Name="RegionBox" Grid.Column="1" SelectionChanged="OnSelectionChanged"/><ComboBox x:Name="TopicBox" Grid.Column="2" SelectionChanged="OnSelectionChanged"/></Grid>
+      <TextBlock x:Name="RegulationsHeader" Style="{StaticResource SubtitleTextBlockStyle}"/>
+      <ListView x:Name="EntriesList" IsItemClickEnabled="True" ItemClick="OnEntryClick" SelectionMode="None" MaxHeight="560" HorizontalContentAlignment="Stretch">
+        <ListView.ItemContainerStyle><Style TargetType="ListViewItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0,0,0,8"/><Setter Property="IsTabStop" Value="False"/><Setter Property="UseSystemFocusVisuals" Value="False"/><Setter Property="FocusVisualPrimaryBrush" Value="Transparent"/><Setter Property="FocusVisualSecondaryBrush" Value="Transparent"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListViewItem"><ListViewItemPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTransitions="{TemplateBinding ContentTransitions}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Padding="{TemplateBinding Padding}" CornerRadius="{StaticResource CardFocusCornerRadius}"/></ControlTemplate></Setter.Value></Setter></Style></ListView.ItemContainerStyle>
+        <ListView.ItemTemplate><DataTemplate>
+          <Button Tag="{Binding}" Click="OnRegulationButtonClick" Style="{StaticResource CardActionButtonStyle}" Margin="0" Padding="{StaticResource CardContentPadding}" CornerRadius="{StaticResource CardCornerRadius}" FocusVisualMargin="0" FocusVisualPrimaryThickness="1" FocusVisualSecondaryThickness="0" AutomationProperties.Name="{Binding AutomationName}">
+            <StackPanel Spacing="8" HorizontalAlignment="Stretch">
+              <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap"/>
+              <TextBlock Text="{Binding Metadata}" FontSize="13" Opacity="0.75" TextWrapping="Wrap"/>
+              <TextBlock Text="{Binding Summary}" FontSize="14" TextWrapping="WrapWholeWords"/>
+            </StackPanel>
+          </Button>
+        </DataTemplate></ListView.ItemTemplate>
+      </ListView>
+      <Border x:Name="DetailPanel" Visibility="Collapsed" Padding="{StaticResource CardContentPadding}" Margin="0,0,0,8" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="{StaticResource CardCornerRadius}">
+        <StackPanel Spacing="8"><TextBlock x:Name="DetailHeader" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/><TextBlock x:Name="DetailText" FontSize="14" TextWrapping="WrapWholeWords"/><StackPanel Orientation="Horizontal" Spacing="8"><Button x:Name="DetailOpenButton" Click="OnDetailOpenClick"/><Button x:Name="DetailDownloadButton" Click="OnDetailDownloadClick"/><Button x:Name="DetailCloseButton" Click="OnDetailCloseClick"/></StackPanel></StackPanel>
+      </Border>
+      <InfoBar x:Name="LinkErrorBar" IsOpen="False" IsClosable="True" Severity="Error"/>
+      <TextBlock x:Name="PortalsHeader" Style="{StaticResource SubtitleTextBlockStyle}"/>
+      <ListView x:Name="PortalsList" SelectionMode="None" MaxHeight="520" HorizontalContentAlignment="Stretch">
+        <ListView.ItemsPanel><ItemsPanelTemplate><ItemsWrapGrid MaximumRowsOrColumns="2" Orientation="Horizontal"/></ItemsPanelTemplate></ListView.ItemsPanel>
+        <ListView.ItemTemplate><DataTemplate>
+          <Border Padding="{StaticResource CardContentPadding}" Margin="0,0,8,8" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="{StaticResource CardCornerRadius}" HorizontalAlignment="Stretch">
+            <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Spacing="8"><TextBlock Text="{Binding Portal.PlatformName}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding Portal.Region}" FontSize="13" Opacity="0.75"/><TextBlock Text="{Binding Portal.Coverage}" FontSize="14" TextWrapping="WrapWholeWords"/><TextBlock Text="{Binding Portal.UsageNote}" FontSize="14" TextWrapping="WrapWholeWords"/><TextBlock Text="{Binding UrlDisplay}" FontSize="13" TextWrapping="WrapWholeWords" Opacity="0.7"/><TextBlock Text="{Binding StatusText}" FontSize="13" TextWrapping="Wrap"/></StackPanel><Button Grid.Column="1" Tag="{Binding}" Click="OnOpenPortalClick" IsEnabled="{Binding IsValidUrl}" VerticalAlignment="Top" ToolTipService.ToolTip="{Binding OpenButtonToolTip}" AutomationProperties.Name="{Binding AutomationName}" Content="{Binding OpenButtonText}"/></Grid>
+          </Border>
+        </DataTemplate></ListView.ItemTemplate>
+      </ListView>
+      <TextBlock x:Name="NotesHeader" Style="{StaticResource SubtitleTextBlockStyle}"/>
+      <ItemsControl x:Name="NotesList"><ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" FontSize="14" TextWrapping="WrapWholeWords" Margin="0,0,0,8"/></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

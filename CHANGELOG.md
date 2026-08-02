@@ -1,6 +1,12 @@
 # 更改日志
 
-## 0.3.9（预览版，当前公开候选版本）
+## 0.4.1（预览版，随 v0.4.3 发布）
+
+- 新增离线流程审核清单工具，支持设计与科研双分类位置、稳定 ID、阶段/审核项编辑、状态统计、复制、排序及本地数据备份恢复。
+- 新增 `WorkflowReviewChecklistSchemaVersion = 1`，复用统一原子 JSON 存储和 `BackupFormatVersion = 1`。
+- 扩展工具注册模型以支持多个分类展示位置，搜索、收藏和导航仍按唯一 Stable ID 工作。
+
+## 0.3.9（预览版，已发布）
 
 ### Added
 
@@ -236,7 +242,7 @@
 - Shared page spacing, card actions, status badges, and less-truncated long tool text.
 - ProjectSchemaVersion remains 3 and BackupFormatVersion remains 1.
 
-## 0.4.0（开发完成，待发布）
+## 0.4.0（预览版，已发布）
 
 ### Added
 
@@ -251,5 +257,16 @@
 
 ### Notes
 
-- v0.4.0 为待发布的开发完成版本；Draft PR #17 保持未合并状态。
+- v0.4.0 已通过 PR #17 合并并正式发布（tag `v0.4.0`）。
 - 已知限制：自 v0.3.11.1 延续，部分冷启动环境在原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响本版本已验收功能，后续版本单独处理。
+## 0.4.3（预览版，已发布）
+
+- 新增 `design-concept-dictionary` 设计理念词典，支持离线新增、编辑、重置、复制、删除、搜索、项目类型/标签筛选和排序。
+- 使用独立 `DesignConceptDictionarySchemaVersion = 1`，数据位于 `data/tools/design-concept-dictionary/concepts.json`，复用原子保存、最后有效备份和未来版本保护。
+- 将词典数据纳入现有 `.uptbackup` 校验与导入回滚流程；不新增附件，也不修改 `BackupFormatVersion`。
+- 增加中文、日语和英文资源，以及工具注册、搜索、数据、复制和响应式页面回归测试。
+
+## 0.4.2（随 v0.4.3 发布）
+
+- Added the offline, read-only Architecture & Planning Regulations Index with 221 catalog entries, 20 official portals, source notes, filters, and official-link navigation.
+- Source data is generated from the approved workbook at development time; the packaged app does not access Excel or online caches.

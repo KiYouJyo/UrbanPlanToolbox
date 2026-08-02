@@ -1,6 +1,6 @@
-<Page x:Class="UrbanPlanToolbox.Views.UnitScaleConverterPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:UrbanPlanToolbox.Controls">
+<Page x:Class="UrbanPlanToolbox.Views.UnitScaleConverterPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
  <ScrollViewer><StackPanel Style="{StaticResource PageContentStackPanelStyle}">
-  <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap" /><controls:FavoriteButton x:Name="FavoriteButton" Grid.Column="1" VerticalAlignment="Top" /></Grid>
+  <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap" />
   <TextBlock x:Uid="Page_UnitScaleConverter_Description" TextWrapping="Wrap" />
   <Pivot x:Name="ConverterPivot" SelectionChanged="OnCategoryChanged">
    <PivotItem x:Uid="Pivot_Length" Tag="Length" /><PivotItem x:Uid="Pivot_Area" Tag="Area" /><PivotItem x:Uid="Pivot_Volume" Tag="Volume" />

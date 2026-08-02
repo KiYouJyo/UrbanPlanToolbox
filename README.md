@@ -1,6 +1,6 @@
 # 规划工具箱（UrbanPlan Toolbox）
 
-> 当前版本：`v0.4.0`（MSIX `0.4.0.0`）。面向 Windows 的城市规划辅助工具箱，项目、设置与规划输入均在本地处理。
+> 当前版本：`v0.4.3`（MSIX `0.4.3.0`）。面向 Windows 的城市规划辅助工具箱，项目、设置与规划输入均在本地处理。
 
 > 已知限制：在部分冷启动环境中，原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响已验收功能，将在后续版本单独处理。
 
@@ -50,6 +50,14 @@
 
 该自签名包用于测试预览，不是正式受信任代码签名；完整构建、测试与打包说明见 [docs/RELEASE.md](docs/RELEASE.md) 与 [packaging/README.md](packaging/README.md)。
 
+## v0.4.1 流程审核清单
+
+- 新增 `workflow-review-checklist`，同一个 Stable ID 同时出现在设计工具→前期分析与科研工具→前期工具。
+- 两个入口共享同一离线页面和 `data/tools/workflow-review-checklist/checklists.json` 数据；搜索与收藏只产生一个工具记录。
+- 支持清单、流程阶段、审核项、四种审核状态、重点项、备注、筛选、统计、复制、排序和导入导出兼容。
+- 使用独立 `WorkflowReviewChecklistSchemaVersion = 1`，不改变 `ProjectSchemaVersion` 或 `BackupFormatVersion = 1`。
+- 已随 v0.4.3 一并发布；Splash 后短暂黑色窗口属于既有已知限制。
+
 ## 技术与系统要求
 
 C#、.NET 10、WinUI 3、Windows App SDK 和单项目 MSIX。支持 Windows 10 17763+，优先 Windows 11 x64。开发需要 Visual Studio 2026 的 WinUI 工作负载、Windows SDK 10.0.26100.0 和 .NET SDK 10。
@@ -65,3 +73,10 @@ C#、.NET 10、WinUI 3、Windows App SDK 和单项目 MSIX。支持 Windows 10 1
 ## 后续计划
 
 版本路线图与版本/发布政策见 [docs/ROADMAP.md](docs/ROADMAP.md)。
+## v0.4.3 设计理念词典
+
+v0.4.3 adds the offline `design-concept-dictionary` tool under Design → Design Development. Concepts are stored at `%LocalAppData%\\UrbanPlanToolbox\\data\\tools\\design-concept-dictionary\\concepts.json` with independent schema version 1, atomic writes, last-valid recovery, future-schema protection, search/filter/sort, editable project-type and tag lists, and validated backup/import support. No attachments or external concept sources are bundled.
+
+## Regulations index data
+
+Version 0.4.2 packages a deterministic JSON snapshot at `Assets/Data/RegulationsIndex/regulations-index.v1.json`. It is an offline research index and official-portal directory, not legal advice, a complete legal corpus, a standards/PDF repository, or a compliance decision engine. Currentness, local adoption, paid standards, and applicable project requirements must be checked at the official source.
