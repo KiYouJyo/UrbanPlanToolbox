@@ -143,7 +143,12 @@ public sealed partial class ColorPaletteRecorderPage : Page
         var rgb = new TextBlock { Text = RgbSummary(draft.Hex) };
         var error = new TextBlock { Foreground = new SolidColorBrush(Colors.IndianRed) };
         var panel = new StackPanel { Spacing = 8 }; panel.Children.Add(picker); panel.Children.Add(name); panel.Children.Add(hex); panel.Children.Add(rgb); panel.Children.Add(error);
-        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_EditColor"), Content = new ScrollViewer { Content = panel, MaxHeight = 620 }, PrimaryButtonText = T("Palette_Save"), CloseButtonText = T("Action_Cancel") };
+        // A nested ScrollViewer intercepts ColorSpectrum pointer drags. Keep the picker directly
+        // in the dialog at normal heights; only introduce scrolling where the window is too short.
+        object content = XamlRoot.Size.Height < 680
+            ? new ScrollViewer { Content = panel, MaxHeight = Math.Max(240, XamlRoot.Size.Height - 180), VerticalScrollMode = ScrollMode.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Auto }
+            : panel;
+        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_EditColor"), Content = content, PrimaryButtonText = T("Palette_Save"), CloseButtonText = T("Action_Cancel") };
         var synchronizing = false;
         var lastEditSource = ColorEditSource.None;
         void CopyPickerColorToDraft(Color pickedColor)
