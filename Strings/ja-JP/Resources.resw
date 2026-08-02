@@ -61,7 +61,7 @@
     <comment>トップページのサブタイトル。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v0.3.9 プレビュー版。プロジェクトデータと計画ツールのデータはこのデバイス内に保持されます。</value>
+    <value>0.5.0 Preview。プロジェクトデータとツールデータはこのデバイス内に保持されます。</value>
     <comment>トップページのバージョンとプライバシー説明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
