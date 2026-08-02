@@ -259,3 +259,7 @@
 
 - v0.4.0 为待发布的开发完成版本；Draft PR #17 保持未合并状态。
 - 已知限制：自 v0.3.11.1 延续，部分冷启动环境在原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响本版本已验收功能，后续版本单独处理。
+## 0.4.2
+
+- Added the offline, read-only Architecture & Planning Regulations Index with 221 catalog entries, 20 official portals, source notes, filters, and official-link navigation.
+- Source data is generated from the approved workbook at development time; the packaged app does not access Excel or online caches.

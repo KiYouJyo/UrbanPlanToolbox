@@ -70,6 +70,24 @@ public sealed class ToolRegistry
             CategoryPlacements = [
                 new(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis, 40),
                 new(ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 40)]
+        },
+        new(
+            ToolIds.RegulationsIndex,
+            "Tool_RegulationsIndex_Name",
+            "Tool_RegulationsIndex_Description",
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.MasterPlanning,
+            "\uE71D",
+            typeof(Views.RegulationsIndexPage),
+            50,
+            true,
+            "xingyefaguizhishiku",
+            "X",
+            "Tool_RegulationsIndex_Keywords")
+        {
+            CategoryPlacements = [
+                new(ToolPrimaryCategory.Design, ToolSecondaryCategory.MasterPlanning, 50),
+                new(ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 50)]
         }
     ]);
 
