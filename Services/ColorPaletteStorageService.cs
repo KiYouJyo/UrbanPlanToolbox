@@ -101,6 +101,60 @@ public sealed class ColorPaletteStorageService
         Colors = source.Colors.Select(color => new ColorPaletteColor { ColorId = color.ColorId, Name = color.Name, Hex = color.Hex, SortOrder = color.SortOrder }).ToList()
     };
 
+    public static ColorEditorDraft CreateColorEditorDraft(ColorPaletteColor source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        return new ColorEditorDraft
+        {
+            ColorId = source.ColorId,
+            Name = source.Name,
+            Hex = TryNormalizeHex(source.Hex, out var hex) ? hex : "#000000",
+            SortOrder = source.SortOrder
+        };
+    }
+
+    public static bool TryApplyColorEditorDraft(ColorPaletteScheme scheme, ColorEditorDraft draft, out string? error)
+    {
+        ArgumentNullException.ThrowIfNull(scheme);
+        ArgumentNullException.ThrowIfNull(draft);
+        error = null;
+        if (draft.ColorId == Guid.Empty || !TryNormalizeHex(draft.Hex, out var hex)) { error = "ColorInvalid"; return false; }
+        var index = scheme.Colors.FindIndex(color => color.ColorId == draft.ColorId);
+        if (index < 0) { error = "ColorNotFound"; return false; }
+        scheme.Colors[index] = new ColorPaletteColor
+        {
+            ColorId = draft.ColorId,
+            Name = NormalizeText(draft.Name),
+            Hex = hex,
+            SortOrder = draft.SortOrder
+        };
+        return true;
+    }
+
+    public static ColorPaletteEditSnapshot CreateEditSnapshot(ColorPaletteScheme scheme)
+    {
+        ArgumentNullException.ThrowIfNull(scheme);
+        return new ColorPaletteEditSnapshot(
+            scheme.SchemeId,
+            NormalizeText(scheme.Name),
+            NormalizeText(scheme.Category),
+            NormalizeText(scheme.CustomCategoryName),
+            scheme.Images.OrderBy(image => image.SortOrder).ThenBy(image => image.ImageId).Select(image => new ColorPaletteImageEditSnapshot(image.ImageId, NormalizePath(image.RelativePath), NormalizeText(image.OriginalFileName), NormalizeText(image.ContentType), image.SortOrder)).ToArray(),
+            scheme.Colors.OrderBy(color => color.SortOrder).ThenBy(color => color.ColorId).Select(color => new ColorPaletteColorEditSnapshot(color.ColorId, NormalizeText(color.Name), NormalizeHexForSnapshot(color.Hex), color.SortOrder)).ToArray());
+    }
+
+    public static IReadOnlyList<string> DescribeEditDifferences(ColorPaletteEditSnapshot baseline, ColorPaletteEditSnapshot current)
+    {
+        var differences = new List<string>();
+        if (baseline.SchemeId != current.SchemeId) differences.Add($"SchemeId: {baseline.SchemeId:D} != {current.SchemeId:D}");
+        if (baseline.Name != current.Name) differences.Add($"Name: '{baseline.Name}' != '{current.Name}'");
+        if (baseline.Category != current.Category) differences.Add($"ColorFamily: '{baseline.Category}' != '{current.Category}'");
+        if (baseline.CustomCategoryName != current.CustomCategoryName) differences.Add($"CustomColorFamily: '{baseline.CustomCategoryName}' != '{current.CustomCategoryName}'");
+        DescribeCollectionDifferences("Images", baseline.Images, current.Images, differences);
+        DescribeCollectionDifferences("Colors", baseline.Colors, current.Colors, differences);
+        return differences;
+    }
+
     public static bool TryValidateDocument(ColorPaletteDocument document, out string? error)
     {
         error = null;
@@ -120,4 +174,17 @@ public sealed class ColorPaletteStorageService
     }
 
     private static string GetContentType(string extension) => extension.ToLowerInvariant() switch { ".png" => "image/png", ".jpg" or ".jpeg" => "image/jpeg", ".webp" => "image/webp", ".gif" => "image/gif", ".bmp" => "image/bmp", _ => "image/tiff" };
+
+    private static string NormalizeText(string? value) => value?.Trim() ?? "";
+    private static string NormalizePath(string? value) => NormalizeText(value).Replace('\\', '/');
+    private static string NormalizeHexForSnapshot(string? value) => TryNormalizeHex(value, out var normalized) ? normalized : $"!INVALID:{NormalizeText(value)}";
+
+    private static void DescribeCollectionDifferences<T>(string field, IReadOnlyList<T> baseline, IReadOnlyList<T> current, ICollection<string> differences)
+    {
+        if (baseline.Count != current.Count) differences.Add($"{field}.Count: {baseline.Count} != {current.Count}");
+        var count = Math.Min(baseline.Count, current.Count);
+        for (var index = 0; index < count; index++) if (!EqualityComparer<T>.Default.Equals(baseline[index], current[index])) differences.Add($"{field}[{index}]: {baseline[index]} != {current[index]}");
+        for (var index = count; index < baseline.Count; index++) differences.Add($"{field}[{index}]: {baseline[index]} != <missing>");
+        for (var index = count; index < current.Count; index++) differences.Add($"{field}[{index}]: <missing> != {current[index]}");
+    }
 }

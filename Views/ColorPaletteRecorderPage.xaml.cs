@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using System.Diagnostics;
 using Windows.Storage.Pickers;
 using Windows.UI;
 using WinRT.Interop;
@@ -23,6 +24,7 @@ public sealed partial class ColorPaletteRecorderPage : Page
     private readonly List<ColorPaletteImage> _newImages = [];
     private bool _dirty;
     private bool _initializingEditor;
+    private ColorPaletteEditSnapshot? _editBaseline;
 
     public ColorPaletteRecorderPage()
     {
@@ -72,22 +74,29 @@ public sealed partial class ColorPaletteRecorderPage : Page
     private void OpenEditor(ColorPaletteScheme scheme, bool isNew = false)
     {
         _initializingEditor = true;
-        _editing = ColorPaletteStorageService.CloneScheme(scheme); _isNew = isNew; _pendingImageDeletes.Clear(); _newImages.Clear(); _dirty = false; EditorStatus.IsOpen = false; ListPanel.Visibility = Visibility.Collapsed; EditorPanel.Visibility = Visibility.Visible; EditorTitle.Text = scheme.Name; SchemeNameBox.Header = T("Palette_Name"); SchemeNameBox.Text = scheme.Name; CustomCategoryBox.Header = T("Palette_CustomCategory");
-        CategoryBox.SelectedItem = CategoryBox.Items.OfType<Choice>().First(x => x.Id == scheme.Category); CustomCategoryBox.Text = scheme.CustomCategoryName ?? ""; RenderImages(); RenderColors(); _initializingEditor = false; _dirty = false;
+        _editing = ColorPaletteStorageService.CloneScheme(scheme); _isNew = isNew; _pendingImageDeletes.Clear(); _newImages.Clear(); _dirty = false; _editBaseline = null; EditorStatus.IsOpen = false; ListPanel.Visibility = Visibility.Collapsed; EditorPanel.Visibility = Visibility.Visible; EditorTitle.Text = scheme.Name; SchemeNameBox.Header = T("Palette_Name"); SchemeNameBox.Text = scheme.Name; CustomCategoryBox.Header = T("Palette_CustomCategory");
+        CategoryBox.SelectedItem = CategoryBox.Items.OfType<Choice>().First(x => x.Id == scheme.Category); CustomCategoryBox.Text = scheme.CustomCategoryName ?? ""; RenderImages(); RenderColors(); _initializingEditor = false; EstablishEditBaseline();
     }
     private async void OnBack(object sender, RoutedEventArgs e)
     {
+        UpdateDirtyState();
         if (_dirty && !await ConfirmDiscardAsync()) return;
-        DiscardDraft(); _editing = null; _dirty = false; EditorPanel.Visibility = Visibility.Collapsed; ListPanel.Visibility = Visibility.Visible; RenderCards();
+        DiscardDraft(); _editing = null; _editBaseline = null; _dirty = false; EditorPanel.Visibility = Visibility.Collapsed; ListPanel.Visibility = Visibility.Visible; RenderCards();
     }
-    private void OnChanged(object sender, TextChangedEventArgs e) { if (_initializingEditor || _editing is null) return; _editing.Name = SchemeNameBox.Text.Trim(); _editing.CustomCategoryName = CustomCategoryBox.Text.Trim(); _dirty = true; }
-    private void OnCategoryChanged(object sender, SelectionChangedEventArgs e) { if (_editing is null || CategoryBox.SelectedItem is not Choice choice) return; _editing.Category = choice.Id; CustomCategoryBox.Visibility = choice.Id == ColorPaletteCategories.Custom ? Visibility.Visible : Visibility.Collapsed; if (!_initializingEditor) _dirty = true; }
+    private void OnChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_editing is null) return;
+        if (ReferenceEquals(sender, SchemeNameBox)) _editing.Name = SchemeNameBox.Text.Trim();
+        else if (ReferenceEquals(sender, CustomCategoryBox)) _editing.CustomCategoryName = CustomCategoryBox.Text.Trim();
+        if (!_initializingEditor) UpdateDirtyState();
+    }
+    private void OnCategoryChanged(object sender, SelectionChangedEventArgs e) { if (_editing is null || CategoryBox.SelectedItem is not Choice choice) return; _editing.Category = choice.Id; CustomCategoryBox.Visibility = choice.Id == ColorPaletteCategories.Custom ? Visibility.Visible : Visibility.Collapsed; if (!_initializingEditor) UpdateDirtyState(); }
     private async void OnAddImages(object sender, RoutedEventArgs e)
     {
         if (_editing is null || App.MainWindow is null) return;
         var picker = new FileOpenPicker(); picker.FileTypeFilter.Add(".png"); picker.FileTypeFilter.Add(".jpg"); picker.FileTypeFilter.Add(".jpeg"); picker.FileTypeFilter.Add(".webp"); picker.FileTypeFilter.Add(".bmp"); InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(App.MainWindow));
         var files = await picker.PickMultipleFilesAsync(); foreach (var file in files) { try { var image = await _storage.CopyImageAsync(_editing.SchemeId, file.Path, _editing.Images.Count); _editing.Images.Add(image); _newImages.Add(image); } catch { Show(EditorStatus, T("Palette_ImageImportFailed")); } }
-        _dirty = true; RenderImages();
+        UpdateDirtyState(); RenderImages();
     }
     private void RenderImages()
     {
@@ -96,10 +105,10 @@ public sealed partial class ColorPaletteRecorderPage : Page
         {
             var panel = new StackPanel { Width = 180, Margin = new Thickness(0, 0, 8, 8), Spacing = 4 }; var path = _storage.ResolveManagedImagePath(image.RelativePath);
             if (File.Exists(path)) panel.Children.Add(new Image { Source = new BitmapImage(new Uri(path)), Height = 120, Stretch = Microsoft.UI.Xaml.Media.Stretch.UniformToFill }); else panel.Children.Add(new TextBlock { Text = T("Palette_ImageMissing"), Height = 120, TextWrapping = TextWrapping.Wrap });
-            var remove = new Button { Content = T("Action_Delete"), Tag = image }; remove.Click += (sender, _) => { var item = (ColorPaletteImage)((Button)sender).Tag; if (!_newImages.Remove(item)) _pendingImageDeletes.Add(item); _editing.Images.Remove(item); _dirty = true; RenderImages(); }; panel.Children.Add(remove); ImagesList.Items.Add(panel);
+            var remove = new Button { Content = T("Action_Delete"), Tag = image }; remove.Click += (sender, _) => { var item = (ColorPaletteImage)((Button)sender).Tag; if (!_newImages.Remove(item)) _pendingImageDeletes.Add(item); _editing.Images.Remove(item); UpdateDirtyState(); RenderImages(); }; panel.Children.Add(remove); ImagesList.Items.Add(panel);
         }
     }
-    private void OnAddColor(object sender, RoutedEventArgs e) { if (_editing is null) return; _editing.Colors.Add(new ColorPaletteColor { Hex = "#000000", SortOrder = _editing.Colors.Count }); _dirty = true; RenderColors(); }
+    private void OnAddColor(object sender, RoutedEventArgs e) { if (_editing is null) return; _editing.Colors.Add(new ColorPaletteColor { ColorId = Guid.NewGuid(), Hex = "#000000", SortOrder = _editing.Colors.Count }); UpdateDirtyState(); RenderColors(); }
     private void RenderColors()
     {
         ColorsPanel.Items.Clear(); if (_editing is null) return;
@@ -109,11 +118,11 @@ public sealed partial class ColorPaletteRecorderPage : Page
             var row = new Grid(); row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(56) }); row.ColumnDefinitions.Add(new ColumnDefinition()); row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var edit = new Button { Background = new SolidColorBrush(ParseColor(color.Hex)), Width = 48, Height = 48, Tag = color }; edit.Click += async (sender, _) => await EditColorAsync((ColorPaletteColor)((Button)sender).Tag); Grid.SetColumn(edit, 0); row.Children.Add(edit);
             var details = new StackPanel { Spacing = 2 }; details.Children.Add(new TextBlock { Text = string.IsNullOrWhiteSpace(color.Name) ? T("Palette_UnnamedColor") : color.Name, TextWrapping = TextWrapping.Wrap }); details.Children.Add(new TextBlock { Text = color.Hex }); details.Children.Add(new TextBlock { Text = RgbSummary(color.Hex) }); Grid.SetColumn(details, 1); row.Children.Add(details);
-            var actions = new StackPanel { Spacing = 4 }; var editAction = new Button { Content = T("Palette_EditColor"), Tag = color }; editAction.Click += async (sender, _) => await EditColorAsync((ColorPaletteColor)((Button)sender).Tag); var remove = new Button { Content = T("Action_Delete"), Tag = color }; remove.Click += (sender, _) => { _editing!.Colors.Remove((ColorPaletteColor)((Button)sender).Tag); _dirty = true; RenderColors(); }; actions.Children.Add(editAction); actions.Children.Add(remove); Grid.SetColumn(actions, 2); row.Children.Add(actions);
+            var actions = new StackPanel { Spacing = 4 }; var editAction = new Button { Content = T("Palette_EditColor"), Tag = color }; editAction.Click += async (sender, _) => await EditColorAsync((ColorPaletteColor)((Button)sender).Tag); var remove = new Button { Content = T("Action_Delete"), Tag = color }; remove.Click += (sender, _) => { _editing!.Colors.Remove((ColorPaletteColor)((Button)sender).Tag); UpdateDirtyState(); RenderColors(); }; actions.Children.Add(editAction); actions.Children.Add(remove); Grid.SetColumn(actions, 2); row.Children.Add(actions);
             card.Child = row; ColorsPanel.Items.Add(card);
         }
     }
-    private async void OnSave(object sender, RoutedEventArgs e) { if (_editing is null) return; _editing.Name = SchemeNameBox.Text.Trim(); _editing.UpdatedAtUtc = DateTimeOffset.UtcNow; foreach (var color in _editing.Colors) if (!ColorPaletteStorageService.TryNormalizeHex(color.Hex, out var hex)) { Show(EditorStatus, T("Palette_InvalidHex")); return; } else color.Hex = hex; var next = ColorPaletteStorageService.CloneDocument(_document); var index = next.Schemes.FindIndex(s => s.SchemeId == _editing.SchemeId); if (index < 0) next.Schemes.Add(ColorPaletteStorageService.CloneScheme(_editing)); else next.Schemes[index] = ColorPaletteStorageService.CloneScheme(_editing); var result = await _storage.SaveAsync(next); if (!result.Succeeded) { Show(EditorStatus, T("Palette_SaveFailed")); return; } foreach (var image in _pendingImageDeletes) _storage.DeleteManagedImage(image); _pendingImageDeletes.Clear(); _newImages.Clear(); _document = next; _isNew = false; _dirty = false; Show(EditorStatus, T("Palette_Saved")); RenderCards(); }
+    private async void OnSave(object sender, RoutedEventArgs e) { if (_editing is null) return; _editing.Name = SchemeNameBox.Text.Trim(); _editing.UpdatedAtUtc = DateTimeOffset.UtcNow; foreach (var color in _editing.Colors) if (!ColorPaletteStorageService.TryNormalizeHex(color.Hex, out var hex)) { Show(EditorStatus, T("Palette_InvalidHex")); return; } else color.Hex = hex; var next = ColorPaletteStorageService.CloneDocument(_document); var index = next.Schemes.FindIndex(s => s.SchemeId == _editing.SchemeId); if (index < 0) next.Schemes.Add(ColorPaletteStorageService.CloneScheme(_editing)); else next.Schemes[index] = ColorPaletteStorageService.CloneScheme(_editing); var result = await _storage.SaveAsync(next); if (!result.Succeeded) { Show(EditorStatus, T("Palette_SaveFailed")); return; } foreach (var image in _pendingImageDeletes) _storage.DeleteManagedImage(image); _pendingImageDeletes.Clear(); _newImages.Clear(); _document = next; _isNew = false; EstablishEditBaseline(); Show(EditorStatus, T("Palette_Saved")); RenderCards(); }
     private void OnReset(object sender, RoutedEventArgs e) { if (_editing is null) return; DiscardDraft(); var saved = _document.Schemes.FirstOrDefault(s => s.SchemeId == _editing.SchemeId); if (saved is null) OpenEditor(new ColorPaletteScheme { SchemeId = _editing.SchemeId, Name = T("Palette_NewScheme") }, true); else OpenEditor(saved); }
     private async Task DeleteAsync(ColorPaletteScheme scheme) { var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_DeleteTitle"), Content = T("Palette_DeleteMessage"), PrimaryButtonText = T("Action_Delete"), CloseButtonText = T("Action_Cancel") }; if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return; var next = ColorPaletteStorageService.CloneDocument(_document); next.Schemes.RemoveAll(s => s.SchemeId == scheme.SchemeId); var result = await _storage.SaveAsync(next); if (!result.Succeeded) { Show(ListStatus, T("Palette_SaveFailed")); return; } _storage.DeleteSchemeAttachments(scheme.SchemeId); _document = next; RenderCards(); }
     private async void OnDeleteScheme(object sender, RoutedEventArgs e)
@@ -123,10 +132,11 @@ public sealed partial class ColorPaletteRecorderPage : Page
         await DeleteAsync(_document.Schemes.First(scheme => scheme.SchemeId == _editing.SchemeId));
         if (!_document.Schemes.Any(scheme => scheme.SchemeId == _editing.SchemeId)) await ReturnToListAsync();
     }
-    private Task ReturnToListAsync() { _editing = null; _dirty = false; EditorPanel.Visibility = Visibility.Collapsed; ListPanel.Visibility = Visibility.Visible; RenderCards(); return Task.CompletedTask; }
+    private Task ReturnToListAsync() { _editing = null; _editBaseline = null; _dirty = false; EditorPanel.Visibility = Visibility.Collapsed; ListPanel.Visibility = Visibility.Visible; RenderCards(); return Task.CompletedTask; }
     private async Task EditColorAsync(ColorPaletteColor color)
     {
-        var draft = new ColorPaletteColor { ColorId = color.ColorId, Name = color.Name, Hex = color.Hex, SortOrder = color.SortOrder };
+        if (_editing is null) return;
+        var draft = ColorPaletteStorageService.CreateColorEditorDraft(color);
         var picker = new ColorPicker { Color = ParseColor(draft.Hex), Width = 280, Height = 280 };
         var name = new TextBox { Header = T("Palette_ColorName"), Text = draft.Name ?? "" };
         var hex = new TextBox { Header = "HEX", Text = draft.Hex };
@@ -135,15 +145,39 @@ public sealed partial class ColorPaletteRecorderPage : Page
         var panel = new StackPanel { Spacing = 8 }; panel.Children.Add(picker); panel.Children.Add(name); panel.Children.Add(hex); panel.Children.Add(rgb); panel.Children.Add(error);
         var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_EditColor"), Content = new ScrollViewer { Content = panel, MaxHeight = 620 }, PrimaryButtonText = T("Palette_Save"), CloseButtonText = T("Action_Cancel") };
         var synchronizing = false;
-        picker.ColorChanged += (_, args) => { if (synchronizing) return; synchronizing = true; draft.Hex = $"#{args.NewColor.R:X2}{args.NewColor.G:X2}{args.NewColor.B:X2}"; hex.Text = draft.Hex; rgb.Text = RgbSummary(draft.Hex); error.Text = ""; synchronizing = false; };
-        hex.TextChanged += (_, _) => { if (synchronizing) return; if (ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var normalized)) { synchronizing = true; draft.Hex = normalized; picker.Color = ParseColor(normalized); rgb.Text = RgbSummary(normalized); error.Text = ""; synchronizing = false; } else if (!string.IsNullOrWhiteSpace(hex.Text)) error.Text = T("Palette_InvalidHex"); };
+        var lastEditSource = ColorEditSource.None;
+        picker.ColorChanged += (_, args) =>
+        {
+            if (synchronizing) return;
+            synchronizing = true;
+            draft.Hex = ToHex(args.NewColor); lastEditSource = ColorEditSource.Picker;
+            hex.Text = draft.Hex; rgb.Text = RgbSummary(draft.Hex); error.Text = "";
+            synchronizing = false;
+        };
+        hex.TextChanged += (_, _) =>
+        {
+            if (synchronizing) return;
+            if (ColorPaletteStorageService.TryNormalizeHex(hex.Text, out var normalized))
+            {
+                synchronizing = true;
+                draft.Hex = normalized; lastEditSource = ColorEditSource.Hex;
+                picker.Color = ParseColor(normalized); rgb.Text = RgbSummary(normalized); error.Text = "";
+                synchronizing = false;
+            }
+            else if (!string.IsNullOrWhiteSpace(hex.Text)) error.Text = T("Palette_InvalidHex");
+        };
         if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
-        if (!ColorPaletteStorageService.TryNormalizeHex(draft.Hex, out var value)) { Show(EditorStatus, T("Palette_InvalidHex")); return; }
-        color.Name = name.Text.Trim(); color.Hex = value; _dirty = true; RenderColors();
+        // Reading the picker only for a picker-originated edit closes the event-timing gap without
+        // letting an earlier HEX field value overwrite the user's last picker selection.
+        if (lastEditSource == ColorEditSource.Picker) draft.Hex = ToHex(picker.Color);
+        draft.Name = name.Text;
+        if (!ColorPaletteStorageService.TryApplyColorEditorDraft(_editing, draft, out _)) { Show(EditorStatus, T("Palette_InvalidHex")); return; }
+        UpdateDirtyState(); RenderColors();
     }
     private async Task<bool> ConfirmDiscardAsync() { var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Palette_UnsavedTitle"), Content = T("Palette_UnsavedMessage"), PrimaryButtonText = T("Action_Discard"), CloseButtonText = T("Action_Cancel") }; return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary; }
     private string CategoryName(ColorPaletteScheme scheme) => scheme.Category == ColorPaletteCategories.Custom ? scheme.CustomCategoryName ?? T("Palette_CategoryCustom") : CategoryBox.Items.OfType<Choice>().First(x => x.Id == scheme.Category).Name;
     private static Color ParseColor(string hex) => ColorPaletteStorageService.TryNormalizeHex(hex, out var normalized) ? ColorHelper.FromArgb(255, Convert.ToByte(normalized[1..3], 16), Convert.ToByte(normalized[3..5], 16), Convert.ToByte(normalized[5..7], 16)) : Colors.Gray;
+    private static string ToHex(Color color) => $"#{color.R:X2}{color.G:X2}{color.B:X2}";
     private static string RgbSummary(string hex) { var color = ParseColor(hex); return $"RGB {color.R}, {color.G}, {color.B}"; }
     private Border CreateCardPreview(ColorPaletteScheme scheme)
     {
@@ -156,6 +190,21 @@ public sealed partial class ColorPaletteRecorderPage : Page
         return preview;
     }
     private void DiscardDraft() { foreach (var image in _newImages) _storage.DeleteManagedImage(image); _newImages.Clear(); _pendingImageDeletes.Clear(); }
+    private void EstablishEditBaseline()
+    {
+        if (_editing is null) { _editBaseline = null; _dirty = false; return; }
+        _editBaseline = ColorPaletteStorageService.CreateEditSnapshot(_editing);
+        _dirty = false;
+    }
+    private void UpdateDirtyState()
+    {
+        if (_initializingEditor || _editing is null || _editBaseline is null) return;
+        var current = ColorPaletteStorageService.CreateEditSnapshot(_editing);
+        var differences = ColorPaletteStorageService.DescribeEditDifferences(_editBaseline, current);
+        _dirty = differences.Count > 0;
+        if (_dirty) Debug.WriteLine($"Color palette unsaved differences: {string.Join("; ", differences)}");
+    }
     private void Show(InfoBar bar, string message) { bar.Message = message; bar.IsOpen = true; }
     private sealed record Choice(string Id, string Name) { public override string ToString() => Name; }
+    private enum ColorEditSource { None, Picker, Hex }
 }

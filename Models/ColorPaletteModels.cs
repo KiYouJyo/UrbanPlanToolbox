@@ -45,3 +45,25 @@ public sealed class ColorPaletteColor
     public string Hex { get; set; } = "#000000";
     public int SortOrder { get; init; }
 }
+
+/// <summary>Short-lived, isolated state for one color editor dialog.</summary>
+public sealed class ColorEditorDraft
+{
+    public Guid ColorId { get; init; }
+    public string? Name { get; set; }
+    public string Hex { get; set; } = "#000000";
+    public int SortOrder { get; init; }
+}
+
+/// <summary>Only user-editable, persisted fields participate in unsaved-change detection.</summary>
+public sealed record ColorPaletteEditSnapshot(
+    Guid SchemeId,
+    string Name,
+    string Category,
+    string CustomCategoryName,
+    IReadOnlyList<ColorPaletteImageEditSnapshot> Images,
+    IReadOnlyList<ColorPaletteColorEditSnapshot> Colors);
+
+public sealed record ColorPaletteImageEditSnapshot(Guid ImageId, string RelativePath, string OriginalFileName, string ContentType, int SortOrder);
+
+public sealed record ColorPaletteColorEditSnapshot(Guid ColorId, string Name, string Hex, int SortOrder);

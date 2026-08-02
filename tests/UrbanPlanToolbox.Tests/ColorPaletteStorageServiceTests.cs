@@ -118,6 +118,57 @@ public sealed class ColorPaletteStorageServiceTests : IDisposable
         Assert.Equal("#778899", restored[2].Hex);
     }
 
+    [Fact]
+    public async Task ColorEditorDraftsReplaceOnlyTheirMatchingColorAndPersistRedGreenBlue()
+    {
+        var scheme = new ColorPaletteScheme { Name = "Primary", Category = ColorPaletteCategories.Mixed };
+        scheme.Colors.Add(new ColorPaletteColor { ColorId = Guid.NewGuid(), Hex = "#000000", SortOrder = 0 });
+        scheme.Colors.Add(new ColorPaletteColor { ColorId = Guid.NewGuid(), Hex = "#000000", SortOrder = 1 });
+        scheme.Colors.Add(new ColorPaletteColor { ColorId = Guid.NewGuid(), Hex = "#000000", SortOrder = 2 });
+
+        var red = ColorPaletteStorageService.CreateColorEditorDraft(scheme.Colors[0]); red.Hex = "#ff0000";
+        var green = ColorPaletteStorageService.CreateColorEditorDraft(scheme.Colors[1]); green.Hex = "#00ff00";
+        var blue = ColorPaletteStorageService.CreateColorEditorDraft(scheme.Colors[2]); blue.Hex = "#0000ff";
+        Assert.True(ColorPaletteStorageService.TryApplyColorEditorDraft(scheme, red, out _));
+        Assert.True(ColorPaletteStorageService.TryApplyColorEditorDraft(scheme, green, out _));
+        Assert.True(ColorPaletteStorageService.TryApplyColorEditorDraft(scheme, blue, out _));
+        Assert.Equal(["#FF0000", "#00FF00", "#0000FF"], scheme.Colors.OrderBy(color => color.SortOrder).Select(color => color.Hex));
+        Assert.Equal(3, scheme.Colors.Select(color => color.ColorId).Distinct().Count());
+
+        Assert.True((await _service.SaveAsync(new ColorPaletteDocument { Schemes = [scheme] })).Succeeded);
+        var json = await File.ReadAllTextAsync(_paths.GetToolDataFilePath(ToolIds.ColorPaletteRecorder, ColorPaletteStorageService.DataFileName));
+        Assert.Contains("#FF0000", json); Assert.Contains("#00FF00", json); Assert.Contains("#0000FF", json);
+        var restored = Assert.Single((await _service.ReadAsync()).Value!.Schemes).Colors.OrderBy(color => color.SortOrder).Select(color => color.Hex);
+        Assert.Equal(["#FF0000", "#00FF00", "#0000FF"], restored);
+    }
+
+    [Fact]
+    public void CancellingColorEditorDraftLeavesOriginalColorUntouched()
+    {
+        var original = new ColorPaletteColor { Hex = "#112233", Name = "Saved", SortOrder = 0 };
+        var draft = ColorPaletteStorageService.CreateColorEditorDraft(original);
+        draft.Hex = "#FF0000"; draft.Name = "Discarded";
+
+        Assert.Equal("#112233", original.Hex);
+        Assert.Equal("Saved", original.Name);
+    }
+
+    [Fact]
+    public void EditSnapshotNormalizesLoadedValuesAndIdentifiesOnlyBusinessChanges()
+    {
+        var scheme = new ColorPaletteScheme { Name = "  Saved  ", Category = ColorPaletteCategories.Cool, CustomCategoryName = null };
+        scheme.Images.Add(new ColorPaletteImage { RelativePath = $"{scheme.SchemeId:D}\\first.png", OriginalFileName = " first.png ", ContentType = "image/png", SortOrder = 0 });
+        scheme.Colors.Add(new ColorPaletteColor { Name = null, Hex = "#aabbcc", SortOrder = 0 });
+        var baseline = ColorPaletteStorageService.CreateEditSnapshot(scheme);
+
+        scheme.CustomCategoryName = ""; scheme.Images[0] = new ColorPaletteImage { ImageId = scheme.Images[0].ImageId, RelativePath = $"{scheme.SchemeId:D}/first.png", OriginalFileName = "first.png", ContentType = "image/png", SortOrder = 0 }; scheme.Colors[0].Hex = "AABBCC";
+        Assert.Empty(ColorPaletteStorageService.DescribeEditDifferences(baseline, ColorPaletteStorageService.CreateEditSnapshot(scheme)));
+
+        scheme.Colors[0].Hex = "#FF0000";
+        var differences = ColorPaletteStorageService.DescribeEditDifferences(baseline, ColorPaletteStorageService.CreateEditSnapshot(scheme));
+        Assert.Single(differences); Assert.StartsWith("Colors[0]", differences[0]);
+    }
+
     [Theory]
     [InlineData("../escape.png")]
     [InlineData("C:/escape.png")]
