@@ -105,6 +105,7 @@ public sealed partial class DesignConceptDictionaryPage : Page
         _editing = DesignConceptDictionaryService.Clone(_savedEditing);
         ListPanel.Visibility = Visibility.Collapsed;
         EditorPanel.Visibility = Visibility.Visible;
+        NewButton.Visibility = Visibility.Collapsed;
         RenderEditor();
         _dirty = false;
     }
@@ -216,7 +217,18 @@ public sealed partial class DesignConceptDictionaryPage : Page
     }
 
     private async Task<ContentDialogResult> ConfirmDiscardAsync() => await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = T("Concept_UnsavedTitle"), Content = T("Concept_UnsavedMessage"), PrimaryButtonText = T("Concept_Discard"), CloseButtonText = T("Action_Cancel"), DefaultButton = ContentDialogButton.Close });
-    private void ReturnToList() { _editing = null; _savedEditing = null; _baseline = null; _dirty = false; EditorPanel.Visibility = Visibility.Collapsed; ListPanel.Visibility = Visibility.Visible; RefreshFilters(); RenderCards(); }
+    private void ReturnToList()
+    {
+        _editing = null;
+        _savedEditing = null;
+        _baseline = null;
+        _dirty = false;
+        EditorPanel.Visibility = Visibility.Collapsed;
+        ListPanel.Visibility = Visibility.Visible;
+        NewButton.Visibility = Visibility.Visible;
+        RefreshFilters();
+        RenderCards();
+    }
     private void ShowEditorError(string? error)
     {
         var resourceKey = error switch

@@ -112,10 +112,16 @@ public sealed class DesignConceptDictionaryTests : IDisposable
         Assert.Equal(3, Count(xaml, "DisplayMemberPath=\"Display\""));
         Assert.Equal(3, Count(xaml, "SelectedValuePath=\"Value\""));
         Assert.Contains("HorizontalContentAlignment=\"Stretch\"", xaml);
+        Assert.Contains("x:Name=\"ContentPanel\"", xaml);
+        Assert.Contains("HorizontalAlignment=\"Stretch\"", xaml);
+        Assert.DoesNotContain("x:Name=\"ContentPanel\"\n                    Style=\"{StaticResource PageContentStackPanelStyle}\"\n                    MaxWidth=", xaml);
         Assert.Contains("AdaptiveTrigger MinWindowWidth=\"720\"", xaml);
         Assert.DoesNotContain("ActualWidth", xaml);
         Assert.DoesNotContain("FilterChoice.ToString", xaml);
         Assert.DoesNotContain("Width=\"400\"", xaml);
+        var code = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml.cs"));
+        Assert.Contains("NewButton.Visibility = Visibility.Collapsed", code);
+        Assert.Contains("NewButton.Visibility = Visibility.Visible", code);
     }
 
     [Fact]

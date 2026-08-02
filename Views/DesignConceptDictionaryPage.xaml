@@ -9,8 +9,7 @@
       <Grid HorizontalAlignment="Stretch">
         <StackPanel x:Name="ContentPanel"
                     Style="{StaticResource PageContentStackPanelStyle}"
-                    MaxWidth="1400"
-                    HorizontalAlignment="Center">
+                    HorizontalAlignment="Stretch">
           <Grid ColumnSpacing="12">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
