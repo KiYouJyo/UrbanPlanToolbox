@@ -1,6 +1,6 @@
 # 规划工具箱（UrbanPlan Toolbox）
 
-> 当前版本：`v0.4.0`（MSIX `0.4.0.0`）。面向 Windows 的城市规划辅助工具箱，项目、设置与规划输入均在本地处理。
+> 当前版本：`v0.4.3`（MSIX `0.4.3.0`）。面向 Windows 的城市规划辅助工具箱，项目、设置与规划输入均在本地处理。
 
 > 已知限制：在部分冷启动环境中，原生 SplashScreen 结束后仍可能短暂显示带标题栏的纯黑窗口；该呈现问题不影响已验收功能，将在后续版本单独处理。
 
@@ -56,7 +56,7 @@
 - 两个入口共享同一离线页面和 `data/tools/workflow-review-checklist/checklists.json` 数据；搜索与收藏只产生一个工具记录。
 - 支持清单、流程阶段、审核项、四种审核状态、重点项、备注、筛选、统计、复制、排序和导入导出兼容。
 - 使用独立 `WorkflowReviewChecklistSchemaVersion = 1`，不改变 `ProjectSchemaVersion` 或 `BackupFormatVersion = 1`。
-- 当前仍为预览版本；Splash 后短暂黑色窗口属于既有已知限制。
+- 已随 v0.4.3 一并发布；Splash 后短暂黑色窗口属于既有已知限制。
 
 ## 技术与系统要求
 
