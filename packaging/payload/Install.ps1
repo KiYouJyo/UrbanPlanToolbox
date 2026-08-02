@@ -53,6 +53,17 @@ try {
     $installerMetadata = Get-InstallerMetadata $payloadRoot
     $null = Get-SafePayloadFilePath $payloadRoot $installerMetadata.msixFileName
     $null = Get-SafePayloadFilePath $payloadRoot $installerMetadata.certificateFileName
+    $payloadRequiredFiles = @(
+        $installerMetadata.msixFileName,
+        $installerMetadata.certificateFileName,
+        'SHA256SUMS.txt',
+        'Dependencies\x64\Microsoft.WindowsAppRuntime.2.msix'
+    )
+    foreach ($requiredFile in $payloadRequiredFiles) {
+        if (-not (Test-Path -LiteralPath (Join-Path $payloadRoot $requiredFile) -PathType Leaf)) {
+            throw '未找到完整安装文件。请先将整个 ZIP 解压到同一文件夹，再运行安装脚本。'
+        }
+    }
     $hashMap = Get-PayloadHashMap (Join-Path $payloadRoot 'SHA256SUMS.txt')
     $msixRelative = $installerMetadata.msixFileName
     $cerRelative = $installerMetadata.certificateFileName
@@ -60,6 +71,7 @@ try {
     $msixPath = Assert-PayloadHash $hashMap $msixRelative
     $cerPath = Assert-PayloadHash $hashMap $cerRelative
     $dependencyPath = Assert-PayloadHash $hashMap $dependencyRelative
+    Write-InstallLog "有效载荷校验通过：MSIX、CER、依赖和 SHA-256 清单均完整。"
     $metadata = Get-MsixPackageMetadata $msixPath
     Assert-MetadataMatchesMsix $installerMetadata $metadata
     if ($metadata.Architecture -cne 'x64') { throw "主 MSIX 架构不是 x64：$($metadata.Architecture)" }
@@ -67,26 +79,40 @@ try {
     $certificateThumbprint = $certificate.Thumbprint.ToUpperInvariant()
     Write-InstallLog "已验证 MSIX $($metadata.Name) $($metadata.Version)，Publisher $($metadata.Publisher)。"
 
-    $trustedStore = 'Cert:\LocalMachine\TrustedPeople'
-    $trustedCertificate = Get-ChildItem -Path $trustedStore | Where-Object { $_.Thumbprint -eq $certificateThumbprint } | Select-Object -First 1
-    if ($null -eq $trustedCertificate) {
-        Import-Certificate -FilePath $cerPath -CertStoreLocation $trustedStore | Out-Null
-        $certificateWasImported = $true
-        Write-InstallLog "已导入准确测试证书 $certificateThumbprint 到 LocalMachine TrustedPeople。"
+    $existingDevRegistration = Get-AppxPackage -Name $metadata.Name -ErrorAction SilentlyContinue | Where-Object { $_.Publisher -eq $metadata.Publisher -and $_.IsDevelopmentMode } | Select-Object -First 1
+    if ($null -ne $existingDevRegistration) {
+        Write-InstallLog "发现开发模式松散注册：$($existingDevRegistration.PackageFullName)，移除该开发注册。"
+        Remove-AppxPackage -Package $existingDevRegistration.PackageFullName -ErrorAction Stop
+        Write-InstallLog "已移除开发模式松散注册。"
     }
-    else { Write-InstallLog "准确测试证书已在 LocalMachine TrustedPeople 中受信任。" }
 
-    $runtime = Get-AppxPackage -AllUsers -Name 'Microsoft.WindowsAppRuntime.2' | Where-Object { $_.Architecture -eq 'X64' -and $_.Publisher -eq 'CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US' -and [version]$_.Version -ge $metadata.RuntimeMinVersion } | Sort-Object Version -Descending | Select-Object -First 1
-    if ($null -ne $runtime) {
-        Write-InstallLog "找到兼容 Windows App Runtime $($runtime.Version)；仅安装主 MSIX。"
-        Add-AppxPackage -Path $msixPath
+    $existingPackage = Get-AppxPackage -Name $metadata.Name -ErrorAction SilentlyContinue | Where-Object { $_.Publisher -eq $metadata.Publisher -and $_.Architecture -eq 'X64' -and -not $_.IsDevelopmentMode } | Sort-Object Version -Descending | Select-Object -First 1
+    if ($null -ne $existingPackage -and [version]$existingPackage.Version -eq $metadata.Version -and $existingPackage.Status -eq 'Ok') {
+        Write-InstallLog "已安装相同版本 $($metadata.Version)（$($existingPackage.PackageFullName)），无需重新安装。"
+        $installed = $existingPackage
     }
     else {
-        Write-InstallLog "未找到 $($metadata.RuntimeMinVersion) 或更高版本的兼容 x64 Windows App Runtime；使用随附依赖。"
-        Add-AppxPackage -Path $msixPath -DependencyPath $dependencyPath
-    }
+        $trustedStore = 'Cert:\LocalMachine\TrustedPeople'
+        $trustedCertificate = Get-ChildItem -Path $trustedStore | Where-Object { $_.Thumbprint -eq $certificateThumbprint } | Select-Object -First 1
+        if ($null -eq $trustedCertificate) {
+            Import-Certificate -FilePath $cerPath -CertStoreLocation $trustedStore | Out-Null
+            $certificateWasImported = $true
+            Write-InstallLog "已导入准确测试证书 $certificateThumbprint 到 LocalMachine TrustedPeople。"
+        }
+        else { Write-InstallLog "准确测试证书已在 LocalMachine TrustedPeople 中受信任。" }
 
-    $installed = Get-AppxPackage -Name $metadata.Name | Where-Object { $_.Publisher -eq $metadata.Publisher -and $_.Architecture -eq 'X64' } | Sort-Object Version -Descending | Select-Object -First 1
+        $runtime = Get-AppxPackage -AllUsers -Name 'Microsoft.WindowsAppRuntime.2' | Where-Object { $_.Architecture -eq 'X64' -and $_.Publisher -eq 'CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US' -and [version]$_.Version -ge $metadata.RuntimeMinVersion } | Sort-Object Version -Descending | Select-Object -First 1
+        if ($null -ne $runtime) {
+            Write-InstallLog "找到兼容 Windows App Runtime $($runtime.Version)；仅安装主 MSIX。"
+            Add-AppxPackage -Path $msixPath
+        }
+        else {
+            Write-InstallLog "未找到 $($metadata.RuntimeMinVersion) 或更高版本的兼容 x64 Windows App Runtime；使用随附依赖。"
+            Add-AppxPackage -Path $msixPath -DependencyPath $dependencyPath
+        }
+
+        $installed = Get-AppxPackage -Name $metadata.Name | Where-Object { $_.Publisher -eq $metadata.Publisher -and $_.Architecture -eq 'X64' } | Sort-Object Version -Descending | Select-Object -First 1
+    }
     if ($null -eq $installed -or [version]$installed.Version -ne $metadata.Version -or $installed.Status -ne 'Ok' -or $installed.IsDevelopmentMode) { throw '安装后的包身份、版本、状态或开发模式验证失败。' }
     Write-InstallLog "安装验证通过：$($installed.PackageFullName)；Status=$($installed.Status)；IsDevelopmentMode=$($installed.IsDevelopmentMode)。"
     if ($LaunchAfterInstall) {
