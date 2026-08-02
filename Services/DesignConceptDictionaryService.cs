@@ -62,7 +62,19 @@ public sealed class DesignConceptDictionaryService
         NormalizeText(concept.Notes));
 
     public static bool HasBusinessChanges(DesignConceptEditSnapshot baseline, DesignConceptEditSnapshot current) =>
-        !Equals(baseline, current);
+        GetChangedFields(baseline, current).Count > 0;
+
+    public static IReadOnlyList<string> GetChangedFields(DesignConceptEditSnapshot baseline, DesignConceptEditSnapshot current)
+    {
+        var fields = new List<string>();
+        if (!string.Equals(baseline.Name, current.Name, StringComparison.Ordinal)) fields.Add(nameof(DesignConcept.Name));
+        if (!string.Equals(baseline.Definition, current.Definition, StringComparison.Ordinal)) fields.Add(nameof(DesignConcept.Definition));
+        if (!baseline.ApplicableProjectTypes.SequenceEqual(current.ApplicableProjectTypes, StringComparer.OrdinalIgnoreCase)) fields.Add(nameof(DesignConcept.ApplicableProjectTypes));
+        if (!baseline.Tags.SequenceEqual(current.Tags, StringComparer.OrdinalIgnoreCase)) fields.Add(nameof(DesignConcept.Tags));
+        if (!string.Equals(baseline.SourceOrReference, current.SourceOrReference, StringComparison.Ordinal)) fields.Add(nameof(DesignConcept.SourceOrReference));
+        if (!string.Equals(baseline.Notes, current.Notes, StringComparison.Ordinal)) fields.Add(nameof(DesignConcept.Notes));
+        return fields;
+    }
 
     public static bool TryBuildConcept(
         DesignConceptDraft draft,
@@ -164,7 +176,7 @@ public sealed class DesignConceptDictionaryService
         return true;
     }
 
-    private static string NormalizeText(string? value) => value?.Trim() ?? string.Empty;
+    private static string NormalizeText(string? value) => (value?.Trim() ?? string.Empty).Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
     private static string? NullIfEmpty(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     private static IReadOnlyList<string> NormalizeList(IEnumerable<string>? values) =>
         (values ?? []).Select(NormalizeText).Where(value => value.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();

@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
+using System.Diagnostics;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
 
@@ -36,6 +38,9 @@ public sealed partial class DesignConceptDictionaryPage : Page
         TagsEditor.Label = T("Concept_Tags");
         TagsEditor.AddButtonText = T("Concept_Add");
         TagsEditor.PlaceholderText = T("Concept_TagPlaceholder");
+        AutomationProperties.SetName(ProjectTypeFilter, T("Concept_ProjectTypeFilter"));
+        AutomationProperties.SetName(TagFilter, T("Concept_TagFilter"));
+        AutomationProperties.SetName(SortBox, T("Concept_SortLastModified"));
         BackButton.Content = T("Action_Back");
         SaveButton.Content = T("Concept_Save");
         ResetButton.Content = T("Concept_Reset");
@@ -64,11 +69,15 @@ public sealed partial class DesignConceptDictionaryPage : Page
 
     private void RefreshFilters()
     {
+        var selectedProjectType = (ProjectTypeFilter.SelectedItem as FilterChoice)?.Value;
+        var selectedTag = (TagFilter.SelectedItem as FilterChoice)?.Value;
         _loading = true;
-        ProjectTypeFilter.ItemsSource = new[] { new FilterChoice(string.Empty, T("Concept_AllProjectTypes")) }.Concat(DesignConceptDictionaryService.GetProjectTypes(_document).Select(value => new FilterChoice(value, value))).ToArray();
-        TagFilter.ItemsSource = new[] { new FilterChoice(string.Empty, T("Concept_AllTags")) }.Concat(DesignConceptDictionaryService.GetTags(_document).Select(value => new FilterChoice(value, value))).ToArray();
-        ProjectTypeFilter.SelectedIndex = 0;
-        TagFilter.SelectedIndex = 0;
+        var projectChoices = new[] { new FilterChoice(string.Empty, T("Concept_AllProjectTypes")) }.Concat(DesignConceptDictionaryService.GetProjectTypes(_document).Select(value => new FilterChoice(value, value))).ToArray();
+        var tagChoices = new[] { new FilterChoice(string.Empty, T("Concept_AllTags")) }.Concat(DesignConceptDictionaryService.GetTags(_document).Select(value => new FilterChoice(value, value))).ToArray();
+        ProjectTypeFilter.ItemsSource = projectChoices;
+        TagFilter.ItemsSource = tagChoices;
+        ProjectTypeFilter.SelectedItem = projectChoices.FirstOrDefault(choice => string.Equals(choice.Value, selectedProjectType, StringComparison.OrdinalIgnoreCase)) ?? projectChoices[0];
+        TagFilter.SelectedItem = tagChoices.FirstOrDefault(choice => string.Equals(choice.Value, selectedTag, StringComparison.OrdinalIgnoreCase)) ?? tagChoices[0];
         _loading = false;
     }
 
@@ -128,7 +137,9 @@ public sealed partial class DesignConceptDictionaryPage : Page
         _editing.Tags = TagsEditor.Values.ToList();
         _editing.SourceOrReference = SourceBox.Text;
         _editing.Notes = NotesBox.Text;
-        _dirty = _baseline is not null && DesignConceptDictionaryService.HasBusinessChanges(_baseline, DesignConceptDictionaryService.CreateEditSnapshot(_editing));
+        var current = DesignConceptDictionaryService.CreateEditSnapshot(_editing);
+        _dirty = _baseline is not null && DesignConceptDictionaryService.HasBusinessChanges(_baseline, current);
+        if (_dirty && _baseline is not null) Debug.WriteLine($"DesignConceptDictionary dirty fields: {string.Join(',', DesignConceptDictionaryService.GetChangedFields(_baseline, current))}");
         EditorStatus.IsOpen = false;
     }
 

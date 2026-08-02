@@ -104,6 +104,37 @@ public sealed class DesignConceptDictionaryTests : IDisposable
         Assert.Contains("AutomationProperties.Name=\"Remove tag\"", tagXaml);
     }
 
+    [Fact]
+    public void ConceptPageUsesDisplayMembersAndStableResponsiveContainers()
+    {
+        var root = FindRepositoryRoot();
+        var xaml = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml"));
+        Assert.Equal(3, Count(xaml, "DisplayMemberPath=\"Display\""));
+        Assert.Equal(3, Count(xaml, "SelectedValuePath=\"Value\""));
+        Assert.Contains("HorizontalContentAlignment=\"Stretch\"", xaml);
+        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"720\"", xaml);
+        Assert.DoesNotContain("ActualWidth", xaml);
+        Assert.DoesNotContain("FilterChoice.ToString", xaml);
+        Assert.DoesNotContain("Width=\"400\"", xaml);
+    }
+
+    [Fact]
+    public void SnapshotNormalizesTextAndReportsOnlyBusinessFieldDifferences()
+    {
+        var concept = CreateConcept("名称", "第一行\r\n第二行", ["住宅"], ["生态"], null);
+        concept.Notes = null;
+        var baseline = DesignConceptDictionaryService.CreateEditSnapshot(concept);
+        var same = DesignConceptDictionaryService.CreateEditSnapshot(new DesignConcept
+        {
+            Name = " 名称 ", Definition = "第一行\n第二行", ApplicableProjectTypes = ["住宅"], Tags = ["生态"], Notes = string.Empty,
+            CreatedAt = concept.CreatedAt, UpdatedAt = concept.UpdatedAt
+        });
+        Assert.False(DesignConceptDictionaryService.HasBusinessChanges(baseline, same));
+
+        same = same with { Notes = "changed" };
+        Assert.Equal([nameof(DesignConcept.Notes)], DesignConceptDictionaryService.GetChangedFields(baseline, same));
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_root)) Directory.Delete(_root, recursive: true);
@@ -126,4 +157,6 @@ public sealed class DesignConceptDictionaryTests : IDisposable
         while (directory is not null && (!File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.csproj")) || !Directory.Exists(Path.Combine(directory.FullName, "Views")))) directory = directory.Parent;
         return directory?.FullName ?? throw new DirectoryNotFoundException("Repository root not found.");
     }
+
+    private static int Count(string text, string value) => text.Split(value, StringSplitOptions.None).Length - 1;
 }
