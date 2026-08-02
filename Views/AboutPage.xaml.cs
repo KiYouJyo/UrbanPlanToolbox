@@ -60,7 +60,9 @@ public sealed partial class AboutPage : Page
         {
             var message = RepositoryLinks.StoreProductUri is null ? _localization.GetString("Update_StoreManagedNoProduct") : _localization.GetString("Update_StoreManaged");
             if (RepositoryLinks.StoreProductUri is not null && await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString("Dialog_UpdateTitle"), Content = message, PrimaryButtonText = _localization.GetString("Action_OpenStore"), CloseButtonText = _localization.GetString("Action_Later") }, _pageLifetime.Token) == ContentDialogResult.Primary)
-                await Launcher.LaunchUriAsync(RepositoryLinks.StoreProductUri);
+            {
+                if (!await OpenStoreProductAsync()) await ShowMessageAsync(_localization.GetString("Error_OpenRepositoryFailed"), _localization.GetString("Dialog_OpenFailedTitle"));
+            }
             else await ShowMessageAsync(message, _localization.GetString("Dialog_UpdateTitle"));
             return;
         }
@@ -97,6 +99,11 @@ public sealed partial class AboutPage : Page
     }
 
     private Task ShowMessageAsync(string message, string title) => AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = title, Content = message, CloseButtonText = _localization.GetString("Dialog_Ok") }, _pageLifetime.Token);
+    private static async Task<bool> OpenStoreProductAsync()
+    {
+        if (RepositoryLinks.StoreProductUri is not null && await Launcher.LaunchUriAsync(RepositoryLinks.StoreProductUri)) return true;
+        return RepositoryLinks.StoreWebUri is not null && await Launcher.LaunchUriAsync(RepositoryLinks.StoreWebUri);
+    }
     private static string ToDisplayVersion(Version version) => $"{version.Major}.{version.Minor}.{version.Build}";
     private static string Truncate(string value, int maxLength) => value.Length <= maxLength ? value : $"{value[..maxLength]}…";
 }

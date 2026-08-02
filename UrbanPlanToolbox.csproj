@@ -41,6 +41,17 @@
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\UrbanPlanToolbox.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <!-- Store builds use an isolated, Partner Center-associated package manifest. -->
+  <ItemGroup Condition="'$(DistributionChannel)' == 'Store'">
+    <None Remove="Package.appxmanifest" />
+    <None Remove="Package.Store.appxmanifest" />
+    <Content Remove="Package.appxmanifest" />
+    <Content Remove="Package.Store.appxmanifest" />
+    <AppxManifest Include="Package.Store.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+  </ItemGroup>
   <ItemGroup>
     <Compile Remove="tests\**\*.cs" />
   </ItemGroup>
