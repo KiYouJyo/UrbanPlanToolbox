@@ -26,6 +26,7 @@ public sealed partial class CoordinateSystemConverterPage : Page
         SinglePointPivot.Header = _localization.GetString("Coordinate_ModeSingle"); ShapefilePivot.Header = _localization.GetString("Coordinate_ModeShapefile");
         SourceSystemBox.Header = _localization.GetString("Coordinate_Source"); TargetSystemBox.Header = _localization.GetString("Coordinate_Target");
         LongitudeBox.Header = _localization.GetString("Coordinate_Longitude"); LatitudeBox.Header = _localization.GetString("Coordinate_Latitude");
+        SingleSettingsTitle.Text = _localization.GetString("Coordinate_Source"); ResultTitle.Text = _localization.GetString("Coordinate_ResultTitle");
         SwapButton.Content = _localization.GetString("Coordinate_Swap"); ConvertButton.Content = _localization.GetString("Coordinate_ActionConvert"); ClearButton.Content = _localization.GetString("Coordinate_ActionClear"); SampleButton.Content = _localization.GetString("Coordinate_ActionSample");
         CopyLongitudeButton.Content = _localization.GetString("Coordinate_CopyLongitude"); CopyLatitudeButton.Content = _localization.GetString("Coordinate_CopyLatitude"); CopyCoordinateButton.Content = _localization.GetString("Coordinate_CopyCoordinate");
         ShapefileDescriptionText.Text = _localization.GetString("Coordinate_ShapefileDescription"); ShapefilePrivacyText.Text = _localization.GetString("Coordinate_ShapefilePrivacy"); DisclaimerText.Text = _localization.GetString("Coordinate_Disclaimer");
@@ -33,7 +34,8 @@ public sealed partial class CoordinateSystemConverterPage : Page
         SourceSystemBox.SelectedItem = CoordinateSystemType.Wgs84; TargetSystemBox.SelectedItem = CoordinateSystemType.Gcj02;
         ShapefileSourceBox.ItemsSource = ShapefileTargetBox.ItemsSource = Enum.GetValues<CoordinateSystemType>();
         ShapefileSourceBox.SelectedItem = CoordinateSystemType.Wgs84; ShapefileTargetBox.SelectedItem = CoordinateSystemType.Gcj02;
-        SelectShapefileButton.Content = _localization.GetString("Shapefile_Select"); SelectOutputFolderButton.Content = _localization.GetString("Shapefile_OutputFolder"); ConvertShapefileButton.Content = _localization.GetString("Coordinate_ActionConvert"); CancelShapefileButton.Content = _localization.GetString("Shapefile_Cancel"); OpenOutputFolderButton.Content = _localization.GetString("Shapefile_OpenOutput"); OutputNameBox.Header = _localization.GetString("Shapefile_OutputName");
+        ShapefileSourceBox.Header = _localization.GetString("Coordinate_Source"); ShapefileTargetBox.Header = _localization.GetString("Coordinate_Target");
+        SelectShapefileButton.Content = _localization.GetString("Shapefile_Select"); SelectOutputFolderButton.Content = _localization.GetString("Shapefile_OutputFolder"); ConvertShapefileButton.Content = _localization.GetString("Coordinate_ActionConvert"); CancelShapefileButton.Content = _localization.GetString("Shapefile_Cancel"); OpenOutputFolderButton.Content = _localization.GetString("Shapefile_OpenOutput"); OutputNameBox.Header = _localization.GetString("Shapefile_OutputName"); OutputNameBox.PlaceholderText = "planning_area_gcj02"; OutputNameHelpText.Text = _localization.GetString("Shapefile_OutputNameHelp");
     }
 
     private void OnConvert(object sender, RoutedEventArgs e)
@@ -75,13 +77,17 @@ public sealed partial class CoordinateSystemConverterPage : Page
     private async void OnConvertShapefile(object sender, RoutedEventArgs e)
     {
         if (_shapefilePath is null || _outputFolder is null) { Show(_localization.GetString("Shapefile_ChooseFirst"), InfoBarSeverity.Warning); return; }
+        var outputName = NormalizeOutputName(OutputNameBox.Text); if (outputName is null) { Show(_localization.GetString("Shapefile_InvalidName"), InfoBarSeverity.Error); return; }
+        if ((CoordinateSystemType)ShapefileSourceBox.SelectedItem == (CoordinateSystemType)ShapefileTargetBox.SelectedItem) { Show(_localization.GetString("Coordinate_SameSystem"), InfoBarSeverity.Warning); return; }
+        OutputNameBox.Text = outputName;
         _shapefileCancellation = new(); ConvertShapefileButton.IsEnabled = false; CancelShapefileButton.IsEnabled = true; ShapefileProgress.Visibility = Visibility.Visible;
         var progress = new Progress<ShapefileConversionProgress>(p => ShapefileProgressText.Text = _localization.GetFormattedString("Shapefile_Progress", p.FeaturesProcessed, p.VerticesProcessed, p.Warnings));
-        var result = await _shapefileConversion.ConvertAsync(new(_shapefilePath, _outputFolder, OutputNameBox.Text, (CoordinateSystemType)ShapefileSourceBox.SelectedItem, (CoordinateSystemType)ShapefileTargetBox.SelectedItem), progress, _shapefileCancellation.Token);
+        var result = await _shapefileConversion.ConvertAsync(new(_shapefilePath, _outputFolder, outputName, (CoordinateSystemType)ShapefileSourceBox.SelectedItem, (CoordinateSystemType)ShapefileTargetBox.SelectedItem), progress, _shapefileCancellation.Token);
         ConvertShapefileButton.IsEnabled = true; CancelShapefileButton.IsEnabled = false; ShapefileProgress.Visibility = Visibility.Collapsed;
         ShapefileProgressText.Text = result.IsSuccess ? $"{_localization.GetString("Shapefile_Completed")}: {result.FeaturesProcessed}, {result.VerticesProcessed}" : result.Error; OpenOutputFolderButton.IsEnabled = result.IsSuccess;
     }
 
     private void OnCancelShapefile(object sender, RoutedEventArgs e) => _shapefileCancellation?.Cancel();
     private async void OnOpenOutputFolder(object sender, RoutedEventArgs e) { if (_outputFolder is not null) await Launcher.LaunchFolderPathAsync(_outputFolder); }
+    private static string? NormalizeOutputName(string? value) { var name = (value ?? string.Empty).Trim(); while (name.EndsWith(".shp", StringComparison.OrdinalIgnoreCase)) name = name[..^4]; return string.IsNullOrWhiteSpace(name) || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.Contains(Path.DirectorySeparatorChar) || name.Contains(Path.AltDirectorySeparatorChar) || name is "CON" or "NUL" ? null : name; }
 }
