@@ -1,13 +1,15 @@
-# Third-party notices / 第三方许可 / 第三者告知
+# Third-party notices / 第三方声明 / 第三者告知
 
-Version 0.5.0 · Last updated 2026-08-02
+Version 0.5.0 · Last updated 2026-08-04
 
-## Application dependencies / 应用依赖 / アプリ依存関係
+## Application dependencies
 
-- Microsoft.WindowsAppSDK 2.3.1 — Microsoft software; see the package license and notices distributed with the SDK.
-- Microsoft.Windows.SDK.BuildTools 10.0.28000.2526 — Microsoft software; see the package license and notices distributed with the package.
-- Microsoft.Windows.SDK.BuildTools.WinApp 0.5.0 — Microsoft software; see the package license and notices distributed with the package.
+The project references the following packages in `UrbanPlanToolbox.csproj`:
 
-The application uses Windows App SDK and Windows APIs for WinUI, file pickers, the default browser, and local notifications. Windows, Microsoft Store, government websites, and the listed official data portals are not project partners or sponsors. The regulation index is a research aid; each entry's official source remains authoritative. No external font, icon, example dataset, or paid service is bundled beyond the repository assets and the listed packages.
+- `Microsoft.WindowsAppSDK` `2.3.1` — Microsoft software; see the package license and notices distributed with the SDK.
+- `Microsoft.Windows.SDK.BuildTools` `10.0.28000.2526` — Microsoft software; see the package license and notices distributed with the package.
+- `Microsoft.Windows.SDK.BuildTools.WinApp` `0.5.0` — Microsoft software; see the package license and notices distributed with the package.
 
-项目尚未声明自身的开源许可证；本文件不替用户作出许可证选择。法规资料的发布机构和官方来源以索引条目记录为准。
+应用使用 Windows App SDK 和 Windows API 提供 WinUI、文件选择器、默认浏览器和本地通知能力。Windows、Microsoft Store、政府网站和索引中的官方数据门户不是本项目的合作方或赞助方。法规索引是研究辅助工具，每条记录的官方来源仍是权威来源。
+
+仓库没有捆绑外部字体、第三方图标、示例数据或付费服务；图标和界面资源来自仓库内的 `Assets`。项目本身当前未声明许可证，本文件不替用户选择许可证。
