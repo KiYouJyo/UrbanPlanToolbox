@@ -8,7 +8,7 @@ public sealed class VisualPolishPackagingTests
     public void VersionAndUserAgentAre050()
     {
         var root = FindRepositoryRoot();
-        Assert.Contains("Version=\"0.5.0.2\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
+        Assert.Contains("Version=\"0.5.0.3\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
         Assert.Contains("<Version>0.5.0</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
         Assert.Contains("UrbanPlanToolbox/", File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs")));
     }

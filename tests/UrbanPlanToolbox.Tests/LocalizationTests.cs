@@ -244,7 +244,7 @@ public sealed partial class LocalizationTests
     public void VersionConfigurationIs050()
     {
         var manifest = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Package.appxmanifest"));
-        Assert.Contains("Version=\"0.5.0.2\"", manifest);
+        Assert.Contains("Version=\"0.5.0.3\"", manifest);
         var languages = Regex.Matches(manifest, "<Resource Language=\\\"([^\\\"]+)\\\"")
             .Select(match => match.Groups[1].Value).ToArray();
         Assert.Equal(["zh-CN", "ja-JP", "en-US"], languages);
