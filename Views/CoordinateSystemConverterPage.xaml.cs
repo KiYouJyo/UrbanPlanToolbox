@@ -29,7 +29,7 @@ public sealed partial class CoordinateSystemConverterPage : Page
         SingleSettingsTitle.Text = _localization.GetString("Coordinate_Source"); ResultTitle.Text = _localization.GetString("Coordinate_ResultTitle");
         SwapButton.Content = _localization.GetString("Coordinate_Swap"); ConvertButton.Content = _localization.GetString("Coordinate_ActionConvert"); ClearButton.Content = _localization.GetString("Coordinate_ActionClear"); SampleButton.Content = _localization.GetString("Coordinate_ActionSample");
         CopyLongitudeButton.Content = _localization.GetString("Coordinate_CopyLongitude"); CopyLatitudeButton.Content = _localization.GetString("Coordinate_CopyLatitude"); CopyCoordinateButton.Content = _localization.GetString("Coordinate_CopyCoordinate");
-        ShapefileDescriptionText.Text = _localization.GetString("Coordinate_ShapefileDescription"); ShapefilePrivacyText.Text = _localization.GetString("Coordinate_ShapefilePrivacy"); DisclaimerText.Text = _localization.GetString("Coordinate_Disclaimer");
+        ShapefileDescriptionText.Text = _localization.GetString("Coordinate_ShapefileDescription"); ShapefilePrivacyText.Text = _localization.GetString("Coordinate_ShapefilePrivacy"); ShapefileSelectionHelpText.Text = _localization.GetString("Shapefile_SelectionHelp"); DisclaimerText.Text = _localization.GetString("Coordinate_Disclaimer");
         SourceSystemBox.ItemsSource = TargetSystemBox.ItemsSource = Enum.GetValues<CoordinateSystemType>();
         SourceSystemBox.SelectedItem = CoordinateSystemType.Wgs84; TargetSystemBox.SelectedItem = CoordinateSystemType.Gcj02;
         ShapefileSourceBox.ItemsSource = ShapefileTargetBox.ItemsSource = Enum.GetValues<CoordinateSystemType>();
@@ -64,8 +64,10 @@ public sealed partial class CoordinateSystemConverterPage : Page
         var picker = new FileOpenPicker(); picker.FileTypeFilter.Add(".shp"); WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
         var file = await picker.PickSingleFileAsync(); if (file is null) return;
         _shapefilePath = file.Path; var dataset = _shapefileConversion.Inspect(file.Path); SelectedShapefileText.Text = file.Name;
-        CompanionStatusText.Text = $".shp: {(dataset.HasShp ? "OK" : "missing")}  .dbf: {(dataset.HasDbf ? "OK" : "missing")}  .shx: {(dataset.HasShx ? "OK" : "missing")}  .prj: {(dataset.HasPrj ? "present" : "optional")}  .cpg: {(dataset.HasCpg ? "present" : "optional")}";
-        OutputNameBox.Text = Path.GetFileNameWithoutExtension(file.Name) + "_gcj02"; if (dataset.Warning is not null) Show(dataset.Warning, InfoBarSeverity.Warning);
+        CompanionStatusText.Text = FormatCompanionStatus(dataset);
+        OutputNameBox.Text = Path.GetFileNameWithoutExtension(file.Name) + "_gcj02";
+        if (!dataset.HasDbf) Show(_localization.GetString("Shapefile_MissingDbf"), InfoBarSeverity.Error);
+        else if (!dataset.HasShx) Show(_localization.GetString("Shapefile_MissingShx"), InfoBarSeverity.Warning);
     }
 
     private async void OnSelectOutputFolder(object sender, RoutedEventArgs e)
@@ -90,4 +92,13 @@ public sealed partial class CoordinateSystemConverterPage : Page
     private void OnCancelShapefile(object sender, RoutedEventArgs e) => _shapefileCancellation?.Cancel();
     private async void OnOpenOutputFolder(object sender, RoutedEventArgs e) { if (_outputFolder is not null) await Launcher.LaunchFolderPathAsync(_outputFolder); }
     private static string? NormalizeOutputName(string? value) { var name = (value ?? string.Empty).Trim(); while (name.EndsWith(".shp", StringComparison.OrdinalIgnoreCase)) name = name[..^4]; return string.IsNullOrWhiteSpace(name) || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.Contains(Path.DirectorySeparatorChar) || name.Contains(Path.AltDirectorySeparatorChar) || name is "CON" or "NUL" ? null : name; }
+    private string FormatCompanionStatus(ShapefileDataset dataset) => string.Join(Environment.NewLine,
+        _localization.GetString("Shapefile_CompanionStatusTitle"),
+        CompanionStatus(".shp", dataset.HasShp, "Shapefile_CompanionMissing"),
+        CompanionStatus(".dbf", dataset.HasDbf, "Shapefile_CompanionMissing"),
+        CompanionStatus(".shx", dataset.HasShx, "Shapefile_CompanionRecommended"),
+        CompanionStatus(".prj", dataset.HasPrj, "Shapefile_CompanionOptionalMissing"),
+        CompanionStatus(".cpg", dataset.HasCpg, "Shapefile_CompanionOptionalMissing"));
+
+    private string CompanionStatus(string extension, bool exists, string missingKey) => _localization.GetFormattedString(exists ? "Shapefile_CompanionFound" : missingKey, extension);
 }
