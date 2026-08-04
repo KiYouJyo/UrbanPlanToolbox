@@ -80,7 +80,7 @@ public sealed class BackupDataServiceTests
         await scope.Projects.SaveAsync(project);
         await scope.Projects.AddMilestoneAsync(project.Id, "Public review", new DateOnly(2026, 9, 1), new TimeOnly(14, 0), "Council hall");
         await scope.Projects.ArchiveAsync(project.Id, true);
-        new SettingsService(scope.Provider.Paths.SettingsFilePath).Save(new AppSettings { Theme = "Dark", Language = "ja-JP", FavoriteToolIds = [ToolIds.UnitScaleConverter] });
+        new SettingsService(scope.Provider.Paths.SettingsFilePath).Save(new AppSettings { Theme = "Dark", Language = "ja-JP", DecimalPlaces = 3, AutoCalculate = true, FavoriteToolIds = [ToolIds.UnitScaleConverter] });
         var output = scope.Path("roundtrip.uptbackup"); await scope.Backup.ExportAsync(output);
 
         await scope.Projects.CreateAsync("Changed", ProjectTypeCodes.Personal);
@@ -104,6 +104,8 @@ public sealed class BackupDataServiceTests
         Assert.True(folder.RequiresReselection);
         Assert.Equal("Dark", settings.Theme);
         Assert.Equal("ja-JP", settings.Language);
+        Assert.Equal(3, settings.DecimalPlaces);
+        Assert.True(settings.AutoCalculate);
         Assert.Equal([ToolIds.UnitScaleConverter], settings.FavoriteToolIds);
     }
 

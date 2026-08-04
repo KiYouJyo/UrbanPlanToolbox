@@ -39,4 +39,20 @@ public sealed class SettingsAndFormattingTests
         }
         finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
     }
+
+    [Fact]
+    public void LegacyToolSpecificSettingsRemainReadableWithoutSettingsPageControls()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, "{\"SchemaVersion\":1,\"Theme\":\"System\",\"DecimalPlaces\":3,\"AutoCalculate\":true,\"Language\":\"en-US\",\"FavoriteToolIds\":[]}");
+            var loaded = new SettingsService(path).Load();
+            Assert.Equal(3, loaded.DecimalPlaces);
+            Assert.True(loaded.AutoCalculate);
+            Assert.Equal("en-US", loaded.Language);
+        }
+        finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
+    }
 }
