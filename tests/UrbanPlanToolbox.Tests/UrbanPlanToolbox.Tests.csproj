@@ -50,6 +50,14 @@
   <Compile Include="../../Services/VersionParser.cs" Link="Services/VersionParser.cs" />
   <Compile Include="../../Services/GitHubUpdateService.cs" Link="Services/GitHubUpdateService.cs" />
   <Compile Include="../../Services/AppVersionProvider.cs" Link="Services/AppVersionProvider.cs" />
+  <Compile Include="../../Models/AppUpdateState.cs" Link="Models/AppUpdateState.cs" />
+  <Compile Include="../../Models/AppUpdateInfo.cs" Link="Models/AppUpdateInfo.cs" />
+  <Compile Include="../../Models/AppUpdateProgress.cs" Link="Models/AppUpdateProgress.cs" />
+  <Compile Include="../../Models/AppUpdateResult.cs" Link="Models/AppUpdateResult.cs" />
+  <Compile Include="../../Services/IAppUpdateService.cs" Link="Services/IAppUpdateService.cs" />
+  <Compile Include="../../Services/FakeAppUpdateService.cs" Link="Services/FakeAppUpdateService.cs" />
+  <Compile Include="../../Services/AppUpdateErrorMapper.cs" Link="Services/AppUpdateErrorMapper.cs" />
+  <Compile Include="../../ViewModels/UpdateViewModel.cs" Link="ViewModels/UpdateViewModel.cs" />
   <Compile Include="../../Services/DistributionChannel.cs" Link="Services/DistributionChannel.cs" />
   <Compile Include="../../Services/DiagnosticsInfoService.cs" Link="Services/DiagnosticsInfoService.cs" />
   <Compile Include="../../Services/LocalDataResetService.cs" Link="Services/LocalDataResetService.cs" />

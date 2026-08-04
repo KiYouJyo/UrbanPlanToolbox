@@ -1,0 +1,41 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using UrbanPlanToolbox.Models;
+using UrbanPlanToolbox.Services;
+
+namespace UrbanPlanToolbox.ViewModels;
+
+public sealed class UpdateViewModel(IAppUpdateService service) : INotifyPropertyChanged
+{
+    private readonly IAppUpdateService _service = service;
+    private int _busy;
+    private AppUpdateInfo _info = new(AppUpdateState.NotChecked);
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public AppUpdateInfo Info { get => _info; private set { _info = value; OnChanged(); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); } }
+    public double? Progress { get; private set; }
+    public bool CanCheck => Volatile.Read(ref _busy) == 0;
+    public bool CanInstall => CanCheck && Info.IsUpdateAvailable;
+
+    public async Task CheckAsync(CancellationToken cancellationToken = default)
+    {
+        if (Interlocked.Exchange(ref _busy, 1) != 0) return;
+        try { Info = new(AppUpdateState.Checking); Info = await _service.CheckForUpdatesAsync(cancellationToken); }
+        catch (OperationCanceledException) { Info = new(AppUpdateState.Cancelled); }
+        finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
+    }
+
+    public async Task DownloadAndInstallAsync(CancellationToken cancellationToken = default)
+    {
+        if (!CanInstall || Interlocked.Exchange(ref _busy, 1) != 0) return;
+        try
+        {
+            var progress = new Progress<AppUpdateProgress>(value => { Progress = value.Value; Info = new(value.State, Detail: value.Detail); OnChanged(nameof(Progress)); });
+            var result = await _service.DownloadAndInstallAsync(progress, cancellationToken);
+            Info = new(result.State, Detail: result.Detail, ErrorCode: result.ErrorCode);
+        }
+        catch (OperationCanceledException) { Info = new(AppUpdateState.Cancelled); }
+        finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
+    }
+
+    private void OnChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new(name));
+}

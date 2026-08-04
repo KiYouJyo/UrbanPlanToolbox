@@ -4,11 +4,11 @@
 
 An offline-first Windows toolbox for urban planning, architectural design, and spatial research.
 
-[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) ![Version](https://img.shields.io/badge/version-1.1.0-0078D4)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
 
 ## Get the app
 
-The current version is **1.1.0**. Microsoft Store and GitHub sideload packages both use `1.1.0.0`, while their package identities and publishers remain separate.
+The preview version is **v1.2.0** and both package channels use `1.2.0.0`, while their identities and publishers remain separate.
 
 ## About UrbanPlanToolbox
 
@@ -74,6 +74,6 @@ Report issues through [GitHub Issues](https://github.com/KiYouJyo/UrbanPlanToolb
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for completed work and future directions. The roadmap communicates direction and is not a promise of features or dates.
 
-## License and third-party notices
+## License
 
-This repository does not currently declare a project license. Until that decision is made, do not describe it as licensed open-source software. Dependencies and external data sources are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+UrbanPlanToolbox is open source under the [MIT License](LICENSE). Dependencies and external data sources are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Use [Issues](https://github.com/KiYouJyo/UrbanPlanToolbox/issues) for reports and suggestions, and submit pull requests when appropriate.

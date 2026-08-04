@@ -1,6 +1,6 @@
 # UrbanPlanToolbox Privacy / 隐私政策 / プライバシーポリシー
 
-Version 1.1.0 · Last updated 2026-08-04
+Version 1.2.0 · Last updated 2026-08-04
 
 ## Local coordinate files
 
@@ -10,7 +10,7 @@ Shapefile datasets and their companion files are read only on this device. Coord
 
 UrbanPlanToolbox 不要求账户，不收集、出售或上传个人信息。项目、设置、收藏、工具数据、时间节点、通知相关数据和应用管理的附件保存在本机 `%LocalAppData%\\UrbanPlanToolbox`。用户选择的工作文件夹只保存引用和系统访问令牌；应用不会复制、扫描或删除外部文件夹。
 
-Microsoft Store 版的更新由 Microsoft Store 管理。GitHub 旁加载版只有在用户主动检查更新时访问 GitHub Releases API；项目主页、问题反馈、法规官方入口、支持、隐私政策和 Store 页面只在用户点击后打开。应用没有广告、遥测、追踪、自动崩溃上传、自动日志上传或自动上传用户数据。外部网站有自己的隐私政策，应用不控制其行为。
+应用不要求账户，不收集、出售或上传个人信息。项目、设置、收藏、归档和其他应用数据默认保存在本机。Microsoft Store 版仅在用户主动检查、下载或安装更新时访问 Microsoft Store 服务；GitHub 旁加载版仅在用户主动检查更新时访问 GitHub Releases API。项目和政策链接只在用户明确操作后由系统默认浏览器打开。应用没有广告、遥测、追踪、自动崩溃上传、自动日志上传或自动上传用户数据。外部网站有自己的隐私政策，应用不控制其行为。
 
 ## 日本語
 
@@ -22,4 +22,4 @@ Microsoft Store 版の更新は Microsoft Store が管理します。GitHub サ�
 
 UrbanPlanToolbox requires no account and does not collect, sell, or upload personal information. Projects, settings, favorites, tool data, milestones, notification data, and app-managed attachments are stored locally under `%LocalAppData%\\UrbanPlanToolbox`. A selected work folder is retained only as a reference and OS access token; the app does not copy, scan, or delete that external folder.
 
-Microsoft Store updates are managed by Microsoft Store. The GitHub sideloaded build accesses the GitHub Releases API only when the user explicitly checks for updates. Project, issue, official-regulation, support, privacy, and Store pages open only after the user clicks them. The app has no ads, telemetry, tracking, automatic crash upload, automatic log upload, or automatic upload of user data. External sites have their own privacy policies.
+UrbanPlanToolbox does not require an account and does not collect, sell, or upload personal information. Projects, settings, favorites, archives, and other application data are stored locally by default. The Microsoft Store edition accesses Microsoft Store services only when the user actively checks for, downloads, or installs an update. The GitHub sideload edition accesses the GitHub Releases API only when the user actively checks for updates. Project and policy links are opened by the system default browser only after explicit user action. The app has no ads, telemetry, tracking, automatic crash upload, automatic log upload, or automatic upload of user data.
