@@ -4,11 +4,11 @@
 
 面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。
 
-[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) ![Version](https://img.shields.io/badge/version-0.5.0%20Preview-orange) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4?logo=windows) ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet) ![WinUI 3](https://img.shields.io/badge/UI-WinUI%203-0078D4)
+[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) ![Version](https://img.shields.io/badge/version-1.1.0-0078D4) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4?logo=windows) ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet) ![WinUI 3](https://img.shields.io/badge/UI-WinUI%203-0078D4)
 
 ## 获取应用
 
-推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前面向用户的版本为 **0.5.0 Preview**；Store 技术包版本为 `1.0.0.0`，两者含义不同。
+推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前开发版本为 **1.1.0**，Microsoft Store 和 GitHub 旁加载包版本均为 `1.1.0.0`；两条渠道的身份和 Publisher 保持独立。
 
 ## 关于 UrbanPlanToolbox
 

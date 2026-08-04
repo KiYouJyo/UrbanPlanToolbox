@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
  <PropertyGroup><TargetFramework>net10.0-windows10.0.26100.0</TargetFramework><Platforms>AnyCPU;x64</Platforms><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><IsPackable>false</IsPackable><IsTestProject>true</IsTestProject></PropertyGroup>
- <ItemGroup><PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" /><PackageReference Include="xunit" Version="2.9.3" /><PackageReference Include="xunit.runner.visualstudio" Version="3.0.2"><PrivateAssets>all</PrivateAssets></PackageReference></ItemGroup>
+ <ItemGroup><PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" /><PackageReference Include="NetTopologySuite.IO.Esri.Shapefile" Version="1.2.0" /><PackageReference Include="xunit" Version="2.9.3" /><PackageReference Include="xunit.runner.visualstudio" Version="3.0.2"><PrivateAssets>all</PrivateAssets></PackageReference></ItemGroup>
  <ItemGroup>
   <Compile Include="../../Models/PlanningInput.cs" Link="Models/PlanningInput.cs" />
   <Compile Include="../../Models/PlanningResult.cs" Link="Models/PlanningResult.cs" />
@@ -35,8 +35,14 @@
   <Compile Include="../../Models/MeasurementCategory.cs" Link="Models/MeasurementCategory.cs" />
   <Compile Include="../../Models/MeasurementUnit.cs" Link="Models/MeasurementUnit.cs" />
   <Compile Include="../../Models/ConversionResult.cs" Link="Models/ConversionResult.cs" />
+  <Compile Include="../../Models/CoordinateConversionModels.cs" Link="Models/CoordinateConversionModels.cs" />
   <Compile Include="../../Services/UnitConversionService.cs" Link="Services/UnitConversionService.cs" />
   <Compile Include="../../Services/ScaleConversionService.cs" Link="Services/ScaleConversionService.cs" />
+  <Compile Include="../../Services/ICoordinateConversionService.cs" Link="Services/ICoordinateConversionService.cs" />
+  <Compile Include="../../Services/CoordinateConversionService.cs" Link="Services/CoordinateConversionService.cs" />
+  <Compile Include="../../Models/ShapefileConversionModels.cs" Link="Models/ShapefileConversionModels.cs" />
+  <Compile Include="../../Services/IShapefileCoordinateConversionService.cs" Link="Services/IShapefileCoordinateConversionService.cs" />
+  <Compile Include="../../Services/ShapefileCoordinateConversionService.cs" Link="Services/ShapefileCoordinateConversionService.cs" />
   <Compile Include="../../Helpers/ConversionResultFormatter.cs" Link="Helpers/ConversionResultFormatter.cs" />
   <Compile Include="../../Models/GitHubRelease.cs" Link="Models/GitHubRelease.cs" />
   <Compile Include="../../Models/UpdateCheckResult.cs" Link="Models/UpdateCheckResult.cs" />

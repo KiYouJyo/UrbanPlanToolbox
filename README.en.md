@@ -4,11 +4,11 @@
 
 An offline-first Windows toolbox for urban planning, architectural design, and spatial research.
 
-[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) ![Version](https://img.shields.io/badge/version-0.5.0%20Preview-orange) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4?logo=windows) ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet) ![WinUI 3](https://img.shields.io/badge/UI-WinUI%203-0078D4)
+[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) ![Version](https://img.shields.io/badge/version-1.1.0-0078D4)
 
 ## Get the app
 
-The recommended way to install and receive updates is the [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW). The user-facing product version is **0.5.0 Preview**; the Store package version is `1.0.0.0`, which is a separate technical value.
+The current development target is **1.1.0**. Microsoft Store and GitHub sideload packages both use `1.1.0.0`, while their package identities and publishers remain separate.
 
 ## About UrbanPlanToolbox
 
@@ -20,6 +20,7 @@ UrbanPlanToolbox is a Windows desktop toolbox for urban planning, architectural 
 - Project milestones with Windows local reminders and work-folder access.
 - Planning-metrics calculator and unit and scale converter.
 - Palette recorder, workflow review checklist, architecture and planning regulations index, and design-concept dictionary.
+- Coordinate System Converter for local WGS 84, GCJ-02, and BD-09 point conversion. Shapefile files are processed locally; projected coordinate systems are not supported.
 - Local tool search and favorites, plus `.uptbackup` export, import, and restore.
 - Simplified Chinese, Japanese, and English; light, dark, and system themes.
 
@@ -30,6 +31,8 @@ The Microsoft Store is the primary channel for ordinary users. The repository al
 ## Privacy and offline design
 
 Microsoft Store updates are managed by Microsoft Store. The sideloaded build accesses the GitHub Releases API only when the user explicitly checks for updates; external regulations, support, and project links open only after the user selects them. The app requires no account and has no ads, telemetry, tracking, automatic crash upload, or automatic upload of user data. Project and tool data stays on the device.
+
+GCJ-02 and BD-09 results use public approximation algorithms for map overlay, data preparation, and research support only. They are not surveying-, approval-, construction-, or legal-grade coordinate transformations.
 
 See [PRIVACY.md](PRIVACY.md) and the [online privacy policy](https://kiyoujyo.github.io/UrbanPlanToolbox/privacy/).
 

@@ -1,0 +1,78 @@
+name: Microsoft Store v1.1 controlled publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Create/update a draft, or publish the tagged main build
+        required: true
+        type: choice
+        options: [draft, publish]
+      confirmation:
+        description: Required exact confirmation for publish mode
+        required: false
+        type: string
+      rolloutPercentage:
+        description: Store package rollout percentage
+        required: true
+        default: '100'
+        type: string
+      existingDraftPolicy:
+        description: Stop on an existing Partner Center draft (reuse is intentionally not implemented for v1.1.0)
+        required: true
+        default: fail
+        type: choice
+        options: [fail, reuse]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: microsoft-store-v1.1-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: windows-2025-vs2026
+    environment: microsoft-store-production
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
+        with: { dotnet-version: 10.0.x }
+      - name: Verify publish safety gate
+        shell: pwsh
+        run: |
+          if ('${{ inputs.mode }}' -eq 'publish') {
+            if ('${{ github.ref }}' -ne 'refs/heads/main') { throw 'Publish requires main.' }
+            if ('${{ inputs.confirmation }}' -cne 'PUBLISH_V1.1.0') { throw 'Publish confirmation is invalid.' }
+            git fetch --tags --force
+            $tagCommit = git rev-list -n 1 v1.1.0
+            if ($tagCommit -ne '${{ github.sha }}') { throw 'v1.1.0 must point to the checked-out main HEAD.' }
+          }
+      - name: Test and build Store upload package
+        shell: pwsh
+        run: |
+          dotnet test UrbanPlanToolbox.slnx -c Release -p:Platform=x64
+          ./packaging/Build-StorePackage.ps1 -SourceCommit '${{ github.sha }}' -PackageVersion '1.1.0.0' -OutputDirectory "$env:RUNNER_TEMP\UrbanPlanToolbox-Store"
+      - name: Record Microsoft Store CLI version
+        shell: pwsh
+        run: |
+          msstore --version
+          $status = msstore submission status '${{ vars.MSSTORE_PRODUCT_ID }}' 2>&1 | Out-String
+          if ($status -match 'PendingCommit') {
+            throw 'Partner Center has a PendingCommit submission. This workflow will not modify, reuse, publish, or delete it.'
+          }
+          if ('${{ inputs.existingDraftPolicy }}' -eq 'reuse') {
+            throw 'Draft reuse requires separate manual review and is intentionally disabled for v1.1.0.'
+          }
+      - name: Publish or retain a Store draft
+        uses: microsoft/microsoft-store-apppublisher@v1.1
+        with:
+          tenant-id: ${{ secrets.AZURE_AD_TENANT_ID }}
+          client-id: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          client-secret: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+          seller-id: ${{ secrets.SELLER_ID }}
+          product-id: ${{ vars.MSSTORE_PRODUCT_ID }}
+          package-path: ${{ runner.temp }}\UrbanPlanToolbox-Store\AppPackages
+          no-commit: ${{ inputs.mode == 'draft' }}
+          package-rollout-percentage: ${{ inputs.rolloutPercentage }}

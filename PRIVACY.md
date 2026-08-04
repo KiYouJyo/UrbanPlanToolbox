@@ -1,6 +1,10 @@
 # UrbanPlanToolbox Privacy / 隐私政策 / プライバシーポリシー
 
-Version 0.5.0 · Last updated 2026-08-04
+Version 1.1.0 · Last updated 2026-08-04
+
+## Local coordinate files
+
+Shapefile datasets and their companion files are read only on this device. Coordinates and attributes are not uploaded, source files are not modified, and source paths are not retained by the app or included in `.uptbackup` backups. Conversion outputs are written only to the folder you choose; temporary conversion files are removed after success, cancellation, or failure.
 
 ## 简体中文
 
