@@ -67,6 +67,7 @@ try {
         sourceCommit = $sourceCommitResolved; packageVersion = $PackageVersion; package = $upload[0].FullName; sha256 = $hash
         channel = 'Store'; signed = $false; manifestIdentity = $identity.Name; priResourceMapName = $identityValidation.PriResourceMapName
         languages = @($identityValidation.ManifestLanguages); validationResult = $identityValidation.ValidationResult
+        wackReady = $true; buildUtc = [DateTime]::UtcNow.ToString('O')
     } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $output 'store-package-build.json') -Encoding UTF8
     Write-Output "MSIXUPLOAD=$($upload[0].FullName)"
     Write-Output "SHA256=$hash"
