@@ -51,13 +51,13 @@ try {
     $packageDirectory = Join-Path $output 'AppPackages'
     & dotnet restore (Join-Path $temporaryWorktree 'UrbanPlanToolbox.slnx') "-p:Configuration=$Configuration" "-p:Platform=$Platform"
     if ($LASTEXITCODE -ne 0) { throw 'Restore in the isolated Store build worktree failed.' }
-    & $MsBuildPath (Join-Path $temporaryWorktree 'UrbanPlanToolbox.csproj') /t:Build /m "/p:Configuration=$Configuration" "/p:Platform=$Platform" /p:DistributionChannel=Store /p:RuntimeIdentifier=win-x64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Never /p:UapAppxPackageBuildMode=StoreUpload "/p:AppxPackageDir=$packageDirectory\\" /p:Restore=false
+    & $MsBuildPath (Join-Path $temporaryWorktree 'UrbanPlanToolbox.csproj') /t:Build /m "/p:Configuration=$Configuration" "/p:Platform=$Platform" /p:DistributionChannel=Store /p:RuntimeIdentifier=win-x64 /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false /p:AppxBundle=Always /p:AppxBundlePlatforms=x64 /p:UapAppxPackageBuildMode=StoreUpload "/p:AppxPackageDir=$packageDirectory\\" /p:Restore=false
     if ($LASTEXITCODE -ne 0) { throw 'Store package build failed.' }
 
     $upload = @(Get-ChildItem -LiteralPath $packageDirectory -Recurse -Filter '*.msixupload' -File)
     if ($upload.Count -ne 1) { throw "Expected exactly one .msixupload; found $($upload.Count)." }
-    if ($upload[0].Name -notmatch 'x64') { throw 'Store package is not x64.' }
-    $identityValidation = & (Join-Path $temporaryWorktree 'packaging\Test-PackageResourceIdentity.ps1') -PackagePath $upload[0].FullName -ExpectedIdentityName $identity.Name -OutputDirectory (Join-Path $output 'pri-validation')
+    if ($upload[0].Name -notmatch 'bundle') { throw 'Store update must remain an MSIX Bundle because the previously published Store version is a Bundle.' }
+    $identityValidation = & (Join-Path $temporaryWorktree 'packaging\Test-PackageResourceIdentity.ps1') -PackagePath $upload[0].FullName -ExpectedIdentityName $identity.Name -RequireBundle -OutputDirectory (Join-Path $output 'pri-validation')
     if ($LASTEXITCODE -ne 0) { throw 'Store package PRI identity validation failed.' }
 
     $sensitive = Get-ChildItem -LiteralPath $packageDirectory -Recurse -File | Where-Object { $_.Extension -in '.pfx','.p12','.cer','.key' }
@@ -70,6 +70,12 @@ try {
         wackReady = $true; buildUtc = [DateTime]::UtcNow.ToString('O')
     } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $output 'store-package-build.json') -Encoding UTF8
     Write-Output "MSIXUPLOAD=$($upload[0].FullName)"
+    Write-Output 'STORE_UPLOAD_FORMAT=MSIXBUNDLE'
+    Write-Output "STORE_BUNDLE_VERSION=$PackageVersion"
+    Write-Output "STORE_MAIN_ARCHITECTURE=x64"
+    Write-Output "STORE_RESOURCE_SCALES=$($identityValidation.ResourceScales -join ',')"
+    Write-Output "STORE_MANIFEST_IDENTITY=$($identityValidation.ManifestIdentity)"
+    Write-Output "STORE_PRI_RESOURCE_MAP=$($identityValidation.PriResourceMapName)"
     Write-Output "SHA256=$hash"
 }
 finally {
