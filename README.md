@@ -8,7 +8,7 @@
 
 ## 获取应用
 
-推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前版本为 **1.1.0**，Microsoft Store 和 GitHub 旁加载包版本均为 `1.1.0.0`；两条渠道的身份和 Publisher 保持独立。
+推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前版本为 **1.2.0**，Microsoft Store 和 GitHub 旁加载包版本均为 `1.2.0.0`；两条渠道的身份和 Publisher 保持独立。
 
 ## 关于 UrbanPlanToolbox
 
