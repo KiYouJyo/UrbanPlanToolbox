@@ -15,6 +15,9 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("worktree remove --force", script);
         Assert.Contains("Test-PackageResourceIdentity.ps1", script);
         Assert.Contains("UapAppxPackageBuildMode=StoreUpload", script);
+        Assert.Contains("AppxBundle=Always", script);
+        Assert.Contains("AppxBundlePlatforms=x64", script);
+        Assert.DoesNotContain("AppxBundle=Never", script);
     }
 
     [Fact]
@@ -27,6 +30,8 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("AppDisplayName", script);
         Assert.Contains("AppDescription", script);
         Assert.Contains("Language-$language", script);
+        Assert.Contains("RequireBundle", script);
+        Assert.Contains("Bundle is missing required scale", script);
     }
 
     private static string FindRepositoryRoot()
