@@ -78,4 +78,4 @@
 
 本次 WACK 已完整执行，没有发现应用专属硬阻断。唯一 FAIL 是明确标记为可选的静态扫描项，命中系统运行库、Windows App SDK 依赖和用户主动外部链接启动所需的系统 API；它不应被改写成 PASS，但也没有证据表明需要本轮修改源码。
 
-这不等同于已经完成 Microsoft Store 提交。PR 仍应保持 Draft，等待用户确认隐私政策文本或 GitHub Pages 部署方案，并继续保留 Partner Center 上传、最终元数据审核和提交认证等外部步骤。
+这是首次 Store 发布前的历史验收记录。当前发布状态和可复用流程请参阅 [Microsoft Store 发布指南](../STORE-PUBLISHING.md)；本文件不代表当前待提交或阻断状态。

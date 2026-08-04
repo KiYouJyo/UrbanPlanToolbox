@@ -1,5 +1,16 @@
 # 更改日志
 
+## Unreleased
+
+- 更新公开仓库文档，使其反映 Microsoft Store 已发布状态；不包含产品功能变更。
+
+## 0.5.0 Preview（Microsoft Store 已发布）
+
+- 当前面向用户的产品版本为 `0.5.0 Preview`。
+- Microsoft Store 技术包版本为 `1.0.0.0`；该值仅用于 Store 包版本管理，不取代产品版本。
+- Store 产品页：https://apps.microsoft.com/detail/9MWDPJG1BHKW
+- Store 与 GitHub 旁加载渠道继续使用独立身份、包版本和更新流程。
+
 ## 0.4.1（预览版，随 v0.4.3 发布）
 
 - 新增离线流程审核清单工具，支持设计与科研双分类位置、稳定 ID、阶段/审核项编辑、状态统计、复制、排序及本地数据备份恢复。
