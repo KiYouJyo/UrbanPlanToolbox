@@ -12,3 +12,4 @@ public sealed class AboutPage;
 public sealed class WorkflowReviewChecklistPage;
 public sealed class RegulationsIndexPage;
 public sealed class DesignConceptDictionaryPage;
+public sealed class CoordinateSystemConverterPage;

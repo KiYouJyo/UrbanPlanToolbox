@@ -23,4 +23,36 @@ public sealed class SettingsAndFormattingTests
         try { var service = new SettingsService(path); service.Save(new AppSettings { DecimalPlaces = 3, AutoCalculate = true, Theme = "Dark", Language = "ja-JP" }); var loaded = new SettingsService(path).Load(); Assert.Equal(3, loaded.DecimalPlaces); Assert.True(loaded.AutoCalculate); Assert.Equal("Dark", loaded.Theme); Assert.Equal("ja-JP", loaded.Language); }
         finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
     }
+
+    [Fact]
+    public void ThemeAndLanguagePersistIndependently()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");
+        try
+        {
+            var service = new SettingsService(path);
+            service.Save(new AppSettings { Theme = "Dark", Language = "zh-CN" });
+            service.Update(settings => settings.Language = "ja-JP");
+            var loaded = service.Load();
+            Assert.Equal("Dark", loaded.Theme);
+            Assert.Equal("ja-JP", loaded.Language);
+        }
+        finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
+    }
+
+    [Fact]
+    public void LegacyToolSpecificSettingsRemainReadableWithoutSettingsPageControls()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, "{\"SchemaVersion\":1,\"Theme\":\"System\",\"DecimalPlaces\":3,\"AutoCalculate\":true,\"Language\":\"en-US\",\"FavoriteToolIds\":[]}");
+            var loaded = new SettingsService(path).Load();
+            Assert.Equal(3, loaded.DecimalPlaces);
+            Assert.True(loaded.AutoCalculate);
+            Assert.Equal("en-US", loaded.Language);
+        }
+        finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
+    }
 }

@@ -2,7 +2,15 @@
 
 ## Unreleased
 
-- 更新公开仓库文档，使其反映 Microsoft Store 已发布状态；不包含产品功能变更。
+- 暂无未发布变更。
+
+## 1.1.0（当前发布版本）
+
+- 产品显示版本更新为 `1.1.0`；GitHub 旁加载包和 Microsoft Store 包均使用 `1.1.0.0`，但继续保持独立身份、Publisher 和更新流程。
+- 新增 WGS 84、GCJ-02 与 BD-09 六方向点坐标本地转换；公开近似算法仅用于地图叠加、数据准备和科研辅助，不适用于测绘、审批、施工或法律用途。
+- 新增本地 Shapefile 转换，支持二维 Point、MultiPoint、PolyLine 和 Polygon；明确拒绝 Z/M、NullShape 与投影坐标系，并本地化配套文件说明和状态。
+- 重构设置页为分组卡片结构，语言切换后可选择立即重启或稍后重启。
+- 补充 Shapefile 数据边界、第三方组件声明、隐私说明以及 GitHub / Store 双轨发布资料。
 
 ## 0.5.0 Preview（Microsoft Store 已发布）
 

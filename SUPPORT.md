@@ -1,6 +1,6 @@
 # UrbanPlanToolbox Support / 帮助与支持 / サポート
 
-Version 0.5.0 · Last updated 2026-08-04
+Version 1.1.0 · Last updated 2026-08-04
 
 ## 在线入口
 

@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Automation;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
 using Windows.Storage.Pickers;
@@ -9,6 +10,8 @@ public sealed partial class SettingsPage : Page
 {
     private readonly SettingsService _settingsService = new();
     private readonly ILocalizationService _localization = LocalizationService.Default;
+    private readonly IApplicationRestartService _restartService = new ApplicationRestartService();
+    private readonly LanguageRestartPromptCoordinator _languageRestartPrompt = new();
     private bool _isApplying;
     private string _currentLanguage = LanguagePreference.SystemValue;
 
@@ -16,39 +19,64 @@ public sealed partial class SettingsPage : Page
     {
         InitializeComponent();
         TitleText.Text = _localization.GetString("Navigation_Settings");
+        AppearanceLanguageTitle.Text = _localization.GetString("Settings_AppearanceLanguageTitle"); AppearanceLanguageDescription.Text = _localization.GetString("Settings_AppearanceLanguageDescription");
+        ThemeLabel.Text = _localization.GetString("Settings_ThemeLabel"); ThemeDescription.Text = _localization.GetString("Settings_ThemeDescription");
+        LanguageLabel.Text = _localization.GetString("Settings_LanguageLabel"); LanguageDescription.Text = _localization.GetString("Settings_LanguageDescription");
+        ApplicationSettingsTitle.Text = _localization.GetString("Settings_ApplicationSettingsTitle"); ApplicationSettingsDescription.Text = _localization.GetString("Settings_ApplicationSettingsDescription");
+        RestoreDefaultsLabel.Text = _localization.GetString("Settings_RestoreDefaultsTitle"); RestoreDefaultsDescription.Text = _localization.GetString("Settings_RestoreDefaultsScopeDescription");
+        DataManagementTitle.Text = _localization.GetString("Settings_DataManagementTitle"); DataManagementDescription.Text = _localization.GetString("Settings_DataManagementDescription");
+        ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text); ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
         Apply(_settingsService.Load());
         ClearDataButton.Content = _localization.GetString("DataManagement_Clear");
     }
-    private void OnRestore(object sender, RoutedEventArgs e) { var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; }); Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults"); }
-    private void OnSettingChanged(object sender, object e) { if (!_isApplying) SaveCurrentSettings(); }
-    private void SaveCurrentSettings()
+    private async void OnRestore(object sender, RoutedEventArgs e)
     {
         var previousLanguage = _currentLanguage;
-        var settings = _settingsService.Update(current =>
+        var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; });
+        Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults");
+        var restoredLanguage = LanguagePreference.Normalize(settings.Language);
+        if (!string.Equals(previousLanguage, restoredLanguage, StringComparison.OrdinalIgnoreCase) && _languageRestartPrompt.TryBegin(previousLanguage, restoredLanguage))
+            await ShowLanguageRestartDialogAsync();
+    }
+    private void OnThemeChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isApplying) return;
+        var settings = _settingsService.Update(current => current.Theme = (ThemeBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "System");
+        ApplyTheme(settings.Theme); StatusText.Text = _localization.GetString("Status_SettingsSaved");
+    }
+    private async void OnLanguageChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isApplying) return;
+        var selectedLanguage = LanguagePreference.Normalize((LanguageBox.SelectedItem as ComboBoxItem)?.Tag?.ToString());
+        if (string.Equals(_currentLanguage, selectedLanguage, StringComparison.OrdinalIgnoreCase)) return;
+        if (!_languageRestartPrompt.TryBegin(_currentLanguage, selectedLanguage)) { ApplyLanguageSelection(_currentLanguage); return; }
+        _settingsService.Update(current => current.Language = selectedLanguage);
+        _currentLanguage = selectedLanguage;
+        await ShowLanguageRestartDialogAsync();
+    }
+    private async Task ShowLanguageRestartDialogAsync()
+    {
+        LanguageRestartHint.Text = _localization.GetString("Setting_Language_SavedRestartHint"); LanguageRestartHint.Visibility = Visibility.Visible;
+        var restartRequested = false;
+        try
         {
-            current.Theme = (ThemeBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "System";
-            current.DecimalPlaces = DecimalBox.SelectedIndex < 0 ? 2 : DecimalBox.SelectedIndex;
-            current.AutoCalculate = AutoCalculateToggle.IsOn;
-            current.Language = LanguagePreference.Normalize((LanguageBox.SelectedItem as ComboBoxItem)?.Tag?.ToString());
-        });
-        _currentLanguage = settings.Language;
-        ApplyTheme(settings.Theme);
-        StatusText.Text = string.Equals(previousLanguage, settings.Language, StringComparison.Ordinal)
-            ? _localization.GetString("Status_SettingsSaved")
-            : _localization.GetString("Setting_Language_RestartHint");
+            var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString("Setting_Language_RestartTitle"), Content = _localization.GetString("Setting_Language_RestartMessage"), PrimaryButtonText = _localization.GetString("Setting_Language_RestartNow"), CloseButtonText = _localization.GetString("Setting_Language_Later"), DefaultButton = ContentDialogButton.Close };
+            restartRequested = await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary;
+        }
+        finally { if (!_languageRestartPrompt.Complete(restartRequested, _restartService) && restartRequested) StatusText.Text = _localization.GetString("Setting_Language_RestartFailed"); }
     }
     private void Apply(AppSettings settings)
     {
         _isApplying = true;
         ThemeBox.SelectedIndex = settings.Theme switch { "Light" => 1, "Dark" => 2, _ => 0 };
-        DecimalBox.SelectedIndex = settings.DecimalPlaces;
-        AutoCalculateToggle.IsOn = settings.AutoCalculate;
-        var language = LanguagePreference.Normalize(settings.Language);
-        LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
+        var language = LanguagePreference.Normalize(settings.Language); ApplyLanguageSelection(language);
         _currentLanguage = language;
+        LanguageRestartHint.Visibility = Visibility.Collapsed;
         _isApplying = false;
         ApplyTheme(settings.Theme);
     }
+    private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
+    private static void ConfigureAccessibility(FrameworkElement control, string name, string helpText) { AutomationProperties.SetName(control, name); AutomationProperties.SetHelpText(control, helpText); }
     private static void ApplyTheme(string theme) => ThemePreference.Apply(App.MainWindow?.Content as FrameworkElement, theme);
     private async void OnExport(object sender, RoutedEventArgs e)
     {

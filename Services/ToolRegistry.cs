@@ -104,6 +104,22 @@ public sealed class ToolRegistry
             "Tool_DesignConceptDictionary_Keywords")
         {
             CategoryPlacements = [new(ToolPrimaryCategory.Design, ToolSecondaryCategory.DesignDevelopment, 60)]
+        },
+        new(
+            ToolIds.CoordinateSystemConverter,
+            "Tool_CoordinateSystemConverter_Name",
+            "Tool_CoordinateSystemConverter_Description",
+            ToolPrimaryCategory.Research,
+            ToolSecondaryCategory.GeographicTools,
+            "\uE81C",
+            typeof(Views.CoordinateSystemConverterPage),
+            70,
+            true,
+            "zuobiaoxizhuanhuanqi",
+            "Z",
+            "Tool_CoordinateSystemConverter_Keywords")
+        {
+            CategoryPlacements = [new(ToolPrimaryCategory.Research, ToolSecondaryCategory.GeographicTools, 10)]
         }
     ]);
 

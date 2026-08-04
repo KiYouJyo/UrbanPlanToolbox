@@ -29,6 +29,20 @@
                 <Setter Property="CornerRadius" Value="12" />
                 <Setter Property="VerticalAlignment" Value="Top" />
             </Style>
+            <Style x:Key="SettingsSectionCardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+                <Setter Property="Padding" Value="{StaticResource CardContentPadding}" />
+            </Style>
+            <Style x:Key="SettingsRowLabelStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+            <Style x:Key="SettingsDescriptionStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="Opacity" Value="0.72" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

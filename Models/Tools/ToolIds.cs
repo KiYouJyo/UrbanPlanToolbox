@@ -8,4 +8,5 @@ public static class ToolIds
     public const string WorkflowReviewChecklist = "workflow-review-checklist";
     public const string RegulationsIndex = "architecture-planning-regulations-index";
     public const string DesignConceptDictionary = "design-concept-dictionary";
+    public const string CoordinateSystemConverter = "coordinate-system-converter";
 }
