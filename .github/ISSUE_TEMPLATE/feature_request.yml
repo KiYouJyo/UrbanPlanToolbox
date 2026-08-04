@@ -1,0 +1,22 @@
+name: Feature request
+description: Suggest an improvement for UrbanPlanToolbox
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Data and privacy considerations
+      description: Explain any local data, backup, network, or localization implications.
