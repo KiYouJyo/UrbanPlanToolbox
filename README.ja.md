@@ -4,11 +4,11 @@
 
 都市・地域計画、建築設計、空間研究のためのオフライン優先 Windows ツールボックス。
 
-[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) ![Version](https://img.shields.io/badge/version-0.5.0%20Preview-orange) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4?logo=windows) ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet) ![WinUI 3](https://img.shields.io/badge/UI-WinUI%203-0078D4)
+[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) ![Version](https://img.shields.io/badge/version-1.1.0-0078D4) ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-0078D4?logo=windows) ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet) ![WinUI 3](https://img.shields.io/badge/UI-WinUI%203-0078D4)
 
 ## アプリを入手
 
-インストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。利用者向け製品バージョンは **0.5.0 Preview** です。Store の技術パッケージバージョン `1.0.0.0` は別の値です。
+インストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。現在のバージョンは **1.1.0** です。Microsoft Store 版と GitHub サイドロード版のパッケージバージョンはともに `1.1.0.0` ですが、ID と Publisher は別々です。
 
 ## UrbanPlanToolbox について
 
@@ -20,6 +20,7 @@ UrbanPlanToolbox は、都市・地域計画、建築設計、空間研究のた
 - プロジェクトのマイルストーンと Windows ローカル通知、作業フォルダーへの入口。
 - 計画指標の簡易計算、単位・縮尺換算。
 - カラーパレット記録、ワークフローチェックリスト、建築・計画法規インデックス、デザインコンセプト辞典。
+- WGS 84、GCJ-02、BD-09 の点座標をローカルで変換する座標系変換ツール。Shapefile は端末内で処理され、投影座標系には対応しません。
 - ローカル検索とお気に入り、`.uptbackup` のエクスポート、インポート、復元。
 - 中国語（簡体字）、日本語、英語、ライト・ダーク・システムテーマ。
 
@@ -30,6 +31,8 @@ UrbanPlanToolbox は、都市・地域計画、建築設計、空間研究のた
 ## プライバシーとオフライン設計
 
 Microsoft Store 版の更新は Microsoft Store が管理します。サイドロード版が GitHub Releases API にアクセスするのは、利用者が更新確認を明示的に実行した場合だけです。外部の法規、サポート、プロジェクトのリンクは利用者が選択したときだけ開きます。アカウント、広告、テレメトリ、追跡、自動クラッシュ送信、自動的なユーザーデータ送信はありません。プロジェクトとツールのデータはデバイスに保存されます。
+
+GCJ-02 と BD-09 の結果は公開された近似アルゴリズムによるもので、地図の重ね合わせ、データ準備、研究支援専用です。測量、審査、施工、法的用途の座標変換成果ではありません。
 
 [PRIVACY.md](PRIVACY.md) と[オンラインプライバシーポリシー](https://kiyoujyo.github.io/UrbanPlanToolbox/privacy/)をご覧ください。
 

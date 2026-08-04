@@ -61,7 +61,7 @@
     <comment>欢迎页副标题。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>0.5.0 Preview。项目数据与工具数据均保留在本机。</value>
+    <value>1.1.0。项目数据与工具数据均保留在本机。</value>
     <comment>欢迎页版本与隐私说明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">

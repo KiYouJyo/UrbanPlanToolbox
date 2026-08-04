@@ -8,7 +8,7 @@
 
 ## 获取应用
 
-推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前开发版本为 **1.1.0**，Microsoft Store 和 GitHub 旁加载包版本均为 `1.1.0.0`；两条渠道的身份和 Publisher 保持独立。
+推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前版本为 **1.1.0**，Microsoft Store 和 GitHub 旁加载包版本均为 `1.1.0.0`；两条渠道的身份和 Publisher 保持独立。
 
 ## 关于 UrbanPlanToolbox
 
@@ -20,16 +20,19 @@ UrbanPlanToolbox 是一个面向城乡规划、建筑设计和空间研究的 Wi
 - 项目时间节点与 Windows 本地提醒，以及工作文件夹入口。
 - 规划指标快速计算器、单位与比例尺换算器。
 - 色卡方案记录器、流程审核清单、建筑与规划法规索引、设计理念词典。
+- 坐标系转换器支持 WGS 84、GCJ-02 与 BD-09 点坐标的本地转换，并在本机处理 Shapefile；不支持投影坐标系。
 - 本地工具搜索与收藏；支持 `.uptbackup` 数据导出、导入和恢复。
 - 简体中文、日语和英语；浅色、深色和跟随系统主题。
 
 ## 安装
 
-Microsoft Store 是普通用户的首选渠道。仓库也保留 x64 framework-dependent 自签名旁加载包的维护流程，但其版本可能落后于 Store，不能视为与 Store 版同步的安装方式；请从 [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) 阅读对应版本说明并核对校验和。
+Microsoft Store 是普通用户的首选渠道。仓库同时提供 x64 framework-dependent 自签名旁加载包；请从 [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) 获取对应版本，并在安装前核对校验和。两条渠道身份独立，不能相互覆盖升级。
 
 ## 隐私与离线设计
 
 Microsoft Store 版的更新由 Microsoft Store 管理。旁加载版只有在用户主动检查更新时才访问 GitHub Releases API；外部法规、支持和项目链接只会在用户点击后打开。应用不要求账户、无广告、无遥测、无追踪、无自动崩溃上传，也不会自动上传用户数据。用户项目和工具数据保存在本机。
+
+GCJ-02 与 BD-09 结果采用公开近似算法，仅适用于地图叠加、数据准备和科研辅助，不属于测绘、审批、施工或法律用途的坐标转换成果。
 
 详见 [PRIVACY.md](PRIVACY.md) 和[在线隐私政策](https://kiyoujyo.github.io/UrbanPlanToolbox/privacy/)。
 

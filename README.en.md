@@ -8,7 +8,7 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 ## Get the app
 
-The current development target is **1.1.0**. Microsoft Store and GitHub sideload packages both use `1.1.0.0`, while their package identities and publishers remain separate.
+The current version is **1.1.0**. Microsoft Store and GitHub sideload packages both use `1.1.0.0`, while their package identities and publishers remain separate.
 
 ## About UrbanPlanToolbox
 
@@ -26,7 +26,7 @@ UrbanPlanToolbox is a Windows desktop toolbox for urban planning, architectural 
 
 ## Installation
 
-The Microsoft Store is the primary channel for ordinary users. The repository also maintains an x64 framework-dependent self-signed sideloading path, but its release may lag behind the Store and is not represented as synchronized with it; see the relevant [GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) and verify its checksums.
+The Microsoft Store is the primary channel for ordinary users. The repository also provides an x64 framework-dependent self-signed sideloading package; obtain the matching version from [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) and verify its checksums before installation. The two channel identities cannot update each other in place.
 
 ## Privacy and offline design
 
