@@ -13,6 +13,11 @@ on:
         required: true
         default: false
         type: boolean
+      certification_confirmation:
+        description: Type SUBMIT to confirm committing the existing Store draft
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -55,10 +60,13 @@ jobs:
           "source_sha=$sha" >> $env:GITHUB_OUTPUT
           "package_version=$packageVersion" >> $env:GITHUB_OUTPUT
       - name: Restore Release dependencies
+        if: inputs.submit_for_certification == false
         run: dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Release -p:Platform=x64
       - name: Run unit tests
+        if: inputs.submit_for_certification == false
         run: dotnet test UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore --verbosity normal
       - name: Build validated Store upload package
+        if: inputs.submit_for_certification == false
         id: package
         shell: pwsh
         run: |
@@ -68,6 +76,7 @@ jobs:
           "package_path=$($metadata.package)" >> $env:GITHUB_OUTPUT
           "sha256=$($metadata.sha256)" >> $env:GITHUB_OUTPUT
       - name: Preserve Store upload artifact
+        if: inputs.submit_for_certification == false
         uses: actions/upload-artifact@v7
         with:
           name: UrbanPlanToolbox-Store-${{ steps.version.outputs.package_version }}
@@ -135,15 +144,37 @@ jobs:
           $arguments = @('publish', (Get-Location).Path, '--inputDirectory', $packageDirectory, '--appId', $env:STORE_PRODUCT_ID, '--noCommit')
           & msstore @arguments
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store draft upload failed with exit code $LASTEXITCODE." }
-      - name: Upload and submit for certification
+      - name: Validate certification confirmation
         if: inputs.submit_for_certification == true
+        shell: pwsh
+        run: |
+          if ('${{ inputs.certification_confirmation }}' -cne 'SUBMIT') {
+            throw 'Certification confirmation is missing. Type SUBMIT to commit the existing Store draft.'
+          }
+      - name: Verify existing Store draft is PendingCommit
+        if: inputs.submit_for_certification == true
+        id: verify_pending_draft
         shell: pwsh
         env:
           STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
-          PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
         run: |
-          $packageDirectory = Split-Path -Parent $env:PACKAGE_PATH
-          $arguments = @('publish', (Get-Location).Path, '--inputDirectory', $packageDirectory, '--appId', $env:STORE_PRODUCT_ID)
+          $arguments = @('submission', 'status', $env:STORE_PRODUCT_ID)
+          $statusOutput = (& msstore @arguments 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unable to read Microsoft Store submission status. Exit code: $LASTEXITCODE."
+          }
+          if ($statusOutput -notmatch '(?i)\bPendingCommit\b') {
+            throw 'Expected an existing PendingCommit Store draft. Certification submission has been stopped.'
+          }
+          'Existing Store draft status: PendingCommit'
+      - name: Submit existing Store draft for certification
+        if: inputs.submit_for_certification == true && steps.verify_pending_draft.outcome == 'success'
+        id: submit_existing_draft
+        shell: pwsh
+        env:
+          STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
+        run: |
+          $arguments = @('submission', 'publish', $env:STORE_PRODUCT_ID)
           & msstore @arguments
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store certification submission failed with exit code $LASTEXITCODE." }
       - name: Show current Store submission status
@@ -151,7 +182,8 @@ jobs:
           always() &&
           steps.setup_store_cli.outcome == 'success' &&
           steps.configure_store_cli.outcome == 'success' &&
-          steps.verify_store_access.outcome == 'success'
+          steps.verify_store_access.outcome == 'success' &&
+          (inputs.submit_for_certification == false || steps.verify_pending_draft.outcome == 'success')
         continue-on-error: true
         shell: pwsh
         env:
