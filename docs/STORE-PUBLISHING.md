@@ -5,8 +5,8 @@ UrbanPlanToolbox 已在 Microsoft Store 发布。普通用户入口为：
 - 产品页：https://apps.microsoft.com/detail/9MWDPJG1BHKW
 - Store 协议：`ms-windows-store://pdp/?productid=9MWDPJG1BHKW`
 - Store ID：`9MWDPJG1BHKW`
-- 当前产品版本：`1.1.0`
-- 本次待人工提交技术包版本：`1.1.0.0`
+- 当前产品版本：`1.2.1`
+- 本次待人工提交技术包版本：`1.2.1.0`
 
 ## Store 身份
 
@@ -17,9 +17,9 @@ UrbanPlanToolbox 已在 Microsoft Store 发布。普通用户入口为：
 
 Store 渠道使用 `Package.Store.appxmanifest` 和 `DistributionChannel=Store`，生成 `.msixupload` 并在最终主线产物上运行 WACK。发布后的更新由 Microsoft Store 管理。
 
-## v1.1.0 人工提交边界
+## v1.2.1 手动工作流边界
 
-本次从最终 `main` 构建 `1.1.0.0` `.msixupload`，完成 WACK 并生成 Partner Center 人工提交清单。截图、提交说明与已有 `PendingCommit` 必须由维护者在 Partner Center 中确认：不运行 Store CLI、Actions draft/publish 或任何自动上传，不新增、修改、提交或删除现有 `PendingCommit`。在 Microsoft 完成认证前，公开 Store 页面仍可能提供旧版本。
+本次从最终 `main` 构建 `1.2.1.0` `.msixupload`，通过仅 `workflow_dispatch` 的 Actions 工作流上传 Partner Center 草稿。首次运行使用 `submit_for_certification=false`；草稿验收通过后才允许再次手动运行并送认证。在 Microsoft 完成认证前，公开 Store 页面仍可能提供旧版本。
 
 ## 渠道隔离
 

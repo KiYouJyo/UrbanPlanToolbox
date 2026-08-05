@@ -40,9 +40,9 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
             };
             var result = await operation.AsTask(cancellationToken);
             var state = result.OverallState.ToString();
-            if (state.Contains("Cancel", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Cancelled);
-            if (!state.Contains("Complete", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Failed, state);
-            return new(AppUpdateState.Completed);
+            if (state.Equals("Canceled", StringComparison.OrdinalIgnoreCase) || state.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Cancelled);
+            if (state.Equals("Completed", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Completed);
+            return new(AppUpdateState.Failed, state);
         }
         catch (OperationCanceledException) { return new(AppUpdateState.Cancelled); }
         catch (InvalidOperationException exception) when (exception.Message == "StoreWindowUnavailable") { return new(AppUpdateState.Failed, exception.Message); }

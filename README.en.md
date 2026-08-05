@@ -8,7 +8,7 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 ## Get the app
 
-The preview version is **v1.2.0** and both package channels use `1.2.0.0`, while their identities and publishers remain separate.
+The preview version is **v1.2.1** and both package channels use `1.2.1.0`, while their identities and publishers remain separate.
 
 ## About UrbanPlanToolbox
 

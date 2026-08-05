@@ -1,0 +1,110 @@
+name: Publish Microsoft Store update
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Branch, tag, or commit already contained in main
+        required: true
+        default: main
+        type: string
+      submit_for_certification:
+        description: Submit the Store draft for certification
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: microsoft-store-publish
+  cancel-in-progress: false
+
+env:
+  STORE_PRODUCT_ID: 9MWDPJG1BHKW
+
+jobs:
+  build-and-publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-2025-vs2026
+    steps:
+      - name: Checkout selected source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - name: Validate source and package version
+        id: version
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          [xml]$project = Get-Content -Raw UrbanPlanToolbox.csproj
+          [xml]$manifest = Get-Content -Raw Package.Store.appxmanifest
+          $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
+          $packageVersion = [string]$manifest.Package.Identity.Version
+          if ($projectVersion -ne '1.2.1' -or $packageVersion -ne '1.2.1.0') { throw "Expected 1.2.1 / 1.2.1.0, got $projectVersion / $packageVersion" }
+          $sha = (git rev-parse HEAD).Trim()
+          git fetch origin main --no-tags
+          git merge-base --is-ancestor $sha origin/main
+          if ($LASTEXITCODE -ne 0) { throw "Source is not contained in origin/main: $sha" }
+          "source_sha=$sha" >> $env:GITHUB_OUTPUT
+          "package_version=$packageVersion" >> $env:GITHUB_OUTPUT
+      - name: Restore Release dependencies
+        run: dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Release -p:Platform=x64
+      - name: Run unit tests
+        run: dotnet test UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore --verbosity normal
+      - name: Build validated Store upload package
+        id: package
+        shell: pwsh
+        run: |
+          $output = Join-Path $env:RUNNER_TEMP "UrbanPlanToolbox-store-$env:GITHUB_RUN_ID"
+          & ./packaging/Build-StorePackage.ps1 -SourceCommit '${{ steps.version.outputs.source_sha }}' -PackageVersion '${{ steps.version.outputs.package_version }}' -Configuration Release -Platform x64 -OutputDirectory $output
+          $metadata = Get-Content (Join-Path $output 'store-package-build.json') -Raw | ConvertFrom-Json
+          "package_path=$($metadata.package)" >> $env:GITHUB_OUTPUT
+          "sha256=$($metadata.sha256)" >> $env:GITHUB_OUTPUT
+      - name: Preserve Store upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: UrbanPlanToolbox-Store-${{ steps.version.outputs.package_version }}
+          path: ${{ steps.package.outputs.package_path }}
+          if-no-files-found: error
+      - name: Validate Microsoft Store credentials
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          SELLER_ID: ${{ secrets.SELLER_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          $missing = @('TENANT_ID','SELLER_ID','CLIENT_ID','CLIENT_SECRET') | Where-Object { [string]::IsNullOrWhiteSpace((Get-Item "env:$_").Value) }
+          if ($missing) { throw "Missing required secrets: $($missing -join ', ')" }
+          'All four Store secrets are non-empty.'
+      - name: Setup Microsoft Store Developer CLI
+        uses: microsoft/microsoft-store-apppublisher@v1.1
+      - name: Configure Microsoft Store Developer CLI
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          SELLER_ID: ${{ secrets.SELLER_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          msstore reconfigure --tenantId "$env:TENANT_ID" --sellerId "$env:SELLER_ID" --clientId "$env:CLIENT_ID" --clientSecret "$env:CLIENT_SECRET"
+          msstore settings --enableTelemetry false
+      - name: Verify Store product access
+        run: msstore apps get "$env:STORE_PRODUCT_ID"
+      - name: Upload as draft Store submission
+        if: inputs.submit_for_certification == false
+        run: msstore publish "$PWD" --inputFile '${{ steps.package.outputs.package_path }}' --appId "$env:STORE_PRODUCT_ID" --noCommit
+      - name: Upload and submit for certification
+        if: inputs.submit_for_certification == true
+        run: msstore publish "$PWD" --inputFile '${{ steps.package.outputs.package_path }}' --appId "$env:STORE_PRODUCT_ID"
+      - name: Show current Store submission status
+        if: always()
+        continue-on-error: true
+        run: msstore submission status "$env:STORE_PRODUCT_ID"

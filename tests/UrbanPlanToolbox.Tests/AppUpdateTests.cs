@@ -8,6 +8,14 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class AppUpdateTests
 {
     [Theory]
+    [InlineData("JoKiy.UrbanPlanToolbox", "CN=C4E4B33A-7B77-4121-897C-7D720A5471F8", "c4e4b33a7b774121897c7d720a5471f8", DistributionChannel.Store)]
+    [InlineData("556F80C5-C4D4-452B-93B4-00DE3FA7AC29", "CN=AppPublisher", "00000000000000000000000000000000", DistributionChannel.GitHub)]
+    [InlineData("JoKiy.UrbanPlanToolbox", "CN=AppPublisher", "c4e4b33a7b774121897c7d720a5471f8", DistributionChannel.GitHub)]
+    [InlineData("JoKiy.UrbanPlanToolbox", "CN=C4E4B33A-7B77-4121-897C-7D720A5471F8", "", DistributionChannel.GitHub)]
+    public void PackageIdentityMustMatchStoreIdentityExactly(string name, string publisher, string publisherId, DistributionChannel expected) =>
+        Assert.Equal(expected, DistributionChannelIdentity.Identify(name, publisher, publisherId));
+
+    [Theory]
     [InlineData(FakeAppUpdateScenario.UpToDate, AppUpdateState.UpToDate)]
     [InlineData(FakeAppUpdateScenario.UpdateAvailable, AppUpdateState.UpdateAvailable)]
     [InlineData(FakeAppUpdateScenario.UnsupportedChannel, AppUpdateState.UnsupportedChannel)]

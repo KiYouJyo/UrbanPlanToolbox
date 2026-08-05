@@ -8,12 +8,7 @@ public enum DistributionChannel
 
 public static class DistributionChannelProvider
 {
-    public static DistributionChannel Current =>
-#if URBANPLANTOOLBOX_STORE
-        DistributionChannel.Store;
-#else
-        DistributionChannel.GitHub;
-#endif
+    public static DistributionChannel Current => new AppDistributionChannelService().GetCurrentChannel();
 
     public static bool UsesGitHubUpdates => Current == DistributionChannel.GitHub;
 }

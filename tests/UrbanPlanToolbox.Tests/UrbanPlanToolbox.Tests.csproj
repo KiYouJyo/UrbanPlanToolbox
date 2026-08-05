@@ -59,6 +59,8 @@
   <Compile Include="../../Services/AppUpdateErrorMapper.cs" Link="Services/AppUpdateErrorMapper.cs" />
   <Compile Include="../../ViewModels/UpdateViewModel.cs" Link="ViewModels/UpdateViewModel.cs" />
   <Compile Include="../../Services/DistributionChannel.cs" Link="Services/DistributionChannel.cs" />
+  <Compile Include="../../Services/DistributionChannelIdentity.cs" Link="Services/DistributionChannelIdentity.cs" />
+  <Compile Include="../../Services/AppDistributionChannelService.cs" Link="Services/AppDistributionChannelService.cs" />
   <Compile Include="../../Services/DiagnosticsInfoService.cs" Link="Services/DiagnosticsInfoService.cs" />
   <Compile Include="../../Services/LocalDataResetService.cs" Link="Services/LocalDataResetService.cs" />
   <Compile Include="../../Models/Navigation/PrimaryNavigationDefinition.cs" Link="Models/Navigation/PrimaryNavigationDefinition.cs" />

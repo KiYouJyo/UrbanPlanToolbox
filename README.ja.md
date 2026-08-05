@@ -8,7 +8,7 @@
 
 ## アプリを入手
 
-インストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。現在のバージョンは **1.1.0** です。Microsoft Store 版と GitHub サイドロード版のパッケージバージョンはともに `1.1.0.0` ですが、ID と Publisher は別々です。
+インストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。現在のバージョンは **1.2.1** です。Microsoft Store 版と GitHub サイドロード版のパッケージバージョンはともに `1.2.1.0` ですが、ID と Publisher は別々です。
 
 ## UrbanPlanToolbox について
 
