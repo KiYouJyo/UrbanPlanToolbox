@@ -1,0 +1,222 @@
+name: One-time Store resubmit v1.2.1
+
+on:
+  push:
+    branches:
+      - codex/store-resubmit-v1.2.1
+    paths:
+      - .github/workflows/one-time-store-resubmit-v1.2.1.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: microsoft-store-publish
+  cancel-in-progress: false
+
+env:
+  STORE_PRODUCT_ID: 9MWDPJG1BHKW
+  EXPECTED_PACKAGE_NAME: UrbanPlanToolbox_1.2.1.0_x64_bundle.msixupload
+  EXPECTED_PACKAGE_VERSION: 1.2.1.0
+  EXPECTED_PACKAGE_SHA256: 85C6EE05964B66ECDC4B0A393803F76C9ADE0FC433AEBC9A5FA7C2D30FA3B579
+
+jobs:
+  resubmit-exact-package:
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 30
+    steps:
+      - name: Download the validated v1.2.1 Store artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: UrbanPlanToolbox-Store-1.2.1.0
+          path: ${{ runner.temp }}\store-artifact
+          github-token: ${{ github.token }}
+          repository: KiYouJyo/UrbanPlanToolbox
+          run-id: 31004582054
+
+      - name: Verify the exact package file and SHA-256
+        id: package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packageRoot = Join-Path $env:RUNNER_TEMP 'store-artifact'
+          $packages = @(Get-ChildItem -Path $packageRoot -Recurse -File -Filter '*.msixupload')
+          if ($packages.Count -ne 1) {
+            throw "Expected exactly one .msixupload file in the artifact, found $($packages.Count)."
+          }
+          $package = $packages[0]
+          if ($package.Name -cne $env:EXPECTED_PACKAGE_NAME) {
+            throw "Unexpected Store package filename: $($package.Name)"
+          }
+          $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $package.FullName).Hash
+          if ($actualHash -cne $env:EXPECTED_PACKAGE_SHA256) {
+            throw "Store package SHA-256 mismatch."
+          }
+          "package_path=$($package.FullName)" >> $env:GITHUB_OUTPUT
+          "Verified exact package: $($package.Name)" >> $env:GITHUB_STEP_SUMMARY
+          "Verified SHA-256: $actualHash" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Validate Microsoft Store credentials
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          SELLER_ID: ${{ secrets.SELLER_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $missing = @('TENANT_ID','SELLER_ID','CLIENT_ID','CLIENT_SECRET') | Where-Object {
+            [string]::IsNullOrWhiteSpace((Get-Item "env:$_").Value)
+          }
+          if ($missing) { throw "Missing required secrets: $($missing -join ', ')" }
+          $tenantGuid = [Guid]::Empty
+          if (-not [Guid]::TryParse($env:TENANT_ID.Trim(), [ref]$tenantGuid)) {
+            throw 'AZURE_AD_TENANT_ID is not a valid GUID.'
+          }
+          $clientGuid = [Guid]::Empty
+          if (-not [Guid]::TryParse($env:CLIENT_ID.Trim(), [ref]$clientGuid)) {
+            throw 'AZURE_AD_APPLICATION_CLIENT_ID is not a valid GUID.'
+          }
+          'Store credential presence and GUID format checks passed.'
+
+      - name: Setup Microsoft Store Developer CLI
+        id: setup_store_cli
+        uses: microsoft/microsoft-store-apppublisher@v1.1
+
+      - name: Configure Microsoft Store Developer CLI
+        id: configure_store_cli
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          SELLER_ID: ${{ secrets.SELLER_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $arguments = @(
+            'reconfigure'
+            '--tenantId', $env:TENANT_ID.Trim()
+            '--sellerId', $env:SELLER_ID.Trim()
+            '--clientId', $env:CLIENT_ID.Trim()
+            '--clientSecret', $env:CLIENT_SECRET
+          )
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) {
+            throw "Microsoft Store CLI reconfiguration failed with exit code $LASTEXITCODE."
+          }
+          & msstore settings --enableTelemetry false
+          if ($LASTEXITCODE -ne 0) {
+            throw "Microsoft Store CLI settings failed with exit code $LASTEXITCODE."
+          }
+
+      - name: Verify Store product access
+        id: verify_store_access
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & msstore apps get $env:STORE_PRODUCT_ID
+          if ($LASTEXITCODE -ne 0) {
+            throw "Microsoft Store product access failed with exit code $LASTEXITCODE."
+          }
+
+      - name: Refuse to overwrite an active Store submission
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $statusOutput = (& msstore submission status $env:STORE_PRODUCT_ID 2>&1 | Out-String)
+          $statusExit = $LASTEXITCODE
+          if ($statusExit -eq 0) {
+            $activePattern = '(?i)\b(PendingCommit|CommitStarted|PreProcessing|Certification|PendingPublication|Publishing|Release)\b'
+            if ($statusOutput -match $activePattern) {
+              throw "An active Microsoft Store submission still exists. Refusing to overwrite or duplicate it."
+            }
+            "Pre-upload Store status: $($statusOutput.Trim())" >> $env:GITHUB_STEP_SUMMARY
+          } else {
+            'No readable active submission was returned before upload; continuing with a new draft.' >> $env:GITHUB_STEP_SUMMARY
+          }
+
+      - name: Upload the exact v1.2.1 package as a draft
+        id: upload_draft
+        shell: pwsh
+        env:
+          PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Test-Path -LiteralPath $env:PACKAGE_PATH -PathType Leaf)) {
+            throw 'The verified Store package path no longer exists.'
+          }
+          # Microsoft’s current GitHub Actions guidance passes the package file itself
+          # as the publish command's positional path. This prevents directory candidate selection.
+          $arguments = @(
+            'publish'
+            $env:PACKAGE_PATH
+            '-id', $env:STORE_PRODUCT_ID
+            '--noCommit'
+          )
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) {
+            throw "Exact Microsoft Store draft upload failed with exit code $LASTEXITCODE."
+          }
+
+      - name: Verify the draft contains the exact v1.2.1 package
+        id: verify_exact_draft
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $verified = $false
+          $lastStatus = ''
+          $lastSubmission = ''
+          for ($attempt = 1; $attempt -le 12; $attempt++) {
+            $lastStatus = (& msstore submission status $env:STORE_PRODUCT_ID 2>&1 | Out-String)
+            $statusExit = $LASTEXITCODE
+            if ($statusExit -eq 0 -and $lastStatus -match '(?i)\bPendingCommit\b') {
+              $lastSubmission = (& msstore submission get $env:STORE_PRODUCT_ID 2>&1 | Out-String)
+              $getExit = $LASTEXITCODE
+              if ($getExit -eq 0 -and
+                  $lastSubmission -match [regex]::Escape($env:EXPECTED_PACKAGE_NAME) -and
+                  $lastSubmission -match [regex]::Escape($env:EXPECTED_PACKAGE_VERSION)) {
+                $verified = $true
+                break
+              }
+            }
+            Start-Sleep -Seconds 15
+          }
+          if (-not $verified) {
+            "Last Store status: $($lastStatus.Trim())" >> $env:GITHUB_STEP_SUMMARY
+            throw 'The draft could not be proven to contain the exact 1.2.1.0 package. Certification was not submitted.'
+          }
+          "Verified Partner Center draft package: $env:EXPECTED_PACKAGE_NAME" >> $env:GITHUB_STEP_SUMMARY
+          "Verified Partner Center draft version: $env:EXPECTED_PACKAGE_VERSION" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Submit the verified draft for certification
+        id: submit_verified_draft
+        if: steps.verify_exact_draft.outcome == 'success'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & msstore submission publish $env:STORE_PRODUCT_ID
+          if ($LASTEXITCODE -ne 0) {
+            throw "Microsoft Store certification submission failed with exit code $LASTEXITCODE."
+          }
+
+      - name: Confirm certification processing started
+        if: steps.submit_verified_draft.outcome == 'success'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $started = $false
+          $lastStatus = ''
+          for ($attempt = 1; $attempt -le 12; $attempt++) {
+            $lastStatus = (& msstore submission status $env:STORE_PRODUCT_ID 2>&1 | Out-String)
+            if ($LASTEXITCODE -eq 0 -and
+                $lastStatus -match '(?i)\b(CommitStarted|PreProcessing|Certification|PendingPublication|Publishing|Release|Published)\b') {
+              $started = $true
+              break
+            }
+            Start-Sleep -Seconds 10
+          }
+          "Post-submit Store status: $($lastStatus.Trim())" >> $env:GITHUB_STEP_SUMMARY
+          if (-not $started) {
+            throw 'The publish command returned successfully, but certification processing was not yet observable. Do not retry submission automatically.'
+          }
