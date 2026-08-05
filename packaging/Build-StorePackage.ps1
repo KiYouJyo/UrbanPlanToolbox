@@ -13,7 +13,6 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $output = [IO.Path]::GetFullPath($OutputDirectory)
 $repoPrefix = $repoRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 if ($output -eq $repoRoot -or $output.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Store package output must be outside the repository.' }
-if ($PackageVersion -ne '1.2.0.0') { throw 'This v1.2 workflow only accepts Store package version 1.2.0.0.' }
 if (Test-Path -LiteralPath $output) {
     if (@(Get-ChildItem -LiteralPath $output -Force).Count -gt 0) { throw "Store package output directory must be new or empty: $output" }
 }
@@ -30,6 +29,13 @@ $manifestPath = Join-Path $repoRoot 'Package.Store.appxmanifest'
 $identity = $manifest.Package.Identity
 if ($identity.Name -ne 'JoKiy.UrbanPlanToolbox' -or $identity.Publisher -ne 'CN=C4E4B33A-7B77-4121-897C-7D720A5471F8' -or $identity.Version -ne $PackageVersion) { throw 'Store manifest identity, publisher, or version is invalid.' }
 if ($manifest.Package.Properties.PublisherDisplayName -cne ('Jo Kiy' + [char]333)) { throw 'Store publisher display name is invalid.' }
+
+$projectPath = Join-Path $repoRoot 'UrbanPlanToolbox.csproj'
+[xml]$project = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($projectPath))
+$projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
+if (-not $projectVersion -or $projectVersion -notmatch '^\d+\.\d+\.\d+$') { throw 'UrbanPlanToolbox.csproj must declare a three-part Version.' }
+$expectedPackageVersion = "$projectVersion.0"
+if ($PackageVersion -ne $expectedPackageVersion) { throw "Store package version must match the project version. Expected=$expectedPackageVersion Actual=$PackageVersion" }
 
 if (-not $MsBuildPath) {
     $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
