@@ -49,6 +49,17 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("Configure Microsoft Store Developer CLI", workflow);
         Assert.Contains("Verify Store product access", workflow);
         Assert.Contains("Upload as draft Store submission", workflow);
+        Assert.Contains("submit_for_certification == false", workflow);
+        Assert.Contains("--noCommit", workflow);
+        Assert.Contains("[Guid]::TryParse($env:TENANT_ID.Trim()", workflow);
+        Assert.Contains("[Guid]::TryParse($env:CLIENT_ID.Trim()", workflow);
+        Assert.Contains("'--clientId', $env:CLIENT_ID.Trim()", workflow);
+        Assert.Contains("'--tenantId', $env:TENANT_ID.Trim()", workflow);
+        Assert.Contains("$LASTEXITCODE", workflow);
+        Assert.DoesNotContain("\\\"", workflow);
+        Assert.DoesNotContain("$env:CLIENT_SECRET.Length", workflow);
+        Assert.DoesNotContain("$env:CLIENT_SECRET.Substring", workflow);
+        Assert.Contains("Write workflow summary", workflow);
     }
 
     [Fact]

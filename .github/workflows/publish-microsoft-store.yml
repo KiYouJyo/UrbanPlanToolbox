@@ -83,7 +83,14 @@ jobs:
         run: |
           $missing = @('TENANT_ID','SELLER_ID','CLIENT_ID','CLIENT_SECRET') | Where-Object { [string]::IsNullOrWhiteSpace((Get-Item "env:$_").Value) }
           if ($missing) { throw "Missing required secrets: $($missing -join ', ')" }
-          'All four Store secrets are non-empty.'
+          $tenantGuid = [Guid]::Empty
+          if (-not [Guid]::TryParse($env:TENANT_ID.Trim(), [ref]$tenantGuid)) { throw 'AZURE_AD_TENANT_ID is present but is not a valid GUID.' }
+          $clientGuid = [Guid]::Empty
+          if (-not [Guid]::TryParse($env:CLIENT_ID.Trim(), [ref]$clientGuid)) { throw 'AZURE_AD_APPLICATION_CLIENT_ID is present but is not a valid GUID.' }
+          'Tenant ID format: valid'
+          'Client ID format: valid'
+          'Seller ID: present'
+          'Client Secret: present'
       - name: Setup Microsoft Store Developer CLI
         uses: microsoft/microsoft-store-apppublisher@v1.1
       - name: Configure Microsoft Store Developer CLI
@@ -94,17 +101,63 @@ jobs:
           CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
         run: |
-          msstore reconfigure --tenantId "$env:TENANT_ID" --sellerId "$env:SELLER_ID" --clientId "$env:CLIENT_ID" --clientSecret "$env:CLIENT_SECRET"
-          msstore settings --enableTelemetry false
+          $arguments = @(
+            'reconfigure'
+            '--tenantId', $env:TENANT_ID.Trim()
+            '--sellerId', $env:SELLER_ID.Trim()
+            '--clientId', $env:CLIENT_ID.Trim()
+            '--clientSecret', $env:CLIENT_SECRET
+            '--reset'
+          )
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Store CLI reconfiguration failed with exit code $LASTEXITCODE." }
+          $arguments = @('settings', '--enableTelemetry', 'false')
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Store CLI settings failed with exit code $LASTEXITCODE." }
       - name: Verify Store product access
-        run: msstore apps get "$env:STORE_PRODUCT_ID"
+        shell: pwsh
+        env:
+          STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
+        run: |
+          $arguments = @('apps', 'get', $env:STORE_PRODUCT_ID)
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Store product access failed with exit code $LASTEXITCODE." }
       - name: Upload as draft Store submission
         if: inputs.submit_for_certification == false
-        run: msstore publish "$PWD" --inputFile '${{ steps.package.outputs.package_path }}' --appId "$env:STORE_PRODUCT_ID" --noCommit
+        shell: pwsh
+        env:
+          STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
+          PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
+        run: |
+          $arguments = @('publish', (Get-Location).Path, '--inputFile', $env:PACKAGE_PATH, '--appId', $env:STORE_PRODUCT_ID, '--noCommit')
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Store draft upload failed with exit code $LASTEXITCODE." }
       - name: Upload and submit for certification
         if: inputs.submit_for_certification == true
-        run: msstore publish "$PWD" --inputFile '${{ steps.package.outputs.package_path }}' --appId "$env:STORE_PRODUCT_ID"
+        shell: pwsh
+        env:
+          STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
+          PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
+        run: |
+          $arguments = @('publish', (Get-Location).Path, '--inputFile', $env:PACKAGE_PATH, '--appId', $env:STORE_PRODUCT_ID)
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Store certification submission failed with exit code $LASTEXITCODE." }
       - name: Show current Store submission status
         if: always()
         continue-on-error: true
-        run: msstore submission status "$env:STORE_PRODUCT_ID"
+        shell: pwsh
+        env:
+          STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
+        run: |
+          $arguments = @('submission', 'status', $env:STORE_PRODUCT_ID)
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Store submission status failed with exit code $LASTEXITCODE." }
+      - name: Write workflow summary
+        if: always()
+        shell: pwsh
+        run: |
+          $mode = if ('${{ inputs.submit_for_certification }}' -eq 'true') { 'certification submission requested' } else { 'uploaded as draft with no certification submission' }
+          "Source commit: ${{ steps.version.outputs.source_sha }}" >> $env:GITHUB_STEP_SUMMARY
+          "Package version: ${{ steps.version.outputs.package_version }}" >> $env:GITHUB_STEP_SUMMARY
+          "Product ID: $env:STORE_PRODUCT_ID" >> $env:GITHUB_STEP_SUMMARY
+          "Mode: $mode" >> $env:GITHUB_STEP_SUMMARY
