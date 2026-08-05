@@ -1,0 +1,85 @@
+name: One-time Store status diagnostic
+
+on:
+  pull_request:
+    branches:
+      - codex/store-resubmit-base-v1.2.1
+    paths:
+      - .store-status-diagnostic.trigger
+
+permissions:
+  contents: read
+
+concurrency:
+  group: microsoft-store-publish
+  cancel-in-progress: false
+
+env:
+  STORE_PRODUCT_ID: 9MWDPJG1BHKW
+
+jobs:
+  inspect-store-submission:
+    if: github.head_ref == 'codex/store-status-diagnostic-v1.2.1'
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 15
+    steps:
+      - name: Validate Store credentials
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          SELLER_ID: ${{ secrets.SELLER_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $missing = @('TENANT_ID','SELLER_ID','CLIENT_ID','CLIENT_SECRET') | Where-Object { [string]::IsNullOrWhiteSpace((Get-Item "env:$_").Value) }
+          if ($missing) { throw "Missing Secrets: $($missing -join ', ')" }
+          $tenant = [Guid]::Empty
+          $client = [Guid]::Empty
+          if (-not [Guid]::TryParse($env:TENANT_ID.Trim(), [ref]$tenant)) { throw 'Invalid Tenant GUID.' }
+          if (-not [Guid]::TryParse($env:CLIENT_ID.Trim(), [ref]$client)) { throw 'Invalid Client GUID.' }
+
+      - name: Setup Store CLI
+        uses: microsoft/microsoft-store-apppublisher@v1.1
+
+      - name: Configure Store CLI
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          SELLER_ID: ${{ secrets.SELLER_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & msstore reconfigure --tenantId $env:TENANT_ID.Trim() --sellerId $env:SELLER_ID.Trim() --clientId $env:CLIENT_ID.Trim() --clientSecret $env:CLIENT_SECRET
+          if ($LASTEXITCODE -ne 0) { throw "Store CLI configuration failed: $LASTEXITCODE" }
+          & msstore settings --enableTelemetry false
+          if ($LASTEXITCODE -ne 0) { throw "Store CLI settings failed: $LASTEXITCODE" }
+
+      - name: Read current Store submission
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+
+          '===== APPLICATION ====='
+          & msstore apps get $env:STORE_PRODUCT_ID
+          $appExit = $LASTEXITCODE
+          "apps get exit code: $appExit"
+
+          '===== SUBMISSION STATUS ====='
+          & msstore submission status $env:STORE_PRODUCT_ID
+          $statusExit = $LASTEXITCODE
+          "submission status exit code: $statusExit"
+
+          '===== SUBMISSION DETAILS ====='
+          & msstore submission get $env:STORE_PRODUCT_ID
+          $getExit = $LASTEXITCODE
+          "submission get exit code: $getExit"
+
+          "apps get exit code: $appExit" >> $env:GITHUB_STEP_SUMMARY
+          "submission status exit code: $statusExit" >> $env:GITHUB_STEP_SUMMARY
+          "submission get exit code: $getExit" >> $env:GITHUB_STEP_SUMMARY
+
+          if ($appExit -ne 0 -or $statusExit -ne 0) {
+            throw 'Read-only Store diagnostic did not complete successfully.'
+          }
