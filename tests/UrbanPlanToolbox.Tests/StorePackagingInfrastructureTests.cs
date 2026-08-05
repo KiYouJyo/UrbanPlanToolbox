@@ -56,6 +56,16 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("'--clientId', $env:CLIENT_ID.Trim()", workflow);
         Assert.Contains("'--tenantId', $env:TENANT_ID.Trim()", workflow);
         Assert.Contains("$LASTEXITCODE", workflow);
+        Assert.Contains("id: setup_store_cli", workflow);
+        Assert.Contains("id: configure_store_cli", workflow);
+        Assert.Contains("id: verify_store_access", workflow);
+        Assert.Contains("steps.setup_store_cli.outcome == 'success'", workflow);
+        Assert.Contains("steps.configure_store_cli.outcome == 'success'", workflow);
+        Assert.Contains("steps.verify_store_access.outcome == 'success'", workflow);
+        Assert.DoesNotContain("'--reset'", workflow);
+        Assert.DoesNotContain("echo y", workflow, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("--yes", workflow, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("--no-confirm", workflow, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("\\\"", workflow);
         Assert.DoesNotContain("$env:CLIENT_SECRET.Length", workflow);
         Assert.DoesNotContain("$env:CLIENT_SECRET.Substring", workflow);

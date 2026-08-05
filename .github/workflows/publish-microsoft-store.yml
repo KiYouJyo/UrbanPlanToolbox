@@ -92,8 +92,10 @@ jobs:
           'Seller ID: present'
           'Client Secret: present'
       - name: Setup Microsoft Store Developer CLI
+        id: setup_store_cli
         uses: microsoft/microsoft-store-apppublisher@v1.1
       - name: Configure Microsoft Store Developer CLI
+        id: configure_store_cli
         shell: pwsh
         env:
           TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
@@ -107,7 +109,6 @@ jobs:
             '--sellerId', $env:SELLER_ID.Trim()
             '--clientId', $env:CLIENT_ID.Trim()
             '--clientSecret', $env:CLIENT_SECRET
-            '--reset'
           )
           & msstore @arguments
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store CLI reconfiguration failed with exit code $LASTEXITCODE." }
@@ -115,6 +116,7 @@ jobs:
           & msstore @arguments
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store CLI settings failed with exit code $LASTEXITCODE." }
       - name: Verify Store product access
+        id: verify_store_access
         shell: pwsh
         env:
           STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
@@ -143,7 +145,11 @@ jobs:
           & msstore @arguments
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store certification submission failed with exit code $LASTEXITCODE." }
       - name: Show current Store submission status
-        if: always()
+        if: |
+          always() &&
+          steps.setup_store_cli.outcome == 'success' &&
+          steps.configure_store_cli.outcome == 'success' &&
+          steps.verify_store_access.outcome == 'success'
         continue-on-error: true
         shell: pwsh
         env:
