@@ -62,6 +62,9 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("steps.setup_store_cli.outcome == 'success'", workflow);
         Assert.Contains("steps.configure_store_cli.outcome == 'success'", workflow);
         Assert.Contains("steps.verify_store_access.outcome == 'success'", workflow);
+        Assert.Contains("--inputDirectory", workflow);
+        Assert.Contains("Split-Path -Parent $env:PACKAGE_PATH", workflow);
+        Assert.DoesNotContain("--inputFile", workflow);
         Assert.DoesNotContain("'--reset'", workflow);
         Assert.DoesNotContain("echo y", workflow, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("--yes", workflow, StringComparison.OrdinalIgnoreCase);

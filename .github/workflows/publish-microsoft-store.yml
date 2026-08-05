@@ -131,7 +131,8 @@ jobs:
           STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
           PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
         run: |
-          $arguments = @('publish', (Get-Location).Path, '--inputFile', $env:PACKAGE_PATH, '--appId', $env:STORE_PRODUCT_ID, '--noCommit')
+          $packageDirectory = Split-Path -Parent $env:PACKAGE_PATH
+          $arguments = @('publish', (Get-Location).Path, '--inputDirectory', $packageDirectory, '--appId', $env:STORE_PRODUCT_ID, '--noCommit')
           & msstore @arguments
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store draft upload failed with exit code $LASTEXITCODE." }
       - name: Upload and submit for certification
@@ -141,7 +142,8 @@ jobs:
           STORE_PRODUCT_ID: ${{ env.STORE_PRODUCT_ID }}
           PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
         run: |
-          $arguments = @('publish', (Get-Location).Path, '--inputFile', $env:PACKAGE_PATH, '--appId', $env:STORE_PRODUCT_ID)
+          $packageDirectory = Split-Path -Parent $env:PACKAGE_PATH
+          $arguments = @('publish', (Get-Location).Path, '--inputDirectory', $packageDirectory, '--appId', $env:STORE_PRODUCT_ID)
           & msstore @arguments
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store certification submission failed with exit code $LASTEXITCODE." }
       - name: Show current Store submission status
