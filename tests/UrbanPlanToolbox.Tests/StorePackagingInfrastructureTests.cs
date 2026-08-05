@@ -50,6 +50,12 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("Verify Store product access", workflow);
         Assert.Contains("Upload as draft Store submission", workflow);
         Assert.Contains("submit_for_certification == false", workflow);
+        Assert.Contains("certification_confirmation", workflow);
+        Assert.Contains("Type SUBMIT to confirm committing the existing Store draft", workflow);
+        Assert.Contains("Verify existing Store draft is PendingCommit", workflow);
+        Assert.Contains("(?i)\\bPendingCommit\\b", workflow);
+        Assert.Contains("Submit existing Store draft for certification", workflow);
+        Assert.Contains("'submission', 'publish', $env:STORE_PRODUCT_ID", workflow);
         Assert.Contains("--noCommit", workflow);
         Assert.Contains("[Guid]::TryParse($env:TENANT_ID.Trim()", workflow);
         Assert.Contains("[Guid]::TryParse($env:CLIENT_ID.Trim()", workflow);
@@ -73,6 +79,14 @@ public sealed class StorePackagingInfrastructureTests
         Assert.DoesNotContain("$env:CLIENT_SECRET.Length", workflow);
         Assert.DoesNotContain("$env:CLIENT_SECRET.Substring", workflow);
         Assert.Contains("Write workflow summary", workflow);
+
+        var certificationStart = workflow.IndexOf("- name: Submit existing Store draft for certification", StringComparison.Ordinal);
+        var certificationEnd = workflow.IndexOf("- name: Show current Store submission status", StringComparison.Ordinal);
+        var certificationStep = workflow[certificationStart..certificationEnd];
+        Assert.DoesNotContain("PACKAGE_PATH", certificationStep);
+        Assert.DoesNotContain("--inputDirectory", certificationStep);
+        Assert.DoesNotContain("--inputFile", certificationStep);
+        Assert.DoesNotContain("--noCommit", certificationStep);
     }
 
     [Fact]
