@@ -13,6 +13,7 @@ public sealed partial class AboutPage : Page
 {
     private readonly CancellationTokenSource _pageLifetime = new();
     private readonly ILocalizationService _localization = LocalizationService.Default;
+    private readonly DistributionChannel _channel = new AppDistributionChannelService().GetCurrentChannel();
     private readonly UpdateViewModel _updates = new(AppUpdateServiceFactory.CreateDefault());
 
     public AboutPage()
@@ -30,7 +31,7 @@ public sealed partial class AboutPage : Page
     {
         DisplayVersionText.Text = AppVersionProvider.DisplayVersion; PackageVersionText.Text = AppVersionProvider.GetPackageVersion();
         ArchitectureText.Text = RuntimeInformation.ProcessArchitecture.ToString();
-        var channel = new AppDistributionChannelService().GetCurrentChannel(); ChannelText.Text = ChannelLabel(channel); UpdateSourceText.Text = ChannelLabel(channel); UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
+        ChannelText.Text = ChannelLabel(_channel); UpdateSourceText.Text = ChannelLabel(_channel); UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
         try { PackageIdentityText.Text = Package.Current.Id.FullName; PublisherText.Text = Package.Current.Id.Publisher; }
         catch (Exception) when (OperatingSystem.IsWindows()) { PackageIdentityText.Text = T("About_Unavailable"); PublisherText.Text = T("About_Unavailable"); }
     }
@@ -50,8 +51,8 @@ public sealed partial class AboutPage : Page
 
     private void RenderUpdate()
     {
-        var info = _updates.Info; CheckUpdateButton.IsEnabled = _updates.CanCheck; InstallUpdateButton.Visibility = info.IsUpdateAvailable ? Visibility.Visible : Visibility.Collapsed; InstallUpdateButton.IsEnabled = _updates.CanInstall;
-        OpenReleasesButton.Visibility = info.State == AppUpdateState.UnsupportedChannel ? Visibility.Visible : Visibility.Collapsed;
+        var info = _updates.Info; CheckUpdateButton.IsEnabled = _updates.CanCheck; InstallUpdateButton.Visibility = _channel == DistributionChannel.Store && info.IsUpdateAvailable ? Visibility.Visible : Visibility.Collapsed; InstallUpdateButton.IsEnabled = _updates.CanInstall;
+        OpenReleasesButton.Visibility = _channel == DistributionChannel.GitHub || info.State == AppUpdateState.UnsupportedChannel ? Visibility.Visible : Visibility.Collapsed;
         UpdateProgress.Visibility = _updates.Progress is null ? Visibility.Collapsed : Visibility.Visible;
         if (_updates.Progress is double progress) UpdateProgress.Value = progress;
         UpdateStatusText.Text = T($"Update_State_{info.State}");

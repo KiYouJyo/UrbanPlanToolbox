@@ -244,20 +244,20 @@ public sealed partial class LocalizationTests
     public void VersionConfigurationIs110AndChannelsRemainDistinct()
     {
         var manifest = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Package.appxmanifest"));
-        Assert.Contains("Version=\"1.2.0.0\"", manifest);
+        Assert.Contains("Version=\"1.2.1.0\"", manifest);
         var languages = Regex.Matches(manifest, "<Resource Language=\\\"([^\\\"]+)\\\"")
             .Select(match => match.Groups[1].Value).ToArray();
         Assert.Equal(["zh-CN", "ja-JP", "en-US"], languages);
         Assert.Contains("ms-resource:AppDisplayName", manifest);
 
         var project = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "UrbanPlanToolbox.csproj"));
-        Assert.Contains("<Version>1.2.0</Version>", project);
-        Assert.Contains("<AssemblyVersion>1.2.0</AssemblyVersion>", project);
-        Assert.Contains("<FileVersion>1.2.0</FileVersion>", project);
-        Assert.Contains("<InformationalVersion>1.2.0</InformationalVersion>", project);
+        Assert.Contains("<Version>1.2.1</Version>", project);
+        Assert.Contains("<AssemblyVersion>1.2.1</AssemblyVersion>", project);
+        Assert.Contains("<FileVersion>1.2.1</FileVersion>", project);
+        Assert.Contains("<InformationalVersion>1.2.1</InformationalVersion>", project);
         var storeManifest = File.ReadAllText(Path.Combine(FindRepositoryRoot(), "Package.Store.appxmanifest"));
         Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", storeManifest);
-        Assert.Contains("Version=\"1.2.0.0\"", storeManifest);
+        Assert.Contains("Version=\"1.2.1.0\"", storeManifest);
         Assert.DoesNotContain("Name=\"JoKiy.UrbanPlanToolbox\"", manifest);
         Assert.Contains("<DefaultLanguage>zh-CN</DefaultLanguage>", project);
         Assert.Contains("<AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>", project);

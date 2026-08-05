@@ -4,6 +4,14 @@
 
 - 暂无未发布变更。
 
+## 1.2.1（当前发布版本）
+
+### 修复
+
+- 修复 Store 包运行时渠道识别未读取正式 Package Identity、导致“关于”页面显示为 GitHub 的问题。
+- 恢复 GitHub 旁加载版的 GitHub Releases 更新检查，并将 Store 更新 API 限定在正式 Store Identity。
+- 增加手动触发的 Microsoft Store 草稿上传工作流；上传、认证和发布阶段保持独立。
+
 ## 1.2.0（当前发布版本）
 
 ### 新增

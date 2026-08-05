@@ -1,10 +1,10 @@
 # 发布指南
 
-本文档是今后发布 UrbanPlanToolbox 的可复用指南。当前产品版本为 `1.1.0`；GitHub 旁加载包和本次准备提交 Microsoft Store 的包均使用 `1.1.0.0`，但身份与更新流程相互独立。
+本文档是今后发布 UrbanPlanToolbox 的可复用指南。当前产品版本为 `1.2.1`；GitHub 旁加载包和 Microsoft Store 包均使用 `1.2.1.0`，但身份与更新流程相互独立。
 
 ## 产品版本
 
-- 应用显示版本：当前为 `1.1.0`，由产品版本和应用资源共同表达。
+- 应用显示版本：当前为 `1.2.1`，由产品版本和应用资源共同表达。
 - Store 包版本：独立、单调递增，第四段为 `0`。
 - GitHub 旁加载包使用独立的 `Package.appxmanifest` 版本和签名身份。
 
@@ -19,7 +19,7 @@
 3. 生成 `.msixupload`，在最终主线产物上运行 WACK。
 4. 上传 Partner Center，完成认证和发布后由 Microsoft Store 分发与更新。
 
-`v1.1.0` 的 Store 产物只准备到最终 `.msixupload`、WACK 结果与人工提交材料。因截图复用和 Partner Center 已存在的 `PendingCommit` 需要人工判断，本次不运行 Store CLI、自动化 draft/publish 或自动上传，也不修改现有 `PendingCommit`。
+`v1.2.1` 的 Store 工作流首次支持手动上传草稿；首次运行必须使用 `submit_for_certification=false`，完成 Partner Center 草稿验收后才可再次手动送认证。GitHub Release 与 Store 提交保持独立。
 
 ## GitHub 旁加载渠道
 
