@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       source_ref:
-        description: Branch, tag, or commit to package
+        description: Branch, tag, or commit to package (must already be contained in main)
         required: true
         default: main
         type: string
@@ -27,6 +27,7 @@ env:
 jobs:
   build-and-publish:
     name: Build and publish Store package
+    if: github.ref == 'refs/heads/main'
     runs-on: windows-2025-vs2026
     timeout-minutes: 90
 
@@ -72,6 +73,15 @@ jobs:
           $sourceSha = (git rev-parse HEAD).Trim()
           if ($LASTEXITCODE -ne 0 -or -not $sourceSha) {
             throw 'Unable to resolve the checked-out source commit.'
+          }
+
+          git fetch origin main --no-tags
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Unable to fetch origin/main for source validation.'
+          }
+          git merge-base --is-ancestor $sourceSha origin/main
+          if ($LASTEXITCODE -ne 0) {
+            throw "The selected source commit is not contained in origin/main: $sourceSha"
           }
 
           "package_version=$packageVersion" >> $env:GITHUB_OUTPUT
@@ -166,7 +176,7 @@ jobs:
         run: msstore apps get "$env:STORE_PRODUCT_ID"
 
       - name: Upload as draft Store submission
-        if: ${{ !inputs.submit_for_certification }}
+        if: ${{ inputs.submit_for_certification == false }}
         shell: pwsh
         run: |
           msstore publish "$PWD" `
@@ -175,7 +185,7 @@ jobs:
             --noCommit
 
       - name: Upload and submit for certification
-        if: ${{ inputs.submit_for_certification }}
+        if: ${{ inputs.submit_for_certification == true }}
         shell: pwsh
         run: |
           msstore publish "$PWD" `
@@ -195,10 +205,10 @@ jobs:
           @"
           ## Microsoft Store update
 
-          - Source: `${{ steps.version.outputs.source_sha }}`
-          - Version: `${{ steps.version.outputs.package_version }}`
-          - Product ID: `$env:STORE_PRODUCT_ID`
-          - SHA-256: `${{ steps.package.outputs.sha256 }}`
+          - Source commit: ${{ steps.version.outputs.source_sha }}
+          - Version: ${{ steps.version.outputs.package_version }}
+          - Product ID: $env:STORE_PRODUCT_ID
+          - SHA-256: ${{ steps.package.outputs.sha256 }}
           - Mode: $mode
 
           Microsoft Store certification remains a separate Partner Center process after submission.
