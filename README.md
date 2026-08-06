@@ -77,3 +77,5 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 ## 许可证与第三方声明
 
 本仓库当前未声明项目许可证；在许可证决定前，请不要将其描述为已授权的开源软件。依赖与外部数据来源见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+
+<!-- Pages redeploy trigger: recover from cancelled deployment 31102137189 -->
