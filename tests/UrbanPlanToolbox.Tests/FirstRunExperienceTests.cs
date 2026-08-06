@@ -1,4 +1,5 @@
 using UrbanPlanToolbox.Services;
+using UrbanPlanToolbox.Models;
 using Xunit;
 
 namespace UrbanPlanToolbox.Tests;
@@ -51,6 +52,48 @@ public sealed class FirstRunExperienceTests
 
         // Manual opening is intentionally a host concern; the lifecycle service never exposes a reset operation.
         Assert.False(service.ShouldShowAutomatically());
+    }
+
+    [Fact]
+    public void LifecycleStateDistinguishesNewInstallationAndCompletion()
+    {
+        using var scope = new TemporaryState();
+        var service = new FirstRunExperienceService(scope.Path, () => false);
+
+        Assert.Equal(FirstRunGuideInstallationState.NewInstallation, service.InstallationState);
+        Assert.True(service.TryMarkCompleted(out var error), error);
+        Assert.Equal(FirstRunGuideInstallationState.Completed, service.InstallationState);
+    }
+
+    [Fact]
+    public void LegacyMigrationIsPersistedAndNotReevaluated()
+    {
+        using var scope = new TemporaryState();
+        var calls = 0;
+        var service = new FirstRunExperienceService(scope.Path, () =>
+        {
+            calls++;
+            return true;
+        });
+
+        Assert.False(service.ShouldShowAutomatically());
+        var reopened = new FirstRunExperienceService(scope.Path, () => false);
+
+        Assert.Equal(1, calls);
+        Assert.False(reopened.ShouldShowAutomatically());
+    }
+
+    [Fact]
+    public void PendingStateWithMissingCompletionStillShowsGuide()
+    {
+        using var scope = new TemporaryState();
+        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(scope.Path)!);
+        File.WriteAllText(scope.Path, "{\"StateSchemaVersion\":1,\"InstallationState\":3,\"CompletedFirstRunGuideVersion\":0,\"LegacyInstallationMigrationEvaluated\":true}");
+
+        var service = new FirstRunExperienceService(scope.Path, () => true);
+
+        Assert.True(service.ShouldShowAutomatically());
+        Assert.False(service.IsCompleted);
     }
 
     [Fact]
