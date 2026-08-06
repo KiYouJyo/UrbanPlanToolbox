@@ -4,11 +4,11 @@
 
 都市・地域計画、建築設計、空間研究のためのオフライン優先 Windows ツールボックス。
 
-[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) ![Platform](https://img.shields.io/badge(platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge(Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
 
 ## アプリを入手
 
-インストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。現在の開発バージョンは **1.3.0**、候補パッケージは `1.3.0.0` です。Microsoft Store 版と GitHub サイドロード版の ID と Publisher は別々です。
+インストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。現在の公開バージョンは **1.3.0** です。GitHub Release には x64 framework-dependent の自己署名サイドロードパッケージを公開しています。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
 
 ## UrbanPlanToolbox について
 
@@ -26,7 +26,7 @@ UrbanPlanToolbox は、都市・地域計画、建築設計、空間研究のた
 
 ## インストール
 
-一般利用者には Microsoft Store を第一の配布経路として案内しています。リポジトリには x64 framework-dependent の自己署名サイドロード手順もありますが、Store 版より遅れる場合があり、同期された配布とは扱いません。該当する [GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) の説明とチェックサムを確認してください。
+一般利用者には Microsoft Store を第一の配布経路として案内しています。リポジトリには x64 framework-dependent の自己署名サイドロードパッケージもあります。[最新の GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) の説明とチェックサムを確認してください。
 
 ## プライバシーとオフライン設計
 

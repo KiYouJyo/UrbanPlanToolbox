@@ -107,6 +107,10 @@ jobs:
             }
           }
 
+      - name: Validate release documentation
+        shell: pwsh
+        run: ./scripts/Test-ReleaseDocumentationConsistency.ps1
+
       - name: Validate CMD files
         shell: pwsh
         run: |

@@ -1,6 +1,6 @@
 # Third-party notices / 第三方声明 / 第三者告知
 
-Version 1.1.0 · Last updated 2026-08-04
+Version 1.3.0 · Last updated 2026-08-06
 
 ## Application dependencies
 
