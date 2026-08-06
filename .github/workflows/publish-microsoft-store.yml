@@ -82,7 +82,10 @@ jobs:
         run: |
           $output = Join-Path $env:RUNNER_TEMP 'store-release-notes.normalized.json'
           & ./packaging/Validate-StoreReleaseNotes.ps1 -Version '${{ steps.version.outputs.product_version }}' -Path '${{ steps.version.outputs.release_notes_path }}' -OutputPath $output
-          if ($LASTEXITCODE -ne 0) { throw "Release-notes validation failed with exit code $LASTEXITCODE." }
+          if (-not (Test-Path -LiteralPath $output -PathType Leaf)) {
+            throw 'Release-notes validation completed without producing the normalized output file.'
+          }
+          $null = Get-Content -LiteralPath $output -Raw | ConvertFrom-Json -ErrorAction Stop
           "normalized_path=$output" >> $env:GITHUB_OUTPUT
 
       - name: Restore Release dependencies
@@ -100,9 +103,18 @@ jobs:
         run: |
           $output = Join-Path $env:RUNNER_TEMP "UrbanPlanToolbox-store-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
           & ./packaging/Build-StorePackage.ps1 -SourceCommit '${{ steps.version.outputs.source_sha }}' -PackageVersion '${{ steps.version.outputs.package_version }}' -Configuration Release -Platform x64 -OutputDirectory $output
-          if ($LASTEXITCODE -ne 0) { throw "Store package build failed with exit code $LASTEXITCODE." }
           $metadataPath = Join-Path $output 'store-package-build.json'
-          $metadata = Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json
+          if (-not (Test-Path -LiteralPath $metadataPath -PathType Leaf)) {
+            throw "Store package build did not produce metadata: $metadataPath"
+          }
+          $metadata = Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json -ErrorAction Stop
+          if ([string]::IsNullOrWhiteSpace([string]$metadata.package) -or
+              -not (Test-Path -LiteralPath $metadata.package -PathType Leaf)) {
+            throw 'Store package build metadata does not reference an existing package.'
+          }
+          if ([string]::IsNullOrWhiteSpace([string]$metadata.sha256)) {
+            throw 'Store package build metadata does not contain SHA-256.'
+          }
           "package_path=$($metadata.package)" >> $env:GITHUB_OUTPUT
           "sha256=$($metadata.sha256)" >> $env:GITHUB_OUTPUT
           "metadata_path=$metadataPath" >> $env:GITHUB_OUTPUT
@@ -196,7 +208,8 @@ jobs:
           CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
         run: |
           $submissionId = & ./packaging/Update-StoreReleaseNotes.ps1 -ProductId $env:STORE_PRODUCT_ID -ReleaseNotesPath '${{ steps.release_notes.outputs.normalized_path }}' -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
-          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($submissionId)) { throw 'Store release-notes update failed.' }
+          $submissionId = [string]$submissionId
+          if ([string]::IsNullOrWhiteSpace($submissionId)) { throw 'Store release-notes update completed without returning a submission ID.' }
           "submission_id=$($submissionId.Trim())" >> $env:GITHUB_OUTPUT
 
       - name: Validate certification confirmation
