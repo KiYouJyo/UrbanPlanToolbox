@@ -1,0 +1,20 @@
+{
+  "version": "1.3.1",
+  "locales": {
+    "zh-CN": [
+      "新增四步骤首次使用向导，简要介绍隐私、项目、工具和搜索功能。",
+      "可从设置页重新打开向导，并改进首次启动与升级迁移。",
+      "保持现有项目和设置兼容。"
+    ],
+    "ja-JP": [
+      "プライバシー、プロジェクト、ツール、検索を紹介する4ステップの初回ガイドを追加しました。",
+      "設定からガイドを再度開けるようにし、初回起動とアップグレード時の移行を改善しました。",
+      "既存のプロジェクトと設定との互換性を維持しています。"
+    ],
+    "en-US": [
+      "Added a four-step first-run guide covering privacy, projects, tools, and search.",
+      "The guide can be reopened from Settings, with improved first-launch and upgrade migration.",
+      "Existing projects and settings remain compatible."
+    ]
+  }
+}

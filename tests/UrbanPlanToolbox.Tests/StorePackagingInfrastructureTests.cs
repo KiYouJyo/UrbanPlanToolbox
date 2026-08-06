@@ -117,6 +117,7 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("$expectedPackageVersion = \"$projectVersion.0\"", script);
         Assert.Contains("$PackageVersion -ne $expectedPackageVersion", script);
         Assert.DoesNotContain("PackageVersion -ne '1.3.0.0'", script);
+        Assert.Contains("PackageVersion -ne '1.3.1.0'", script);
         Assert.Contains("DistributionChannel=Store", script);
         Assert.Contains("URBANPLANTOOLBOX_STORE", project);
 

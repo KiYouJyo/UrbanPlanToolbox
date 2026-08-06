@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl x:Class="UrbanPlanToolbox.Views.FirstRunGuideHost"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+  IsTabStop="True" KeyDown="OnKeyDown" GettingFocus="OnGettingFocus" SizeChanged="OnSizeChanged">
+  <!-- This is an opaque, hit-testable window-level surface. It must remain a
+       sibling of RootFrame, never a child of a page or its ScrollViewer. -->
+  <Grid x:Name="OverlayRoot" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
+        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="24">
+    <Border x:Name="GuideCard" Style="{StaticResource SettingsSectionCardStyle}"
+            HorizontalAlignment="Center" VerticalAlignment="Center" Padding="32">
+      <Grid RowSpacing="24">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Spacing="4">
+          <TextBlock x:Name="StepText" Style="{StaticResource SettingsDescriptionStyle}"
+                     AutomationProperties.AutomationId="FirstRunGuideStep" />
+          <TextBlock x:Name="GuideTitle" Style="{StaticResource TitleTextBlockStyle}"
+                     TextWrapping="Wrap" AutomationProperties.AutomationId="FirstRunGuideTitle" />
+        </StackPanel>
+
+        <ScrollViewer x:Name="BodyScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="20">
+            <TextBlock x:Name="GuideBody" Style="{StaticResource SettingsDescriptionStyle}"
+                       TextWrapping="Wrap" AutomationProperties.AutomationId="FirstRunGuideBody" />
+            <ItemsControl x:Name="FeatureList">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,4">
+                    <FontIcon Glyph="&#xE73E;" AutomationProperties.AccessibilityView="Raw" />
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button x:Name="PrivacyButton" Click="OnPrivacy" HorizontalAlignment="Left" />
+          </StackPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Row="2" ColumnSpacing="8">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Button x:Name="SkipButton" Grid.Column="1" Click="OnSkip" />
+          <Button x:Name="BackButton" Grid.Column="2" Click="OnBack" />
+          <Button x:Name="NextButton" Grid.Column="3" Click="OnNext" />
+        </Grid>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### v1.3.1 development
+
+- Added a four-step first-run guide covering welcome and privacy, projects, tools and search, and completion.
+- Added a reopen action in the Application settings card; guide lifecycle state remains separate from preferences and project data.
+- New installs see the guide automatically, while v1.3.0 and earlier upgrades are migrated without forced onboarding.
+
 ## 1.3.0（已正式发布）
 
 ### 新增

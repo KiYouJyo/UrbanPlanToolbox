@@ -14,6 +14,10 @@
   <Compile Include="../../Models/ColorPaletteModels.cs" Link="Models/ColorPaletteModels.cs" />
   <Compile Include="../../Models/WorkflowReviewChecklistModels.cs" Link="Models/WorkflowReviewChecklistModels.cs" />
   <Compile Include="../../Services/SettingsService.cs" Link="Services/SettingsService.cs" />
+  <Compile Include="../../Models/FirstRunGuideState.cs" Link="Models/FirstRunGuideState.cs" />
+  <Compile Include="../../Services/IFirstRunExperienceService.cs" Link="Services/IFirstRunExperienceService.cs" />
+  <Compile Include="../../Services/FirstRunExperienceService.cs" Link="Services/FirstRunExperienceService.cs" />
+  <Compile Include="../../Services/FirstRunGuideLaunchMode.cs" Link="Services/FirstRunGuideLaunchMode.cs" />
   <Compile Include="../../Services/AppDataPaths.cs" Link="Services/AppDataPaths.cs" />
   <Compile Include="../../Services/IAppDataPathProvider.cs" Link="Services/IAppDataPathProvider.cs" />
   <Compile Include="../../Services/AppDataPathProvider.cs" Link="Services/AppDataPathProvider.cs" />

@@ -145,6 +145,12 @@
               <TextBlock x:Name="RestoreDefaultsDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
               <Button x:Uid="Action_RestoreDefaults" Click="OnRestore" HorizontalAlignment="Left"/>
             </StackPanel>
+            <Border Height="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
+            <StackPanel Spacing="4">
+              <TextBlock x:Name="FirstRunGuideLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
+              <TextBlock x:Name="FirstRunGuideDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/>
+              <Button x:Name="ReopenFirstRunGuideButton" Click="OnReopenFirstRunGuide" HorizontalAlignment="Left"/>
+            </StackPanel>
             <TextBlock x:Name="StatusText" Style="{StaticResource SettingsDescriptionStyle}"/>
           </StackPanel>
         </Border>

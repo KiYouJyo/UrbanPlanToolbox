@@ -21,6 +21,7 @@ public sealed partial class SettingsPage : Page
         LanguageLabel.Text = _localization.GetString("Settings_LanguageLabel"); LanguageDescription.Text = _localization.GetString("Settings_LanguageDescription_Runtime");
         ApplicationSettingsTitle.Text = _localization.GetString("Settings_ApplicationSettingsTitle"); ApplicationSettingsDescription.Text = _localization.GetString("Settings_ApplicationSettingsDescription");
         RestoreDefaultsLabel.Text = _localization.GetString("Settings_RestoreDefaultsTitle"); RestoreDefaultsDescription.Text = _localization.GetString("Settings_RestoreDefaultsScopeDescription");
+        FirstRunGuideLabel.Text = _localization.GetString("FirstRunGuide_SettingsTitle"); FirstRunGuideDescription.Text = _localization.GetString("FirstRunGuide_SettingsDescription"); ReopenFirstRunGuideButton.Content = _localization.GetString("FirstRunGuide_SettingsAction");
         DataManagementTitle.Text = _localization.GetString("Settings_DataManagementTitle"); DataManagementDescription.Text = _localization.GetString("Settings_DataManagementDescription");
         MilestoneNotificationsTitle.Text = _localization.GetString("Settings_MilestoneNotificationsTitle");
         MilestoneNotificationsDescription.Text = _localization.GetString("Settings_MilestoneNotificationsDescription");
@@ -84,6 +85,7 @@ public sealed partial class SettingsPage : Page
         ApplyTheme(settings.Theme);
     }
     private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
+    private void OnReopenFirstRunGuide(object sender, RoutedEventArgs e) => App.MainWindow?.ShowFirstRunGuideFromSettings();
     private static void ConfigureAccessibility(FrameworkElement control, string name, string helpText) { AutomationProperties.SetName(control, name); AutomationProperties.SetHelpText(control, helpText); }
     private static void ApplyTheme(string theme) => ThemePreference.Apply(App.MainWindow?.Content as FrameworkElement, theme);
     private async void OnMilestoneNotificationsToggled(object sender, RoutedEventArgs e)

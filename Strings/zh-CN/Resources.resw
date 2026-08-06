@@ -61,7 +61,7 @@
     <comment>欢迎页副标题。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v1.3.0。项目数据与工具数据均保留在本机。</value>
+    <value>v1.3.1。项目数据与工具数据均保留在本机。</value>
     <comment>欢迎页版本与隐私说明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -1662,4 +1662,30 @@ dwyblchhq</value>
   <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24 小时</value></data>
   <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3 天</value></data>
   <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>重复提醒（第 {0} 次）</value></data>
+  <data name="FirstRunGuide_Step" xml:space="preserve"><value>{0} / 4</value></data>
+  <data name="FirstRunGuide_Step1Title" xml:space="preserve"><value>欢迎使用 UrbanPlanToolbox</value></data>
+  <data name="FirstRunGuide_Step1Body" xml:space="preserve"><value>UrbanPlanToolbox 面向规划设计和研究工作。应用不要求账户，也不收集个人信息。项目和设置默认保存在本机。只有在你主动检查更新时，应用才会访问 Microsoft Store 或 GitHub 更新服务；链接会在你选择后交由默认浏览器打开。</value></data>
+  <data name="FirstRunGuide_Step2Title" xml:space="preserve"><value>用项目组织规划工作</value></data>
+  <data name="FirstRunGuide_Step2Body" xml:space="preserve"><value>在一个项目工作台中创建和管理规划项目。</value></data>
+  <data name="FirstRunGuide_ProjectFeature1" xml:space="preserve"><value>在专用工作台记录项目资料。</value></data>
+  <data name="FirstRunGuide_ProjectFeature2" xml:space="preserve"><value>管理待办事项和重要时间节点。</value></data>
+  <data name="FirstRunGuide_ProjectFeature3" xml:space="preserve"><value>保存规划指标快照。</value></data>
+  <data name="FirstRunGuide_ProjectFeature4" xml:space="preserve"><value>设置工作文件夹快捷入口。</value></data>
+  <data name="FirstRunGuide_ProjectFeature5" xml:space="preserve"><value>完成后归档，并可在需要时恢复。</value></data>
+  <data name="FirstRunGuide_Step3Title" xml:space="preserve"><value>快速找到所需功能</value></data>
+  <data name="FirstRunGuide_Step3Body" xml:space="preserve"><value>设计工具和科研工具按类别整理，主要在本机运行。</value></data>
+  <data name="FirstRunGuide_ToolFeature1" xml:space="preserve"><value>设计工具</value></data>
+  <data name="FirstRunGuide_ToolFeature2" xml:space="preserve"><value>科研工具</value></data>
+  <data name="FirstRunGuide_ToolFeature3" xml:space="preserve"><value>搜索与收藏</value></data>
+  <data name="FirstRunGuide_Step4Title" xml:space="preserve"><value>准备就绪</value></data>
+  <data name="FirstRunGuide_Step4Body" xml:space="preserve"><value>现在可以创建项目或使用工具。应用语言、提醒和其他偏好可以在设置中调整。以后也可以从应用设置重新打开本向导。</value></data>
+  <data name="FirstRunGuide_PrivacyLink" xml:space="preserve"><value>查看完整隐私政策</value></data>
+  <data name="FirstRunGuide_Back" xml:space="preserve"><value>上一步</value></data>
+  <data name="FirstRunGuide_Next" xml:space="preserve"><value>下一步</value></data>
+  <data name="FirstRunGuide_Skip" xml:space="preserve"><value>跳过</value></data>
+  <data name="FirstRunGuide_Start" xml:space="preserve"><value>开始使用</value></data>
+  <data name="FirstRunGuide_Close" xml:space="preserve"><value>关闭向导</value></data>
+  <data name="FirstRunGuide_SettingsTitle" xml:space="preserve"><value>首次使用向导</value></data>
+  <data name="FirstRunGuide_SettingsDescription" xml:space="preserve"><value>重新查看项目、工具、搜索功能和隐私信息的简要介绍。</value></data>
+  <data name="FirstRunGuide_SettingsAction" xml:space="preserve"><value>重新打开</value></data>
 </root>
