@@ -5,9 +5,10 @@ namespace UrbanPlanToolbox.Services;
 /// <summary>Pure reminder selection and default-time policy, independent of the Windows notification shell.</summary>
 public static class MilestoneReminderPlanner
 {
-    public static IReadOnlyList<MilestoneReminder> Create(IEnumerable<ProjectRecord> projects, DateTimeOffset now) =>
+    public static IReadOnlyList<MilestoneReminder> Create(IEnumerable<ProjectRecord> projects, DateTimeOffset now, bool enabled = true) =>
+        !enabled ? [] :
         projects.Where(project => !project.IsArchived)
-            .SelectMany(project => project.Milestones.Where(milestone => milestone.ReminderEnabled).Select(milestone => Create(project, milestone)))
+            .SelectMany(project => project.Milestones.Select(milestone => Create(project, milestone)))
             .Where(reminder => reminder.DueAtLocal > now)
             .OrderBy(reminder => reminder.DueAtLocal)
             .ToArray();
