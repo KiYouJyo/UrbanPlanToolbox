@@ -9,12 +9,41 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+function Read-XmlDocument {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "XML file was not found: $Path"
+    }
+
+    $settings = [System.Xml.XmlReaderSettings]::new()
+    $settings.DtdProcessing = [System.Xml.DtdProcessing]::Prohibit
+    $settings.XmlResolver = $null
+    $reader = [System.Xml.XmlReader]::Create($Path, $settings)
+
+    try {
+        $document = [System.Xml.XmlDocument]::new()
+        $document.PreserveWhitespace = $true
+        $document.XmlResolver = $null
+        $document.Load($reader)
+        Write-Output -NoEnumerate $document
+    }
+    finally {
+        $reader.Dispose()
+    }
+}
+
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $output = [IO.Path]::GetFullPath($OutputDirectory)
 $repoPrefix = $repoRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 if ($output -eq $repoRoot -or $output.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Store package output must be outside the repository.' }
 $projectPath = Join-Path $repoRoot 'UrbanPlanToolbox.csproj'
-[xml]$project = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($projectPath))
+$project = Read-XmlDocument -Path $projectPath
 $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
 if ($projectVersion -notmatch '^\d+\.\d+\.\d+$') { throw "UrbanPlanToolbox.csproj Version must use major.minor.patch format; got '$projectVersion'." }
 $expectedPackageVersion = "$projectVersion.0"
@@ -32,11 +61,11 @@ $workingTreeState = & git -C $repoRoot status --porcelain
 if ($LASTEXITCODE -ne 0 -or $workingTreeState) { throw 'The source working tree must be clean before a Store package build.' }
 
 $githubManifestPath = Join-Path $repoRoot 'Package.appxmanifest'
-[xml]$githubManifest = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($githubManifestPath))
+$githubManifest = Read-XmlDocument -Path $githubManifestPath
 if ([string]$githubManifest.Package.Identity.Version -ne $PackageVersion) { throw 'GitHub manifest version does not match the dynamically derived Store package version.' }
 
 $manifestPath = Join-Path $repoRoot 'Package.Store.appxmanifest'
-[xml]$manifest = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($manifestPath))
+$manifest = Read-XmlDocument -Path $manifestPath
 $identity = $manifest.Package.Identity
 if ($identity.Name -ne 'JoKiy.UrbanPlanToolbox' -or $identity.Publisher -ne 'CN=C4E4B33A-7B77-4121-897C-7D720A5471F8' -or $identity.Version -ne $PackageVersion) { throw 'Store manifest identity, publisher, or version is invalid.' }
 if ($manifest.Package.Properties.PublisherDisplayName -cne ('Jo Kiy' + [char]333)) { throw 'Store publisher display name is invalid.' }

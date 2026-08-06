@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Xml;
 using Xunit;
 
 namespace UrbanPlanToolbox.Tests;
@@ -19,6 +20,35 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("AppxBundle=Always", script);
         Assert.Contains("AppxBundlePlatforms=x64", script);
         Assert.DoesNotContain("AppxBundle=Never", script);
+        Assert.Contains("function Read-XmlDocument", script);
+        Assert.Contains("XmlReaderSettings", script);
+        Assert.Contains("DtdProcessing = [System.Xml.DtdProcessing]::Prohibit", script);
+        Assert.Contains("$settings.XmlResolver = $null", script);
+        Assert.Contains("$document.Load($reader)", script);
+        Assert.Contains("XML file was not found", script);
+        Assert.DoesNotContain("[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($projectPath))", script);
+        Assert.DoesNotContain("[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($githubManifestPath))", script);
+        Assert.DoesNotContain("[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($manifestPath))", script);
+    }
+
+    [Fact]
+    public void StorePackagingXmlInputsLoadWithBomSafeSecureReader()
+    {
+        var root = FindRepositoryRoot();
+        var settings = new XmlReaderSettings
+        {
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null
+        };
+
+        foreach (var relativePath in new[] { "UrbanPlanToolbox.csproj", "Package.appxmanifest", "Package.Store.appxmanifest" })
+        {
+            var path = Path.Combine(root, relativePath);
+            using var reader = XmlReader.Create(path, settings);
+            var document = new XmlDocument { PreserveWhitespace = true, XmlResolver = null };
+            document.Load(reader);
+            Assert.NotNull(document.DocumentElement);
+        }
     }
 
     [Fact]
