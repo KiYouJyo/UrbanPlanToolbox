@@ -180,8 +180,8 @@ jobs:
           CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
         run: |
+          $ErrorActionPreference = 'Stop'
           $output = & ./packaging/Assert-StoreReadyForNewSubmission.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedLastPublishedSubmissionId $env:EXPECTED_LAST_PUBLISHED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
-          if ($LASTEXITCODE -ne 0) { throw 'Store pre-publication state assertion failed.' }
           $output | ForEach-Object { Write-Output $_ }
           $lastPublished = $output | Where-Object { $_ -like 'last_published_submission_id=*' } | Select-Object -First 1
           if ([string]::IsNullOrWhiteSpace($lastPublished)) { throw 'Store pre-publication assertion did not return last published submission ID.' }
@@ -219,6 +219,7 @@ jobs:
           CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
         run: |
+          $ErrorActionPreference = 'Stop'
           $submissionId = (& ./packaging/Update-StoreReleaseNotes.ps1 -ProductId $env:STORE_PRODUCT_ID -ReleaseNotesPath '${{ steps.release_notes.outputs.normalized_path }}' -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET | Select-Object -Last 1).ToString().Trim()
           if ([string]::IsNullOrWhiteSpace($submissionId)) { throw 'Store release-notes update completed without returning a submission ID.' }
           "submission_id=$submissionId" >> $env:GITHUB_OUTPUT
@@ -232,9 +233,9 @@ jobs:
           CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
           EXPECTED_SUBMISSION_ID: ${{ steps.update_store_release_notes.outputs.submission_id }}
         run: |
+          $ErrorActionPreference = 'Stop'
           $packageFileName = '${{ steps.package.outputs.package_file }}'
           & ./packaging/Verify-StoreDraftSubmission.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' -ExpectedPackageFileName $packageFileName -ExpectedReleaseNotesPath '${{ steps.release_notes.outputs.normalized_path }}' -ExpectedSubmissionId $env:EXPECTED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
-          if ($LASTEXITCODE -ne 0) { throw 'Store draft verification failed.' }
           "verified=true" >> $env:GITHUB_OUTPUT
 
       - name: Commit verified Store submission for certification
@@ -256,8 +257,8 @@ jobs:
           CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
           EXPECTED_SUBMISSION_ID: ${{ steps.update_store_release_notes.outputs.submission_id }}
         run: |
+          $ErrorActionPreference = 'Stop'
           & ./packaging/Verify-StoreSubmissionCommitted.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedSubmissionId $env:EXPECTED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
-          if ($LASTEXITCODE -ne 0) { throw 'Post-commit Store submission status verification failed.' }
 
       - name: Remove transient Store draft after pre-commit failure
         if: failure() && steps.commit_store_submission.outcome == 'skipped' && steps.update_store_release_notes.outputs.submission_id != ''
@@ -268,8 +269,8 @@ jobs:
           CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
           TRANSIENT_SUBMISSION_ID: ${{ steps.update_store_release_notes.outputs.submission_id }}
         run: |
+          $ErrorActionPreference = 'Stop'
           & ./packaging/Remove-TransientStoreDraft.ps1 -ProductId $env:STORE_PRODUCT_ID -SubmissionId $env:TRANSIENT_SUBMISSION_ID -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' -ExpectedPackageFileName '${{ steps.package.outputs.package_file }}' -ProtectedPublishedSubmissionId $env:PROTECTED_PUBLISHED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
-          if ($LASTEXITCODE -ne 0) { throw 'Transient Store draft cleanup failed.' }
 
       - name: Write workflow summary
         if: always()
