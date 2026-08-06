@@ -65,7 +65,6 @@
               <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
                 <TextBlock x:Name="LanguageLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
                 <TextBlock x:Name="LanguageDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
-                <TextBlock x:Name="LanguageRestartHint" Style="{StaticResource SettingsDescriptionStyle}" Visibility="Collapsed"/>
               </StackPanel>
               <ComboBox x:Name="LanguageBox"
                         Grid.Row="1"

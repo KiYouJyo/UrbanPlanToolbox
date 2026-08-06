@@ -10,7 +10,7 @@ public sealed class FakeAppUpdateService(FakeAppUpdateScenario scenario = FakeAp
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) => Task.FromResult(_scenario switch
     {
         FakeAppUpdateScenario.UpToDate => new AppUpdateInfo(AppUpdateState.UpToDate),
-        FakeAppUpdateScenario.UpdateAvailable or FakeAppUpdateScenario.Cancelled or FakeAppUpdateScenario.DownloadFailed or FakeAppUpdateScenario.InstallFailed or FakeAppUpdateScenario.InstallWillCloseApp => new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.2.1"),
+        FakeAppUpdateScenario.UpdateAvailable or FakeAppUpdateScenario.Cancelled or FakeAppUpdateScenario.DownloadFailed or FakeAppUpdateScenario.InstallFailed or FakeAppUpdateScenario.InstallWillCloseApp => new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.3.0"),
         FakeAppUpdateScenario.UnsupportedChannel => new AppUpdateInfo(AppUpdateState.UnsupportedChannel),
         FakeAppUpdateScenario.NetworkError => new AppUpdateInfo(AppUpdateState.Failed, ErrorCode: "NetworkError"),
         _ => new AppUpdateInfo(AppUpdateState.Failed, ErrorCode: "StoreUnavailable")

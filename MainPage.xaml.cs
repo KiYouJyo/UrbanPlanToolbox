@@ -15,8 +15,16 @@ namespace UrbanPlanToolbox;
 /// </summary>
 public sealed partial class MainPage : Page
 {
+    private readonly ShellNavigationState? _initialState;
+
     public MainPage()
+        : this(null)
     {
+    }
+
+    public MainPage(ShellNavigationState? initialState)
+    {
+        _initialState = initialState;
         InitializeComponent();
         ApplyLocalizedNavigation();
         NavigateTo(typeof(Views.HomePage));
@@ -30,6 +38,41 @@ public sealed partial class MainPage : Page
             settingsItem.Content = settingsLabel;
             AutomationProperties.SetName(settingsItem, settingsLabel);
             ToolTipService.SetToolTip(settingsItem, settingsLabel);
+        }
+
+        if (_initialState is null)
+        {
+            Navigation.SelectedItem = Navigation.MenuItems[0];
+            NavigateTo(typeof(Views.HomePage));
+            return;
+        }
+
+        if (_initialState.IsSettings)
+        {
+            Navigation.SelectedItem = Navigation.SettingsItem;
+            NavigateTo(typeof(Views.SettingsPage));
+            return;
+        }
+
+        var item = Navigation.MenuItems.OfType<NavigationViewItem>()
+            .FirstOrDefault(candidate => string.Equals(candidate.Tag?.ToString(), _initialState.PrimaryNavigationId, StringComparison.Ordinal));
+        if (item is not null)
+        {
+            Navigation.SelectedItem = item;
+            if (!string.IsNullOrWhiteSpace(_initialState.PageTypeName))
+            {
+                var restoredPage = Type.GetType(_initialState.PageTypeName, throwOnError: false);
+                if (restoredPage is not null && typeof(Page).IsAssignableFrom(restoredPage))
+                {
+                    NavigateTo(restoredPage);
+                    return;
+                }
+            }
+            if (PrimaryNavigation.Default.TryGet(item.Tag?.ToString(), out var route) && route is not null)
+            {
+                NavigateTo(route.PageType);
+                return;
+            }
         }
 
         Navigation.SelectedItem = Navigation.MenuItems[0];
@@ -75,5 +118,14 @@ public sealed partial class MainPage : Page
     private void NavigateTo(Type page)
     {
         if (ContentFrame.CurrentSourcePageType != page) ContentFrame.Navigate(page);
+    }
+
+    public ShellNavigationState CaptureState()
+    {
+        var selected = Navigation.SelectedItem as NavigationViewItem;
+        return new ShellNavigationState(
+            selected?.Tag?.ToString(),
+            ContentFrame.CurrentSourcePageType?.AssemblyQualifiedName,
+            ReferenceEquals(selected, Navigation.SettingsItem));
     }
 }

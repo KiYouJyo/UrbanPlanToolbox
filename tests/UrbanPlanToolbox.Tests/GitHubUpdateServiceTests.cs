@@ -22,8 +22,8 @@ public sealed class GitHubUpdateServiceTests
     [Fact]
     public void ApplicationVersionIsUnifiedAndUsesGitHubByDefault()
     {
-        Assert.Equal("1.2.1", AppVersionProvider.Version);
-        Assert.Equal("v1.2.1", AppVersionProvider.DisplayVersion);
+        Assert.Equal("1.3.0", AppVersionProvider.Version);
+        Assert.Equal("v1.3.0", AppVersionProvider.DisplayVersion);
         Assert.Equal(DistributionChannel.GitHub, DistributionChannelProvider.Current);
         Assert.True(DistributionChannelProvider.UsesGitHubUpdates);
     }
@@ -73,7 +73,7 @@ public sealed class GitHubUpdateServiceTests
     {
         var handler = new StubHandler(HttpStatusCode.OK, ReleaseJson("v0.3.9"));
         await new GitHubUpdateService(new HttpClient(handler)).CheckForUpdatesAsync(new Version(0, 3, 8, 0));
-        Assert.Equal("UrbanPlanToolbox/1.2.1", handler.UserAgent);
+        Assert.Equal("UrbanPlanToolbox/1.3.0", handler.UserAgent);
     }
 
     private static GitHubUpdateService CreateService(HttpStatusCode statusCode, string content) => new(new HttpClient(new StubHandler(statusCode, content)));

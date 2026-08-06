@@ -44,7 +44,7 @@ public sealed class SettingsPageContractTests
         var restore = code[code.IndexOf("private async void OnRestore", StringComparison.Ordinal)..code.IndexOf("private void OnThemeChanged", StringComparison.Ordinal)];
         Assert.DoesNotContain("Delete", restore);
         Assert.DoesNotContain("ClearLocalData", restore);
-        Assert.Contains("ShowLanguageRestartDialogAsync", restore);
+        Assert.Contains("SwitchLanguageAsync", code);
     }
 
     [Fact]
@@ -53,12 +53,10 @@ public sealed class SettingsPageContractTests
         var root = FindRepositoryRoot();
         var code = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml.cs"));
         Assert.Contains("if (_isApplying) return;", code);
-        Assert.Contains("LanguageRestartPromptCoordinator", code);
-        foreach (var key in new[] { "Setting_Language_RestartTitle", "Setting_Language_RestartMessage", "Setting_Language_RestartNow", "Setting_Language_Later", "Setting_Language_RestartFailed" })
-            Assert.Contains($"GetString(\"{key}\")", code);
-        Assert.True(code.IndexOf("_settingsService.Update(current => current.Language", StringComparison.Ordinal) < code.IndexOf("ShowAsync(dialog)", StringComparison.Ordinal));
+        Assert.Contains("SwitchLanguageAsync", code);
+        Assert.Contains("LanguageBox.IsEnabled = false", code);
+        Assert.DoesNotContain("ShowLanguageRestartDialogAsync", code);
         Assert.DoesNotContain("AppInstance.Restart", code);
-        Assert.Contains("AppInstance.Restart", File.ReadAllText(Path.Combine(root, "Services", "ApplicationRestartService.cs")));
     }
 
     private static string FindRepositoryRoot()

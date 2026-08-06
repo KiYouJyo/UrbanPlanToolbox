@@ -8,7 +8,7 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 ## Get the app
 
-The preview version is **v1.2.1** and both package channels use `1.2.1.0`, while their identities and publishers remain separate.
+The preview version is **v1.3.0** and both package channels use `1.3.0.0`, while their identities and publishers remain separate.
 
 ## About UrbanPlanToolbox
 
@@ -46,7 +46,7 @@ App data is stored in the local application-data directory. Settings provides `.
 
 ## Languages
 
-The interface supports Simplified Chinese, 日本語, and English. Choose a language in Settings; it takes effect after restart.
+The interface supports Simplified Chinese, 日本語, and English. Choose a language in Settings; it takes effect immediately.
 
 ## Documentation
 

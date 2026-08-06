@@ -65,14 +65,14 @@ Strings/
 4. 在设置页语言列表中新增选项（显示名称与内部 BCP-47 值分离）。
 5. 运行全部测试并补充该语言的解析与搜索测试。
 
-## 语言设置与重启生效机制
+## 语言设置与运行时生效机制
 
 - 设置页提供：跟随系统（`system`）、简体中文（`zh-CN`）、日本語（`ja-JP`）、English（`en-US`）。
 - 语言偏好保存在现有设置文件 `%LOCALAPPDATA%\UrbanPlanToolbox\settings.json` 的 `Language` 字段。
 - 选择具体语言时保存对应 BCP-47 标签；选择“跟随系统”时保存 `system`（清除覆盖）。
 - 应用启动时，`App.OnLaunched` 在创建 `MainWindow` 和加载本地化资源之前调用
   `Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride` 应用语言覆盖。
-- 修改语言后只显示“下次启动时生效”的提示，不自动重启、不实现整棵可视化树的实时刷新；同一语言重复选择不重复提示。
+- 修改语言后由 `LocalizationService` 立即保存并更新资源；主窗口重建现有 Shell 视觉树，同一语言重复选择不会触发重建。
 
 ## ToolDefinition、分类与搜索如何使用资源键
 
@@ -179,3 +179,13 @@ Strings/
 ## MSIX package language verification
 
 The source manifest explicitly declares `zh-CN`, `ja-JP`, and `en-US` in that order. The single offline MSIX keeps language candidates in its main PRI by setting `AppxBundleAutoResourcePackageQualifiers` to `Scale|DXFeatureLevel`; scale packages remain permitted, while language packages are not. Source RESW presence alone is not release evidence: before a local signed package is installed, run `packaging/Test-PackagedLanguageResources.ps1` against the actual MSIX and its generated intermediate directory. It verifies the packaged `AppxManifest.xml`, PRI language qualifiers and candidates, the absence of language resource packages, and the generated split configuration.
+
+## Runtime language switching (v1.3)
+
+`LocalizationService.Default` is the single authority for the selected language. `SettingsPage` calls `SwitchLanguageAsync`; pages must not write `ApplicationLanguages.PrimaryLanguageOverride`, create their own `ResourceLoader`, or show a restart prompt.
+
+The service persists the normalized `Language` value (`system`, `zh-CN`, `ja-JP`, or `en-US`), updates the UI cultures, replaces its resource loader, and raises `LanguageChanged`. `MainWindow` subscribes once and rebuilds the existing `MainPage`/visual tree. This reloads XAML `x:Uid` resources consistently without creating a second process or window.
+
+Before rebuilding, `MainPage` stores `ShellNavigationState` using stable navigation IDs. Project data, drafts, filters, and tool inputs must remain in their ViewModel, draft model, business service, navigation parameter, or existing persistence layer; never serialize a Page or control instance. Culture-sensitive display formatting may use the selected UI culture, while JSON, project files, coordinates, imports, exports, and numeric storage must use `InvariantCulture`.
+
+When adding a page, use `x:Uid` for static XAML text, `ILocalizationService` for dynamic text, and unsubscribe page-owned events when the page is unloaded or disposed. Add the same resource keys to all three RESW catalogs. Validate key-set equality and run runtime switching tests for all three directions, repeated switching, state restoration, and failed-switch rollback.
