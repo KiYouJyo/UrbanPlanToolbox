@@ -41,6 +41,10 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
+        // This must precede SettingsService.Load and all other initialization:
+        // a newly-created default settings file is not evidence of an upgrade.
+        var firstRunExperience = FirstRunExperienceService.Default;
+        firstRunExperience.PrepareForLaunch();
         var settings = new SettingsService().Load();
         LocalizationService.Default.ApplyPersistedLanguage(settings);
         _window = MainWindow = new MainWindow();

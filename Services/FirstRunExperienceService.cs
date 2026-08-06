@@ -10,6 +10,7 @@ namespace UrbanPlanToolbox.Services;
 public sealed class FirstRunExperienceService : IFirstRunExperienceService
 {
     public const int CurrentVersion = 1;
+    public static FirstRunExperienceService Default { get; } = new();
     private readonly string _statePath;
     private readonly Func<bool> _legacyInstallationExists;
     private readonly object _gate = new();
@@ -22,6 +23,15 @@ public sealed class FirstRunExperienceService : IFirstRunExperienceService
     }
 
     public int CurrentFirstRunGuideVersion => CurrentVersion;
+
+    /// <summary>
+    /// Captures the new-installation/legacy-user decision before any startup
+    /// service can create default files in the legacy data root.
+    /// </summary>
+    public void PrepareForLaunch()
+    {
+        lock (_gate) _ = LoadOrMigrate();
+    }
 
     public FirstRunGuideInstallationState InstallationState
     {

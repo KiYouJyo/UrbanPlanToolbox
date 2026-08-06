@@ -97,6 +97,46 @@ public sealed class FirstRunExperienceTests
     }
 
     [Fact]
+    public void LaunchPreparationRunsBeforeDefaultSettingsCreation()
+    {
+        using var scope = new TemporaryState();
+        var legacyFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(scope.Path)!, "settings.json");
+        var service = new FirstRunExperienceService(scope.Path, () => File.Exists(legacyFile));
+
+        service.PrepareForLaunch();
+        File.WriteAllText(legacyFile, "{}", System.Text.Encoding.UTF8);
+
+        Assert.True(service.ShouldShowAutomatically());
+    }
+
+    [Fact]
+    public void ClearingPackageStateAllowsTheNextInstallationToShowGuide()
+    {
+        using var scope = new TemporaryState();
+        var firstInstall = new FirstRunExperienceService(scope.Path, () => false);
+        Assert.True(firstInstall.TryMarkCompleted(out var error), error);
+
+        File.Delete(scope.Path);
+        var secondInstall = new FirstRunExperienceService(scope.Path, () => false);
+
+        Assert.True(secondInstall.ShouldShowAutomatically());
+    }
+
+    [Fact]
+    public void RestoredLegacyDataDoesNotForceOnboarding()
+    {
+        using var scope = new TemporaryState();
+        var legacyFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(scope.Path)!, "settings.json");
+        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(legacyFile)!);
+        File.WriteAllText(legacyFile, "{}", System.Text.Encoding.UTF8);
+        var service = new FirstRunExperienceService(scope.Path, () => File.Exists(legacyFile));
+
+        service.PrepareForLaunch();
+
+        Assert.False(service.ShouldShowAutomatically());
+    }
+
+    [Fact]
     public void GuideResourcesHaveMatchingKeysAndNonEmptyValues()
     {
         var catalogs = ReswCatalog.Languages.Select(ReswCatalog.Load).ToArray();

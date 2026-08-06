@@ -28,7 +28,7 @@ public sealed partial class FirstRunGuideHost : UserControl
 
     public event EventHandler? Closed;
 
-    public FirstRunGuideHost() : this(new FirstRunExperienceService()) { }
+    public FirstRunGuideHost() : this(FirstRunExperienceService.Default) { }
 
     public FirstRunGuideHost(IFirstRunExperienceService stateService)
     {

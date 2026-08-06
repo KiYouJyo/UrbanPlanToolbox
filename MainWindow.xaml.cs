@@ -20,7 +20,7 @@ public sealed partial class MainWindow : Window
 {
     private readonly INavigationStateService _navigationState = new NavigationStateService();
     private readonly LocalizationService _localization = LocalizationService.Default;
-    private readonly FirstRunExperienceService _firstRunExperience = new();
+    private readonly FirstRunExperienceService _firstRunExperience = FirstRunExperienceService.Default;
     private UIElement? _focusBeforeFirstRunGuide;
     private bool _firstRunGuideShowing;
 

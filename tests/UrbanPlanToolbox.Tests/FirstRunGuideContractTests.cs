@@ -36,6 +36,19 @@ public sealed class FirstRunGuideContractTests
         Assert.Contains("_focusBeforeFirstRunGuide", code);
     }
 
+    [Fact]
+    public void LaunchPreflightsGuideStateBeforeSettingsAndUsesOneService()
+    {
+        var root = FindRepositoryRoot();
+        var app = File.ReadAllText(Path.Combine(root, "App.xaml.cs"));
+        var window = File.ReadAllText(Path.Combine(root, "MainWindow.xaml.cs"));
+        var host = File.ReadAllText(Path.Combine(root, "Views", "FirstRunGuideHost.xaml.cs"));
+
+        Assert.True(app.IndexOf("PrepareForLaunch", StringComparison.Ordinal) < app.IndexOf("new SettingsService().Load", StringComparison.Ordinal));
+        Assert.Contains("FirstRunExperienceService.Default", window);
+        Assert.Contains("FirstRunExperienceService.Default", host);
+    }
+
     private static string FindRepositoryRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
