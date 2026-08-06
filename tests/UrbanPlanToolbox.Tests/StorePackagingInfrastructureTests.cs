@@ -99,7 +99,7 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("steps.setup_store_cli.outcome == 'success'", workflow);
         Assert.Contains("steps.configure_store_cli.outcome == 'success'", workflow);
         Assert.Contains("steps.verify_store_access.outcome == 'success'", workflow);
-        Assert.Contains("--inputDirectory", workflow);
+        Assert.DoesNotContain("--inputDirectory", workflow);
         Assert.Contains("Split-Path -Parent $env:PACKAGE_PATH", workflow);
         Assert.DoesNotContain("--inputFile", workflow);
         Assert.DoesNotContain("'--reset'", workflow);
@@ -126,11 +126,37 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("metadata.package", packageStep);
         Assert.Contains("metadata.sha256", packageStep);
 
+        var uploadStart = workflow.IndexOf("- name: Upload as draft Store submission", StringComparison.Ordinal);
         var notesUpdateStart = workflow.IndexOf("- name: Update three-language Store release notes", StringComparison.Ordinal);
+        var uploadStep = workflow[uploadStart..notesUpdateStart];
+        Assert.Contains("id: upload_store_draft", uploadStep);
+        Assert.Contains("'publish',$env:PACKAGE_PATH", uploadStep);
+        Assert.Contains("--noCommit", uploadStep);
+        Assert.DoesNotContain("--inputDirectory", uploadStep);
+        Assert.DoesNotContain("(Get-Location).Path", uploadStep);
+        Assert.Contains("exactly the selected .msixupload file", uploadStep);
+        Assert.Contains("Store package SHA-256 does not match build metadata", uploadStep);
+
         var certificationStart = workflow.IndexOf("- name: Validate certification confirmation", StringComparison.Ordinal);
         var notesUpdateStep = workflow[notesUpdateStart..certificationStart];
         Assert.DoesNotContain("$LASTEXITCODE", notesUpdateStep);
         Assert.Contains("submission ID", notesUpdateStep);
+
+        var verifyStart = workflow.IndexOf("- name: Verify Store draft contents", StringComparison.Ordinal);
+        var verifyStep = workflow[verifyStart..certificationStart];
+        Assert.Contains("Verify-StoreDraftSubmission.ps1", verifyStep);
+        Assert.Contains("ExpectedPackageVersion", verifyStep);
+        Assert.Contains("ExpectedPackageFileName", verifyStep);
+        Assert.Contains("ExpectedReleaseNotesPath", verifyStep);
+        Assert.Contains("ExpectedSubmissionId", verifyStep);
+        Assert.Contains("verified=true", verifyStep);
+
+        var verificationScript = File.ReadAllText(Path.Combine(root, "packaging", "Verify-StoreDraftSubmission.ps1"));
+        Assert.Contains("PendingCommit", verificationScript);
+        Assert.Contains("ApplicationPackages", verificationScript);
+        Assert.Contains("ExpectedPackageVersion", verificationScript);
+        Assert.Contains("ExpectedPackageFileName", verificationScript);
+        Assert.Contains("Verified Store release notes", verificationScript);
 
         var certificationSubmitStart = workflow.IndexOf("- name: Submit existing Store draft for certification", StringComparison.Ordinal);
         var certificationEnd = workflow.IndexOf("- name: Show current Store submission status", StringComparison.Ordinal);

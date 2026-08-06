@@ -189,12 +189,43 @@ jobs:
 
       - name: Upload as draft Store submission
         if: inputs.submit_for_certification == false
+        id: upload_store_draft
         shell: pwsh
         env:
           PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
+          METADATA_PATH: ${{ steps.package.outputs.metadata_path }}
+          EXPECTED_PACKAGE_VERSION: ${{ steps.version.outputs.package_version }}
         run: |
-          $packageDirectory = Split-Path -Parent $env:PACKAGE_PATH
-          $arguments = @('publish',(Get-Location).Path,'--inputDirectory',$packageDirectory,'--appId',$env:STORE_PRODUCT_ID,'--noCommit')
+          $ErrorActionPreference = 'Stop'
+          if (-not (Test-Path -LiteralPath $env:PACKAGE_PATH -PathType Leaf)) {
+            throw "Store package does not exist: $env:PACKAGE_PATH"
+          }
+          if ([IO.Path]::GetExtension($env:PACKAGE_PATH) -ine '.msixupload') {
+            throw "Store package must be a .msixupload file: $env:PACKAGE_PATH"
+          }
+          $metadata = Get-Content -LiteralPath $env:METADATA_PATH -Raw | ConvertFrom-Json -ErrorAction Stop
+          if ([IO.Path]::GetFullPath([string]$metadata.package) -cne [IO.Path]::GetFullPath($env:PACKAGE_PATH)) {
+            throw 'Store package metadata does not reference the package selected for upload.'
+          }
+          if ([string]$metadata.packageVersion -cne $env:EXPECTED_PACKAGE_VERSION) {
+            throw "Store package metadata version mismatch: $($metadata.packageVersion)"
+          }
+          if ([string]$metadata.manifestIdentity -cne 'JoKiy.UrbanPlanToolbox') {
+            throw "Store package metadata identity mismatch: $($metadata.manifestIdentity)"
+          }
+          if ($env:PACKAGE_PATH -notmatch '(?i)x64.*bundle\.msixupload$') {
+            throw "Store package must be the x64 MSIX Bundle upload: $env:PACKAGE_PATH"
+          }
+          $directoryPackages = @(Get-ChildItem -LiteralPath (Split-Path -Parent $env:PACKAGE_PATH) -Filter '*.msixupload' -File)
+          if ($directoryPackages.Count -ne 1 -or $directoryPackages[0].FullName -cne $env:PACKAGE_PATH) {
+            throw 'Store package directory must contain exactly the selected .msixupload file.'
+          }
+          $actualHash = (Get-FileHash -LiteralPath $env:PACKAGE_PATH -Algorithm SHA256).Hash.ToUpperInvariant()
+          if ([string]$metadata.sha256 -cne $actualHash) {
+            throw 'Store package SHA-256 does not match build metadata.'
+          }
+
+          $arguments = @('publish',$env:PACKAGE_PATH,'--appId',$env:STORE_PRODUCT_ID,'--noCommit')
           & msstore @arguments
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store draft upload failed with exit code $LASTEXITCODE." }
 
@@ -211,6 +242,29 @@ jobs:
           $submissionId = [string]$submissionId
           if ([string]::IsNullOrWhiteSpace($submissionId)) { throw 'Store release-notes update completed without returning a submission ID.' }
           "submission_id=$($submissionId.Trim())" >> $env:GITHUB_OUTPUT
+
+      - name: Verify Store draft contents
+        if: inputs.submit_for_certification == false
+        id: verify_store_draft
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+          EXPECTED_PACKAGE_FILE_NAME: ${{ steps.package.outputs.package_path }}
+          EXPECTED_SUBMISSION_ID: ${{ steps.update_store_release_notes.outputs.submission_id }}
+        run: |
+          $packageFileName = Split-Path -Leaf $env:EXPECTED_PACKAGE_FILE_NAME
+          & ./packaging/Verify-StoreDraftSubmission.ps1 `
+            -ProductId $env:STORE_PRODUCT_ID `
+            -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' `
+            -ExpectedPackageFileName $packageFileName `
+            -ExpectedReleaseNotesPath '${{ steps.release_notes.outputs.normalized_path }}' `
+            -ExpectedSubmissionId $env:EXPECTED_SUBMISSION_ID `
+            -TenantId $env:TENANT_ID.Trim() `
+            -ClientId $env:CLIENT_ID.Trim() `
+            -ClientSecret $env:CLIENT_SECRET
+          "verified=true" >> $env:GITHUB_OUTPUT
 
       - name: Validate certification confirmation
         if: inputs.submit_for_certification == true
@@ -237,7 +291,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "Microsoft Store certification submission failed with exit code $LASTEXITCODE." }
 
       - name: Show current Store submission status
-        if: always() && steps.setup_store_cli.outcome == 'success' && steps.configure_store_cli.outcome == 'success' && steps.verify_store_access.outcome == 'success' && (inputs.submit_for_certification == false || steps.verify_pending_draft.outcome == 'success')
+        if: always() && steps.setup_store_cli.outcome == 'success' && steps.configure_store_cli.outcome == 'success' && steps.verify_store_access.outcome == 'success' && (inputs.submit_for_certification == false && steps.verify_store_draft.outcome == 'success' || inputs.submit_for_certification == true && steps.verify_pending_draft.outcome == 'success')
         continue-on-error: true
         shell: pwsh
         run: |
@@ -259,5 +313,12 @@ jobs:
           if ('${{ inputs.submit_for_certification }}' -eq 'false') {
             "- Package SHA-256: ${{ steps.package.outputs.sha256 }}" >> $env:GITHUB_STEP_SUMMARY
             "- Store draft submission ID: ${{ steps.update_store_release_notes.outputs.submission_id }}" >> $env:GITHUB_STEP_SUMMARY
+            "- Store draft status: PendingCommit" >> $env:GITHUB_STEP_SUMMARY
+            "- Verified Store package version: ${{ steps.version.outputs.package_version }}" >> $env:GITHUB_STEP_SUMMARY
+            "- Store package file: ${{ steps.package.outputs.package_path }}" >> $env:GITHUB_STEP_SUMMARY
+            "- zh-CN Release Notes: verified" >> $env:GITHUB_STEP_SUMMARY
+            "- ja-JP Release Notes: verified" >> $env:GITHUB_STEP_SUMMARY
+            "- en-US Release Notes: verified" >> $env:GITHUB_STEP_SUMMARY
+            "- Certification submitted: false" >> $env:GITHUB_STEP_SUMMARY
             "The draft was not submitted for certification." >> $env:GITHUB_STEP_SUMMARY
           }
