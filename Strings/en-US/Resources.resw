@@ -61,7 +61,7 @@
     <comment>Home page subtitle.</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v1.3.0. Project data and tool data stay on this device.</value>
+    <value>v1.3.1. Project data and tool data stay on this device.</value>
     <comment>Home page version and privacy statement.</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -1690,4 +1690,30 @@ Latest version: {1}</value>
   <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24 hours</value></data>
   <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3 days</value></data>
   <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>Repeat reminder ({0} of 3)</value></data>
+  <data name="FirstRunGuide_Step" xml:space="preserve"><value>{0} / 4</value></data>
+  <data name="FirstRunGuide_Step1Title" xml:space="preserve"><value>Welcome to UrbanPlanToolbox</value></data>
+  <data name="FirstRunGuide_Step1Body" xml:space="preserve"><value>UrbanPlanToolbox supports planning design and research work. No account is required, and the app does not collect personal information. Projects and settings are stored locally by default. Microsoft Store or GitHub update services are contacted only when you actively check for updates; links open in your default browser after you choose them.</value></data>
+  <data name="FirstRunGuide_Step2Title" xml:space="preserve"><value>Organize planning work with projects</value></data>
+  <data name="FirstRunGuide_Step2Body" xml:space="preserve"><value>Create and manage planning projects from one workspace.</value></data>
+  <data name="FirstRunGuide_ProjectFeature1" xml:space="preserve"><value>Record project materials in a dedicated workspace.</value></data>
+  <data name="FirstRunGuide_ProjectFeature2" xml:space="preserve"><value>Track tasks and important milestones.</value></data>
+  <data name="FirstRunGuide_ProjectFeature3" xml:space="preserve"><value>Save planning metric snapshots.</value></data>
+  <data name="FirstRunGuide_ProjectFeature4" xml:space="preserve"><value>Keep work-folder shortcuts for quick access.</value></data>
+  <data name="FirstRunGuide_ProjectFeature5" xml:space="preserve"><value>Archive completed work and restore it when needed.</value></data>
+  <data name="FirstRunGuide_Step3Title" xml:space="preserve"><value>Find the right function quickly</value></data>
+  <data name="FirstRunGuide_Step3Body" xml:space="preserve"><value>Design and research tools are organized by category and run mainly on this device.</value></data>
+  <data name="FirstRunGuide_ToolFeature1" xml:space="preserve"><value>Design tools</value></data>
+  <data name="FirstRunGuide_ToolFeature2" xml:space="preserve"><value>Research tools</value></data>
+  <data name="FirstRunGuide_ToolFeature3" xml:space="preserve"><value>Search and favorites</value></data>
+  <data name="FirstRunGuide_Step4Title" xml:space="preserve"><value>You are ready to begin</value></data>
+  <data name="FirstRunGuide_Step4Body" xml:space="preserve"><value>Create a project or start with a tool. Language, reminders, and other preferences can be adjusted in Settings. You can reopen this guide from App settings at any time.</value></data>
+  <data name="FirstRunGuide_PrivacyLink" xml:space="preserve"><value>View the full privacy policy</value></data>
+  <data name="FirstRunGuide_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="FirstRunGuide_Next" xml:space="preserve"><value>Next</value></data>
+  <data name="FirstRunGuide_Skip" xml:space="preserve"><value>Skip</value></data>
+  <data name="FirstRunGuide_Start" xml:space="preserve"><value>Start using UrbanPlanToolbox</value></data>
+  <data name="FirstRunGuide_Close" xml:space="preserve"><value>Close guide</value></data>
+  <data name="FirstRunGuide_SettingsTitle" xml:space="preserve"><value>First-run guide</value></data>
+  <data name="FirstRunGuide_SettingsDescription" xml:space="preserve"><value>Review a short introduction to projects, tools, search, and privacy.</value></data>
+  <data name="FirstRunGuide_SettingsAction" xml:space="preserve"><value>Reopen</value></data>
 </root>

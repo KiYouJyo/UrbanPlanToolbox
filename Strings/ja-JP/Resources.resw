@@ -61,7 +61,7 @@
     <comment>トップページのサブタイトル。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v1.3.0。プロジェクトデータとツールデータはこのデバイス内に保持されます。</value>
+    <value>v1.3.1。プロジェクトデータとツールデータはこのデバイス内に保持されます。</value>
     <comment>トップページのバージョンとプライバシー説明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -1656,4 +1656,30 @@
   <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24時間</value></data>
   <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3日</value></data>
   <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>再通知（{0}回目）</value></data>
+  <data name="FirstRunGuide_Step" xml:space="preserve"><value>{0} / 4</value></data>
+  <data name="FirstRunGuide_Step1Title" xml:space="preserve"><value>UrbanPlanToolbox へようこそ</value></data>
+  <data name="FirstRunGuide_Step1Body" xml:space="preserve"><value>UrbanPlanToolbox は都市計画の設計と研究を支援します。アカウントは必要なく、個人情報を収集しません。プロジェクトと設定は原則としてこの端末に保存されます。更新を手動で確認したときだけ Microsoft Store または GitHub の更新サービスにアクセスし、リンクは選択後に既定のブラウザーで開きます。</value></data>
+  <data name="FirstRunGuide_Step2Title" xml:space="preserve"><value>プロジェクトで計画業務を整理</value></data>
+  <data name="FirstRunGuide_Step2Body" xml:space="preserve"><value>専用のワークスペースで計画プロジェクトを作成、管理できます。</value></data>
+  <data name="FirstRunGuide_ProjectFeature1" xml:space="preserve"><value>プロジェクト資料をワークスペースに記録。</value></data>
+  <data name="FirstRunGuide_ProjectFeature2" xml:space="preserve"><value>タスクと重要なマイルストーンを管理。</value></data>
+  <data name="FirstRunGuide_ProjectFeature3" xml:space="preserve"><value>計画指標のスナップショットを保存。</value></data>
+  <data name="FirstRunGuide_ProjectFeature4" xml:space="preserve"><value>作業フォルダーへのショートカットを設定。</value></data>
+  <data name="FirstRunGuide_ProjectFeature5" xml:space="preserve"><value>完了した作業をアーカイブし、必要なときに復元。</value></data>
+  <data name="FirstRunGuide_Step3Title" xml:space="preserve"><value>必要な機能をすばやく見つける</value></data>
+  <data name="FirstRunGuide_Step3Body" xml:space="preserve"><value>設計ツールと研究ツールをカテゴリ別に整理しています。主に端末内で動作します。</value></data>
+  <data name="FirstRunGuide_ToolFeature1" xml:space="preserve"><value>設計ツール</value></data>
+  <data name="FirstRunGuide_ToolFeature2" xml:space="preserve"><value>研究ツール</value></data>
+  <data name="FirstRunGuide_ToolFeature3" xml:space="preserve"><value>検索とお気に入り</value></data>
+  <data name="FirstRunGuide_Step4Title" xml:space="preserve"><value>準備ができました</value></data>
+  <data name="FirstRunGuide_Step4Body" xml:space="preserve"><value>プロジェクトを作成するか、ツールを使い始めましょう。言語、リマインダーなどの設定は「設定」で変更できます。このガイドは後からアプリ設定で再び開けます。</value></data>
+  <data name="FirstRunGuide_PrivacyLink" xml:space="preserve"><value>プライバシーポリシー全文を見る</value></data>
+  <data name="FirstRunGuide_Back" xml:space="preserve"><value>前へ</value></data>
+  <data name="FirstRunGuide_Next" xml:space="preserve"><value>次へ</value></data>
+  <data name="FirstRunGuide_Skip" xml:space="preserve"><value>スキップ</value></data>
+  <data name="FirstRunGuide_Start" xml:space="preserve"><value>使い始める</value></data>
+  <data name="FirstRunGuide_Close" xml:space="preserve"><value>ガイドを閉じる</value></data>
+  <data name="FirstRunGuide_SettingsTitle" xml:space="preserve"><value>初回利用ガイド</value></data>
+  <data name="FirstRunGuide_SettingsDescription" xml:space="preserve"><value>プロジェクト、ツール、検索、プライバシーの概要をもう一度確認します。</value></data>
+  <data name="FirstRunGuide_SettingsAction" xml:space="preserve"><value>再び開く</value></data>
 </root>

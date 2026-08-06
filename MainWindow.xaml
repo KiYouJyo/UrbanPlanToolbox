@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:UrbanPlanToolbox"
+    xmlns:views="using:UrbanPlanToolbox.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="UrbanPlanToolbox"
     mc:Ignorable="d">
@@ -33,5 +34,6 @@
         <InfoBar x:Name="NotificationBar" Grid.Row="1" Margin="24" VerticalAlignment="Top"
                  HorizontalAlignment="Stretch" IsOpen="False" IsClosable="True"
                  />
+        <views:FirstRunGuideHost x:Name="FirstRunGuide" Grid.RowSpan="2" Canvas.ZIndex="10" />
     </Grid>
 </Window>

@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Windows.Graphics;
 using UrbanPlanToolbox.Models.Interaction;
 using UrbanPlanToolbox.Services;
+using UrbanPlanToolbox.Views;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,6 +19,7 @@ public sealed partial class MainWindow : Window
 {
     private readonly INavigationStateService _navigationState = new NavigationStateService();
     private readonly LocalizationService _localization = LocalizationService.Default;
+    private readonly FirstRunExperienceService _firstRunExperience = new();
 
     public MainWindow()
     {
@@ -37,9 +39,26 @@ public sealed partial class MainWindow : Window
         // native splash dismissal can reveal a title-bar-only black frame.
         RootFrame.Navigate(typeof(MainPage));
         if (RootFrame.Content is null) throw new InvalidOperationException("Main window first-frame content was not created.");
+        FirstRunGuide.Closed += OnFirstRunGuideClosed;
     }
 
     public void Navigate(Type pageType) => RootFrame.Navigate(pageType);
+
+    public void ShowFirstRunGuideFromSettings() => ShowFirstRunGuide(manual: true);
+
+    public void ShowFirstRunGuideIfNeeded()
+    {
+        if (_firstRunExperience.ShouldShowAutomatically()) ShowFirstRunGuide(manual: false);
+    }
+
+    private void ShowFirstRunGuide(bool manual)
+    {
+        if (FirstRunGuide.Visibility == Visibility.Visible) return;
+        if (RootFrame.Content is MainPage currentPage) _navigationState.Save(currentPage.CaptureState());
+        FirstRunGuide.Show(manual);
+    }
+
+    private void OnFirstRunGuideClosed(object? sender, EventArgs e) { }
 
     private void OnLanguageChanged(object? sender, LanguageChangedEventArgs e)
     {

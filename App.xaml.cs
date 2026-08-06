@@ -51,6 +51,7 @@ public partial class App : Application
         {
             AppDataPathProvider.Default.EnsureInfrastructureDirectories();
             await MilestoneReminderService.Default.RefreshAsync();
+            MainWindow?.ShowFirstRunGuideIfNeeded();
         });
     }
 
