@@ -1,0 +1,69 @@
+name: Delete one Microsoft Store API draft
+
+on:
+  workflow_dispatch:
+    inputs:
+      product_id:
+        description: Store product ID
+        required: true
+        type: string
+      expected_pending_submission_id:
+        description: Exact PendingApplicationSubmission ID to delete
+        required: true
+        type: string
+      expected_published_submission_id:
+        description: Exact LastPublishedApplicationSubmission ID to preserve
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  delete-one-draft:
+    runs-on: windows-2025-vs2026
+    steps:
+      - name: Delete exact pending Store draft and verify
+        shell: pwsh
+        env:
+          PRODUCT_ID: ${{ inputs.product_id }}
+          EXPECTED_PENDING_ID: ${{ inputs.expected_pending_submission_id }}
+          EXPECTED_PUBLISHED_ID: ${{ inputs.expected_published_submission_id }}
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $token = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token" -ContentType 'application/x-www-form-urlencoded' -Body @{
+            client_id = $env:CLIENT_ID
+            client_secret = $env:CLIENT_SECRET
+            scope = 'https://manage.devcenter.microsoft.com/.default'
+            grant_type = 'client_credentials'
+          }
+          if ([string]::IsNullOrWhiteSpace([string]$token.access_token)) { throw 'Token response did not contain an access token.' }
+          $headers = @{ Authorization = "Bearer $($token.access_token)"; TenantId = $env:TENANT_ID; Accept = 'application/json' }
+          $applicationUri = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$env:PRODUCT_ID"
+
+          $before = Invoke-RestMethod -Method Get -Uri $applicationUri -Headers $headers
+          $pending = $before.PendingApplicationSubmission
+          if ($null -eq $pending) { throw 'PendingApplicationSubmission is null; deletion stopped.' }
+          if ([string]$pending.Id -ne $env:EXPECTED_PENDING_ID) { throw "Pending submission mismatch. Expected=$env:EXPECTED_PENDING_ID Actual=$($pending.Id)" }
+          $publishedId = [string]$before.LastPublishedApplicationSubmission.Id
+          if ($publishedId -ne $env:EXPECTED_PUBLISHED_ID) { throw "Published submission mismatch. Expected=$env:EXPECTED_PUBLISHED_ID Actual=$publishedId" }
+          $submissionUri = "$applicationUri/submissions/$env:EXPECTED_PENDING_ID"
+          $pendingDetails = Invoke-RestMethod -Method Get -Uri $submissionUri -Headers $headers
+          if ([string]$pendingDetails.Status -ne 'PendingCommit') { throw "Pending submission status is not PendingCommit: $($pendingDetails.Status)" }
+          Write-Output "Before pending_submission_id=$($pending.Id) status=$($pendingDetails.Status) published_submission_id=$publishedId"
+
+          Invoke-RestMethod -Method Delete -Uri $submissionUri -Headers $headers | Out-Null
+          Write-Output "DELETE completed for $env:EXPECTED_PENDING_ID"
+
+          $after = Invoke-RestMethod -Method Get -Uri $applicationUri -Headers $headers
+          if ($null -ne $after.PendingApplicationSubmission) { throw "PendingApplicationSubmission still exists: $($after.PendingApplicationSubmission.Id)" }
+          $afterPublishedId = [string]$after.LastPublishedApplicationSubmission.Id
+          if ($afterPublishedId -ne $env:EXPECTED_PUBLISHED_ID) { throw "Published submission changed. Expected=$env:EXPECTED_PUBLISHED_ID Actual=$afterPublishedId" }
+          Write-Output "After pending_submission_id=null published_submission_id=$afterPublishedId"
+          "## Store draft deletion" >> $env:GITHUB_STEP_SUMMARY
+          "- Deleted pending submission: $env:EXPECTED_PENDING_ID" >> $env:GITHUB_STEP_SUMMARY
+          "- Preserved published submission: $afterPublishedId" >> $env:GITHUB_STEP_SUMMARY
+          "- PendingApplicationSubmission after DELETE: null" >> $env:GITHUB_STEP_SUMMARY
