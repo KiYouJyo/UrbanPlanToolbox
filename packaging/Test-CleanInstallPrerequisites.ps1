@@ -1,13 +1,14 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)][string]$PackageFamilyName,
-    [string]$PackageDataRoot = (Join-Path $env:LOCALAPPDATA "Packages\$PackageFamilyName"),
+    [Parameter(Mandatory)][string]$ExpectedPackageFamilyName,
+    [string]$PackageDataRoot,
     [string]$LegacyDataRoot = (Join-Path $env:LOCALAPPDATA 'UrbanPlanToolbox')
 )
 
 $ErrorActionPreference = 'Stop'
+$PackageDataRoot = if ($PackageDataRoot) { $PackageDataRoot } else { Join-Path $env:LOCALAPPDATA "Packages\$ExpectedPackageFamilyName" }
 
-$installed = @(Get-AppxPackage -PackageFamilyName $PackageFamilyName -ErrorAction SilentlyContinue)
+$installed = @(Get-AppxPackage -ErrorAction SilentlyContinue | Where-Object { $_.PackageFamilyName -eq $ExpectedPackageFamilyName })
 if ($installed.Count -gt 0) {
     throw "The package is still installed: $($installed.PackageFullName -join ', ')"
 }
@@ -33,7 +34,7 @@ if ($legacyEvidence.Count -gt 0) {
 }
 
 [pscustomobject]@{
-    PackageFamilyName = $PackageFamilyName
+    PackageFamilyName = $ExpectedPackageFamilyName
     PackageRemoved = $true
     PackageDataCleared = $true
     PackageExternalHistoricalDataCleared = $true
