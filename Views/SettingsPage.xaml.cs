@@ -22,14 +22,30 @@ public sealed partial class SettingsPage : Page
         ApplicationSettingsTitle.Text = _localization.GetString("Settings_ApplicationSettingsTitle"); ApplicationSettingsDescription.Text = _localization.GetString("Settings_ApplicationSettingsDescription");
         RestoreDefaultsLabel.Text = _localization.GetString("Settings_RestoreDefaultsTitle"); RestoreDefaultsDescription.Text = _localization.GetString("Settings_RestoreDefaultsScopeDescription");
         DataManagementTitle.Text = _localization.GetString("Settings_DataManagementTitle"); DataManagementDescription.Text = _localization.GetString("Settings_DataManagementDescription");
+        MilestoneNotificationsTitle.Text = _localization.GetString("Settings_MilestoneNotificationsTitle");
+        MilestoneNotificationsDescription.Text = _localization.GetString("Settings_MilestoneNotificationsDescription");
+        MilestoneNotificationsLabel.Text = _localization.GetString("Settings_MilestoneNotificationsLabel");
+        MilestoneNotificationsToggle.OnContent = _localization.GetString("Settings_MilestoneNotificationsOn");
+        MilestoneNotificationsToggle.OffContent = _localization.GetString("Settings_MilestoneNotificationsOff");
         ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text); ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
+        ConfigureAccessibility(MilestoneNotificationsToggle, MilestoneNotificationsLabel.Text, MilestoneNotificationsDescription.Text);
         Apply(_settingsService.Load());
         ClearDataButton.Content = _localization.GetString("DataManagement_Clear");
+        Loaded += OnLoaded;
+    }
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        Loaded -= OnLoaded;
+        var enabled = await MilestoneReminderService.Default.GetEnabledAsync();
+        _isApplying = true;
+        MilestoneNotificationsToggle.IsOn = enabled;
+        _isApplying = false;
     }
     private async void OnRestore(object sender, RoutedEventArgs e)
     {
-        var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; });
+        var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; current.ProjectMilestoneNotificationsEnabled = AppSettings.DefaultProjectMilestoneNotificationsEnabled; });
         Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults");
+        await MilestoneReminderService.Default.RefreshAsync();
         if (!string.Equals(_localization.CurrentLanguage, LanguagePreference.ResolveEffectiveLanguage(settings.Language, Windows.System.UserProfile.GlobalizationPreferences.Languages), StringComparison.OrdinalIgnoreCase))
             await _localization.SwitchLanguageAsync(settings.Language);
     }
@@ -60,12 +76,31 @@ public sealed partial class SettingsPage : Page
         _isApplying = true;
         ThemeBox.SelectedIndex = settings.Theme switch { "Light" => 1, "Dark" => 2, _ => 0 };
         var language = LanguagePreference.Normalize(settings.Language); ApplyLanguageSelection(language);
+        MilestoneNotificationsToggle.IsOn = settings.IsProjectMilestoneNotificationsEnabled;
         _isApplying = false;
         ApplyTheme(settings.Theme);
     }
     private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
     private static void ConfigureAccessibility(FrameworkElement control, string name, string helpText) { AutomationProperties.SetName(control, name); AutomationProperties.SetHelpText(control, helpText); }
     private static void ApplyTheme(string theme) => ThemePreference.Apply(App.MainWindow?.Content as FrameworkElement, theme);
+    private async void OnMilestoneNotificationsToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isApplying) return;
+        var enabled = MilestoneNotificationsToggle.IsOn;
+        MilestoneNotificationsToggle.IsEnabled = false;
+        var result = await MilestoneReminderService.Default.SetEnabledAsync(enabled);
+        MilestoneNotificationsToggle.IsEnabled = true;
+        if (result.Succeeded)
+        {
+            StatusText.Text = _localization.GetString("Status_SettingsSaved");
+            return;
+        }
+
+        _isApplying = true;
+        MilestoneNotificationsToggle.IsOn = !enabled;
+        _isApplying = false;
+        StatusText.Text = _localization.GetString("Milestone_Reminder_SchedulingFailed");
+    }
     private async void OnExport(object sender, RoutedEventArgs e)
     {
         var picker = new FileSavePicker { SuggestedFileName = $"UrbanPlanToolbox-{DateTime.Now:yyyyMMdd-HHmmss}" };

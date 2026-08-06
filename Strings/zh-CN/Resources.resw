@@ -1585,12 +1585,8 @@ dwyblchhq</value>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作完成</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>重要时间节点提醒</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}：{1} 将于 {2} 到期。</value></data>
-  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows 提醒</value></data>
-  <data name="Milestone_Reminder_On" xml:space="preserve"><value>开启（本地通知）</value></data>
-  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>关闭</value></data>
   <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>项目已保存，但 Windows 未能计划提醒：{0}</value></data>
   <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>未选择具体时间时，将于当天本地时间 09:00 提醒。</value></data>
-  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>关闭此开关时不会创建 Windows 提醒。</value></data>
   <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows 通知</value></data>
   <data name="Notification_Settings_Description" xml:space="preserve"><value>发送测试通知以验证 Windows 能识别 UrbanPlanToolbox 并递送本地提醒。</value></data>
   <data name="Notification_Test_Action" xml:space="preserve"><value>发送测试通知</value></data>
@@ -1654,4 +1650,9 @@ dwyblchhq</value>
   <data name="Update_ErrorNetwork" xml:space="preserve"><value>网络连接失败。</value></data><data name="Update_ErrorStoreUnavailable" xml:space="preserve"><value>Microsoft Store 服务不可用。</value></data><data name="Update_ErrorDownload" xml:space="preserve"><value>更新下载失败。</value></data><data name="Update_ErrorInstall" xml:space="preserve"><value>更新安装失败。</value></data><data name="Update_ErrorNoPending" xml:space="preserve"><value>没有可安装的待处理更新。</value></data><data name="Update_ErrorWindowUnavailable" xml:space="preserve"><value>应用窗口尚未准备好显示 Store 更新界面。</value></data><data name="Update_ErrorStoreCode" xml:space="preserve"><value>Microsoft Store 返回错误。</value></data><data name="Update_ErrorGeneric" xml:space="preserve"><value>无法完成更新。</value></data><data name="Error_OpenExternalLinkFailed" xml:space="preserve"><value>无法打开外部链接。</value></data>
   <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>选择界面语言。更改会立即生效，无需重启应用。</value></data>
   <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>语言切换失败，已继续使用原语言。</value></data>
+  <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>项目时间节点提醒</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>启用后，应用将根据项目中的时间节点发送本机通知。未指定具体时间的时间节点将在当天 09:00 提醒。关闭后将停止项目时间节点提醒，但不会删除时间节点数据。</value></data>
+  <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>启用项目时间节点提醒</value></data>
+  <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>开启</value></data>
+  <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>关闭</value></data>
 </root>

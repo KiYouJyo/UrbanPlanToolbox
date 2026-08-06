@@ -1579,12 +1579,8 @@
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作が完了しました</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>マイルストーンのリマインダー</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}: {1} の期限は {2} です。</value></data>
-  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows リマインダー</value></data>
-  <data name="Milestone_Reminder_On" xml:space="preserve"><value>オン（ローカル通知）</value></data>
-  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>オフ</value></data>
   <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>プロジェクトは保存されましたが、Windows がリマインダーを予約できませんでした: {0}</value></data>
   <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>時刻を指定しない場合、当日の現地時間 09:00 に通知します。</value></data>
-  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>このスイッチがオフの間は Windows リマインダーを作成しません。</value></data>
   <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows 通知</value></data>
   <data name="Notification_Settings_Description" xml:space="preserve"><value>テスト通知を送信して、Windows が UrbanPlanToolbox を認識しローカル通知を配信できることを確認します。</value></data>
   <data name="Notification_Test_Action" xml:space="preserve"><value>テスト通知を送信</value></data>
@@ -1648,4 +1644,9 @@
   <data name="Update_ErrorNetwork" xml:space="preserve"><value>ネットワーク接続に失敗しました。</value></data><data name="Update_ErrorStoreUnavailable" xml:space="preserve"><value>Microsoft Store サービスを利用できません。</value></data><data name="Update_ErrorDownload" xml:space="preserve"><value>更新のダウンロードに失敗しました。</value></data><data name="Update_ErrorInstall" xml:space="preserve"><value>更新のインストールに失敗しました。</value></data><data name="Update_ErrorNoPending" xml:space="preserve"><value>インストール可能な保留中の更新はありません。</value></data><data name="Update_ErrorWindowUnavailable" xml:space="preserve"><value>Store 更新 UI のためのアプリ ウィンドウが準備できていません。</value></data><data name="Update_ErrorStoreCode" xml:space="preserve"><value>Microsoft Store がエラーを返しました。</value></data><data name="Update_ErrorGeneric" xml:space="preserve"><value>更新を完了できません。</value></data><data name="Error_OpenExternalLinkFailed" xml:space="preserve"><value>外部リンクを開けませんでした。</value></data>
   <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>表示言語を選択します。アプリを再起動せずに変更が反映されます。</value></data>
   <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>言語を変更できませんでした。以前の言語を引き続き使用します。</value></data>
+  <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>プロジェクトのマイルストーン通知</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>有効にすると、プロジェクトのマイルストーンに基づいてローカル通知を送信します。時刻を指定していないマイルストーンは、その日の 09:00 に通知します。無効にしてもマイルストーンのデータは削除されません。</value></data>
+  <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>プロジェクトのマイルストーン通知を有効にする</value></data>
+  <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>オン</value></data>
+  <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>オフ</value></data>
 </root>

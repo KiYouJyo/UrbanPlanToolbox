@@ -85,6 +85,20 @@
         <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="16">
             <StackPanel Spacing="4">
+              <TextBlock x:Name="MilestoneNotificationsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
+              <TextBlock x:Name="MilestoneNotificationsDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <Grid ColumnSpacing="24" RowSpacing="8">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <TextBlock x:Name="MilestoneNotificationsLabel" Grid.Column="0" Style="{StaticResource SettingsRowLabelStyle}" VerticalAlignment="Center"/>
+              <ToggleSwitch x:Name="MilestoneNotificationsToggle" Grid.Column="1" Toggled="OnMilestoneNotificationsToggled"/>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4">
               <TextBlock x:Name="DataManagementTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
               <TextBlock x:Name="DataManagementDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
             </StackPanel>

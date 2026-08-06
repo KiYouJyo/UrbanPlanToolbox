@@ -1582,12 +1582,8 @@ Latest version: {1}</value>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>Operation completed</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>Milestone reminder</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}: {1} is due {2}.</value></data>
-  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows reminder</value></data>
-  <data name="Milestone_Reminder_On" xml:space="preserve"><value>On (local notification)</value></data>
-  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>Off</value></data>
   <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>Project saved, but Windows could not schedule its reminder: {0}</value></data>
   <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>Without a specific time, the reminder is scheduled for 09:00 local time.</value></data>
-  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>No Windows reminder will be created while this switch is off.</value></data>
   <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows notifications</value></data>
   <data name="Notification_Settings_Description" xml:space="preserve"><value>Send a test notification to verify that Windows can identify UrbanPlanToolbox and deliver local reminders.</value></data>
   <data name="Notification_Test_Action" xml:space="preserve"><value>Send test notification</value></data>
@@ -1682,4 +1678,9 @@ Latest version: {1}</value>
   <data name="Update_ErrorNetwork" xml:space="preserve"><value>Network connection failed.</value></data><data name="Update_ErrorStoreUnavailable" xml:space="preserve"><value>Microsoft Store service is unavailable.</value></data><data name="Update_ErrorDownload" xml:space="preserve"><value>Update download failed.</value></data><data name="Update_ErrorInstall" xml:space="preserve"><value>Update installation failed.</value></data><data name="Update_ErrorNoPending" xml:space="preserve"><value>No pending update is available.</value></data><data name="Update_ErrorWindowUnavailable" xml:space="preserve"><value>The application window is not ready for Store update UI.</value></data><data name="Update_ErrorStoreCode" xml:space="preserve"><value>Microsoft Store returned an error.</value></data><data name="Update_ErrorGeneric" xml:space="preserve"><value>Unable to complete the update.</value></data><data name="Error_OpenExternalLinkFailed" xml:space="preserve"><value>Could not open the external link.</value></data>
   <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>Choose the display language. Changes apply immediately without restarting the app.</value></data>
   <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>The language could not be changed. Your previous language remains active.</value></data>
+  <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>Project milestone reminders</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>When enabled, the app sends local notifications for project milestones. Milestones without a specific time are scheduled for 9:00 AM on their date. Turning this off cancels project milestone reminders without deleting milestone data.</value></data>
+  <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>Enable project milestone reminders</value></data>
+  <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>On</value></data>
+  <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>Off</value></data>
 </root>
