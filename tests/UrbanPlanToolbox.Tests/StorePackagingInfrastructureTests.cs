@@ -75,6 +75,8 @@ public sealed class StorePackagingInfrastructureTests
         Assert.DoesNotContain("pull_request:", workflow);
         Assert.DoesNotContain("release:", workflow);
         Assert.Contains("STORE_PRODUCT_ID: 9MWDPJG1BHKW", workflow);
+        Assert.Contains("EXPECTED_LAST_PUBLISHED_SUBMISSION_ID: '1152921505701574155'", workflow);
+        Assert.Contains("PROTECTED_PUBLISHED_SUBMISSION_ID: '1152921505701574155'", workflow);
         Assert.Contains("publication_confirmation", workflow);
         Assert.DoesNotContain("submit_for_certification", workflow);
         Assert.DoesNotContain("certification_confirmation", workflow);
