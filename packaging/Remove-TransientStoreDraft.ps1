@@ -34,6 +34,17 @@ function Get-Text {
     return ([string]$Value).Trim()
 }
 
+function Get-PackageVersion {
+    param([System.Collections.IDictionary]$Package)
+    foreach ($name in @('Version','PackageVersion','PackageVersionString')) {
+        $value = Get-OptionalValue -Dictionary $Package -Name $name
+        if (-not [string]::IsNullOrWhiteSpace([string]$value)) { return (Get-Text $value) }
+    }
+    $fileName = Get-Text (Get-OptionalValue -Dictionary $Package -Name 'FileName')
+    if ($fileName -match '(?i)_(\d+\.\d+\.\d+\.\d+)(?:_|\.|$)') { return $matches[1] }
+    return ''
+}
+
 if ($SubmissionId -cne $ProtectedPublishedSubmissionId) {
     # The comparison is intentionally explicit: this script can never target the published submission.
 } else {
@@ -62,7 +73,7 @@ $status = Get-Text $submission[(Get-Key -Dictionary $submission -Name 'Status')]
 if ($status -cne 'PendingCommit') { throw "Transient draft cleanup requires PendingCommit; actual '$status'." }
 $packages = @(Get-OptionalValue -Dictionary $submission -Name 'ApplicationPackages')
 if ($packages.Count -eq 0) { throw 'Transient draft cleanup requires a non-empty application package list.' }
-$versionMatch = @($packages | Where-Object { $_ -is [System.Collections.IDictionary] -and (Get-Text (Get-OptionalValue -Dictionary $_ -Name 'Version')) -eq $ExpectedPackageVersion })
+$versionMatch = @($packages | Where-Object { $_ -is [System.Collections.IDictionary] -and (Get-PackageVersion -Package $_) -eq $ExpectedPackageVersion })
 if ($versionMatch.Count -eq 0) { throw "Transient draft package version does not match $ExpectedPackageVersion." }
 $expectedName = $ExpectedPackageFileName.ToLowerInvariant()
 $nameMatch = @($versionMatch | Where-Object { (Get-Text (Get-OptionalValue -Dictionary $_ -Name 'FileName')).ToLowerInvariant() -eq $expectedName })

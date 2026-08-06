@@ -39,6 +39,17 @@ function Get-Text {
     return ([string]$Value).Trim()
 }
 
+function Get-PackageVersion {
+    param([System.Collections.IDictionary]$Package)
+    foreach ($name in @('Version','PackageVersion','PackageVersionString')) {
+        $value = Get-OptionalValue -Dictionary $Package -Name $name
+        if (-not [string]::IsNullOrWhiteSpace([string]$value)) { return (Get-Text $value) }
+    }
+    $fileName = Get-Text (Get-OptionalValue -Dictionary $Package -Name 'FileName')
+    if ($fileName -match '(?i)_(\d+\.\d+\.\d+\.\d+)(?:_|\.|$)') { return $matches[1] }
+    return ''
+}
+
 $token = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token" -ContentType 'application/x-www-form-urlencoded' -Body @{
     client_id = $ClientId
     client_secret = $ClientSecret
@@ -64,7 +75,7 @@ if ($status -cne 'PendingCommit') { throw "Expected Store draft status PendingCo
 $packages = @(Get-Value -Dictionary $submission -Name 'ApplicationPackages')
 if ($packages.Count -eq 0) { throw 'Store draft application package list is empty.' }
 $expectedVersionPackages = @($packages | Where-Object {
-    $_ -is [System.Collections.IDictionary] -and (Get-Text (Get-OptionalValue -Dictionary $_ -Name 'Version')) -eq $ExpectedPackageVersion
+    $_ -is [System.Collections.IDictionary] -and (Get-PackageVersion -Package $_) -eq $ExpectedPackageVersion
 })
 if ($expectedVersionPackages.Count -eq 0) { throw "Store draft package list does not contain version $ExpectedPackageVersion." }
 
