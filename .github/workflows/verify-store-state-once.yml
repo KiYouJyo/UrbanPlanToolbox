@@ -28,6 +28,11 @@ jobs:
           $application = (Invoke-WebRequest -Method Get -Uri $uri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
           $pending = $application['PendingApplicationSubmission']
           $published = $application['LastPublishedApplicationSubmission']
+          "application_keys=$($application.Keys -join ',')" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY
+          $publishedUri = "$uri/submissions/$env:EXPECTED_LAST_PUBLISHED_SUBMISSION_ID"
+          $publishedResponse = (Invoke-WebRequest -Method Get -Uri $publishedUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+          "published_submission_get_id=$([string]$publishedResponse['Id'])" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "published_submission_get_status=$([string]$publishedResponse['Status'])" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
           if ($null -ne $pending) { throw "Pending submission still exists: $([string]$pending['Id'])" }
           $publishedId = if ($null -eq $published) { '' } else { [string]$published['Id'] }
           if ([string]::IsNullOrWhiteSpace($publishedId) -or $publishedId -cne $env:EXPECTED_LAST_PUBLISHED_SUBMISSION_ID) { throw "Published submission mismatch. Expected=$env:EXPECTED_LAST_PUBLISHED_SUBMISSION_ID Actual=$publishedId" }
