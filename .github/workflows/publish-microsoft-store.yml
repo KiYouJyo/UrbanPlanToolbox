@@ -28,7 +28,6 @@ concurrency:
 
 env:
   STORE_PRODUCT_ID: 9MWDPJG1BHKW
-  EXPECTED_PRODUCT_VERSION: 1.3.0
 
 jobs:
   build-and-publish:
@@ -52,11 +51,17 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           [xml]$project = Get-Content -LiteralPath UrbanPlanToolbox.csproj -Raw
-          [xml]$manifest = Get-Content -LiteralPath Package.Store.appxmanifest -Raw
+          [xml]$githubManifest = Get-Content -LiteralPath Package.appxmanifest -Raw
+          [xml]$storeManifest = Get-Content -LiteralPath Package.Store.appxmanifest -Raw
           $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
-          $packageVersion = [string]$manifest.Package.Identity.Version
-          if ($projectVersion -ne $env:EXPECTED_PRODUCT_VERSION -or $packageVersion -ne "$projectVersion.0") {
-            throw "Expected $env:EXPECTED_PRODUCT_VERSION / $env:EXPECTED_PRODUCT_VERSION.0, got $projectVersion / $packageVersion"
+          if ($projectVersion -notmatch '^\d+\.\d+\.\d+$') {
+            throw "UrbanPlanToolbox.csproj Version must use major.minor.patch format; got '$projectVersion'."
+          }
+          $expectedPackageVersion = "$projectVersion.0"
+          $githubPackageVersion = [string]$githubManifest.Package.Identity.Version
+          $storePackageVersion = [string]$storeManifest.Package.Identity.Version
+          if ($githubPackageVersion -ne $expectedPackageVersion -or $storePackageVersion -ne $expectedPackageVersion) {
+            throw "Version mismatch. Project=$projectVersion ExpectedPackage=$expectedPackageVersion GitHubManifest=$githubPackageVersion StoreManifest=$storePackageVersion"
           }
           $sha = (git rev-parse HEAD).Trim()
           git fetch origin main --no-tags
@@ -67,7 +72,7 @@ jobs:
           if (-not (Test-Path -LiteralPath $notesPath -PathType Leaf)) { throw "Missing $notesPath" }
           "source_sha=$sha" >> $env:GITHUB_OUTPUT
           "product_version=$projectVersion" >> $env:GITHUB_OUTPUT
-          "package_version=$packageVersion" >> $env:GITHUB_OUTPUT
+          "package_version=$expectedPackageVersion" >> $env:GITHUB_OUTPUT
           "release_notes_path=$notesPath" >> $env:GITHUB_OUTPUT
 
       - name: Validate and normalize Store release notes
