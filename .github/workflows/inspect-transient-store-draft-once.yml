@@ -1,0 +1,56 @@
+name: Inspect transient Microsoft Store draft (read only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      product_id:
+        required: true
+        type: string
+      expected_submission_id:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: windows-2025-vs2026
+    steps:
+      - name: Read exact Store submission fields
+        shell: pwsh
+        env:
+          PRODUCT_ID: ${{ inputs.product_id }}
+          EXPECTED_SUBMISSION_ID: ${{ inputs.expected_submission_id }}
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $token = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token" -ContentType 'application/x-www-form-urlencoded' -Body @{
+            client_id = $env:CLIENT_ID
+            client_secret = $env:CLIENT_SECRET
+            scope = 'https://manage.devcenter.microsoft.com/.default'
+            grant_type = 'client_credentials'
+          }
+          $headers = @{ Authorization = "Bearer $($token.access_token)"; TenantId = $env:TENANT_ID; Accept = 'application/json' }
+          $applicationUri = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$env:PRODUCT_ID"
+          $application = (Invoke-WebRequest -Method Get -Uri $applicationUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+          $pending = $application.PendingApplicationSubmission
+          if ($null -eq $pending) { throw 'PendingApplicationSubmission is null; inspection stopped.' }
+          if ([string]$pending.Id -cne $env:EXPECTED_SUBMISSION_ID) { throw "Pending submission mismatch. Expected=$env:EXPECTED_SUBMISSION_ID Actual=$($pending.Id)" }
+          $submissionUri = "$applicationUri/submissions/$env:EXPECTED_SUBMISSION_ID"
+          $submission = (Invoke-WebRequest -Method Get -Uri $submissionUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+          "pending_submission_id=$($pending.Id)" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY
+          "submission_status=$($submission.Status)" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          $packages = @($submission.ApplicationPackages)
+          "application_packages_count=$($packages.Count)" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          for ($i = 0; $i -lt $packages.Count; $i++) {
+            $package = $packages[$i]
+            $keys = @($package.Keys | ForEach-Object { [string]$_ }) -join ','
+            "package[$i].keys=$keys" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            foreach ($name in @('Version','PackageVersion','FileName','Architecture','PackageFullName','PackageIdentityName')) {
+              $match = @($package.Keys | Where-Object { [string]::Equals([string]$_, $name, [StringComparison]::OrdinalIgnoreCase) })
+              if ($match.Count -eq 1) { "package[$i].$name=$($package[$match[0]])" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append }
+            }
+          }
