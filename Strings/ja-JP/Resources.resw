@@ -1579,12 +1579,8 @@
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作が完了しました</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>マイルストーンのリマインダー</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}: {1} の期限は {2} です。</value></data>
-  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows リマインダー</value></data>
-  <data name="Milestone_Reminder_On" xml:space="preserve"><value>オン（ローカル通知）</value></data>
-  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>オフ</value></data>
   <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>プロジェクトは保存されましたが、Windows がリマインダーを予約できませんでした: {0}</value></data>
   <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>時刻を指定しない場合、当日の現地時間 09:00 に通知します。</value></data>
-  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>このスイッチがオフの間は Windows リマインダーを作成しません。</value></data>
   <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows 通知</value></data>
   <data name="Notification_Settings_Description" xml:space="preserve"><value>テスト通知を送信して、Windows が UrbanPlanToolbox を認識しローカル通知を配信できることを確認します。</value></data>
   <data name="Notification_Test_Action" xml:space="preserve"><value>テスト通知を送信</value></data>
@@ -1646,4 +1642,18 @@
   <data name="Action_GitHubRepository" xml:space="preserve"><value>GitHub リポジトリ</value></data><data name="Action_Releases" xml:space="preserve"><value>Releases</value></data><data name="Action_SubmitIssue" xml:space="preserve"><value>Issue を送信</value></data><data name="Action_ViewMitLicense" xml:space="preserve"><value>MIT License を表示</value></data><data name="Action_DownloadAndInstall" xml:space="preserve"><value>ダウンロードしてインストール</value></data><data name="Action_OpenReleases" xml:space="preserve"><value>GitHub Releases を開く</value></data>
   <data name="Update_State_NotChecked" xml:space="preserve"><value>更新は未確認です</value></data><data name="Update_State_Checking" xml:space="preserve"><value>更新を確認しています…</value></data><data name="Update_State_UpToDate" xml:space="preserve"><value>現在のバージョンは最新です</value></data><data name="Update_State_UpdateAvailable" xml:space="preserve"><value>新しいバージョンが利用可能です</value></data><data name="Update_State_Downloading" xml:space="preserve"><value>更新をダウンロードしています…</value></data><data name="Update_State_Installing" xml:space="preserve"><value>更新をインストールしています…</value></data><data name="Update_State_Completed" xml:space="preserve"><value>更新が完了しました</value></data><data name="Update_State_UnsupportedChannel" xml:space="preserve"><value>このインストールでは Microsoft Store のアプリ内更新を利用できません。</value></data><data name="Update_State_Cancelled" xml:space="preserve"><value>更新はキャンセルされました</value></data><data name="Update_State_Failed" xml:space="preserve"><value>更新に失敗しました。再試行してください。</value></data><data name="Update_SaveBeforeInstall" xml:space="preserve"><value>プロジェクトと未完了の変更を保存してください。更新のインストール中にアプリが閉じる場合があります。</value></data>
   <data name="Update_ErrorNetwork" xml:space="preserve"><value>ネットワーク接続に失敗しました。</value></data><data name="Update_ErrorStoreUnavailable" xml:space="preserve"><value>Microsoft Store サービスを利用できません。</value></data><data name="Update_ErrorDownload" xml:space="preserve"><value>更新のダウンロードに失敗しました。</value></data><data name="Update_ErrorInstall" xml:space="preserve"><value>更新のインストールに失敗しました。</value></data><data name="Update_ErrorNoPending" xml:space="preserve"><value>インストール可能な保留中の更新はありません。</value></data><data name="Update_ErrorWindowUnavailable" xml:space="preserve"><value>Store 更新 UI のためのアプリ ウィンドウが準備できていません。</value></data><data name="Update_ErrorStoreCode" xml:space="preserve"><value>Microsoft Store がエラーを返しました。</value></data><data name="Update_ErrorGeneric" xml:space="preserve"><value>更新を完了できません。</value></data><data name="Error_OpenExternalLinkFailed" xml:space="preserve"><value>外部リンクを開けませんでした。</value></data>
+  <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>表示言語を選択します。アプリを再起動せずに変更が反映されます。</value></data>
+  <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>言語を変更できませんでした。以前の言語を引き続き使用します。</value></data>
+  <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>プロジェクトのマイルストーン通知</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>有効にすると、プロジェクトのマイルストーンに基づいてローカル通知を送信します。時刻を指定していないマイルストーンは、その日の 09:00 に通知します。間隔を選ぶと、初回通知後に最大 3 回再通知します。無効にしてもマイルストーンのデータは削除されません。</value></data>
+  <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>プロジェクトのマイルストーン通知を有効にする</value></data>
+  <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>オン</value></data>
+  <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>オフ</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatLabel" xml:space="preserve"><value>既定の再通知間隔</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatNone.Content" xml:space="preserve"><value>繰り返さない</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours6.Content" xml:space="preserve"><value>6時間</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours12.Content" xml:space="preserve"><value>12時間</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24時間</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3日</value></data>
+  <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>再通知（{0}回目）</value></data>
 </root>

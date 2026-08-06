@@ -19,6 +19,9 @@
               <Setter Target="LanguageBox.(Grid.Row)" Value="0"/>
               <Setter Target="LanguageBox.(Grid.Column)" Value="1"/>
               <Setter Target="LanguageBox.Width" Value="280"/>
+              <Setter Target="MilestoneNotificationsRepeatBox.(Grid.Row)" Value="0"/>
+              <Setter Target="MilestoneNotificationsRepeatBox.(Grid.Column)" Value="1"/>
+              <Setter Target="MilestoneNotificationsRepeatBox.Width" Value="280"/>
               <Setter Target="ImportButton.(Grid.Row)" Value="0"/>
               <Setter Target="ImportButton.(Grid.Column)" Value="1"/>
               <Setter Target="ClearDataButton.(Grid.Row)" Value="0"/>
@@ -65,7 +68,6 @@
               <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
                 <TextBlock x:Name="LanguageLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
                 <TextBlock x:Name="LanguageDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
-                <TextBlock x:Name="LanguageRestartHint" Style="{StaticResource SettingsDescriptionStyle}" Visibility="Collapsed"/>
               </StackPanel>
               <ComboBox x:Name="LanguageBox"
                         Grid.Row="1"
@@ -78,6 +80,38 @@
                 <ComboBoxItem Tag="zh-CN" x:Uid="Setting_Language_ZhCn"/>
                 <ComboBoxItem Tag="ja-JP" x:Uid="Setting_Language_JaJp"/>
                 <ComboBoxItem Tag="en-US" x:Uid="Setting_Language_EnUs"/>
+              </ComboBox>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4">
+              <TextBlock x:Name="MilestoneNotificationsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
+              <TextBlock x:Name="MilestoneNotificationsDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <Grid ColumnSpacing="24" RowSpacing="8">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <TextBlock x:Name="MilestoneNotificationsLabel" Grid.Column="0" Style="{StaticResource SettingsRowLabelStyle}" VerticalAlignment="Center"/>
+              <ToggleSwitch x:Name="MilestoneNotificationsToggle" Grid.Column="1" Toggled="OnMilestoneNotificationsToggled"/>
+            </Grid>
+            <Border Height="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
+            <Grid ColumnSpacing="24" RowSpacing="8">
+              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <TextBlock x:Name="MilestoneNotificationsRepeatLabel" Grid.Row="0" Grid.Column="0" Style="{StaticResource SettingsRowLabelStyle}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+              <ComboBox x:Name="MilestoneNotificationsRepeatBox"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        MinWidth="240"
+                        MaxWidth="360"
+                        SelectionChanged="OnMilestoneNotificationsRepeatChanged">
+                <ComboBoxItem Tag="None" x:Uid="Settings_MilestoneNotificationsRepeatNone"/>
+                <ComboBoxItem Tag="Hours6" x:Uid="Settings_MilestoneNotificationsRepeatHours6"/>
+                <ComboBoxItem Tag="Hours12" x:Uid="Settings_MilestoneNotificationsRepeatHours12"/>
+                <ComboBoxItem Tag="Hours24" x:Uid="Settings_MilestoneNotificationsRepeatHours24"/>
+                <ComboBoxItem Tag="Days3" x:Uid="Settings_MilestoneNotificationsRepeatDays3"/>
               </ComboBox>
             </Grid>
           </StackPanel>

@@ -1,32 +1,127 @@
 using Microsoft.Windows.AppNotifications;
 using Microsoft.Windows.AppNotifications.Builder;
+using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Models.Projects;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 
 namespace UrbanPlanToolbox.Services;
 
-/// <summary>Schedules one local Windows notification for each future, active project milestone.</summary>
+/// <summary>Owns the complete project milestone notification series and its application-level settings.</summary>
 public sealed class MilestoneReminderService
 {
     private readonly ProjectStorageService _projects;
     private readonly ILocalizationService _localization;
+    private readonly SettingsService _settings;
     private readonly Func<DateTimeOffset> _now;
+    private readonly SemaphoreSlim _operationLock = new(1, 1);
     private bool _registered;
 
-    public static MilestoneReminderService Default { get; } = new(ProjectStorageService.Default, LocalizationService.Default);
+    public static MilestoneReminderService Default { get; } = new(ProjectStorageService.Default, LocalizationService.Default, new SettingsService());
 
-    public MilestoneReminderService(ProjectStorageService projects, ILocalizationService localization, Func<DateTimeOffset>? now = null)
+    public MilestoneReminderService(ProjectStorageService projects, ILocalizationService localization, SettingsService? settings = null, Func<DateTimeOffset>? now = null)
     {
         _projects = projects;
         _localization = localization;
+        _settings = settings ?? new SettingsService();
         _now = now ?? (() => DateTimeOffset.Now);
     }
 
     public async Task<MilestoneReminderRefreshResult> RefreshAsync(CancellationToken cancellationToken = default)
     {
+        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            return await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _operationLock.Release();
+        }
+    }
+
+    public async Task<MilestoneReminderRefreshResult> SetEnabledAsync(bool enabled, CancellationToken cancellationToken = default)
+    {
+        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var settings = await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false);
+            if (settings.IsProjectMilestoneNotificationsEnabled == enabled) return MilestoneReminderRefreshResult.Success(0);
+            var previousEnabled = settings.IsProjectMilestoneNotificationsEnabled;
+            _settings.Update(current => current.ProjectMilestoneNotificationsEnabled = enabled);
+            if (!enabled)
+            {
+                if (ClearOwnedSchedulesCore()) return MilestoneReminderRefreshResult.Success(0);
+                _settings.Update(current => current.ProjectMilestoneNotificationsEnabled = previousEnabled);
+                await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+                return MilestoneReminderRefreshResult.Failure(new InvalidOperationException("Project milestone schedules could not be cleared."));
+            }
+
+            var result = await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+            if (result.Succeeded) return result;
+            _settings.Update(current => current.ProjectMilestoneNotificationsEnabled = previousEnabled);
+            ClearOwnedSchedulesCore();
+            return result;
+        }
+        finally
+        {
+            _operationLock.Release();
+        }
+    }
+
+    public async Task<bool> GetEnabledAsync(CancellationToken cancellationToken = default)
+    {
+        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try { return (await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false)).IsProjectMilestoneNotificationsEnabled; }
+        finally { _operationLock.Release(); }
+    }
+
+    public async Task<AppSettings> GetSettingsAsync(CancellationToken cancellationToken = default)
+    {
+        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try { return await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false); }
+        finally { _operationLock.Release(); }
+    }
+
+    public async Task<MilestoneReminderRefreshResult> UpdateRepeatIntervalAsync(MilestoneReminderRepeatInterval interval, CancellationToken cancellationToken = default)
+    {
+        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var current = await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false);
+            var normalized = Enum.IsDefined(interval) ? interval : MilestoneReminderRepeatInterval.None;
+            if (current.NormalizedProjectMilestoneReminderRepeatInterval == normalized) return MilestoneReminderRefreshResult.Success(0);
+
+            var previous = current.NormalizedProjectMilestoneReminderRepeatInterval;
+            _settings.Update(settings => settings.ProjectMilestoneReminderRepeatInterval = normalized);
+            if (!current.IsProjectMilestoneNotificationsEnabled) return MilestoneReminderRefreshResult.Success(0);
+
+            var result = await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+            if (result.Succeeded) return result;
+
+            _settings.Update(settings => settings.ProjectMilestoneReminderRepeatInterval = previous);
+            await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+            return result;
+        }
+        finally { _operationLock.Release(); }
+    }
+
+    public Task<MilestoneReminderRefreshResult> SyncMilestoneAsync(Guid milestoneId, CancellationToken cancellationToken = default) => RefreshAsync(cancellationToken);
+
+    public Task<MilestoneReminderRefreshResult> RemoveMilestoneAsync(Guid milestoneId, CancellationToken cancellationToken = default) => RefreshAsync(cancellationToken);
+
+    private async Task<MilestoneReminderRefreshResult> RefreshCoreAsync(CancellationToken cancellationToken)
+    {
+        var settings = await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false);
+        if (!settings.IsProjectMilestoneNotificationsEnabled)
+        {
+            return ClearOwnedSchedulesCore()
+                ? MilestoneReminderRefreshResult.Success(0)
+                : MilestoneReminderRefreshResult.Failure(new InvalidOperationException("Project milestone schedules could not be cleared."));
+        }
+
         var list = await _projects.ListAsync(false, cancellationToken).ConfigureAwait(false);
-        var reminders = MilestoneReminderPlanner.Create(list.Projects, _now());
+        var reminders = MilestoneReminderPlanner.Create(list.Projects, _now(), settings.NormalizedProjectMilestoneReminderRepeatInterval, enabled: true);
         try
         {
             EnsureRegistered();
@@ -40,7 +135,7 @@ public sealed class MilestoneReminderService
                 document.LoadXml(BuildNotification(reminder).Payload);
                 var scheduled = new ScheduledToastNotification(document, reminder.DueAtLocal)
                 {
-                    Tag = MilestoneReminderIdentity.Tag(reminder.MilestoneId),
+                    Tag = MilestoneReminderIdentity.Tag(reminder.MilestoneId, reminder.RepeatIndex),
                     Group = MilestoneReminderIdentity.Group(reminder.ProjectId)
                 };
                 notifier.AddToSchedule(scheduled);
@@ -49,10 +144,20 @@ public sealed class MilestoneReminderService
         }
         catch (Exception exception) when (OperatingSystem.IsWindows())
         {
-            // Scheduling is deliberately non-blocking, but callers receive a diagnostic result.
             System.Diagnostics.Debug.WriteLine($"Milestone reminder scheduling failed: {exception}");
             return MilestoneReminderRefreshResult.Failure(exception);
         }
+    }
+
+    private async Task<AppSettings> EnsureGlobalSettingAsync(CancellationToken cancellationToken)
+    {
+        var settings = _settings.Load();
+        if (settings.ProjectMilestoneNotificationsEnabled.HasValue) return settings;
+
+        var active = await _projects.ListAsync(false, cancellationToken).ConfigureAwait(false);
+        var archived = await _projects.ListAsync(true, cancellationToken).ConfigureAwait(false);
+        var enabled = MilestoneReminderMigration.DetermineEnabled(active.Projects.Concat(archived.Projects));
+        return _settings.Update(current => current.ProjectMilestoneNotificationsEnabled = enabled);
     }
 
     public MilestoneReminderRefreshResult SendTestNotification()
@@ -76,13 +181,24 @@ public sealed class MilestoneReminderService
 
     public void ClearOwnedSchedules()
     {
+        _operationLock.Wait();
+        try
+        {
+            ClearOwnedSchedulesCore();
+        }
+        finally { _operationLock.Release(); }
+    }
+
+    private bool ClearOwnedSchedulesCore()
+    {
         try
         {
             EnsureRegistered();
             var notifier = ToastNotificationManager.CreateToastNotifier();
             foreach (var scheduled in notifier.GetScheduledToastNotifications().Where(IsOwnedSchedule).ToArray()) notifier.RemoveFromSchedule(scheduled);
+            return true;
         }
-        catch (Exception exception) when (OperatingSystem.IsWindows()) { System.Diagnostics.Debug.WriteLine($"Clearing reminders failed: {exception}"); }
+        catch (Exception exception) when (OperatingSystem.IsWindows()) { System.Diagnostics.Debug.WriteLine($"Clearing reminders failed: {exception}"); return false; }
     }
 
     private AppNotification BuildNotification(MilestoneReminder reminder)
@@ -90,13 +206,15 @@ public sealed class MilestoneReminderService
         var due = reminder.HasExplicitTime
             ? reminder.DueAtLocal.ToString("g")
             : reminder.DueAtLocal.ToString("d");
-        return new AppNotificationBuilder()
+        var builder = new AppNotificationBuilder()
             .AddArgument("action", "openMilestone")
             .AddArgument("projectId", reminder.ProjectId.ToString("D"))
             .AddArgument("milestoneId", reminder.MilestoneId.ToString("D"))
             .AddText(_localization.GetString("Reminder_NotificationTitle"))
-            .AddText(_localization.GetFormattedString("Reminder_NotificationBody", reminder.ProjectName, reminder.MilestoneTitle, due))
-            .BuildNotification();
+            .AddText(_localization.GetFormattedString("Reminder_NotificationBody", reminder.ProjectName, reminder.MilestoneTitle, due));
+        if (reminder.RepeatIndex > 0)
+            builder.AddText(_localization.GetFormattedString("Reminder_NotificationRepeat", reminder.RepeatIndex));
+        return builder.BuildNotification();
     }
 
     private void EnsureRegistered()

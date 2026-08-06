@@ -1582,12 +1582,8 @@ Latest version: {1}</value>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>Operation completed</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>Milestone reminder</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}: {1} is due {2}.</value></data>
-  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows reminder</value></data>
-  <data name="Milestone_Reminder_On" xml:space="preserve"><value>On (local notification)</value></data>
-  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>Off</value></data>
   <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>Project saved, but Windows could not schedule its reminder: {0}</value></data>
   <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>Without a specific time, the reminder is scheduled for 09:00 local time.</value></data>
-  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>No Windows reminder will be created while this switch is off.</value></data>
   <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows notifications</value></data>
   <data name="Notification_Settings_Description" xml:space="preserve"><value>Send a test notification to verify that Windows can identify UrbanPlanToolbox and deliver local reminders.</value></data>
   <data name="Notification_Test_Action" xml:space="preserve"><value>Send test notification</value></data>
@@ -1680,4 +1676,18 @@ Latest version: {1}</value>
   <data name="Update_State_NotChecked" xml:space="preserve"><value>Updates have not been checked.</value></data><data name="Update_State_Checking" xml:space="preserve"><value>Checking for updates…</value></data><data name="Update_State_UpToDate" xml:space="preserve"><value>This is the latest version.</value></data><data name="Update_State_UpdateAvailable" xml:space="preserve"><value>An update is available and ready to download.</value></data><data name="Update_State_Downloading" xml:space="preserve"><value>Downloading update…</value></data><data name="Update_State_Installing" xml:space="preserve"><value>Installing update…</value></data><data name="Update_State_Completed" xml:space="preserve"><value>Update completed.</value></data><data name="Update_State_UnsupportedChannel" xml:space="preserve"><value>This installation does not support Microsoft Store in-app updates.</value></data><data name="Update_State_Cancelled" xml:space="preserve"><value>Update was cancelled.</value></data><data name="Update_State_Failed" xml:space="preserve"><value>Update failed. Please try again.</value></data>
   <data name="Update_SaveBeforeInstall" xml:space="preserve"><value>Save projects and unfinished changes first. The app may close while the update is installed.</value></data>
   <data name="Update_ErrorNetwork" xml:space="preserve"><value>Network connection failed.</value></data><data name="Update_ErrorStoreUnavailable" xml:space="preserve"><value>Microsoft Store service is unavailable.</value></data><data name="Update_ErrorDownload" xml:space="preserve"><value>Update download failed.</value></data><data name="Update_ErrorInstall" xml:space="preserve"><value>Update installation failed.</value></data><data name="Update_ErrorNoPending" xml:space="preserve"><value>No pending update is available.</value></data><data name="Update_ErrorWindowUnavailable" xml:space="preserve"><value>The application window is not ready for Store update UI.</value></data><data name="Update_ErrorStoreCode" xml:space="preserve"><value>Microsoft Store returned an error.</value></data><data name="Update_ErrorGeneric" xml:space="preserve"><value>Unable to complete the update.</value></data><data name="Error_OpenExternalLinkFailed" xml:space="preserve"><value>Could not open the external link.</value></data>
+  <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>Choose the display language. Changes apply immediately without restarting the app.</value></data>
+  <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>The language could not be changed. Your previous language remains active.</value></data>
+  <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>Project milestone reminders</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>When enabled, the app sends local notifications for project milestones. Milestones without a specific time are scheduled for 9:00 AM on their date. Choose a repeat interval to send up to 3 more reminders after the first one. Turning this off cancels project milestone reminders without deleting milestone data.</value></data>
+  <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>Enable project milestone reminders</value></data>
+  <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>On</value></data>
+  <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>Off</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatLabel" xml:space="preserve"><value>Default repeat interval</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatNone.Content" xml:space="preserve"><value>Do not repeat</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours6.Content" xml:space="preserve"><value>6 hours</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours12.Content" xml:space="preserve"><value>12 hours</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24 hours</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3 days</value></data>
+  <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>Repeat reminder ({0} of 3)</value></data>
 </root>

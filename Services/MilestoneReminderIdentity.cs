@@ -10,7 +10,8 @@ public static class MilestoneReminderIdentity
     public const string LegacyGroup = "UrbanPlanToolbox.Milestones";
 
     public static string Group(Guid projectId) => GroupPrefix + Token(projectId.ToString("N"), 12);
-    public static string Tag(Guid milestoneId) => Token(milestoneId.ToString("N"), 16);
+    public static string Tag(Guid milestoneId) => Tag(milestoneId, 0);
+    public static string Tag(Guid milestoneId, int repeatIndex) => Token($"milestone:{milestoneId:N}:{repeatIndex}", 16);
 
     private static string Token(string value, int length) =>
         Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value))).ToLowerInvariant()[..length];

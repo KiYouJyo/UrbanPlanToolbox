@@ -8,7 +8,7 @@
 
 ## 获取应用
 
-推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前版本为 **1.2.1**，Microsoft Store 和 GitHub 旁加载包版本均为 `1.2.1.0`；两条渠道的身份和 Publisher 保持独立。
+推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前开发版本为 **1.3.0**，候选包版本为 `1.3.0.0`；两条渠道的身份和 Publisher 保持独立，正式发布仍需人工验收后单独授权。
 
 ## 关于 UrbanPlanToolbox
 
@@ -46,7 +46,7 @@ Windows 10 17763 或更高版本，x64。开发和构建需要 .NET 10、WinUI 3
 
 ## 语言
 
-界面支持简体中文、日本語和 English，可在设置中选择，重启后生效。
+界面支持简体中文、日本語和 English，可在设置中选择，立即生效。
 
 ## 文档
 

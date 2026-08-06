@@ -25,6 +25,49 @@ public sealed class SettingsAndFormattingTests
     }
 
     [Fact]
+    public void ProjectMilestoneNotificationSettingPersistsAsOneApplicationValue()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");
+        try
+        {
+            var service = new SettingsService(path);
+            service.Save(new AppSettings { ProjectMilestoneNotificationsEnabled = true });
+            var loaded = new SettingsService(path).Load();
+            Assert.True(loaded.ProjectMilestoneNotificationsEnabled);
+            Assert.True(loaded.IsProjectMilestoneNotificationsEnabled);
+        }
+        finally
+        {
+            var folder = Path.GetDirectoryName(path)!;
+            if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void LegacySettingsHaveSafeDisabledDefaultUntilReminderMigrationRuns()
+    {
+        var settings = new AppSettings();
+        Assert.Null(settings.ProjectMilestoneNotificationsEnabled);
+        Assert.False(settings.IsProjectMilestoneNotificationsEnabled);
+    }
+
+    [Fact]
+    public void RepeatIntervalPersistsAsStableEnumValue()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");
+        try
+        {
+            var service = new SettingsService(path);
+            service.Save(new AppSettings { ProjectMilestoneReminderRepeatInterval = MilestoneReminderRepeatInterval.Hours12 });
+            var text = File.ReadAllText(path);
+            Assert.Contains("ProjectMilestoneReminderRepeatInterval", text);
+            Assert.Contains("2", text);
+            Assert.Equal(MilestoneReminderRepeatInterval.Hours12, service.Load().NormalizedProjectMilestoneReminderRepeatInterval);
+        }
+        finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
+    }
+
+    [Fact]
     public void ThemeAndLanguagePersistIndependently()
     {
         var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");

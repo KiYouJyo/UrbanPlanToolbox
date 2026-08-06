@@ -97,12 +97,12 @@ public sealed class StorePackagingInfrastructureTests
         var githubManifest = File.ReadAllText(Path.Combine(root, "Package.appxmanifest"));
         var storeManifest = File.ReadAllText(Path.Combine(root, "Package.Store.appxmanifest"));
         var script = File.ReadAllText(Path.Combine(root, "packaging", "Build-StorePackage.ps1"));
-        Assert.Contains("<Version>1.2.1</Version>", project);
-        Assert.Contains("Version=\"1.2.1.0\"", githubManifest);
+        Assert.Contains("<Version>1.3.0</Version>", project);
+        Assert.Contains("Version=\"1.3.0.0\"", githubManifest);
         Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", storeManifest);
         Assert.Contains("Publisher=\"CN=C4E4B33A-7B77-4121-897C-7D720A5471F8\"", storeManifest);
-        Assert.Contains("Version=\"1.2.1.0\"", storeManifest);
-        Assert.Contains("PackageVersion -ne '1.2.1.0'", script);
+        Assert.Contains("Version=\"1.3.0.0\"", storeManifest);
+        Assert.Contains("PackageVersion -ne '1.3.0.0'", script);
         Assert.Contains("DistributionChannel=Store", script);
         Assert.Contains("URBANPLANTOOLBOX_STORE", project);
     }

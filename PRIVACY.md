@@ -1,6 +1,6 @@
 # UrbanPlanToolbox Privacy / 隐私政策 / プライバシーポリシー
 
-Version 1.2.1 · Last updated 2026-08-05
+Version 1.3.0 · Last updated 2026-08-06
 
 ## Local coordinate files
 

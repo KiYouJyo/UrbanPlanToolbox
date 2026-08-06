@@ -10,10 +10,7 @@ public sealed partial class SettingsPage : Page
 {
     private readonly SettingsService _settingsService = new();
     private readonly ILocalizationService _localization = LocalizationService.Default;
-    private readonly IApplicationRestartService _restartService = new ApplicationRestartService();
-    private readonly LanguageRestartPromptCoordinator _languageRestartPrompt = new();
     private bool _isApplying;
-    private string _currentLanguage = LanguagePreference.SystemValue;
 
     public SettingsPage()
     {
@@ -21,22 +18,38 @@ public sealed partial class SettingsPage : Page
         TitleText.Text = _localization.GetString("Navigation_Settings");
         AppearanceLanguageTitle.Text = _localization.GetString("Settings_AppearanceLanguageTitle"); AppearanceLanguageDescription.Text = _localization.GetString("Settings_AppearanceLanguageDescription");
         ThemeLabel.Text = _localization.GetString("Settings_ThemeLabel"); ThemeDescription.Text = _localization.GetString("Settings_ThemeDescription");
-        LanguageLabel.Text = _localization.GetString("Settings_LanguageLabel"); LanguageDescription.Text = _localization.GetString("Settings_LanguageDescription");
+        LanguageLabel.Text = _localization.GetString("Settings_LanguageLabel"); LanguageDescription.Text = _localization.GetString("Settings_LanguageDescription_Runtime");
         ApplicationSettingsTitle.Text = _localization.GetString("Settings_ApplicationSettingsTitle"); ApplicationSettingsDescription.Text = _localization.GetString("Settings_ApplicationSettingsDescription");
         RestoreDefaultsLabel.Text = _localization.GetString("Settings_RestoreDefaultsTitle"); RestoreDefaultsDescription.Text = _localization.GetString("Settings_RestoreDefaultsScopeDescription");
         DataManagementTitle.Text = _localization.GetString("Settings_DataManagementTitle"); DataManagementDescription.Text = _localization.GetString("Settings_DataManagementDescription");
+        MilestoneNotificationsTitle.Text = _localization.GetString("Settings_MilestoneNotificationsTitle");
+        MilestoneNotificationsDescription.Text = _localization.GetString("Settings_MilestoneNotificationsDescription");
+        MilestoneNotificationsLabel.Text = _localization.GetString("Settings_MilestoneNotificationsLabel");
+        MilestoneNotificationsRepeatLabel.Text = _localization.GetString("Settings_MilestoneNotificationsRepeatLabel");
+        MilestoneNotificationsToggle.OnContent = _localization.GetString("Settings_MilestoneNotificationsOn");
+        MilestoneNotificationsToggle.OffContent = _localization.GetString("Settings_MilestoneNotificationsOff");
         ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text); ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
+        ConfigureAccessibility(MilestoneNotificationsToggle, MilestoneNotificationsLabel.Text, MilestoneNotificationsDescription.Text);
+        ConfigureAccessibility(MilestoneNotificationsRepeatBox, MilestoneNotificationsRepeatLabel.Text, MilestoneNotificationsDescription.Text);
         Apply(_settingsService.Load());
         ClearDataButton.Content = _localization.GetString("DataManagement_Clear");
+        Loaded += OnLoaded;
+    }
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        Loaded -= OnLoaded;
+        var settings = await MilestoneReminderService.Default.GetSettingsAsync();
+        _isApplying = true;
+        ApplyMilestoneReminderSettings(settings);
+        _isApplying = false;
     }
     private async void OnRestore(object sender, RoutedEventArgs e)
     {
-        var previousLanguage = _currentLanguage;
-        var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; });
+        var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; current.ProjectMilestoneNotificationsEnabled = AppSettings.DefaultProjectMilestoneNotificationsEnabled; current.ProjectMilestoneReminderRepeatInterval = MilestoneReminderRepeatInterval.None; });
         Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults");
-        var restoredLanguage = LanguagePreference.Normalize(settings.Language);
-        if (!string.Equals(previousLanguage, restoredLanguage, StringComparison.OrdinalIgnoreCase) && _languageRestartPrompt.TryBegin(previousLanguage, restoredLanguage))
-            await ShowLanguageRestartDialogAsync();
+        await MilestoneReminderService.Default.RefreshAsync();
+        if (!string.Equals(_localization.CurrentLanguage, LanguagePreference.ResolveEffectiveLanguage(settings.Language, Windows.System.UserProfile.GlobalizationPreferences.Languages), StringComparison.OrdinalIgnoreCase))
+            await _localization.SwitchLanguageAsync(settings.Language);
     }
     private void OnThemeChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -48,36 +61,80 @@ public sealed partial class SettingsPage : Page
     {
         if (_isApplying) return;
         var selectedLanguage = LanguagePreference.Normalize((LanguageBox.SelectedItem as ComboBoxItem)?.Tag?.ToString());
-        if (string.Equals(_currentLanguage, selectedLanguage, StringComparison.OrdinalIgnoreCase)) return;
-        if (!_languageRestartPrompt.TryBegin(_currentLanguage, selectedLanguage)) { ApplyLanguageSelection(_currentLanguage); return; }
-        _settingsService.Update(current => current.Language = selectedLanguage);
-        _currentLanguage = selectedLanguage;
-        await ShowLanguageRestartDialogAsync();
-    }
-    private async Task ShowLanguageRestartDialogAsync()
-    {
-        LanguageRestartHint.Text = _localization.GetString("Setting_Language_SavedRestartHint"); LanguageRestartHint.Visibility = Visibility.Visible;
-        var restartRequested = false;
-        try
+        if (string.Equals(LanguagePreference.ResolveEffectiveLanguage(selectedLanguage, Windows.System.UserProfile.GlobalizationPreferences.Languages), _localization.CurrentLanguage, StringComparison.OrdinalIgnoreCase)) return;
+        LanguageBox.IsEnabled = false;
+        var switched = await _localization.SwitchLanguageAsync(selectedLanguage);
+        LanguageBox.IsEnabled = true;
+        if (!switched)
         {
-            var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString("Setting_Language_RestartTitle"), Content = _localization.GetString("Setting_Language_RestartMessage"), PrimaryButtonText = _localization.GetString("Setting_Language_RestartNow"), CloseButtonText = _localization.GetString("Setting_Language_Later"), DefaultButton = ContentDialogButton.Close };
-            restartRequested = await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary;
+            _isApplying = true;
+            ApplyLanguageSelection(_localization.CurrentLanguage);
+            _isApplying = false;
+            StatusText.Text = _localization.GetString("Setting_Language_SwitchFailed");
         }
-        finally { if (!_languageRestartPrompt.Complete(restartRequested, _restartService) && restartRequested) StatusText.Text = _localization.GetString("Setting_Language_RestartFailed"); }
     }
     private void Apply(AppSettings settings)
     {
         _isApplying = true;
         ThemeBox.SelectedIndex = settings.Theme switch { "Light" => 1, "Dark" => 2, _ => 0 };
         var language = LanguagePreference.Normalize(settings.Language); ApplyLanguageSelection(language);
-        _currentLanguage = language;
-        LanguageRestartHint.Visibility = Visibility.Collapsed;
+        MilestoneNotificationsToggle.IsOn = settings.IsProjectMilestoneNotificationsEnabled;
+        ApplyMilestoneReminderSettings(settings);
         _isApplying = false;
         ApplyTheme(settings.Theme);
     }
     private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
     private static void ConfigureAccessibility(FrameworkElement control, string name, string helpText) { AutomationProperties.SetName(control, name); AutomationProperties.SetHelpText(control, helpText); }
     private static void ApplyTheme(string theme) => ThemePreference.Apply(App.MainWindow?.Content as FrameworkElement, theme);
+    private async void OnMilestoneNotificationsToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isApplying) return;
+        var enabled = MilestoneNotificationsToggle.IsOn;
+        MilestoneNotificationsToggle.IsEnabled = false;
+        var result = await MilestoneReminderService.Default.SetEnabledAsync(enabled);
+        MilestoneNotificationsToggle.IsEnabled = true;
+        MilestoneNotificationsRepeatBox.IsEnabled = enabled;
+        if (result.Succeeded)
+        {
+            StatusText.Text = _localization.GetString("Status_SettingsSaved");
+            return;
+        }
+
+        _isApplying = true;
+        ApplyMilestoneReminderSettings(_settingsService.Load());
+        _isApplying = false;
+        StatusText.Text = _localization.GetString("Milestone_Reminder_SchedulingFailed");
+    }
+    private async void OnMilestoneNotificationsRepeatChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isApplying || MilestoneNotificationsRepeatBox.SelectedItem is not ComboBoxItem item) return;
+        if (!Enum.TryParse<MilestoneReminderRepeatInterval>(item.Tag?.ToString(), out var interval)) interval = MilestoneReminderRepeatInterval.None;
+        MilestoneNotificationsRepeatBox.IsEnabled = false;
+        var result = await MilestoneReminderService.Default.UpdateRepeatIntervalAsync(interval);
+        MilestoneNotificationsRepeatBox.IsEnabled = MilestoneNotificationsToggle.IsOn;
+        if (result.Succeeded)
+        {
+            StatusText.Text = _localization.GetString("Status_SettingsSaved");
+            return;
+        }
+
+        _isApplying = true;
+        SelectRepeatInterval(_settingsService.Load().NormalizedProjectMilestoneReminderRepeatInterval);
+        _isApplying = false;
+        StatusText.Text = _localization.GetString("Milestone_Reminder_SchedulingFailed");
+    }
+    private void ApplyMilestoneReminderSettings(AppSettings settings)
+    {
+        MilestoneNotificationsToggle.IsOn = settings.IsProjectMilestoneNotificationsEnabled;
+        SelectRepeatInterval(settings.NormalizedProjectMilestoneReminderRepeatInterval);
+        MilestoneNotificationsRepeatBox.IsEnabled = settings.IsProjectMilestoneNotificationsEnabled;
+    }
+    private void SelectRepeatInterval(MilestoneReminderRepeatInterval interval)
+    {
+        var tag = interval.ToString();
+        MilestoneNotificationsRepeatBox.SelectedItem = MilestoneNotificationsRepeatBox.Items.OfType<ComboBoxItem>().FirstOrDefault(item => string.Equals(item.Tag?.ToString(), tag, StringComparison.Ordinal))
+            ?? MilestoneNotificationsRepeatBox.Items[0];
+    }
     private async void OnExport(object sender, RoutedEventArgs e)
     {
         var picker = new FileSavePicker { SuggestedFileName = $"UrbanPlanToolbox-{DateTime.Now:yyyyMMdd-HHmmss}" };

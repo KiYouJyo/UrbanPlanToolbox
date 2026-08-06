@@ -1585,12 +1585,8 @@ dwyblchhq</value>
   <data name="Interaction_SuccessTitle" xml:space="preserve"><value>操作完成</value></data>
   <data name="Reminder_NotificationTitle" xml:space="preserve"><value>重要时间节点提醒</value></data>
   <data name="Reminder_NotificationBody" xml:space="preserve"><value>{0}：{1} 将于 {2} 到期。</value></data>
-  <data name="Milestone_Field_Reminder" xml:space="preserve"><value>Windows 提醒</value></data>
-  <data name="Milestone_Reminder_On" xml:space="preserve"><value>开启（本地通知）</value></data>
-  <data name="Milestone_Reminder_Off" xml:space="preserve"><value>关闭</value></data>
   <data name="Milestone_Reminder_SchedulingFailed" xml:space="preserve"><value>项目已保存，但 Windows 未能计划提醒：{0}</value></data>
   <data name="Milestone_Reminder_DefaultTime" xml:space="preserve"><value>未选择具体时间时，将于当天本地时间 09:00 提醒。</value></data>
-  <data name="Milestone_Reminder_DisabledHint" xml:space="preserve"><value>关闭此开关时不会创建 Windows 提醒。</value></data>
   <data name="Notification_Settings_Title" xml:space="preserve"><value>Windows 通知</value></data>
   <data name="Notification_Settings_Description" xml:space="preserve"><value>发送测试通知以验证 Windows 能识别 UrbanPlanToolbox 并递送本地提醒。</value></data>
   <data name="Notification_Test_Action" xml:space="preserve"><value>发送测试通知</value></data>
@@ -1652,4 +1648,18 @@ dwyblchhq</value>
   <data name="Action_GitHubRepository" xml:space="preserve"><value>GitHub 仓库</value></data><data name="Action_Releases" xml:space="preserve"><value>Releases</value></data><data name="Action_SubmitIssue" xml:space="preserve"><value>提交 Issue</value></data><data name="Action_ViewMitLicense" xml:space="preserve"><value>查看 MIT License</value></data><data name="Action_DownloadAndInstall" xml:space="preserve"><value>下载并安装</value></data><data name="Action_OpenReleases" xml:space="preserve"><value>打开 GitHub Releases</value></data>
   <data name="Update_State_NotChecked" xml:space="preserve"><value>尚未检查更新</value></data><data name="Update_State_Checking" xml:space="preserve"><value>正在检查更新……</value></data><data name="Update_State_UpToDate" xml:space="preserve"><value>当前已是最新版本</value></data><data name="Update_State_UpdateAvailable" xml:space="preserve"><value>发现新版本，可用更新已准备下载</value></data><data name="Update_State_Downloading" xml:space="preserve"><value>正在下载更新……</value></data><data name="Update_State_Installing" xml:space="preserve"><value>正在安装更新……</value></data><data name="Update_State_Completed" xml:space="preserve"><value>更新完成</value></data><data name="Update_State_UnsupportedChannel" xml:space="preserve"><value>当前安装版本不支持 Microsoft Store 应用内更新。</value></data><data name="Update_State_Cancelled" xml:space="preserve"><value>更新已取消</value></data><data name="Update_State_Failed" xml:space="preserve"><value>更新失败，请重试。</value></data><data name="Update_SaveBeforeInstall" xml:space="preserve"><value>请先保存当前项目和未完成的修改。安装更新期间应用可能关闭。</value></data>
   <data name="Update_ErrorNetwork" xml:space="preserve"><value>网络连接失败。</value></data><data name="Update_ErrorStoreUnavailable" xml:space="preserve"><value>Microsoft Store 服务不可用。</value></data><data name="Update_ErrorDownload" xml:space="preserve"><value>更新下载失败。</value></data><data name="Update_ErrorInstall" xml:space="preserve"><value>更新安装失败。</value></data><data name="Update_ErrorNoPending" xml:space="preserve"><value>没有可安装的待处理更新。</value></data><data name="Update_ErrorWindowUnavailable" xml:space="preserve"><value>应用窗口尚未准备好显示 Store 更新界面。</value></data><data name="Update_ErrorStoreCode" xml:space="preserve"><value>Microsoft Store 返回错误。</value></data><data name="Update_ErrorGeneric" xml:space="preserve"><value>无法完成更新。</value></data><data name="Error_OpenExternalLinkFailed" xml:space="preserve"><value>无法打开外部链接。</value></data>
+  <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>选择界面语言。更改会立即生效，无需重启应用。</value></data>
+  <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>语言切换失败，已继续使用原语言。</value></data>
+  <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>项目时间节点提醒</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>启用后，应用将根据项目中的时间节点发送本机通知。未指定具体时间的时间节点将在当天 09:00 提醒。选择重复间隔后，首次提醒后最多再提醒 3 次。关闭后将停止项目时间节点提醒，但不会删除时间节点数据。</value></data>
+  <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>启用项目时间节点提醒</value></data>
+  <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>开启</value></data>
+  <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>关闭</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatLabel" xml:space="preserve"><value>默认重复提醒间隔</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatNone.Content" xml:space="preserve"><value>不重复</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours6.Content" xml:space="preserve"><value>6 小时</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours12.Content" xml:space="preserve"><value>12 小时</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24 小时</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3 天</value></data>
+  <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>重复提醒（第 {0} 次）</value></data>
 </root>

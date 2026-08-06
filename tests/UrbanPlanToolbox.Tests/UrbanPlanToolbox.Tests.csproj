@@ -7,6 +7,7 @@
   <Compile Include="../../Models/Projects/ProjectModels.cs" Link="Models/Projects/ProjectModels.cs" />
   <Compile Include="../../Services/PlanningCalculationService.cs" Link="Services/PlanningCalculationService.cs" />
   <Compile Include="../../Models/AppSettings.cs" Link="Models/AppSettings.cs" />
+  <Compile Include="../../Models/MilestoneReminderRepeatInterval.cs" Link="Models/MilestoneReminderRepeatInterval.cs" />
   <Compile Include="../../Models/DataEnvelope.cs" Link="Models/DataEnvelope.cs" />
   <Compile Include="../../Models/DataStorageResult.cs" Link="Models/DataStorageResult.cs" />
   <Compile Include="../../Models/BackupModels.cs" Link="Models/BackupModels.cs" />
@@ -79,6 +80,9 @@
   <Compile Include="../../Services/ToolSearchService.cs" Link="Services/ToolSearchService.cs" />
   <Compile Include="../../Services/FavoriteToolsService.cs" Link="Services/FavoriteToolsService.cs" />
   <Compile Include="../../Services/ILocalizationService.cs" Link="Services/ILocalizationService.cs" />
+  <Compile Include="../../Services/LanguageOption.cs" Link="Services/LanguageOption.cs" />
+  <Compile Include="../../Services/INavigationStateService.cs" Link="Services/INavigationStateService.cs" />
+  <Compile Include="../../Services/ShellNavigationState.cs" Link="Services/ShellNavigationState.cs" />
   <Compile Include="../../Services/LanguagePreference.cs" Link="Services/LanguagePreference.cs" />
   <Compile Include="../../Services/IApplicationRestartService.cs" Link="Services/IApplicationRestartService.cs" />
   <Compile Include="../../Services/LanguageRestartPromptCoordinator.cs" Link="Services/LanguageRestartPromptCoordinator.cs" />
@@ -87,6 +91,7 @@
   <Compile Include="../../Services/UnsavedChangesGuard.cs" Link="Services/UnsavedChangesGuard.cs" />
   <Compile Include="../../Services/AppNotificationService.cs" Link="Services/AppNotificationService.cs" />
   <Compile Include="../../Services/MilestoneReminderPlanner.cs" Link="Services/MilestoneReminderPlanner.cs" />
+  <Compile Include="../../Services/MilestoneReminderMigration.cs" Link="Services/MilestoneReminderMigration.cs" />
   <Compile Include="../../Services/MilestoneReminderIdentity.cs" Link="Services/MilestoneReminderIdentity.cs" />
  </ItemGroup>
  <ItemGroup>

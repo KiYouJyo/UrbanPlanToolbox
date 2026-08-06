@@ -16,6 +16,11 @@ internal sealed class DictionaryLocalizationService : ILocalizationService
         _values = values;
     }
 
+    public string CurrentLanguage => "en-US";
+    public IReadOnlyList<LanguageOption> SupportedLanguages => [];
+    public event EventHandler<LanguageChangedEventArgs>? LanguageChanged { add { } remove { } }
+    public Task<bool> SwitchLanguageAsync(string language, CancellationToken cancellationToken = default) => Task.FromResult(true);
+
     public string GetString(string resourceKey) =>
         _values.TryGetValue(resourceKey, out var value) && !string.IsNullOrWhiteSpace(value)
             ? value
