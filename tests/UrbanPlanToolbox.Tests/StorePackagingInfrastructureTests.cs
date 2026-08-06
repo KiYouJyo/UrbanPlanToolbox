@@ -81,9 +81,30 @@ public sealed class StorePackagingInfrastructureTests
         Assert.DoesNotContain("$env:CLIENT_SECRET.Substring", workflow);
         Assert.Contains("Write workflow summary", workflow);
 
-        var certificationStart = workflow.IndexOf("- name: Submit existing Store draft for certification", StringComparison.Ordinal);
+        var notesStart = workflow.IndexOf("- name: Validate and normalize Store release notes", StringComparison.Ordinal);
+        var restoreStart = workflow.IndexOf("- name: Restore Release dependencies", StringComparison.Ordinal);
+        var notesStep = workflow[notesStart..restoreStart];
+        Assert.DoesNotContain("$LASTEXITCODE", notesStep);
+        Assert.Contains("Test-Path -LiteralPath $output -PathType Leaf", notesStep);
+        Assert.Contains("ConvertFrom-Json -ErrorAction Stop", notesStep);
+
+        var packageStart = workflow.IndexOf("- name: Build validated Store upload package", StringComparison.Ordinal);
+        var artifactStart = workflow.IndexOf("- name: Preserve Store deployment artifact", StringComparison.Ordinal);
+        var packageStep = workflow[packageStart..artifactStart];
+        Assert.DoesNotContain("$LASTEXITCODE", packageStep);
+        Assert.Contains("store-package-build.json", packageStep);
+        Assert.Contains("metadata.package", packageStep);
+        Assert.Contains("metadata.sha256", packageStep);
+
+        var notesUpdateStart = workflow.IndexOf("- name: Update three-language Store release notes", StringComparison.Ordinal);
+        var certificationStart = workflow.IndexOf("- name: Validate certification confirmation", StringComparison.Ordinal);
+        var notesUpdateStep = workflow[notesUpdateStart..certificationStart];
+        Assert.DoesNotContain("$LASTEXITCODE", notesUpdateStep);
+        Assert.Contains("submission ID", notesUpdateStep);
+
+        var certificationSubmitStart = workflow.IndexOf("- name: Submit existing Store draft for certification", StringComparison.Ordinal);
         var certificationEnd = workflow.IndexOf("- name: Show current Store submission status", StringComparison.Ordinal);
-        var certificationStep = workflow[certificationStart..certificationEnd];
+        var certificationStep = workflow[certificationSubmitStart..certificationEnd];
         Assert.DoesNotContain("PACKAGE_PATH", certificationStep);
         Assert.DoesNotContain("--inputDirectory", certificationStep);
         Assert.DoesNotContain("--inputFile", certificationStep);
