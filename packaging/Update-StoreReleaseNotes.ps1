@@ -4,7 +4,9 @@ param(
     [Parameter(Mandatory)][string]$ReleaseNotesPath,
     [Parameter(Mandatory)][string]$TenantId,
     [Parameter(Mandatory)][string]$ClientId,
-    [Parameter(Mandatory)][string]$ClientSecret
+    [Parameter(Mandatory)][string]$ClientSecret,
+    [int]$PollIntervalSeconds = 10,
+    [int]$TimeoutSeconds = 300
 )
 
 $ErrorActionPreference = 'Stop'
@@ -21,6 +23,11 @@ function Get-Value {
     param([System.Collections.IDictionary]$Dictionary,[string]$Name)
     return $Dictionary[(Get-Key -Dictionary $Dictionary -Name $Name)]
 }
+function Get-Text {
+    param($Value)
+    if ($null -eq $Value) { return '' }
+    return ([string]$Value).Trim()
+}
 
 $token = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token" -ContentType 'application/x-www-form-urlencoded' -Body @{
     client_id = $ClientId
@@ -32,19 +39,32 @@ if ([string]::IsNullOrWhiteSpace([string]$token.access_token)) { throw 'Microsof
 
 $headers = @{ Authorization = "Bearer $($token.access_token)"; TenantId = $TenantId; Accept = 'application/json' }
 $applicationUri = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$ProductId"
-$application = (Invoke-WebRequest -Method Get -Uri $applicationUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
-$pending = Get-Value -Dictionary $application -Name 'PendingApplicationSubmission'
-if ($pending -isnot [System.Collections.IDictionary]) { throw 'The Store application does not contain a pending draft submission.' }
-$submissionId = [string](Get-Value -Dictionary $pending -Name 'Id')
-if ([string]::IsNullOrWhiteSpace($submissionId)) { throw 'The pending Store submission does not contain an ID.' }
+$deadline = [DateTimeOffset]::UtcNow.AddSeconds($TimeoutSeconds)
+$submission = $null
+$submissionId = ''
+$submissionUri = ''
+do {
+    $application = (Invoke-WebRequest -Method Get -Uri $applicationUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+    $pendingKey = Get-Key -Dictionary $application -Name 'PendingApplicationSubmission' -AllowMissing
+    $pending = if ($null -eq $pendingKey) { $null } else { $application[$pendingKey] }
+    if ($pending -is [System.Collections.IDictionary]) {
+        $submissionId = Get-Text (Get-Value -Dictionary $pending -Name 'Id')
+        if (-not [string]::IsNullOrWhiteSpace($submissionId)) {
+            $submissionUri = "$applicationUri/submissions/$submissionId"
+            $submission = (Invoke-WebRequest -Method Get -Uri $submissionUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+            $status = Get-Text (Get-Value -Dictionary $submission -Name 'Status')
+            if ($status -cne 'PendingCommit') { throw "Store draft must be PendingCommit before metadata update; actual '$status'." }
+            $listings = Get-Value -Dictionary $submission -Name 'Listings'
+            if ($listings -is [System.Collections.IDictionary]) { break }
+        }
+    }
+    if ([DateTimeOffset]::UtcNow -ge $deadline) { throw "Store draft did not become available for metadata update within $TimeoutSeconds seconds." }
+    Start-Sleep -Seconds $PollIntervalSeconds
+} while ($true)
 
-$submissionUri = "$applicationUri/submissions/$submissionId"
-$submission = (Invoke-WebRequest -Method Get -Uri $submissionUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
 $notes = Get-Content -LiteralPath $ReleaseNotesPath -Raw | ConvertFrom-Json -AsHashtable -Depth 20
 $notesLocales = Get-Value -Dictionary $notes -Name 'Locales'
 $listings = Get-Value -Dictionary $submission -Name 'Listings'
-if ($listings -isnot [System.Collections.IDictionary]) { throw 'The Store draft does not contain a Listings dictionary.' }
-
 foreach ($locale in @('zh-CN','ja-JP','en-US')) {
     $listing = $listings[(Get-Key -Dictionary $listings -Name $locale)]
     if ($listing -isnot [System.Collections.IDictionary]) { throw "Store listing '$locale' is not an object." }
@@ -58,6 +78,8 @@ foreach ($locale in @('zh-CN','ja-JP','en-US')) {
 $requestBytes = [Text.Encoding]::UTF8.GetBytes(($submission | ConvertTo-Json -Depth 100 -Compress))
 $null = Invoke-WebRequest -Method Put -Uri $submissionUri -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $requestBytes
 $verified = (Invoke-WebRequest -Method Get -Uri $submissionUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+$verifiedStatus = Get-Text (Get-Value -Dictionary $verified -Name 'Status')
+if ($verifiedStatus -cne 'PendingCommit') { throw "Store draft left PendingCommit while release notes were being updated; actual '$verifiedStatus'." }
 $verifiedListings = Get-Value -Dictionary $verified -Name 'Listings'
 foreach ($locale in @('zh-CN','ja-JP','en-US')) {
     $listing = $verifiedListings[(Get-Key -Dictionary $verifiedListings -Name $locale)]

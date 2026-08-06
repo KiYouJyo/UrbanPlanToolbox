@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       source_ref:
-        description: Branch, tag, or commit already contained in main
+        description: Exact main HEAD, or a tag resolving to the exact main HEAD
         required: true
         default: main
         type: string
@@ -23,13 +23,12 @@ concurrency:
 
 env:
   STORE_PRODUCT_ID: 9MWDPJG1BHKW
-  EXPECTED_LAST_PUBLISHED_SUBMISSION_ID: '1152921505701574155'
-  PROTECTED_PUBLISHED_SUBMISSION_ID: '1152921505701574155'
 
 jobs:
   build-and-publish:
     if: github.ref == 'refs/heads/main'
     runs-on: windows-2025-vs2026
+    timeout-minutes: 75
     steps:
       - name: Checkout selected source
         uses: actions/checkout@v7
@@ -59,8 +58,8 @@ jobs:
           $sha = (git rev-parse HEAD).Trim()
           git fetch origin main --no-tags
           if ($LASTEXITCODE -ne 0) { throw 'Unable to fetch origin/main.' }
-          git merge-base --is-ancestor $sha origin/main
-          if ($LASTEXITCODE -ne 0) { throw "Source is not contained in origin/main: $sha" }
+          $mainSha = (git rev-parse origin/main).Trim()
+          if ($sha -cne $mainSha) { throw "Store publication source must be the exact origin/main HEAD. Source=$sha Main=$mainSha" }
           $notesPath = "packaging/store-release-notes/$projectVersion.json"
           if (-not (Test-Path -LiteralPath $notesPath -PathType Leaf)) { throw "Missing $notesPath" }
           "source_sha=$sha" >> $env:GITHUB_OUTPUT
@@ -70,9 +69,11 @@ jobs:
 
       - name: Validate publication confirmation
         shell: pwsh
+        env:
+          PUBLICATION_CONFIRMATION: ${{ inputs.publication_confirmation }}
         run: |
           $expectedConfirmation = "PUBLISH ${{ steps.version.outputs.product_version }}"
-          if ('${{ inputs.publication_confirmation }}' -cne $expectedConfirmation) { throw "Publication confirmation is invalid. Type exactly: $expectedConfirmation" }
+          if ($env:PUBLICATION_CONFIRMATION -cne $expectedConfirmation) { throw "Publication confirmation is invalid. Type exactly: $expectedConfirmation" }
 
       - name: Validate and normalize Store release notes
         id: release_notes
@@ -83,51 +84,6 @@ jobs:
           if (-not (Test-Path -LiteralPath $output -PathType Leaf)) { throw 'Release-notes validation completed without producing the normalized output file.' }
           $null = Get-Content -LiteralPath $output -Raw | ConvertFrom-Json -ErrorAction Stop
           "normalized_path=$output" >> $env:GITHUB_OUTPUT
-
-      - name: Restore Release dependencies
-        run: dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Release -p:Platform=x64
-
-      - name: Run unit tests
-        run: dotnet test UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore --verbosity normal
-
-      - name: Build validated Store upload package
-        id: package
-        shell: pwsh
-        run: |
-          $output = Join-Path $env:RUNNER_TEMP "UrbanPlanToolbox-store-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
-          & ./packaging/Build-StorePackage.ps1 -SourceCommit '${{ steps.version.outputs.source_sha }}' -PackageVersion '${{ steps.version.outputs.package_version }}' -Configuration Release -Platform x64 -OutputDirectory $output
-          $metadataPath = Join-Path $output 'store-package-build.json'
-          if (-not (Test-Path -LiteralPath $metadataPath -PathType Leaf)) { throw "Store package build did not produce metadata: $metadataPath" }
-          $metadata = Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json -ErrorAction Stop
-          if ([string]::IsNullOrWhiteSpace([string]$metadata.package) -or -not (Test-Path -LiteralPath $metadata.package -PathType Leaf)) { throw 'Store package build metadata does not reference an existing package.' }
-          if ([string]::IsNullOrWhiteSpace([string]$metadata.sha256)) { throw 'Store package build metadata does not contain SHA-256.' }
-          "package_path=$($metadata.package)" >> $env:GITHUB_OUTPUT
-          "package_file=$([IO.Path]::GetFileName([string]$metadata.package))" >> $env:GITHUB_OUTPUT
-          "sha256=$($metadata.sha256)" >> $env:GITHUB_OUTPUT
-          "metadata_path=$metadataPath" >> $env:GITHUB_OUTPUT
-
-      - name: Preserve Store deployment artifact
-        id: artifact
-        shell: pwsh
-        env:
-          PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
-          METADATA_PATH: ${{ steps.package.outputs.metadata_path }}
-          RELEASE_NOTES_PATH: ${{ steps.release_notes.outputs.normalized_path }}
-        run: |
-          $directory = Join-Path $env:RUNNER_TEMP 'store-deployment-artifact'
-          New-Item -ItemType Directory -Path $directory -Force | Out-Null
-          Copy-Item -LiteralPath $env:PACKAGE_PATH -Destination $directory
-          Copy-Item -LiteralPath $env:METADATA_PATH -Destination $directory
-          Copy-Item -LiteralPath $env:RELEASE_NOTES_PATH -Destination $directory
-          "directory=$directory" >> $env:GITHUB_OUTPUT
-
-      - name: Upload Store deployment artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: UrbanPlanToolbox-Store-${{ steps.version.outputs.package_version }}
-          path: ${{ steps.artifact.outputs.directory }}
-          if-no-files-found: error
-          retention-days: 30
 
       - name: Validate Microsoft Store credentials
         shell: pwsh
@@ -147,6 +103,8 @@ jobs:
       - name: Setup Microsoft Store Developer CLI
         id: setup_store_cli
         uses: microsoft/microsoft-store-apppublisher@v1.1
+        with:
+          version: v0.3.9
 
       - name: Configure Microsoft Store Developer CLI
         id: configure_store_cli
@@ -181,11 +139,60 @@ jobs:
           CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $output = & ./packaging/Assert-StoreReadyForNewSubmission.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedLastPublishedSubmissionId $env:EXPECTED_LAST_PUBLISHED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
+          $output = & ./packaging/Assert-StoreReadyForNewSubmission.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
           $output | ForEach-Object { Write-Output $_ }
-          $lastPublished = $output | Where-Object { $_ -like 'last_published_submission_id=*' } | Select-Object -First 1
-          if ([string]::IsNullOrWhiteSpace($lastPublished)) { throw 'Store pre-publication assertion did not return last published submission ID.' }
-          "last_published_submission_id=$($lastPublished -replace '^last_published_submission_id=','')" >> $env:GITHUB_OUTPUT
+          foreach ($name in @('last_published_submission_id','last_published_package_version')) {
+            $line = $output | Where-Object { $_ -like "$name=*" } | Select-Object -First 1
+            if ([string]::IsNullOrWhiteSpace($line)) { throw "Store pre-publication assertion did not return $name." }
+            "$name=$($line -replace "^$name=",'')" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Restore Release dependencies
+        run: dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Release -p:Platform=x64
+
+      - name: Run unit tests
+        run: dotnet test UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore --verbosity normal
+
+      - name: Build validated Store upload package
+        id: package
+        shell: pwsh
+        run: |
+          $output = Join-Path $env:RUNNER_TEMP "UrbanPlanToolbox-store-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
+          & ./packaging/Build-StorePackage.ps1 -SourceCommit '${{ steps.version.outputs.source_sha }}' -PackageVersion '${{ steps.version.outputs.package_version }}' -Configuration Release -Platform x64 -OutputDirectory $output
+          $metadataPath = Join-Path $output 'store-package-build.json'
+          if (-not (Test-Path -LiteralPath $metadataPath -PathType Leaf)) { throw "Store package build did not produce metadata: $metadataPath" }
+          $metadata = Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json -ErrorAction Stop
+          if ([string]::IsNullOrWhiteSpace([string]$metadata.package) -or -not (Test-Path -LiteralPath $metadata.package -PathType Leaf)) { throw 'Store package build metadata does not reference an existing package.' }
+          if ([string]::IsNullOrWhiteSpace([string]$metadata.sha256)) { throw 'Store package build metadata does not contain SHA-256.' }
+          "package_path=$($metadata.package)" >> $env:GITHUB_OUTPUT
+          "package_file=$([IO.Path]::GetFileName([string]$metadata.package))" >> $env:GITHUB_OUTPUT
+          "sha256=$($metadata.sha256)" >> $env:GITHUB_OUTPUT
+          "metadata_path=$metadataPath" >> $env:GITHUB_OUTPUT
+          "wack_executed=$($metadata.wackExecuted.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "wack_result=$($metadata.wackResult)" >> $env:GITHUB_OUTPUT
+
+      - name: Preserve Store deployment artifact
+        id: artifact
+        shell: pwsh
+        env:
+          PACKAGE_PATH: ${{ steps.package.outputs.package_path }}
+          METADATA_PATH: ${{ steps.package.outputs.metadata_path }}
+          RELEASE_NOTES_PATH: ${{ steps.release_notes.outputs.normalized_path }}
+        run: |
+          $directory = Join-Path $env:RUNNER_TEMP 'store-deployment-artifact'
+          New-Item -ItemType Directory -Path $directory -Force | Out-Null
+          Copy-Item -LiteralPath $env:PACKAGE_PATH -Destination $directory
+          Copy-Item -LiteralPath $env:METADATA_PATH -Destination $directory
+          Copy-Item -LiteralPath $env:RELEASE_NOTES_PATH -Destination $directory
+          "directory=$directory" >> $env:GITHUB_OUTPUT
+
+      - name: Upload Store deployment artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: UrbanPlanToolbox-Store-${{ steps.version.outputs.package_version }}
+          path: ${{ steps.artifact.outputs.directory }}
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Upload Store package without committing
         id: upload_store_draft
@@ -234,22 +241,12 @@ jobs:
           EXPECTED_SUBMISSION_ID: ${{ steps.update_store_release_notes.outputs.submission_id }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $packageFileName = '${{ steps.package.outputs.package_file }}'
-          & ./packaging/Verify-StoreDraftSubmission.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' -ExpectedPackageFileName $packageFileName -ExpectedReleaseNotesPath '${{ steps.release_notes.outputs.normalized_path }}' -ExpectedSubmissionId $env:EXPECTED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
+          & ./packaging/Verify-StoreDraftSubmission.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' -ExpectedPackageFileName '${{ steps.package.outputs.package_file }}' -ExpectedReleaseNotesPath '${{ steps.release_notes.outputs.normalized_path }}' -ExpectedSubmissionId $env:EXPECTED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
           "verified=true" >> $env:GITHUB_OUTPUT
 
-      - name: Commit verified Store submission for certification
+      - name: Reverify and commit Store submission for certification
         id: commit_store_submission
         if: steps.verify_store_draft.outcome == 'success'
-        shell: pwsh
-        run: |
-          $arguments = @('submission', 'publish', $env:STORE_PRODUCT_ID)
-          & msstore @arguments
-          if ($LASTEXITCODE -ne 0) { throw "Microsoft Store submission commit failed with exit code $LASTEXITCODE." }
-
-      - name: Verify committed Store submission status
-        id: verify_store_submission_committed
-        if: always() && steps.commit_store_submission.outcome != 'skipped'
         shell: pwsh
         env:
           TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
@@ -258,10 +255,34 @@ jobs:
           EXPECTED_SUBMISSION_ID: ${{ steps.update_store_release_notes.outputs.submission_id }}
         run: |
           $ErrorActionPreference = 'Stop'
-          & ./packaging/Verify-StoreSubmissionCommitted.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedSubmissionId $env:EXPECTED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
+          & ./packaging/Verify-StoreDraftSubmission.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' -ExpectedPackageFileName '${{ steps.package.outputs.package_file }}' -ExpectedReleaseNotesPath '${{ steps.release_notes.outputs.normalized_path }}' -ExpectedSubmissionId $env:EXPECTED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET -TimeoutSeconds 60
+          "commit_attempted=true" >> $env:GITHUB_OUTPUT
+          $arguments = @('submission', 'publish', $env:STORE_PRODUCT_ID)
+          & msstore @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Microsoft Store submission commit failed with exit code $LASTEXITCODE." }
+          "committed_submission_id=$env:EXPECTED_SUBMISSION_ID" >> $env:GITHUB_OUTPUT
 
-      - name: Remove transient Store draft after pre-commit failure
-        if: failure() && steps.commit_store_submission.outcome == 'skipped' && steps.update_store_release_notes.outputs.submission_id != ''
+      - name: Verify committed Store submission status
+        id: verify_store_submission_committed
+        if: steps.commit_store_submission.outcome == 'success'
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+          EXPECTED_SUBMISSION_ID: ${{ steps.update_store_release_notes.outputs.submission_id }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $output = & ./packaging/Verify-StoreSubmissionCommitted.ps1 -ProductId $env:STORE_PRODUCT_ID -ExpectedSubmissionId $env:EXPECTED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
+          $output | ForEach-Object { Write-Output $_ }
+          $statusLine = $output | Where-Object { $_ -like 'post_commit_status=*' } | Select-Object -First 1
+          if ([string]::IsNullOrWhiteSpace($statusLine)) { throw 'Post-commit verification did not return a Store submission status.' }
+          "post_commit_status=$($statusLine -replace '^post_commit_status=','')" >> $env:GITHUB_OUTPUT
+
+      - name: Remove matching transient Store draft after pre-commit failure
+        if: failure() && steps.commit_store_submission.outputs.commit_attempted != 'true' && steps.update_store_release_notes.outputs.submission_id != ''
+        continue-on-error: true
+        id: cleanup_transient_draft
         shell: pwsh
         env:
           TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
@@ -270,13 +291,15 @@ jobs:
           TRANSIENT_SUBMISSION_ID: ${{ steps.update_store_release_notes.outputs.submission_id }}
         run: |
           $ErrorActionPreference = 'Stop'
-          & ./packaging/Remove-TransientStoreDraft.ps1 -ProductId $env:STORE_PRODUCT_ID -SubmissionId $env:TRANSIENT_SUBMISSION_ID -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' -ExpectedPackageFileName '${{ steps.package.outputs.package_file }}' -ProtectedPublishedSubmissionId $env:PROTECTED_PUBLISHED_SUBMISSION_ID -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
+          & ./packaging/Remove-TransientStoreDraft.ps1 -ProductId $env:STORE_PRODUCT_ID -SubmissionId $env:TRANSIENT_SUBMISSION_ID -ExpectedPackageVersion '${{ steps.version.outputs.package_version }}' -ExpectedPackageFileName '${{ steps.package.outputs.package_file }}' -TenantId $env:TENANT_ID.Trim() -ClientId $env:CLIENT_ID.Trim() -ClientSecret $env:CLIENT_SECRET
 
       - name: Write workflow summary
         if: always()
         shell: pwsh
         run: |
-          "## Microsoft Store v1.3.1 publication" >> $env:GITHUB_STEP_SUMMARY
+          $productVersion = '${{ steps.version.outputs.product_version }}'
+          if ([string]::IsNullOrWhiteSpace($productVersion)) { $productVersion = 'unknown' }
+          "## Microsoft Store v$productVersion publication" >> $env:GITHUB_STEP_SUMMARY
           "- Source commit: ${{ steps.version.outputs.source_sha }}" >> $env:GITHUB_STEP_SUMMARY
           "- Product version: ${{ steps.version.outputs.product_version }}" >> $env:GITHUB_STEP_SUMMARY
           "- Package version: ${{ steps.version.outputs.package_version }}" >> $env:GITHUB_STEP_SUMMARY
@@ -284,11 +307,19 @@ jobs:
           "- Package SHA-256: ${{ steps.package.outputs.sha256 }}" >> $env:GITHUB_STEP_SUMMARY
           "- Store Product ID: $env:STORE_PRODUCT_ID" >> $env:GITHUB_STEP_SUMMARY
           "- Last published submission before upload: ${{ steps.store_ready.outputs.last_published_submission_id }}" >> $env:GITHUB_STEP_SUMMARY
+          "- Last published package version: ${{ steps.store_ready.outputs.last_published_package_version }}" >> $env:GITHUB_STEP_SUMMARY
           "- New submission ID: ${{ steps.update_store_release_notes.outputs.submission_id }}" >> $env:GITHUB_STEP_SUMMARY
-          "- Package verification result: ${{ steps.verify_store_draft.outputs.verified }}" >> $env:GITHUB_STEP_SUMMARY
-          "- zh-CN Release Notes verification: verified by API" >> $env:GITHUB_STEP_SUMMARY
-          "- ja-JP Release Notes verification: verified by API" >> $env:GITHUB_STEP_SUMMARY
-          "- en-US Release Notes verification: verified by API" >> $env:GITHUB_STEP_SUMMARY
-          "- Commit command result: ${{ steps.commit_store_submission.outcome }}" >> $env:GITHUB_STEP_SUMMARY
-          "- Post-commit submission status: ${{ steps.verify_store_submission_committed.outcome }}" >> $env:GITHUB_STEP_SUMMARY
-          "- Certification submission requested: true" >> $env:GITHUB_STEP_SUMMARY
+          "- Draft verification step: ${{ steps.verify_store_draft.outcome }}" >> $env:GITHUB_STEP_SUMMARY
+          "- Certification commit step: ${{ steps.commit_store_submission.outcome }}" >> $env:GITHUB_STEP_SUMMARY
+          "- Post-commit verification step: ${{ steps.verify_store_submission_committed.outcome }}" >> $env:GITHUB_STEP_SUMMARY
+          "- Post-commit Store status: ${{ steps.verify_store_submission_committed.outputs.post_commit_status }}" >> $env:GITHUB_STEP_SUMMARY
+          "- Transient draft cleanup step: ${{ steps.cleanup_transient_draft.outcome }}" >> $env:GITHUB_STEP_SUMMARY
+          "- WACK executed in GitHub Actions: ${{ steps.package.outputs.wack_executed }}" >> $env:GITHUB_STEP_SUMMARY
+          "- WACK precheck result: ${{ steps.package.outputs.wack_result }}" >> $env:GITHUB_STEP_SUMMARY
+          if ('${{ steps.verify_store_draft.outcome }}' -eq 'success') {
+            '- Release Notes verification: zh-CN, ja-JP and en-US verified by Partner Center API' >> $env:GITHUB_STEP_SUMMARY
+          } else {
+            '- Release Notes verification: not verified' >> $env:GITHUB_STEP_SUMMARY
+          }
+          $certificationRequested = '${{ steps.commit_store_submission.outcome }}' -eq 'success'
+          "- Certification submission requested: $($certificationRequested.ToString().ToLowerInvariant())" >> $env:GITHUB_STEP_SUMMARY

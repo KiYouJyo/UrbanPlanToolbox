@@ -4,10 +4,11 @@ param(
     [Parameter(Mandatory)][string]$SubmissionId,
     [Parameter(Mandatory)][string]$ExpectedPackageVersion,
     [Parameter(Mandatory)][string]$ExpectedPackageFileName,
-    [Parameter(Mandatory)][string]$ProtectedPublishedSubmissionId,
     [Parameter(Mandatory)][string]$TenantId,
     [Parameter(Mandatory)][string]$ClientId,
-    [Parameter(Mandatory)][string]$ClientSecret
+    [Parameter(Mandatory)][string]$ClientSecret,
+    [int]$PollIntervalSeconds = 5,
+    [int]$TimeoutSeconds = 60
 )
 
 $ErrorActionPreference = 'Stop'
@@ -45,12 +46,6 @@ function Get-PackageVersion {
     return ''
 }
 
-if ($SubmissionId -cne $ProtectedPublishedSubmissionId) {
-    # The comparison is intentionally explicit: this script can never target the published submission.
-} else {
-    throw "Refusing to delete protected published submission $ProtectedPublishedSubmissionId."
-}
-
 $token = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token" -ContentType 'application/x-www-form-urlencoded' -Body @{
     client_id = $ClientId
     client_secret = $ClientSecret
@@ -62,6 +57,12 @@ if ([string]::IsNullOrWhiteSpace([string]$token.access_token)) { throw 'Microsof
 $headers = @{ Authorization = "Bearer $($token.access_token)"; TenantId = $TenantId; Accept = 'application/json' }
 $applicationUri = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$ProductId"
 $application = (Invoke-WebRequest -Method Get -Uri $applicationUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+$lastPublished = Get-OptionalValue -Dictionary $application -Name 'LastPublishedApplicationSubmission'
+if ($lastPublished -isnot [System.Collections.IDictionary]) { throw 'Transient draft cleanup could not identify the current published submission.' }
+$lastPublishedId = Get-Text (Get-OptionalValue -Dictionary $lastPublished -Name 'Id')
+if ([string]::IsNullOrWhiteSpace($lastPublishedId)) { throw 'The current published submission does not contain an ID.' }
+if ($SubmissionId -ceq $lastPublishedId) { throw "Refusing to delete current published submission $lastPublishedId." }
+
 $pending = Get-OptionalValue -Dictionary $application -Name 'PendingApplicationSubmission'
 if ($pending -isnot [System.Collections.IDictionary]) { throw 'Transient Store draft cleanup requires an existing pending submission.' }
 $pendingId = Get-Text (Get-OptionalValue -Dictionary $pending -Name 'Id')
@@ -76,8 +77,27 @@ if ($packages.Count -eq 0) { throw 'Transient draft cleanup requires a non-empty
 $versionMatch = @($packages | Where-Object { $_ -is [System.Collections.IDictionary] -and (Get-PackageVersion -Package $_) -eq $ExpectedPackageVersion })
 if ($versionMatch.Count -eq 0) { throw "Transient draft package version does not match $ExpectedPackageVersion." }
 $expectedName = $ExpectedPackageFileName.ToLowerInvariant()
-$nameMatch = @($versionMatch | Where-Object { (Get-Text (Get-OptionalValue -Dictionary $_ -Name 'FileName')).ToLowerInvariant() -eq $expectedName })
-if ($nameMatch.Count -eq 0) { throw "Transient draft package does not match $ExpectedPackageFileName." }
+$nameMatch = @($versionMatch | Where-Object {
+    $actualName = (Get-Text (Get-OptionalValue -Dictionary $_ -Name 'FileName')).ToLowerInvariant()
+    $actualStem = [IO.Path]::GetFileNameWithoutExtension($actualName).Replace('_bundle', '')
+    $expectedStem = [IO.Path]::GetFileNameWithoutExtension($expectedName).Replace('_bundle', '')
+    $actualName -eq $expectedName -or $actualStem -eq $expectedStem
+})
+if ($nameMatch.Count -ne 1) { throw "Transient draft package does not uniquely match $ExpectedPackageFileName." }
 
 $null = Invoke-WebRequest -Method Delete -Uri $submissionUri -Headers $headers
+$deadline = [DateTimeOffset]::UtcNow.AddSeconds($TimeoutSeconds)
+do {
+    $after = (Invoke-WebRequest -Method Get -Uri $applicationUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+    $remaining = Get-OptionalValue -Dictionary $after -Name 'PendingApplicationSubmission'
+    if ($null -eq $remaining) { break }
+    if ($remaining -is [System.Collections.IDictionary]) {
+        $remainingId = Get-Text (Get-OptionalValue -Dictionary $remaining -Name 'Id')
+        if ($remainingId -cne $SubmissionId) { throw "A different pending submission appeared during cleanup: $remainingId" }
+    }
+    if ([DateTimeOffset]::UtcNow -ge $deadline) { throw "Transient Store draft $SubmissionId was not removed within $TimeoutSeconds seconds." }
+    Start-Sleep -Seconds $PollIntervalSeconds
+} while ($true)
+
 Write-Output "deleted_submission_id=$SubmissionId"
+Write-Output "protected_published_submission_id=$lastPublishedId"
