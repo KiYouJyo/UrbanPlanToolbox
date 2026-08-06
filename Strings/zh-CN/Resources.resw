@@ -1651,8 +1651,15 @@ dwyblchhq</value>
   <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>选择界面语言。更改会立即生效，无需重启应用。</value></data>
   <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>语言切换失败，已继续使用原语言。</value></data>
   <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>项目时间节点提醒</value></data>
-  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>启用后，应用将根据项目中的时间节点发送本机通知。未指定具体时间的时间节点将在当天 09:00 提醒。关闭后将停止项目时间节点提醒，但不会删除时间节点数据。</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>启用后，应用将根据项目中的时间节点发送本机通知。未指定具体时间的时间节点将在当天 09:00 提醒。选择重复间隔后，首次提醒后最多再提醒 3 次。关闭后将停止项目时间节点提醒，但不会删除时间节点数据。</value></data>
   <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>启用项目时间节点提醒</value></data>
   <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>开启</value></data>
   <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>关闭</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatLabel" xml:space="preserve"><value>默认重复提醒间隔</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatNone.Content" xml:space="preserve"><value>不重复</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours6.Content" xml:space="preserve"><value>6 小时</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours12.Content" xml:space="preserve"><value>12 小时</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24 小时</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3 天</value></data>
+  <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>重复提醒（第 {0} 次）</value></data>
 </root>

@@ -37,11 +37,16 @@ public sealed class SettingsPageContractTests
     {
         var root = FindRepositoryRoot();
         var code = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.xaml.cs"));
+        var xaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
         var settings = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml.cs"));
         Assert.DoesNotContain("Milestone_Field_Reminder", code);
         Assert.DoesNotContain("ReminderEnabled", code);
         Assert.Contains("SetEnabledAsync", settings);
-        Assert.Contains("GetEnabledAsync", settings);
+        Assert.Contains("GetSettingsAsync", settings);
+        Assert.Contains("UpdateRepeatIntervalAsync", settings);
+        Assert.Contains("MilestoneNotificationsRepeatBox", xaml);
+        Assert.Contains("Settings_MilestoneNotificationsRepeatHours6", xaml);
+        Assert.Contains("Settings_MilestoneNotificationsRepeatDays3", xaml);
     }
 
     [Fact]

@@ -7,7 +7,7 @@ using Windows.UI.Notifications;
 
 namespace UrbanPlanToolbox.Services;
 
-/// <summary>Schedules one local Windows notification for each future, active project milestone.</summary>
+/// <summary>Owns the complete project milestone notification series and its application-level settings.</summary>
 public sealed class MilestoneReminderService
 {
     private readonly ProjectStorageService _projects;
@@ -47,15 +47,21 @@ public sealed class MilestoneReminderService
         {
             var settings = await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false);
             if (settings.IsProjectMilestoneNotificationsEnabled == enabled) return MilestoneReminderRefreshResult.Success(0);
+            var previousEnabled = settings.IsProjectMilestoneNotificationsEnabled;
             _settings.Update(current => current.ProjectMilestoneNotificationsEnabled = enabled);
             if (!enabled)
             {
-                return ClearOwnedSchedulesCore()
-                    ? MilestoneReminderRefreshResult.Success(0)
-                    : MilestoneReminderRefreshResult.Failure(new InvalidOperationException("Project milestone schedules could not be cleared."));
+                if (ClearOwnedSchedulesCore()) return MilestoneReminderRefreshResult.Success(0);
+                _settings.Update(current => current.ProjectMilestoneNotificationsEnabled = previousEnabled);
+                await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+                return MilestoneReminderRefreshResult.Failure(new InvalidOperationException("Project milestone schedules could not be cleared."));
             }
 
-            return await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+            var result = await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+            if (result.Succeeded) return result;
+            _settings.Update(current => current.ProjectMilestoneNotificationsEnabled = previousEnabled);
+            ClearOwnedSchedulesCore();
+            return result;
         }
         finally
         {
@@ -67,6 +73,36 @@ public sealed class MilestoneReminderService
     {
         await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try { return (await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false)).IsProjectMilestoneNotificationsEnabled; }
+        finally { _operationLock.Release(); }
+    }
+
+    public async Task<AppSettings> GetSettingsAsync(CancellationToken cancellationToken = default)
+    {
+        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try { return await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false); }
+        finally { _operationLock.Release(); }
+    }
+
+    public async Task<MilestoneReminderRefreshResult> UpdateRepeatIntervalAsync(MilestoneReminderRepeatInterval interval, CancellationToken cancellationToken = default)
+    {
+        await _operationLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var current = await EnsureGlobalSettingAsync(cancellationToken).ConfigureAwait(false);
+            var normalized = Enum.IsDefined(interval) ? interval : MilestoneReminderRepeatInterval.None;
+            if (current.NormalizedProjectMilestoneReminderRepeatInterval == normalized) return MilestoneReminderRefreshResult.Success(0);
+
+            var previous = current.NormalizedProjectMilestoneReminderRepeatInterval;
+            _settings.Update(settings => settings.ProjectMilestoneReminderRepeatInterval = normalized);
+            if (!current.IsProjectMilestoneNotificationsEnabled) return MilestoneReminderRefreshResult.Success(0);
+
+            var result = await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+            if (result.Succeeded) return result;
+
+            _settings.Update(settings => settings.ProjectMilestoneReminderRepeatInterval = previous);
+            await RefreshCoreAsync(cancellationToken).ConfigureAwait(false);
+            return result;
+        }
         finally { _operationLock.Release(); }
     }
 
@@ -85,7 +121,7 @@ public sealed class MilestoneReminderService
         }
 
         var list = await _projects.ListAsync(false, cancellationToken).ConfigureAwait(false);
-        var reminders = MilestoneReminderPlanner.Create(list.Projects, _now(), enabled: true);
+        var reminders = MilestoneReminderPlanner.Create(list.Projects, _now(), settings.NormalizedProjectMilestoneReminderRepeatInterval, enabled: true);
         try
         {
             EnsureRegistered();
@@ -99,7 +135,7 @@ public sealed class MilestoneReminderService
                 document.LoadXml(BuildNotification(reminder).Payload);
                 var scheduled = new ScheduledToastNotification(document, reminder.DueAtLocal)
                 {
-                    Tag = MilestoneReminderIdentity.Tag(reminder.MilestoneId),
+                    Tag = MilestoneReminderIdentity.Tag(reminder.MilestoneId, reminder.RepeatIndex),
                     Group = MilestoneReminderIdentity.Group(reminder.ProjectId)
                 };
                 notifier.AddToSchedule(scheduled);
@@ -170,13 +206,15 @@ public sealed class MilestoneReminderService
         var due = reminder.HasExplicitTime
             ? reminder.DueAtLocal.ToString("g")
             : reminder.DueAtLocal.ToString("d");
-        return new AppNotificationBuilder()
+        var builder = new AppNotificationBuilder()
             .AddArgument("action", "openMilestone")
             .AddArgument("projectId", reminder.ProjectId.ToString("D"))
             .AddArgument("milestoneId", reminder.MilestoneId.ToString("D"))
             .AddText(_localization.GetString("Reminder_NotificationTitle"))
-            .AddText(_localization.GetFormattedString("Reminder_NotificationBody", reminder.ProjectName, reminder.MilestoneTitle, due))
-            .BuildNotification();
+            .AddText(_localization.GetFormattedString("Reminder_NotificationBody", reminder.ProjectName, reminder.MilestoneTitle, due));
+        if (reminder.RepeatIndex > 0)
+            builder.AddText(_localization.GetFormattedString("Reminder_NotificationRepeat", reminder.RepeatIndex));
+        return builder.BuildNotification();
     }
 
     private void EnsureRegistered()

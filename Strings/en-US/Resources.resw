@@ -1679,8 +1679,15 @@ Latest version: {1}</value>
   <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>Choose the display language. Changes apply immediately without restarting the app.</value></data>
   <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>The language could not be changed. Your previous language remains active.</value></data>
   <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>Project milestone reminders</value></data>
-  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>When enabled, the app sends local notifications for project milestones. Milestones without a specific time are scheduled for 9:00 AM on their date. Turning this off cancels project milestone reminders without deleting milestone data.</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>When enabled, the app sends local notifications for project milestones. Milestones without a specific time are scheduled for 9:00 AM on their date. Choose a repeat interval to send up to 3 more reminders after the first one. Turning this off cancels project milestone reminders without deleting milestone data.</value></data>
   <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>Enable project milestone reminders</value></data>
   <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>On</value></data>
   <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>Off</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatLabel" xml:space="preserve"><value>Default repeat interval</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatNone.Content" xml:space="preserve"><value>Do not repeat</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours6.Content" xml:space="preserve"><value>6 hours</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours12.Content" xml:space="preserve"><value>12 hours</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24 hours</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3 days</value></data>
+  <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>Repeat reminder ({0} of 3)</value></data>
 </root>

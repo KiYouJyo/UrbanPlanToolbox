@@ -25,10 +25,12 @@ public sealed partial class SettingsPage : Page
         MilestoneNotificationsTitle.Text = _localization.GetString("Settings_MilestoneNotificationsTitle");
         MilestoneNotificationsDescription.Text = _localization.GetString("Settings_MilestoneNotificationsDescription");
         MilestoneNotificationsLabel.Text = _localization.GetString("Settings_MilestoneNotificationsLabel");
+        MilestoneNotificationsRepeatLabel.Text = _localization.GetString("Settings_MilestoneNotificationsRepeatLabel");
         MilestoneNotificationsToggle.OnContent = _localization.GetString("Settings_MilestoneNotificationsOn");
         MilestoneNotificationsToggle.OffContent = _localization.GetString("Settings_MilestoneNotificationsOff");
         ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text); ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
         ConfigureAccessibility(MilestoneNotificationsToggle, MilestoneNotificationsLabel.Text, MilestoneNotificationsDescription.Text);
+        ConfigureAccessibility(MilestoneNotificationsRepeatBox, MilestoneNotificationsRepeatLabel.Text, MilestoneNotificationsDescription.Text);
         Apply(_settingsService.Load());
         ClearDataButton.Content = _localization.GetString("DataManagement_Clear");
         Loaded += OnLoaded;
@@ -36,14 +38,14 @@ public sealed partial class SettingsPage : Page
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         Loaded -= OnLoaded;
-        var enabled = await MilestoneReminderService.Default.GetEnabledAsync();
+        var settings = await MilestoneReminderService.Default.GetSettingsAsync();
         _isApplying = true;
-        MilestoneNotificationsToggle.IsOn = enabled;
+        ApplyMilestoneReminderSettings(settings);
         _isApplying = false;
     }
     private async void OnRestore(object sender, RoutedEventArgs e)
     {
-        var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; current.ProjectMilestoneNotificationsEnabled = AppSettings.DefaultProjectMilestoneNotificationsEnabled; });
+        var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; current.ProjectMilestoneNotificationsEnabled = AppSettings.DefaultProjectMilestoneNotificationsEnabled; current.ProjectMilestoneReminderRepeatInterval = MilestoneReminderRepeatInterval.None; });
         Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults");
         await MilestoneReminderService.Default.RefreshAsync();
         if (!string.Equals(_localization.CurrentLanguage, LanguagePreference.ResolveEffectiveLanguage(settings.Language, Windows.System.UserProfile.GlobalizationPreferences.Languages), StringComparison.OrdinalIgnoreCase))
@@ -77,6 +79,7 @@ public sealed partial class SettingsPage : Page
         ThemeBox.SelectedIndex = settings.Theme switch { "Light" => 1, "Dark" => 2, _ => 0 };
         var language = LanguagePreference.Normalize(settings.Language); ApplyLanguageSelection(language);
         MilestoneNotificationsToggle.IsOn = settings.IsProjectMilestoneNotificationsEnabled;
+        ApplyMilestoneReminderSettings(settings);
         _isApplying = false;
         ApplyTheme(settings.Theme);
     }
@@ -90,6 +93,7 @@ public sealed partial class SettingsPage : Page
         MilestoneNotificationsToggle.IsEnabled = false;
         var result = await MilestoneReminderService.Default.SetEnabledAsync(enabled);
         MilestoneNotificationsToggle.IsEnabled = true;
+        MilestoneNotificationsRepeatBox.IsEnabled = enabled;
         if (result.Succeeded)
         {
             StatusText.Text = _localization.GetString("Status_SettingsSaved");
@@ -97,9 +101,39 @@ public sealed partial class SettingsPage : Page
         }
 
         _isApplying = true;
-        MilestoneNotificationsToggle.IsOn = !enabled;
+        ApplyMilestoneReminderSettings(_settingsService.Load());
         _isApplying = false;
         StatusText.Text = _localization.GetString("Milestone_Reminder_SchedulingFailed");
+    }
+    private async void OnMilestoneNotificationsRepeatChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isApplying || MilestoneNotificationsRepeatBox.SelectedItem is not ComboBoxItem item) return;
+        if (!Enum.TryParse<MilestoneReminderRepeatInterval>(item.Tag?.ToString(), out var interval)) interval = MilestoneReminderRepeatInterval.None;
+        MilestoneNotificationsRepeatBox.IsEnabled = false;
+        var result = await MilestoneReminderService.Default.UpdateRepeatIntervalAsync(interval);
+        MilestoneNotificationsRepeatBox.IsEnabled = MilestoneNotificationsToggle.IsOn;
+        if (result.Succeeded)
+        {
+            StatusText.Text = _localization.GetString("Status_SettingsSaved");
+            return;
+        }
+
+        _isApplying = true;
+        SelectRepeatInterval(_settingsService.Load().NormalizedProjectMilestoneReminderRepeatInterval);
+        _isApplying = false;
+        StatusText.Text = _localization.GetString("Milestone_Reminder_SchedulingFailed");
+    }
+    private void ApplyMilestoneReminderSettings(AppSettings settings)
+    {
+        MilestoneNotificationsToggle.IsOn = settings.IsProjectMilestoneNotificationsEnabled;
+        SelectRepeatInterval(settings.NormalizedProjectMilestoneReminderRepeatInterval);
+        MilestoneNotificationsRepeatBox.IsEnabled = settings.IsProjectMilestoneNotificationsEnabled;
+    }
+    private void SelectRepeatInterval(MilestoneReminderRepeatInterval interval)
+    {
+        var tag = interval.ToString();
+        MilestoneNotificationsRepeatBox.SelectedItem = MilestoneNotificationsRepeatBox.Items.OfType<ComboBoxItem>().FirstOrDefault(item => string.Equals(item.Tag?.ToString(), tag, StringComparison.Ordinal))
+            ?? MilestoneNotificationsRepeatBox.Items[0];
     }
     private async void OnExport(object sender, RoutedEventArgs e)
     {

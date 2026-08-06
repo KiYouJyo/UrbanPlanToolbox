@@ -1645,8 +1645,15 @@
   <data name="Settings_LanguageDescription_Runtime" xml:space="preserve"><value>表示言語を選択します。アプリを再起動せずに変更が反映されます。</value></data>
   <data name="Setting_Language_SwitchFailed" xml:space="preserve"><value>言語を変更できませんでした。以前の言語を引き続き使用します。</value></data>
   <data name="Settings_MilestoneNotificationsTitle" xml:space="preserve"><value>プロジェクトのマイルストーン通知</value></data>
-  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>有効にすると、プロジェクトのマイルストーンに基づいてローカル通知を送信します。時刻を指定していないマイルストーンは、その日の 09:00 に通知します。無効にしてもマイルストーンのデータは削除されません。</value></data>
+  <data name="Settings_MilestoneNotificationsDescription" xml:space="preserve"><value>有効にすると、プロジェクトのマイルストーンに基づいてローカル通知を送信します。時刻を指定していないマイルストーンは、その日の 09:00 に通知します。間隔を選ぶと、初回通知後に最大 3 回再通知します。無効にしてもマイルストーンのデータは削除されません。</value></data>
   <data name="Settings_MilestoneNotificationsLabel" xml:space="preserve"><value>プロジェクトのマイルストーン通知を有効にする</value></data>
   <data name="Settings_MilestoneNotificationsOn" xml:space="preserve"><value>オン</value></data>
   <data name="Settings_MilestoneNotificationsOff" xml:space="preserve"><value>オフ</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatLabel" xml:space="preserve"><value>既定の再通知間隔</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatNone.Content" xml:space="preserve"><value>繰り返さない</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours6.Content" xml:space="preserve"><value>6時間</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours12.Content" xml:space="preserve"><value>12時間</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatHours24.Content" xml:space="preserve"><value>24時間</value></data>
+  <data name="Settings_MilestoneNotificationsRepeatDays3.Content" xml:space="preserve"><value>3日</value></data>
+  <data name="Reminder_NotificationRepeat" xml:space="preserve"><value>再通知（{0}回目）</value></data>
 </root>
