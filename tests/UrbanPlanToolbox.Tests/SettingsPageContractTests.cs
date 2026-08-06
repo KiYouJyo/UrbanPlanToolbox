@@ -10,7 +10,7 @@ public sealed class SettingsPageContractTests
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
-        Assert.True(Regex.Matches(xaml, "SettingsSectionCardStyle").Count >= 3);
+        Assert.True(Regex.Matches(xaml, "SettingsSectionCardStyle").Count >= 4);
         Assert.Contains("AdaptiveTrigger MinWindowWidth=\"720\"", xaml);
         Assert.Contains("x:Name=\"SettingsLayoutRoot\"", xaml);
         Assert.Contains("x:Name=\"SettingsNarrow\"", xaml);
@@ -27,8 +27,21 @@ public sealed class SettingsPageContractTests
         Assert.DoesNotContain("AppearanceLanguageSummary", xaml);
         Assert.Contains("Action_RestoreDefaults", xaml);
         Assert.Contains("DataManagementTitle", xaml);
+        Assert.Contains("MilestoneNotificationsToggle", xaml);
         Assert.DoesNotContain("Canvas", xaml);
         Assert.DoesNotContain("Margin=\"-", xaml);
+    }
+
+    [Fact]
+    public void MilestoneReminderIsApplicationScopedAndEditorHasNoPerItemToggle()
+    {
+        var root = FindRepositoryRoot();
+        var code = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.xaml.cs"));
+        var settings = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml.cs"));
+        Assert.DoesNotContain("Milestone_Field_Reminder", code);
+        Assert.DoesNotContain("ReminderEnabled", code);
+        Assert.Contains("SetEnabledAsync", settings);
+        Assert.Contains("GetEnabledAsync", settings);
     }
 
     [Fact]

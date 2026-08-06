@@ -90,6 +90,7 @@
   <Compile Include="../../Services/UnsavedChangesGuard.cs" Link="Services/UnsavedChangesGuard.cs" />
   <Compile Include="../../Services/AppNotificationService.cs" Link="Services/AppNotificationService.cs" />
   <Compile Include="../../Services/MilestoneReminderPlanner.cs" Link="Services/MilestoneReminderPlanner.cs" />
+  <Compile Include="../../Services/MilestoneReminderMigration.cs" Link="Services/MilestoneReminderMigration.cs" />
   <Compile Include="../../Services/MilestoneReminderIdentity.cs" Link="Services/MilestoneReminderIdentity.cs" />
  </ItemGroup>
  <ItemGroup>
