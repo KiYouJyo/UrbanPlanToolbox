@@ -13,7 +13,7 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $output = [IO.Path]::GetFullPath($OutputDirectory)
 $repoPrefix = $repoRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 if ($output -eq $repoRoot -or $output.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Store package output must be outside the repository.' }
-if ($PackageVersion -ne '1.3.0.0') { throw 'This v1.3.0 workflow only accepts Store package version 1.3.0.0.' }
+if ($PackageVersion -ne '1.3.1.0') { throw 'This v1.3.1 workflow only accepts Store package version 1.3.1.0.' }
 if (Test-Path -LiteralPath $output) {
     if (@(Get-ChildItem -LiteralPath $output -Force).Count -gt 0) { throw "Store package output directory must be new or empty: $output" }
 }

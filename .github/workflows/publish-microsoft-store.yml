@@ -52,13 +52,25 @@ jobs:
           [xml]$manifest = Get-Content -Raw Package.Store.appxmanifest
           $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
           $packageVersion = [string]$manifest.Package.Identity.Version
-          if ($projectVersion -ne '1.2.1' -or $packageVersion -ne '1.2.1.0') { throw "Expected 1.2.1 / 1.2.1.0, got $projectVersion / $packageVersion" }
+          if ($packageVersion -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw "Invalid Store package version: $packageVersion" }
+          if ("$projectVersion.0" -ne $packageVersion) { throw "Project and Store manifest versions do not match: $projectVersion / $packageVersion" }
+          $notesName = "$projectVersion.json"
+          $notesPath = Join-Path $env:GITHUB_WORKSPACE "packaging/store-release-notes/$notesName"
+          if (-not (Test-Path -LiteralPath $notesPath -PathType Leaf)) { throw "Store Release Notes file is missing: $notesPath" }
+          $notes = Get-Content -LiteralPath $notesPath -Raw | ConvertFrom-Json
+          $languages = @($notes.PSObject.Properties.Name)
+          if (@($languages | Sort-Object) -join ',' -ne 'en-US,ja-JP,zh-CN') { throw "Store Release Notes must contain exactly en-US, ja-JP, and zh-CN." }
+          foreach ($language in 'zh-CN','ja-JP','en-US') {
+            $text = [string]$notes.$language
+            if ([string]::IsNullOrWhiteSpace($text) -or $text.Length -gt 1500) { throw "Store Release Notes for $language are empty or exceed 1500 characters." }
+          }
           $sha = (git rev-parse HEAD).Trim()
           git fetch origin main --no-tags
           git merge-base --is-ancestor $sha origin/main
           if ($LASTEXITCODE -ne 0) { throw "Source is not contained in origin/main: $sha" }
           "source_sha=$sha" >> $env:GITHUB_OUTPUT
           "package_version=$packageVersion" >> $env:GITHUB_OUTPUT
+          "release_notes_path=$notesPath" >> $env:GITHUB_OUTPUT
       - name: Restore Release dependencies
         if: inputs.submit_for_certification == false
         run: dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Release -p:Platform=x64
@@ -199,5 +211,6 @@ jobs:
           $mode = if ('${{ inputs.submit_for_certification }}' -eq 'true') { 'certification submission requested' } else { 'uploaded as draft with no certification submission' }
           "Source commit: ${{ steps.version.outputs.source_sha }}" >> $env:GITHUB_STEP_SUMMARY
           "Package version: ${{ steps.version.outputs.package_version }}" >> $env:GITHUB_STEP_SUMMARY
+          "Store Release Notes: ${{ steps.version.outputs.release_notes_path }}" >> $env:GITHUB_STEP_SUMMARY
           "Product ID: $env:STORE_PRODUCT_ID" >> $env:GITHUB_STEP_SUMMARY
           "Mode: $mode" >> $env:GITHUB_STEP_SUMMARY
