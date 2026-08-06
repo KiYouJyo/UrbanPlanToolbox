@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Xunit;
 
 namespace UrbanPlanToolbox.Tests;
@@ -90,21 +91,40 @@ public sealed class StorePackagingInfrastructureTests
     }
 
     [Fact]
-    public void StorePackageContractIsPinnedToTheCurrentVersionAndIdentity()
+    public void StorePackageContractUsesProjectVersionAsTheSingleVersionSource()
     {
         var root = FindRepositoryRoot();
         var project = File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj"));
         var githubManifest = File.ReadAllText(Path.Combine(root, "Package.appxmanifest"));
         var storeManifest = File.ReadAllText(Path.Combine(root, "Package.Store.appxmanifest"));
         var script = File.ReadAllText(Path.Combine(root, "packaging", "Build-StorePackage.ps1"));
-        Assert.Contains("<Version>1.3.1</Version>", project);
-        Assert.Contains("Version=\"1.3.1.0\"", githubManifest);
+        var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "publish-microsoft-store.yml"));
+
+        var versionMatch = Regex.Match(project, @"<Version>(\d+\.\d+\.\d+)</Version>");
+        Assert.True(versionMatch.Success, "UrbanPlanToolbox.csproj must contain a major.minor.patch Version.");
+        var productVersion = versionMatch.Groups[1].Value;
+        var expectedPackageVersion = $"{productVersion}.0";
+
+        Assert.Contains($"Version=\"{expectedPackageVersion}\"", githubManifest);
         Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", storeManifest);
         Assert.Contains("Publisher=\"CN=C4E4B33A-7B77-4121-897C-7D720A5471F8\"", storeManifest);
-        Assert.Contains("Version=\"1.3.1.0\"", storeManifest);
+        Assert.Contains($"Version=\"{expectedPackageVersion}\"", storeManifest);
+
+        Assert.Contains("$expectedPackageVersion = \"$projectVersion.0\"", workflow);
+        Assert.Contains("$notesPath = \"packaging/store-release-notes/$projectVersion.json\"", workflow);
+        Assert.DoesNotContain("EXPECTED_PRODUCT_VERSION", workflow);
+
+        Assert.Contains("$expectedPackageVersion = \"$projectVersion.0\"", script);
+        Assert.Contains("$PackageVersion -ne $expectedPackageVersion", script);
+        Assert.DoesNotContain("PackageVersion -ne '1.3.0.0'", script);
         Assert.Contains("PackageVersion -ne '1.3.1.0'", script);
         Assert.Contains("DistributionChannel=Store", script);
         Assert.Contains("URBANPLANTOOLBOX_STORE", project);
+
+        var releaseNotesPath = Path.Combine(root, "packaging", "store-release-notes", $"{productVersion}.json");
+        Assert.True(File.Exists(releaseNotesPath), $"Missing Store release notes for {productVersion}.");
+        var releaseNotes = File.ReadAllText(releaseNotesPath);
+        Assert.Contains($"\"version\": \"{productVersion}\"", releaseNotes);
     }
 
     private static string FindRepositoryRoot()

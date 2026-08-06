@@ -13,6 +13,12 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $output = [IO.Path]::GetFullPath($OutputDirectory)
 $repoPrefix = $repoRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 if ($output -eq $repoRoot -or $output.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Store package output must be outside the repository.' }
+$projectPath = Join-Path $repoRoot 'UrbanPlanToolbox.csproj'
+[xml]$project = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($projectPath))
+$projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
+if ($projectVersion -notmatch '^\d+\.\d+\.\d+$') { throw "UrbanPlanToolbox.csproj Version must use major.minor.patch format; got '$projectVersion'." }
+$expectedPackageVersion = "$projectVersion.0"
+if ($PackageVersion -ne $expectedPackageVersion) { throw "Store package version must match project version. Project=$projectVersion ExpectedPackage=$expectedPackageVersion ActualPackage=$PackageVersion" }
 if ($PackageVersion -ne '1.3.1.0') { throw 'This v1.3.1 workflow only accepts Store package version 1.3.1.0.' }
 if (Test-Path -LiteralPath $output) {
     if (@(Get-ChildItem -LiteralPath $output -Force).Count -gt 0) { throw "Store package output directory must be new or empty: $output" }
@@ -24,6 +30,10 @@ $headCommit = (& git -C $repoRoot rev-parse HEAD).Trim()
 if ($headCommit -ne $sourceCommitResolved) { throw "SourceCommit must be the current HEAD. HEAD=$headCommit SourceCommit=$sourceCommitResolved" }
 $workingTreeState = & git -C $repoRoot status --porcelain
 if ($LASTEXITCODE -ne 0 -or $workingTreeState) { throw 'The source working tree must be clean before a Store package build.' }
+
+$githubManifestPath = Join-Path $repoRoot 'Package.appxmanifest'
+[xml]$githubManifest = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($githubManifestPath))
+if ([string]$githubManifest.Package.Identity.Version -ne $PackageVersion) { throw 'GitHub manifest version does not match the dynamically derived Store package version.' }
 
 $manifestPath = Join-Path $repoRoot 'Package.Store.appxmanifest'
 [xml]$manifest = [Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($manifestPath))
@@ -64,11 +74,12 @@ try {
     if ($sensitive) { throw "Sensitive file found in Store output: $($sensitive.FullName -join ', ')" }
     $hash = (Get-FileHash -LiteralPath $upload[0].FullName -Algorithm SHA256).Hash.ToUpperInvariant()
     [pscustomobject]@{
-        sourceCommit = $sourceCommitResolved; packageVersion = $PackageVersion; package = $upload[0].FullName; sha256 = $hash
+        sourceCommit = $sourceCommitResolved; productVersion = $projectVersion; packageVersion = $PackageVersion; package = $upload[0].FullName; sha256 = $hash
         channel = 'Store'; signed = $false; manifestIdentity = $identity.Name; priResourceMapName = $identityValidation.PriResourceMapName
         languages = @($identityValidation.ManifestLanguages); validationResult = $identityValidation.ValidationResult
         wackReady = $true; buildUtc = [DateTime]::UtcNow.ToString('O')
     } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $output 'store-package-build.json') -Encoding UTF8
+    Write-Output "PRODUCT_VERSION=$projectVersion"
     Write-Output "MSIXUPLOAD=$($upload[0].FullName)"
     Write-Output 'STORE_UPLOAD_FORMAT=MSIXBUNDLE'
     Write-Output "STORE_BUNDLE_VERSION=$PackageVersion"

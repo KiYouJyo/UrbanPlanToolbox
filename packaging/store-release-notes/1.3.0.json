@@ -1,0 +1,20 @@
+{
+  "version": "1.3.0",
+  "locales": {
+    "zh-CN": [
+      "支持在简体中文、日语和英语之间即时切换界面语言，无需重新启动应用。",
+      "项目时间节点提醒统一移动到设置页，并新增不重复、6 小时、12 小时、24 小时和 3 天重复提醒间隔。",
+      "每个时间节点在首次提醒后最多重复提醒 3 次，并改进提醒去重、过期过滤、修改替换以及删除或归档后的取消处理。"
+    ],
+    "ja-JP": [
+      "アプリを再起動せずに、簡体字中国語、日本語、英語を即時に切り替えられるようになりました。",
+      "プロジェクトのマイルストーン通知設定を設定ページに統合し、繰り返しなし、6 時間、12 時間、24 時間、3 日の間隔を追加しました。",
+      "初回通知後の繰り返しを最大 3 回に制限し、重複排除、期限切れの除外、変更時の置換、削除・アーカイブ時の取消処理を改善しました。"
+    ],
+    "en-US": [
+      "Added instant switching between Simplified Chinese, Japanese, and English without restarting the app.",
+      "Moved project milestone reminder controls to Settings and added repeat intervals of none, 6 hours, 12 hours, 24 hours, and 3 days.",
+      "Milestones can repeat up to three times after the first reminder, with improved deduplication, expiry filtering, replacement, and cancellation."
+    ]
+  }
+}
