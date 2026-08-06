@@ -5,8 +5,8 @@ UrbanPlanToolbox 已在 Microsoft Store 发布。普通用户入口为：
 - 产品页：https://apps.microsoft.com/detail/9MWDPJG1BHKW
 - Store 协议：`ms-windows-store://pdp/?productid=9MWDPJG1BHKW`
 - Store ID：`9MWDPJG1BHKW`
-- 当前开发版本：`1.3.0`
-- 本次待人工提交技术包版本：`1.3.0.0`
+- 当前公开产品版本：`1.3.0`
+- GitHub 旁加载包版本：`1.3.0.0`
 
 ## Store 身份
 

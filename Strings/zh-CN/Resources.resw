@@ -61,7 +61,7 @@
     <comment>欢迎页副标题。</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v1.2.0。项目数据与工具数据均保留在本机。</value>
+    <value>v1.3.0。项目数据与工具数据均保留在本机。</value>
     <comment>欢迎页版本与隐私说明。</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">
@@ -323,7 +323,7 @@ dwyblchhq</value>
     <comment>语言选项：英语（使用母语名称）。</comment>
   </data>
   <data name="Setting_Language_RestartHint" xml:space="preserve">
-    <value>语言将在下次启动时生效。</value>
+    <value>语言更改立即生效，无需重启应用。</value>
     <comment>语言修改后的重启提示。</comment>
   </data>
   <data name="Page_PlanningCalculator_Description.Text" xml:space="preserve">

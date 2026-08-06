@@ -4,11 +4,11 @@
 
 面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。
 
-[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
 
 ## 获取应用
 
-推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前开发版本为 **1.3.0**，候选包版本为 `1.3.0.0`；两条渠道的身份和 Publisher 保持独立，正式发布仍需人工验收后单独授权。
+推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前公开版本为 **1.3.0**；GitHub Release 已提供 x64 framework-dependent 自签名旁加载包。两条渠道的身份、Publisher 和更新流程保持独立。
 
 ## 关于 UrbanPlanToolbox
 
@@ -26,7 +26,7 @@ UrbanPlanToolbox 是一个面向城乡规划、建筑设计和空间研究的 Wi
 
 ## 安装
 
-Microsoft Store 是普通用户的首选渠道。仓库同时提供 x64 framework-dependent 自签名旁加载包；请从 [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) 获取对应版本，并在安装前核对校验和。两条渠道身份独立，不能相互覆盖升级。
+Microsoft Store 是普通用户的首选渠道。仓库同时提供 x64 framework-dependent 自签名旁加载包；请从[最新 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) 获取当前包，并在安装前核对校验和。两条渠道身份独立，不能相互覆盖升级。
 
 ## 隐私与离线设计
 

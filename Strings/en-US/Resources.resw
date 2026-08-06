@@ -61,7 +61,7 @@
     <comment>Home page subtitle.</comment>
   </data>
   <data name="Home_Version.Text" xml:space="preserve">
-    <value>v1.2.0. Project data and tool data stay on this device.</value>
+    <value>v1.3.0. Project data and tool data stay on this device.</value>
     <comment>Home page version and privacy statement.</comment>
   </data>
   <data name="Home_OpenCalculator.Content" xml:space="preserve">

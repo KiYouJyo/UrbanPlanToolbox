@@ -4,11 +4,11 @@
 
 An offline-first Windows toolbox for urban planning, architectural design, and spatial research.
 
-[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
 
 ## Get the app
 
-The preview version is **v1.3.0** and both package channels use `1.3.0.0`, while their identities and publishers remain separate.
+The current public version is **v1.3.0**. The GitHub Release provides the x64 framework-dependent self-signed sideloading package; Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
 
 ## About UrbanPlanToolbox
 
@@ -23,10 +23,11 @@ UrbanPlanToolbox is a Windows desktop toolbox for urban planning, architectural 
 - Coordinate System Converter for local WGS 84, GCJ-02, and BD-09 point conversion. Shapefile files are processed locally; projected coordinate systems are not supported.
 - Local tool search and favorites, plus `.uptbackup` export, import, and restore.
 - Simplified Chinese, Japanese, and English; light, dark, and system themes.
+- v1.3.0 adds instant language switching without restarting, plus configurable project-milestone reminders: none, 6/12/24 hours, or 3 days, with up to three repeats and a 09:00 local-time default when no time is set.
 
 ## Installation
 
-The Microsoft Store is the primary channel for ordinary users. The repository also provides an x64 framework-dependent self-signed sideloading package; obtain the matching version from [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) and verify its checksums before installation. The two channel identities cannot update each other in place.
+The Microsoft Store is the primary channel for ordinary users. The repository also provides an x64 framework-dependent self-signed sideloading package; obtain the current package from [the latest GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) and verify its checksums before installation. The two channel identities cannot update each other in place.
 
 ## Privacy and offline design
 
