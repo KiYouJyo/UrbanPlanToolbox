@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$ProductId,
-    [Parameter(Mandatory)][string]$ExpectedLastPublishedSubmissionId,
+    [Parameter(Mandatory)][ValidatePattern('^\d+\.\d+\.\d+\.\d+$')][string]$ExpectedPackageVersion,
     [Parameter(Mandatory)][string]$TenantId,
     [Parameter(Mandatory)][string]$ClientId,
     [Parameter(Mandatory)][string]$ClientSecret
@@ -24,6 +24,17 @@ function Get-Text {
     return ([string]$Value).Trim()
 }
 
+function Get-PackageVersion {
+    param([System.Collections.IDictionary]$Package)
+    foreach ($name in @('Version','PackageVersion','PackageVersionString')) {
+        $value = Get-OptionalValue -Dictionary $Package -Name $name
+        if (-not [string]::IsNullOrWhiteSpace([string]$value)) { return (Get-Text $value) }
+    }
+    $fileName = Get-Text (Get-OptionalValue -Dictionary $Package -Name 'FileName')
+    if ($fileName -match '(?i)_(\d+\.\d+\.\d+\.\d+)(?:_|\.|$)') { return $matches[1] }
+    return ''
+}
+
 $token = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token" -ContentType 'application/x-www-form-urlencoded' -Body @{
     client_id = $ClientId
     client_secret = $ClientSecret
@@ -36,16 +47,33 @@ $headers = @{ Authorization = "Bearer $($token.access_token)"; TenantId = $Tenan
 $applicationUri = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$ProductId"
 $application = (Invoke-WebRequest -Method Get -Uri $applicationUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
 $pending = Get-OptionalValue -Dictionary $application -Name 'PendingApplicationSubmission'
-if ($null -ne $pending) { throw 'Store application already has a pending submission; publication stopped before upload.' }
+if ($null -ne $pending) { throw 'Store application already has a pending submission; publication stopped before upload. Resume or remove that exact draft before starting a new publication.' }
 
 $lastPublished = Get-OptionalValue -Dictionary $application -Name 'LastPublishedApplicationSubmission'
 if ($lastPublished -isnot [System.Collections.IDictionary]) { throw 'Store application does not contain LastPublishedApplicationSubmission.' }
 $lastPublishedId = Get-Text (Get-OptionalValue -Dictionary $lastPublished -Name 'Id')
 if ([string]::IsNullOrWhiteSpace($lastPublishedId)) { throw 'LastPublishedApplicationSubmission does not contain an ID.' }
-if ($lastPublishedId -cne $ExpectedLastPublishedSubmissionId) {
-    throw "Last published submission mismatch. Expected=$ExpectedLastPublishedSubmissionId Actual=$lastPublishedId"
+
+$lastPublishedUri = "$applicationUri/submissions/$lastPublishedId"
+$lastPublishedSubmission = (Invoke-WebRequest -Method Get -Uri $lastPublishedUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+$packages = @(Get-OptionalValue -Dictionary $lastPublishedSubmission -Name 'ApplicationPackages')
+if ($packages.Count -eq 0) { throw 'The last published Store submission does not contain application packages.' }
+
+$publishedVersions = foreach ($package in $packages) {
+    if ($package -isnot [System.Collections.IDictionary]) { continue }
+    $text = Get-PackageVersion -Package $package
+    $parsed = $null
+    if (-not [string]::IsNullOrWhiteSpace($text) -and [Version]::TryParse($text, [ref]$parsed)) { $parsed }
+}
+if (@($publishedVersions).Count -eq 0) { throw 'Unable to determine the package version of the last published Store submission.' }
+$lastPublishedPackageVersion = @($publishedVersions | Sort-Object -Descending | Select-Object -First 1)[0]
+$expectedVersion = [Version]$ExpectedPackageVersion
+if ($expectedVersion -le $lastPublishedPackageVersion) {
+    throw "Store package version must increase monotonically. LastPublished=$lastPublishedPackageVersion ExpectedNew=$expectedVersion"
 }
 
 Write-Output 'pending_submission=none'
 Write-Output "last_published_submission_id=$lastPublishedId"
+Write-Output "last_published_package_version=$lastPublishedPackageVersion"
+Write-Output "expected_package_version=$ExpectedPackageVersion"
 Write-Output "product_id=$ProductId"
