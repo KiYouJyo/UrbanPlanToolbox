@@ -118,7 +118,11 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("if: failure() && steps.commit_store_submission.outcome == 'skipped'", workflow);
         Assert.Contains("Certification submission requested: true", workflow);
 
+        var readyStart = workflow.IndexOf("- name: Assert Store ready for new submission", StringComparison.Ordinal);
         var uploadStart = workflow.IndexOf("- name: Upload Store package without committing", StringComparison.Ordinal);
+        var readyStep = workflow[readyStart..uploadStart];
+        Assert.DoesNotContain("$LASTEXITCODE", readyStep);
+
         var notesUpdateStart = workflow.IndexOf("- name: Update three-language Store release notes", StringComparison.Ordinal);
         var uploadStep = workflow[uploadStart..notesUpdateStart];
         Assert.Contains("'publish', $env:PACKAGE_PATH", uploadStep);
