@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Windows.Graphics;
 using UrbanPlanToolbox.Models.Interaction;
 using UrbanPlanToolbox.Services;
@@ -20,6 +21,8 @@ public sealed partial class MainWindow : Window
     private readonly INavigationStateService _navigationState = new NavigationStateService();
     private readonly LocalizationService _localization = LocalizationService.Default;
     private readonly FirstRunExperienceService _firstRunExperience = new();
+    private UIElement? _focusBeforeFirstRunGuide;
+    private bool _firstRunGuideShowing;
 
     public MainWindow()
     {
@@ -44,21 +47,33 @@ public sealed partial class MainWindow : Window
 
     public void Navigate(Type pageType) => RootFrame.Navigate(pageType);
 
-    public void ShowFirstRunGuideFromSettings() => ShowFirstRunGuide(manual: true);
+    /// <summary>Single window-level coordinator used by Settings and startup.</summary>
+    public void ShowFirstRunGuideFromSettings() => ShowFirstRunGuide(FirstRunGuideLaunchMode.Manual);
 
     public void ShowFirstRunGuideIfNeeded()
     {
-        if (_firstRunExperience.ShouldShowAutomatically()) ShowFirstRunGuide(manual: false);
+        if (_firstRunExperience.ShouldShowAutomatically())
+            ShowFirstRunGuide(FirstRunGuideLaunchMode.Automatic);
     }
 
-    private void ShowFirstRunGuide(bool manual)
+    private void ShowFirstRunGuide(FirstRunGuideLaunchMode mode)
     {
-        if (FirstRunGuide.Visibility == Visibility.Visible) return;
+        if (_firstRunGuideShowing || FirstRunGuide.Visibility == Visibility.Visible) return;
+        _firstRunGuideShowing = true;
+        if (RootFrame.XamlRoot is not null)
+            _focusBeforeFirstRunGuide = FocusManager.GetFocusedElement(RootFrame.XamlRoot) as UIElement;
         if (RootFrame.Content is MainPage currentPage) _navigationState.Save(currentPage.CaptureState());
-        FirstRunGuide.Show(manual);
+        FirstRunGuide.Show(mode);
     }
 
-    private void OnFirstRunGuideClosed(object? sender, EventArgs e) { }
+    private void OnFirstRunGuideClosed(object? sender, EventArgs e)
+    {
+        _firstRunGuideShowing = false;
+        var focusTarget = _focusBeforeFirstRunGuide;
+        _focusBeforeFirstRunGuide = null;
+        if (focusTarget is not null)
+            DispatcherQueue.TryEnqueue(() => focusTarget.Focus(FocusState.Programmatic));
+    }
 
     private void OnLanguageChanged(object? sender, LanguageChangedEventArgs e)
     {

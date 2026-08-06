@@ -1,5 +1,6 @@
 using System.Text.Json;
 using UrbanPlanToolbox.Models;
+using Windows.Storage;
 
 namespace UrbanPlanToolbox.Services;
 
@@ -16,11 +17,19 @@ public sealed class FirstRunExperienceService : IFirstRunExperienceService
 
     public FirstRunExperienceService(string? statePath = null, Func<bool>? legacyInstallationExists = null)
     {
-        _statePath = statePath ?? Path.Combine(AppDataPathProvider.Default.Paths.RootDirectory, "first-run-guide.json");
+        _statePath = statePath ?? ResolvePackagedStatePath();
         _legacyInstallationExists = legacyInstallationExists ?? DetectLegacyInstallation;
     }
 
     public int CurrentFirstRunGuideVersion => CurrentVersion;
+
+    public FirstRunGuideInstallationState InstallationState
+    {
+        get
+        {
+            lock (_gate) return LoadOrMigrate().InstallationState;
+        }
+    }
 
     public bool IsCompleted
     {
@@ -45,6 +54,7 @@ public sealed class FirstRunExperienceService : IFirstRunExperienceService
         {
             var state = LoadOrMigrate();
             state.CompletedFirstRunGuideVersion = CurrentVersion;
+            state.InstallationState = FirstRunGuideInstallationState.Completed;
             return TrySave(state, out error);
         }
     }
@@ -57,10 +67,19 @@ public sealed class FirstRunExperienceService : IFirstRunExperienceService
         if (!state.LegacyInstallationMigrationEvaluated)
         {
             state.LegacyInstallationMigrationEvaluated = true;
-            if (_legacyInstallationExists()) state.CompletedFirstRunGuideVersion = CurrentVersion;
+            state.InstallationState = _legacyInstallationExists()
+                ? FirstRunGuideInstallationState.ExistingUserMigrated
+                : FirstRunGuideInstallationState.NewInstallation;
+            if (state.InstallationState == FirstRunGuideInstallationState.ExistingUserMigrated)
+                state.CompletedFirstRunGuideVersion = CurrentVersion;
             // A failed write is deliberately non-fatal. The next launch retries this one-time decision.
             TrySave(state, out _);
         }
+
+        if (state.CompletedFirstRunGuideVersion >= CurrentVersion)
+            state.InstallationState = FirstRunGuideInstallationState.Completed;
+        else if (state.InstallationState == FirstRunGuideInstallationState.Unknown)
+            state.InstallationState = FirstRunGuideInstallationState.Pending;
 
         _state = state;
         return state;
@@ -72,7 +91,7 @@ public sealed class FirstRunExperienceService : IFirstRunExperienceService
         {
             if (!File.Exists(_statePath)) return new FirstRunGuideState();
             var state = JsonSerializer.Deserialize<FirstRunGuideState>(File.ReadAllText(_statePath)) ?? new FirstRunGuideState();
-            if (state.StateSchemaVersion != 1 || state.CompletedFirstRunGuideVersion < 0) return new FirstRunGuideState();
+            if (state.StateSchemaVersion != 1 || state.CompletedFirstRunGuideVersion < 0 || !Enum.IsDefined(state.InstallationState)) return new FirstRunGuideState();
             state.CompletedFirstRunGuideVersion = Math.Min(state.CompletedFirstRunGuideVersion, CurrentVersion);
             return state;
         }
@@ -118,4 +137,18 @@ public sealed class FirstRunExperienceService : IFirstRunExperienceService
     }
 
     private static bool ContainsFiles(string directory) => Directory.Exists(directory) && Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Any();
+
+    private static string ResolvePackagedStatePath()
+    {
+        try
+        {
+            // Package-scoped LocalState is cleared by a normal uninstall.
+            return Path.Combine(ApplicationData.Current.LocalFolder.Path, "first-run-guide.json");
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or UnauthorizedAccessException)
+        {
+            // Unpackaged development and tests use the existing application-data root.
+            return Path.Combine(AppDataPathProvider.Default.Paths.RootDirectory, "first-run-guide.json");
+        }
+    }
 }
