@@ -146,6 +146,7 @@ public sealed class StorePackagingInfrastructureTests
         var root = FindRepositoryRoot();
         var ready = File.ReadAllText(Path.Combine(root, "packaging", "Assert-StoreReadyForNewSubmission.ps1"));
         var committed = File.ReadAllText(Path.Combine(root, "packaging", "Verify-StoreSubmissionCommitted.ps1"));
+        var draft = File.ReadAllText(Path.Combine(root, "packaging", "Verify-StoreDraftSubmission.ps1"));
         var cleanup = File.ReadAllText(Path.Combine(root, "packaging", "Remove-TransientStoreDraft.ps1"));
 
         Assert.Contains("PendingApplicationSubmission", ready);
@@ -155,12 +156,18 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("TimeoutSeconds", committed);
         Assert.Contains("PollIntervalSeconds", committed);
         Assert.Contains("CommitFailed", committed);
+        Assert.Contains("PackageVersion", draft);
+        Assert.Contains("PackageVersionString", draft);
+        Assert.Contains("Get-PackageVersion", draft);
         Assert.Contains("PendingCommit", cleanup);
         Assert.Contains("ExpectedPackageVersion", cleanup);
         Assert.Contains("ExpectedPackageFileName", cleanup);
         Assert.Contains("ProtectedPublishedSubmissionId", cleanup);
         Assert.Contains("Refusing to delete protected published submission", cleanup);
         Assert.Contains("-Method Delete", cleanup);
+        Assert.Contains("PackageVersion", cleanup);
+        Assert.Contains("PackageVersionString", cleanup);
+        Assert.Contains("Get-PackageVersion", cleanup);
     }
 
     [Fact]
