@@ -8,7 +8,7 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 ## Get the app
 
-The last actually published Microsoft Store version is **v1.3.0** for stable milestone users. The latest formal GitHub version is **v1.4.2**. GitHub may publish more frequently; Microsoft Store updates default to `x.0.0` or `x.5.0` milestones, so v1.4.2 is skipped for Store and the next Store milestone is v1.5.0. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
+The last actually published Microsoft Store version is **v1.3.0** for stable milestone users. The latest formal GitHub version is **v1.5.0**. GitHub may publish more frequently; Microsoft Store updates default to `x.0.0` or `x.5.0` milestones, so v1.5.0 is GitHub-only in this release and the next Store milestone is v2.0.0. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
 
 ## About UrbanPlanToolbox
 
@@ -34,6 +34,10 @@ A local photo-organizing workflow for planning, design, and GIS field surveys. I
 - Organize photos with free-form Tags and Note fields.
 - Export WGS 84 / EPSG:4326 Shapefile points and CSV metadata; photos without GPS remain in the photo and CSV output but are excluded from the point layer.
 - Original photos are read-only and photos/GPS are processed locally. HEIC preview availability may depend on Windows image codec support, without preventing supported metadata reads.
+
+### Drawing Version Comparator
+
+v1.5.0 adds a local comparator for two PNG, JPG/JPEG, or PDF-page images with identical pixel dimensions. It provides semi-transparent overlay and wipe browsing, fit-to-window, zoom, pan, and overlay PNG export without modifying the original files.
 
 ## Installation
 

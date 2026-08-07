@@ -8,7 +8,7 @@
 
 ## 获取应用
 
-普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；当前最后实际公开的 Store 版本为 **v1.3.0**。GitHub 最新正式版本为 **v1.4.2**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新，因此 v1.4.2 按本次发布政策跳过 Store，下一 Store 里程碑为 v1.5.0。两条渠道的身份、Publisher 和更新流程保持独立。
+普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；当前最后实际公开的 Store 版本为 **v1.3.0**。GitHub 最新正式版本为 **v1.5.0**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。v1.5.0 仅发布 GitHub，Microsoft Store 本轮不操作；下一 Store 里程碑为 v2.0.0。两条渠道的身份、Publisher 和更新流程保持独立。
 
 ## 关于 UrbanPlanToolbox
 
@@ -87,6 +87,12 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 ## 许可证与第三方声明
 
 UrbanPlanToolbox 使用 [MIT License](LICENSE) 开源。依赖与外部数据来源见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+
+## v1.5.0 GitHub Release
+
+- 新增“图纸版本差异对比器”，本地比较两张像素尺寸完全一致的 PNG、JPG/JPEG 或 PDF 页面图像。
+- 提供半透明叠加和擦除浏览两种模式，支持保持比例、缩放、平移、适配窗口和叠加结果 PNG 导出。
+- 原始文件不被覆盖；本版本仅发布 GitHub，Microsoft Store 不执行任何操作。
 
 ## v1.4.2 GitHub Release
 

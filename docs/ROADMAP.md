@@ -6,8 +6,14 @@ UrbanPlanToolbox 是面向城乡规划、建筑设计与空间研究的离线优
 
 ## 当前发布状态
 
-- GitHub 最新正式版本：`v1.4.2`。
-- Microsoft Store 最后实际公开版本：`v1.3.0`；本次 v1.4.2 不提交 Store。
+- GitHub 最新正式版本：`v1.5.0`。
+- Microsoft Store 最后实际公开版本：`v1.3.0`；本次 v1.5.0 不提交 Store。
+
+## v1.5.0
+
+- 发布“图纸版本差异对比器”，支持相同像素尺寸图像的半透明叠加与擦除浏览。
+- 支持 PNG、JPG/JPEG 和 PDF 页面本地加载、适配窗口、缩放、平移与叠加 PNG 导出。
+- 状态：Released（GitHub）；Microsoft Store 本轮未操作，下一 Store 里程碑为 `v2.0.0`。
 
 ## v1.4.2
 

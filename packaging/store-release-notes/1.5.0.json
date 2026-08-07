@@ -1,0 +1,6 @@
+{
+  "version": "1.5.0",
+  "zh-CN": "新增图纸版本差异对比器，支持两张相同像素尺寸图像的本地半透明叠加、擦除浏览和叠加结果 PNG 导出。",
+  "en-US": "Adds Drawing Version Comparator for local semi-transparent overlay, wipe browsing, and overlay PNG export of two images with identical pixel dimensions.",
+  "ja-JP": "図面バージョン比較を追加しました。同一ピクセルサイズの2枚の画像をローカルで半透明重ね合わせ、ワイプ表示し、重ね合わせ結果を PNG 出力できます。"
+}

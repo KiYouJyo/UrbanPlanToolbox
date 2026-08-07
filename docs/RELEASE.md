@@ -2,6 +2,12 @@
 
 本文档是 UrbanPlanToolbox 的可复用发布边界与检查清单。
 
+## v1.5.0 发布决策
+
+- GitHub：发布正式 `v1.5.0` Release、`v1.5.0` 标签和从最终 `main` 构建的 x64 旁加载包。
+- Microsoft Store：`NOT TOUCHED`。本版本不执行 Store CLI、Partner Center、草稿上传、认证、listing 修改或 Store 发布；下一 Store 里程碑为 `v2.0.0`。
+- 新增“图纸版本差异对比器”最终交付范围以 README、CHANGELOG 和正式 Release Notes 为准：相同像素尺寸图像的半透明叠加与擦除浏览。
+
 ## v1.4.2 发布决策
 
 - GitHub：发布正式 `v1.4.2` Release、`v1.4.2` 标签和 x64 framework-dependent 自签名旁加载包。
