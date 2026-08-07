@@ -26,6 +26,9 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("$settings.XmlResolver = $null", script);
         Assert.Contains("$document.Load($reader)", script);
         Assert.Contains("XML file was not found", script);
+        Assert.Contains("wackExecuted = $false", script);
+        Assert.Contains("wackResult = 'NotRun'", script);
+        Assert.DoesNotContain("wackReady = $true", script);
         Assert.DoesNotContain("[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($projectPath))", script);
         Assert.DoesNotContain("[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($githubManifestPath))", script);
         Assert.DoesNotContain("[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($manifestPath))", script);
@@ -52,7 +55,7 @@ public sealed class StorePackagingInfrastructureTests
     }
 
     [Fact]
-    public void PriIdentityValidatorChecksManifestPrimaryMapAndLanguageCandidates()
+    public void PriIdentityValidatorChecksManifestPrimaryMapLanguagesAndInstalledSdk()
     {
         var root = FindRepositoryRoot();
         var script = File.ReadAllText(Path.Combine(root, "packaging", "Test-PackageResourceIdentity.ps1"));
@@ -60,9 +63,13 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("PRI primary ResourceMap mismatch", script);
         Assert.Contains("AppDisplayName", script);
         Assert.Contains("AppDescription", script);
-        Assert.Contains("Language-$language", script);
+        Assert.Contains("LANGUAGE-$language", script);
         Assert.Contains("RequireBundle", script);
         Assert.Contains("Bundle is missing required scale", script);
+        Assert.Contains("Resolve-MakePriPath", script);
+        Assert.Contains("Windows Kits\\10\\bin", script);
+        Assert.Contains("Sort-Object Version -Descending", script);
+        Assert.DoesNotContain("10.0.26100.0\\x64\\makepri.exe", script);
     }
 
     [Fact]
@@ -75,30 +82,35 @@ public sealed class StorePackagingInfrastructureTests
         Assert.DoesNotContain("pull_request:", workflow);
         Assert.DoesNotContain("release:", workflow);
         Assert.Contains("STORE_PRODUCT_ID: 9MWDPJG1BHKW", workflow);
-        Assert.Contains("EXPECTED_LAST_PUBLISHED_SUBMISSION_ID: '1152921505701574155'", workflow);
-        Assert.Contains("PROTECTED_PUBLISHED_SUBMISSION_ID: '1152921505701574155'", workflow);
+        Assert.DoesNotContain("EXPECTED_LAST_PUBLISHED_SUBMISSION_ID", workflow);
+        Assert.DoesNotContain("PROTECTED_PUBLISHED_SUBMISSION_ID", workflow);
         Assert.Contains("publication_confirmation", workflow);
-        Assert.DoesNotContain("submit_for_certification", workflow);
-        Assert.DoesNotContain("certification_confirmation", workflow);
+        Assert.Contains("PUBLICATION_CONFIRMATION", workflow);
         Assert.Contains("PUBLISH ${{ steps.version.outputs.product_version }}", workflow);
+        Assert.Contains("Store publication source must be the exact origin/main HEAD", workflow);
+        Assert.DoesNotContain("merge-base --is-ancestor", workflow);
+        Assert.Contains("timeout-minutes: 75", workflow);
         Assert.Contains("Assert-StoreReadyForNewSubmission.ps1", workflow);
+        Assert.Contains("-ExpectedPackageVersion '${{ steps.version.outputs.package_version }}'", workflow);
         Assert.Contains("Validate Microsoft Store credentials", workflow);
         Assert.Contains("Configure Microsoft Store Developer CLI", workflow);
         Assert.Contains("Verify Store product access", workflow);
+        Assert.Contains("version: v0.3.9", workflow);
         Assert.Contains("Upload Store package without committing", workflow);
         Assert.Contains("Update three-language Store release notes", workflow);
         Assert.Contains("Verify Store draft contents", workflow);
         Assert.Contains("Verify-StoreDraftSubmission.ps1", workflow);
-        Assert.Contains("Commit verified Store submission for certification", workflow);
+        Assert.Contains("Reverify and commit Store submission for certification", workflow);
+        Assert.Contains("commit_attempted=true", workflow);
         Assert.Contains("'submission', 'publish', $env:STORE_PRODUCT_ID", workflow);
         Assert.Contains("Verify-StoreSubmissionCommitted.ps1", workflow);
         Assert.Contains("Remove-TransientStoreDraft.ps1", workflow);
+        Assert.Contains("continue-on-error: true", workflow);
         Assert.Contains("--noCommit", workflow);
         Assert.Contains("[Guid]::TryParse($env:TENANT_ID.Trim()", workflow);
         Assert.Contains("[Guid]::TryParse($env:CLIENT_ID.Trim()", workflow);
         Assert.Contains("'--clientId', $env:CLIENT_ID.Trim()", workflow);
         Assert.Contains("'--tenantId', $env:TENANT_ID.Trim()", workflow);
-        Assert.Contains("$LASTEXITCODE", workflow);
         Assert.Contains("id: setup_store_cli", workflow);
         Assert.Contains("id: configure_store_cli", workflow);
         Assert.Contains("id: verify_store_access", workflow);
@@ -112,18 +124,13 @@ public sealed class StorePackagingInfrastructureTests
         Assert.DoesNotContain("\\\"", workflow);
         Assert.DoesNotContain("$env:CLIENT_SECRET.Length", workflow);
         Assert.DoesNotContain("$env:CLIENT_SECRET.Substring", workflow);
-        Assert.Contains("Write workflow summary", workflow);
-        Assert.Contains("if: steps.verify_store_draft.outcome == 'success'", workflow);
-        Assert.Contains("if: always() && steps.commit_store_submission.outcome != 'skipped'", workflow);
-        Assert.Contains("if: failure() && steps.commit_store_submission.outcome == 'skipped'", workflow);
-        Assert.Contains("Certification submission requested: true", workflow);
-
-        var readyStart = workflow.IndexOf("- name: Assert Store ready for new submission", StringComparison.Ordinal);
-        var uploadStart = workflow.IndexOf("- name: Upload Store package without committing", StringComparison.Ordinal);
-        var readyStep = workflow[readyStart..uploadStart];
-        Assert.DoesNotContain("$LASTEXITCODE", readyStep);
+        Assert.Contains("Microsoft Store v$productVersion publication", workflow);
+        Assert.Contains("Post-commit Store status", workflow);
+        Assert.Contains("WACK executed in GitHub Actions", workflow);
+        Assert.DoesNotContain("Microsoft Store v1.3.1 publication", workflow);
 
         var notesUpdateStart = workflow.IndexOf("- name: Update three-language Store release notes", StringComparison.Ordinal);
+        var uploadStart = workflow.IndexOf("- name: Upload Store package without committing", StringComparison.Ordinal);
         var uploadStep = workflow[uploadStart..notesUpdateStart];
         Assert.Contains("'publish', $env:PACKAGE_PATH", uploadStep);
         Assert.Contains("--noCommit", uploadStep);
@@ -132,42 +139,57 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("exactly the selected .msixupload file", uploadStep);
         Assert.Contains("Store package SHA-256 does not match build metadata", uploadStep);
 
-        var commitStart = workflow.IndexOf("- name: Commit verified Store submission for certification", StringComparison.Ordinal);
+        var commitStart = workflow.IndexOf("- name: Reverify and commit Store submission for certification", StringComparison.Ordinal);
         var commitEnd = workflow.IndexOf("- name: Verify committed Store submission status", StringComparison.Ordinal);
         var commitStep = workflow[commitStart..commitEnd];
+        Assert.Contains("Verify-StoreDraftSubmission.ps1", commitStep);
         Assert.Contains("submission', 'publish', $env:STORE_PRODUCT_ID", commitStep);
         Assert.DoesNotContain("PACKAGE_PATH", commitStep);
         Assert.DoesNotContain("--noCommit", commitStep);
     }
 
     [Fact]
-    public void StoreOneRunSafetyScriptsProtectPublishedSubmissionAndPendingCommitBoundary()
+    public void StoreStateScriptsFailClosedAndProtectTheCurrentPublishedSubmission()
     {
         var root = FindRepositoryRoot();
         var ready = File.ReadAllText(Path.Combine(root, "packaging", "Assert-StoreReadyForNewSubmission.ps1"));
         var committed = File.ReadAllText(Path.Combine(root, "packaging", "Verify-StoreSubmissionCommitted.ps1"));
         var draft = File.ReadAllText(Path.Combine(root, "packaging", "Verify-StoreDraftSubmission.ps1"));
         var cleanup = File.ReadAllText(Path.Combine(root, "packaging", "Remove-TransientStoreDraft.ps1"));
+        var notes = File.ReadAllText(Path.Combine(root, "packaging", "Update-StoreReleaseNotes.ps1"));
 
         Assert.Contains("PendingApplicationSubmission", ready);
         Assert.Contains("LastPublishedApplicationSubmission", ready);
-        Assert.Contains("publication stopped before upload", ready);
-        Assert.Contains("PendingCommit", committed);
-        Assert.Contains("TimeoutSeconds", committed);
-        Assert.Contains("PollIntervalSeconds", committed);
-        Assert.Contains("CommitFailed", committed);
-        Assert.Contains("PackageVersion", draft);
+        Assert.Contains("Store package version must increase monotonically", ready);
+        Assert.Contains("ExpectedPackageVersion", ready);
+        Assert.DoesNotContain("ExpectedLastPublishedSubmissionId", ready);
+
+        Assert.Contains("PreProcessingFailed", committed);
+        Assert.Contains("CertificationFailed", committed);
+        Assert.Contains("PublishFailed", committed);
+        Assert.Contains("ReleaseFailed", committed);
+        Assert.Contains("unknown post-commit status", committed);
+        Assert.Contains("acceptedPostCommitStatuses", committed);
+
+        Assert.Contains("PollIntervalSeconds", draft);
+        Assert.Contains("TimeoutSeconds", draft);
+        Assert.Contains("multiple copies of the uploaded package", draft);
+        Assert.Contains("unexpected package at the target version or newer", draft);
         Assert.Contains("PackageVersionString", draft);
-        Assert.Contains("Get-PackageVersion", draft);
+        Assert.Contains("application_package_count", draft);
+
+        Assert.Contains("LastPublishedApplicationSubmission", cleanup);
+        Assert.Contains("Refusing to delete current published submission", cleanup);
         Assert.Contains("PendingCommit", cleanup);
         Assert.Contains("ExpectedPackageVersion", cleanup);
         Assert.Contains("ExpectedPackageFileName", cleanup);
-        Assert.Contains("ProtectedPublishedSubmissionId", cleanup);
-        Assert.Contains("Refusing to delete protected published submission", cleanup);
+        Assert.DoesNotContain("ProtectedPublishedSubmissionId", cleanup);
         Assert.Contains("-Method Delete", cleanup);
-        Assert.Contains("PackageVersion", cleanup);
-        Assert.Contains("PackageVersionString", cleanup);
-        Assert.Contains("Get-PackageVersion", cleanup);
+        Assert.Contains("was not removed within", cleanup);
+
+        Assert.Contains("did not become available for metadata update", notes);
+        Assert.Contains("Store draft must be PendingCommit", notes);
+        Assert.Contains("left PendingCommit", notes);
     }
 
     [Fact]
@@ -196,8 +218,7 @@ public sealed class StorePackagingInfrastructureTests
 
         Assert.Contains("$expectedPackageVersion = \"$projectVersion.0\"", script);
         Assert.Contains("$PackageVersion -ne $expectedPackageVersion", script);
-        Assert.DoesNotContain("PackageVersion -ne '1.3.0.0'", script);
-        Assert.Contains("PackageVersion -ne '1.4.0.0'", script);
+        Assert.DoesNotMatch(new Regex(@"PackageVersion\s+-ne\s+'\d+\.\d+\.\d+\.\d+'"), script);
         Assert.Contains("DistributionChannel=Store", script);
         Assert.Contains("URBANPLANTOOLBOX_STORE", project);
 

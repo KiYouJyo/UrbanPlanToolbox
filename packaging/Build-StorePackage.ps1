@@ -48,7 +48,6 @@ $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version
 if ($projectVersion -notmatch '^\d+\.\d+\.\d+$') { throw "UrbanPlanToolbox.csproj Version must use major.minor.patch format; got '$projectVersion'." }
 $expectedPackageVersion = "$projectVersion.0"
 if ($PackageVersion -ne $expectedPackageVersion) { throw "Store package version must match project version. Project=$projectVersion ExpectedPackage=$expectedPackageVersion ActualPackage=$PackageVersion" }
-if ($PackageVersion -ne '1.4.0.0') { throw 'This v1.4.0 workflow only accepts Store package version 1.4.0.0.' }
 if (Test-Path -LiteralPath $output) {
     if (@(Get-ChildItem -LiteralPath $output -Force).Count -gt 0) { throw "Store package output directory must be new or empty: $output" }
 }
@@ -97,16 +96,25 @@ try {
     if ($upload.Count -ne 1) { throw "Expected exactly one .msixupload; found $($upload.Count)." }
     if ($upload[0].Name -notmatch 'bundle') { throw 'Store update must remain an MSIX Bundle because the previously published Store version is a Bundle.' }
     $identityValidation = & (Join-Path $temporaryWorktree 'packaging\Test-PackageResourceIdentity.ps1') -PackagePath $upload[0].FullName -ExpectedIdentityName $identity.Name -RequireBundle -OutputDirectory (Join-Path $output 'pri-validation')
-    if ($LASTEXITCODE -ne 0) { throw 'Store package PRI identity validation failed.' }
 
     $sensitive = Get-ChildItem -LiteralPath $packageDirectory -Recurse -File | Where-Object { $_.Extension -in '.pfx','.p12','.cer','.key' }
     if ($sensitive) { throw "Sensitive file found in Store output: $($sensitive.FullName -join ', ')" }
     $hash = (Get-FileHash -LiteralPath $upload[0].FullName -Algorithm SHA256).Hash.ToUpperInvariant()
     [pscustomobject]@{
-        sourceCommit = $sourceCommitResolved; productVersion = $projectVersion; packageVersion = $PackageVersion; package = $upload[0].FullName; sha256 = $hash
-        channel = 'Store'; signed = $false; manifestIdentity = $identity.Name; priResourceMapName = $identityValidation.PriResourceMapName
-        languages = @($identityValidation.ManifestLanguages); validationResult = $identityValidation.ValidationResult
-        wackReady = $true; buildUtc = [DateTime]::UtcNow.ToString('O')
+        sourceCommit = $sourceCommitResolved
+        productVersion = $projectVersion
+        packageVersion = $PackageVersion
+        package = $upload[0].FullName
+        sha256 = $hash
+        channel = 'Store'
+        signed = $false
+        manifestIdentity = $identity.Name
+        priResourceMapName = $identityValidation.PriResourceMapName
+        languages = @($identityValidation.ManifestLanguages)
+        validationResult = $identityValidation.ValidationResult
+        wackExecuted = $false
+        wackResult = 'NotRun'
+        buildUtc = [DateTime]::UtcNow.ToString('O')
     } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $output 'store-package-build.json') -Encoding UTF8
     Write-Output "PRODUCT_VERSION=$projectVersion"
     Write-Output "MSIXUPLOAD=$($upload[0].FullName)"
@@ -116,6 +124,8 @@ try {
     Write-Output "STORE_RESOURCE_SCALES=$($identityValidation.ResourceScales -join ',')"
     Write-Output "STORE_MANIFEST_IDENTITY=$($identityValidation.ManifestIdentity)"
     Write-Output "STORE_PRI_RESOURCE_MAP=$($identityValidation.PriResourceMapName)"
+    Write-Output 'WACK_EXECUTED=false'
+    Write-Output 'WACK_RESULT=NotRun'
     Write-Output "SHA256=$hash"
 }
 finally {

@@ -5,13 +5,39 @@ param(
     [string[]]$ExpectedLanguages = @('zh-CN', 'ja-JP', 'en-US'),
     [string]$OutputDirectory,
     [switch]$RequireBundle,
-    [string]$MakePriPath = 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makepri.exe'
+    [string]$MakePriPath
 )
 
 $ErrorActionPreference = 'Stop'
+
+function Resolve-MakePriPath {
+    param([string]$ExplicitPath)
+
+    if (-not [string]::IsNullOrWhiteSpace($ExplicitPath)) {
+        if (-not (Test-Path -LiteralPath $ExplicitPath -PathType Leaf)) { throw "MakePri.exe was not found: $ExplicitPath" }
+        return (Resolve-Path -LiteralPath $ExplicitPath).Path
+    }
+
+    $sdkBinRoot = 'C:\Program Files (x86)\Windows Kits\10\bin'
+    if (-not (Test-Path -LiteralPath $sdkBinRoot -PathType Container)) { throw "Windows SDK bin directory was not found: $sdkBinRoot" }
+
+    $candidates = foreach ($directory in Get-ChildItem -LiteralPath $sdkBinRoot -Directory) {
+        $version = $null
+        if (-not [Version]::TryParse($directory.Name, [ref]$version)) { continue }
+        $candidate = Join-Path $directory.FullName 'x64\makepri.exe'
+        if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+            [pscustomobject]@{ Version = $version; Path = $candidate }
+        }
+    }
+
+    $selected = @($candidates | Sort-Object Version -Descending | Select-Object -First 1)
+    if ($selected.Count -ne 1) { throw "No x64 MakePri.exe was found under $sdkBinRoot." }
+    return $selected[0].Path
+}
+
 $package = (Resolve-Path -LiteralPath $PackagePath).Path
 if ([IO.Path]::GetExtension($package) -notin '.msix', '.msixbundle', '.msixupload') { throw 'PackagePath must point to an .msix, .msixbundle, or .msixupload file.' }
-if (-not (Test-Path -LiteralPath $MakePriPath -PathType Leaf)) { throw "MakePri.exe was not found: $MakePriPath" }
+$MakePriPath = Resolve-MakePriPath -ExplicitPath $MakePriPath
 $expected = @($ExpectedLanguages | ForEach-Object { $_.ToUpperInvariant() })
 $temporaryDirectory = Join-Path ([IO.Path]::GetTempPath()) ('UrbanPlanToolbox-pri-' + [Guid]::NewGuid().ToString('N'))
 $dumpPath = $null
@@ -72,7 +98,17 @@ try {
         $candidates = @($node.SelectNodes("./*[local-name()='Candidate']") | ForEach-Object { $_.GetAttribute('qualifiers').ToUpperInvariant() })
         foreach ($language in $expected) { if ($candidates -notcontains "LANGUAGE-$language") { throw "PRI resource $resourceName is missing Language-$language." } }
     }
-    [pscustomobject]@{ PackagePath = $package; MsixPath = $msixPath; ManifestIdentity = $manifestIdentity; PriResourceMapName = $priResourceMapName; ManifestLanguages = $manifestLanguages; ResourceScales = $resourceScales; ValidationResult = 'Passed'; DumpPath = $dumpPath }
+    [pscustomobject]@{
+        PackagePath = $package
+        MsixPath = $msixPath
+        ManifestIdentity = $manifestIdentity
+        PriResourceMapName = $priResourceMapName
+        ManifestLanguages = $manifestLanguages
+        ResourceScales = $resourceScales
+        ValidationResult = 'Passed'
+        DumpPath = $dumpPath
+        MakePriPath = $MakePriPath
+    }
 }
 finally {
     if (Test-Path -LiteralPath $temporaryDirectory) { Remove-Item -LiteralPath $temporaryDirectory -Recurse -Force }

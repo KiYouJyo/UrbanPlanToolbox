@@ -35,7 +35,14 @@ if ([string]::IsNullOrWhiteSpace([string]$token.access_token)) { throw 'Microsof
 
 $headers = @{ Authorization = "Bearer $($token.access_token)"; TenantId = $TenantId; Accept = 'application/json' }
 $submissionUri = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$ProductId/submissions/$ExpectedSubmissionId"
-$terminalFailureStatuses = @('Cancelled','Canceled','Failed','Rejected','CommitFailed')
+$failureStatuses = @(
+    'Canceled','Cancelled','Failed','Rejected','CommitFailed','PreProcessingFailed',
+    'CertificationFailed','PublishFailed','PublishingFailed','ReleaseFailed'
+)
+$acceptedPostCommitStatuses = @(
+    'CommitStarted','PreProcessing','Certification','PendingPublication',
+    'Release','Publishing','Published','InTheStore'
+)
 $deadline = [DateTimeOffset]::UtcNow.AddSeconds($TimeoutSeconds)
 $status = ''
 do {
@@ -45,13 +52,18 @@ do {
     $status = Get-Text $submission[(Get-Key -Dictionary $submission -Name 'Status')]
     if ([string]::IsNullOrWhiteSpace($status)) { throw 'Committed Store submission returned an empty status.' }
     Write-Host "Submission $ExpectedSubmissionId status: $status"
+
+    if ($failureStatuses -contains $status -or $status -match '(?i)(fail|reject|cancel)') {
+        throw "Store submission entered failure status '$status'."
+    }
     if ($status -cne 'PendingCommit') { break }
     if ([DateTimeOffset]::UtcNow -ge $deadline) { throw "Store submission remained PendingCommit for $TimeoutSeconds seconds." }
     Start-Sleep -Seconds $PollIntervalSeconds
 } while ($true)
 
-if ($terminalFailureStatuses -contains $status) { throw "Store submission entered failure status '$status'." }
-if ($status -ceq 'PendingCommit') { throw 'Store submission is still PendingCommit.' }
+if ($acceptedPostCommitStatuses -notcontains $status) {
+    throw "Store submission entered unknown post-commit status '$status'; refusing to treat it as success."
+}
 
 Write-Output "submission_id=$ExpectedSubmissionId"
 Write-Output "post_commit_status=$status"
