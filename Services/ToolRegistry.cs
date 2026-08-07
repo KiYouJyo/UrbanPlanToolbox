@@ -117,9 +117,24 @@ public sealed class ToolRegistry
             true,
             "zuobiaoxizhuanhuanqi",
             "Z",
-            "Tool_CoordinateSystemConverter_Keywords")
+            "Tool_CoordinateSystemConverter_Keywords"),
+        new(
+            ToolIds.PlanningTerminology,
+            "Tool_PlanningTerminology_Name",
+            "Tool_PlanningTerminology_Description",
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.PreliminaryAnalysis,
+            "\uE8A4",
+            typeof(Views.PlanningTerminologyPage),
+            80,
+            true,
+            "zhongriyingguihuashuyuku",
+            "P",
+            "Tool_PlanningTerminology_Keywords")
         {
-            CategoryPlacements = [new(ToolPrimaryCategory.Research, ToolSecondaryCategory.GeographicTools, 10)]
+            CategoryPlacements = [
+                new(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis, 80),
+                new(ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 15)]
         }
     ]);
 

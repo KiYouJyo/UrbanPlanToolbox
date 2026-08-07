@@ -8,7 +8,7 @@
 
 ## アプリを入手
 
-安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。最後に実際に公開された Store 版は **v1.3.0** です。GitHub の最新正式版は **v1.4.0** で、より頻繁に公開できます。Microsoft Store は原則 `x.0.0` または `x.5.0` のマイルストーンで更新するため、v1.4.0 の Store 公開はスキップし、次の Store マイルストーンを v1.5.0 とします。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
+安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。最後に実際に公開された Store 版は **v1.3.0** です。GitHub の最新正式版は **v1.4.1** で、より頻繁に公開できます。Microsoft Store は原則 `x.0.0` または `x.5.0` のマイルストーンで更新するため、v1.4.1 の Store 公開はスキップし、次の Store マイルストーンを v1.5.0 とします。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
 
 ## UrbanPlanToolbox について
 
