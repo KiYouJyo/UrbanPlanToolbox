@@ -18,10 +18,10 @@
     <Nullable>enable</Nullable>
     <!-- Never let generated test outputs participate in WinUI PRI resource discovery. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);tests\**\*</DefaultItemExcludes>
-    <Version>1.4.2</Version>
-    <AssemblyVersion>1.4.2</AssemblyVersion>
-    <FileVersion>1.4.2</FileVersion>
-    <InformationalVersion>1.4.2</InformationalVersion>
+    <Version>1.5.0</Version>
+    <AssemblyVersion>1.5.0</AssemblyVersion>
+    <FileVersion>1.5.0</FileVersion>
+    <InformationalVersion>1.5.0</InformationalVersion>
     <DefineConstants Condition="'$(DistributionChannel)' == 'Store'">$(DefineConstants);URBANPLANTOOLBOX_STORE</DefineConstants>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <!-- The preview is a single offline MSIX: language candidates stay in its main PRI. -->
@@ -86,6 +86,8 @@
     <PackageReference Include="NetTopologySuite" Version="2.6.0" />
     <PackageReference Include="NetTopologySuite.IO.Esri.Shapefile" Version="1.2.0" />
     <PackageReference Include="MetadataExtractor" Version="2.9.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250506" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250506" />
   </ItemGroup>
 
   <!--

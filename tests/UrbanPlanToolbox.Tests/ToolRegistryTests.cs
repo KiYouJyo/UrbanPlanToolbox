@@ -14,6 +14,7 @@ public sealed class ToolRegistryTests
             tool => Assert.Equal(ToolIds.PlanningIndicatorCalculator, tool.Id),
             tool => Assert.Equal(ToolIds.UnitScaleConverter, tool.Id),
             tool => Assert.Equal(ToolIds.ColorPaletteRecorder, tool.Id),
+            tool => Assert.Equal(ToolIds.DrawingVersionComparator, tool.Id),
             tool => Assert.Equal(ToolIds.WorkflowReviewChecklist, tool.Id),
             tool => Assert.Equal(ToolIds.RegulationsIndex, tool.Id),
             tool => Assert.Equal(ToolIds.DesignConceptDictionary, tool.Id),
@@ -103,16 +104,16 @@ public sealed class ToolRegistryTests
     [Fact]
     public void CategoryFiltersReturnMatchingTools()
     {
-        Assert.Equal(8, ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Design).Count);
+        Assert.Equal(9, ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Design).Count);
         Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.CoordinateSystemConverter, ToolIds.PlanningTerminology], ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Research).Select(tool => tool.Id));
         Assert.Equal(
-            [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.DesignConceptDictionary, ToolIds.PlanningTerminology, ToolIds.FieldSurveyPhotoGis],
+            [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.DrawingVersionComparator, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.DesignConceptDictionary, ToolIds.PlanningTerminology, ToolIds.FieldSurveyPhotoGis],
             ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Design).Select(tool => tool.Id));
         Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.CoordinateSystemConverter, ToolIds.PlanningTerminology], ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Research).Select(tool => tool.Id));
         Assert.Equal(
             [ToolIds.PlanningIndicatorCalculator, ToolIds.RegulationsIndex],
             ToolRegistry.Default.GetBySecondaryCategory(ToolSecondaryCategory.MasterPlanning).Select(tool => tool.Id));
-        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder], ToolRegistry.Default.GetBySecondaryCategory(ToolSecondaryCategory.DetailedDesign).Select(tool => tool.Id));
+        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.DrawingVersionComparator], ToolRegistry.Default.GetBySecondaryCategory(ToolSecondaryCategory.DetailedDesign).Select(tool => tool.Id));
     }
 
     [Fact]
@@ -148,7 +149,7 @@ public sealed class ToolRegistryTests
         Assert.Equal(
             [ToolIds.PlanningIndicatorCalculator, ToolIds.RegulationsIndex],
             ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.MasterPlanning).Select(tool => tool.Id));
-        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder], ToolRegistry.Default.GetAvailableByCategories(
+        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.DrawingVersionComparator], ToolRegistry.Default.GetAvailableByCategories(
                 ToolPrimaryCategory.Design, ToolSecondaryCategory.DetailedDesign).Select(tool => tool.Id));
 
         Assert.Equal([ToolIds.WorkflowReviewChecklist, ToolIds.PlanningTerminology], ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis).Select(tool => tool.Id));
@@ -206,7 +207,7 @@ public sealed class ToolRegistryTests
         Assert.False(string.IsNullOrWhiteSpace(masterPlanningCard.IconGlyph));
         Assert.Equal(typeof(Views.PlanningCalculatorPage), masterPlanningCard.PageType);
 
-        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder], detailedDesignCards.Select(card => card.Id));
+        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.DrawingVersionComparator], detailedDesignCards.Select(card => card.Id));
         Assert.All(detailedDesignCards, card => Assert.False(string.IsNullOrWhiteSpace(TestLocalization.ZhCn.GetString(card.DescriptionResourceKey))));
     }
 

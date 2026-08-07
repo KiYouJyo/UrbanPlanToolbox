@@ -54,6 +54,19 @@ public sealed class ToolRegistry
                 new(ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 30)]
         },
         new(
+            ToolIds.DrawingVersionComparator,
+            "Tool_DrawingVersionComparator_Name",
+            "Tool_DrawingVersionComparator_Description",
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.DetailedDesign,
+            "\uE8A5",
+            typeof(Views.DrawingComparisonPage),
+            35,
+            true,
+            "tuzhibanbenchayiqi",
+            "T",
+            "Tool_DrawingVersionComparator_Keywords"),
+        new(
             ToolIds.WorkflowReviewChecklist,
             "Tool_WorkflowReviewChecklist_Name",
             "Tool_WorkflowReviewChecklist_Description",

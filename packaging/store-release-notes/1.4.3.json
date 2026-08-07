@@ -1,0 +1,8 @@
+{
+  "version": "1.4.3",
+  "notes": {
+    "zh-CN": "修复 Microsoft Store 与 GitHub 旁加载渠道识别及更新来源选择。",
+    "ja-JP": "Microsoft Store と GitHub サイドロードのチャネル識別および更新元の選択を修正しました。",
+    "en-US": "Fixed Microsoft Store and GitHub sideload channel detection and update-source selection."
+  }
+}

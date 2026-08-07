@@ -30,3 +30,27 @@ public static class DistributionChannelProvider
 
     public static bool UsesGitHubUpdates => Current == DistributionChannel.GitHub;
 }
+
+public static class DistributionChannelDecision
+{
+    public static DistributionChannel ForBuild(bool storeBuild, bool packageIdentityAvailable) =>
+        storeBuild ? DistributionChannel.Store :
+        packageIdentityAvailable ? DistributionChannel.GitHub : DistributionChannel.Development;
+}
+
+public enum AppUpdateProviderKind
+{
+    Store,
+    GitHub,
+    Development
+}
+
+public static class AppUpdateProviderDecision
+{
+    public static AppUpdateProviderKind ForChannel(DistributionChannel channel) => channel switch
+    {
+        DistributionChannel.Store => AppUpdateProviderKind.Store,
+        DistributionChannel.GitHub => AppUpdateProviderKind.GitHub,
+        _ => AppUpdateProviderKind.Development
+    };
+}

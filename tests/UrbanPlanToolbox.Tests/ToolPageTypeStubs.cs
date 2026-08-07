@@ -15,3 +15,4 @@ public sealed class DesignConceptDictionaryPage;
 public sealed class CoordinateSystemConverterPage;
 public sealed class PlanningTerminologyPage;
 public sealed class FieldSurveyPhotoGisPage;
+public sealed class DrawingComparisonPage;
