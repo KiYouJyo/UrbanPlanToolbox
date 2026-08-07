@@ -12,8 +12,8 @@ public sealed class ProductReadinessTests
     {
         var text = DiagnosticsInfoService.Create("failed at C:\\Users\\secret\\project.json");
         Assert.Contains("UrbanPlanToolbox", text);
-        Assert.Contains("v1.3.1", text);
-        Assert.Contains("数据架构版本", text);
+        Assert.Contains("v1.4.0", text);
+        Assert.Contains("Data schema version", text);
         Assert.DoesNotContain("C:\\Users", text);
         Assert.Contains(RuntimeInformation.OSArchitecture.ToString(), text);
     }
@@ -30,7 +30,6 @@ public sealed class ProductReadinessTests
             Directory.CreateDirectory(external);
             await File.WriteAllTextAsync(Path.Combine(root, "settings.json"), "data");
             await File.WriteAllTextAsync(Path.Combine(external, "keep.txt"), "keep");
-
             Assert.True(await new LocalDataResetService(provider).ResetAsync());
             Assert.False(File.Exists(Path.Combine(root, "settings.json")));
             Assert.True(File.Exists(Path.Combine(external, "keep.txt")));

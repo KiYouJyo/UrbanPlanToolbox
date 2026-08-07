@@ -19,7 +19,7 @@ public sealed class ToolSearchService
 
         var normalizedQuery = query?.Trim() ?? string.Empty;
         var matchingTools = _toolRegistry.All
-            .Where(tool => tool.IsAvailable && Matches(tool, normalizedQuery, _localization))
+            .Where(tool => tool.IsAvailable && tool.Visibility == ToolVisibility.Visible && tool.Searchable && Matches(tool, normalizedQuery, _localization))
             .OrderByDescending(isFavorite)
             .ThenBy(tool => tool.PinyinSortKey, StringComparer.Ordinal)
             .ThenBy(tool => tool.Id, StringComparer.Ordinal)

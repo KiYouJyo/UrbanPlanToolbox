@@ -1,12 +1,15 @@
 # Microsoft Store 发布指南
 
-UrbanPlanToolbox 已在 Microsoft Store 发布。普通用户入口为：
+## 当前状态与节奏
 
-- 产品页：https://apps.microsoft.com/detail/9MWDPJG1BHKW
-- Store 协议：`ms-windows-store://pdp/?productid=9MWDPJG1BHKW`
+- 产品页：<https://apps.microsoft.com/detail/9MWDPJG1BHKW>
 - Store ID：`9MWDPJG1BHKW`
-- 当前公开产品版本：`1.3.0`
-- GitHub 旁加载包版本：`1.3.0.0`
+- 最后实际公开的 Store 产品版本：`v1.3.0`
+- GitHub 最新正式版本：`v1.4.0`
+- v1.4.0 Store 状态：`SKIPPED BY RELEASE POLICY`
+- 下一 Store 里程碑：`v1.5.0`
+
+Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 产品里程碑更新。GitHub 与 Store 的最新版本可以不同；本页不把 GitHub v1.4.0 表述为 Store v1.4.0。
 
 ## Store 身份
 
@@ -17,9 +20,9 @@ UrbanPlanToolbox 已在 Microsoft Store 发布。普通用户入口为：
 
 Store 渠道使用 `Package.Store.appxmanifest` 和 `DistributionChannel=Store`，生成 `.msixupload` 并在最终主线产物上运行 WACK。发布后的更新由 Microsoft Store 管理。
 
-## v1.2.1 手动工作流边界
+## 手动工作流边界
 
-本次从最终 `main` 构建 `1.2.1.0` `.msixupload`，通过仅 `workflow_dispatch` 的 Actions 工作流上传 Partner Center 草稿。首次运行使用 `submit_for_certification=false`；草稿验收通过后才允许再次手动运行并送认证。在 Microsoft 完成认证前，公开 Store 页面仍可能提供旧版本。
+仅在 Store 里程碑版本取得单独授权后，才允许上传 Partner Center 草稿或送认证。上传、认证和发布阶段保持独立；在认证完成前，公开 Store 页面可能仍提供旧版本。
 
 ## 渠道隔离
 
@@ -27,16 +30,14 @@ GitHub 旁加载渠道使用 `Package.appxmanifest` 与 `CN=AppPublisher`，拥�
 
 ## 应用能力与公开链接
 
-`runFullTrust` 用于 WinUI 桌面应用所需的完全信任执行能力，以及本地文件、提醒和应用数据操作。它不代表应用会自动上传用户数据。
+`runFullTrust` 用于 WinUI 桌面应用所需的完全信任执行能力，以及本地文件、提醒和应用数据操作；它不代表应用会自动上传用户数据。
 
-- 项目主页：https://github.com/KiYouJyo/UrbanPlanToolbox
-- 问题反馈：https://github.com/KiYouJyo/UrbanPlanToolbox/issues
-- 网站：https://kiyoujyo.github.io/UrbanPlanToolbox/
-- 隐私政策：https://kiyoujyo.github.io/UrbanPlanToolbox/privacy/
-- 支持页面：https://kiyoujyo.github.io/UrbanPlanToolbox/support/
+- 项目主页：<https://github.com/KiYouJyo/UrbanPlanToolbox>
+- 问题反馈：<https://github.com/KiYouJyo/UrbanPlanToolbox/issues>
+- 网站：<https://kiyoujyo.github.io/UrbanPlanToolbox/>
+- 隐私政策：<https://kiyoujyo.github.io/UrbanPlanToolbox/privacy/>
+- 支持页面：<https://kiyoujyo.github.io/UrbanPlanToolbox/support/>
 
 ## 后续更新流程
 
-从最终 `main` 重新构建，核对正式 Identity、Publisher、资源、版本和 SHA-256；对最终 Store 产物运行 WACK，再由维护者手工上传 Partner Center。Store 包版本必须单调递增，产品显示版本与公开文档保持一致。不要为同一已发布版本复用或随意重建包。
-
-Partner Center 中的应用名称、描述、隐私政策、支持网址和 Store listing 字段应与公开网站保持一致。不要把 GitHub 旁加载包上传为 Store 包，也不要提交私钥、证书密码或本机验收文件。
+从最终 `main` 重新构建，核对正式 Identity、Publisher、资源、版本和 SHA-256；对最终 Store 产物运行 WACK，再由维护者手工上传 Partner Center。Store 包版本必须单调递增，产品显示版本与公开文档保持一致。不要为同一已发布版本复用或随意重建包，也不要提交私钥、证书密码或本机验收文件。

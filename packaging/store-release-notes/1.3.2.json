@@ -1,0 +1,17 @@
+{
+  "version": "1.3.2",
+  "locales": {
+    "zh-CN": [
+      "修复关于页面发布者显示错误。",
+      "修复冷启动时可能出现纯黑空白窗口的问题。"
+    ],
+    "ja-JP": [
+      "About ページの発行元表示を修正しました。",
+      "冷起動時に黒い空白ウィンドウが表示される問題を修正しました。"
+    ],
+    "en-US": [
+      "Fixed the publisher shown on the About page.",
+      "Fixed a cold-start issue that could show a black empty window."
+    ]
+  }
+}

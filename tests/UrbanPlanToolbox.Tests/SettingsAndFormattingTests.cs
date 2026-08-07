@@ -98,4 +98,46 @@ public sealed class SettingsAndFormattingTests
         }
         finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
     }
+
+    [Fact]
+    public void InvalidSettingsUseSafeDefaultsWithoutDiscardingValidFields()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, "{\"Theme\":\"Banana\",\"Language\":\"xx-invalid\",\"DecimalPlaces\":\"bad\",\"AutoCalculate\":true,\"ProjectMilestoneReminderRepeatInterval\":999,\"FavoriteToolIds\":[\"unit-scale-converter\",\"unit-scale-converter\",\"\"]}");
+
+            var loaded = new SettingsService(path).Load();
+
+            Assert.Equal("System", loaded.Theme);
+            Assert.Equal(LanguagePreference.SystemValue, loaded.Language);
+            Assert.Equal(SettingsService.DefaultDecimalPlaces, loaded.DecimalPlaces);
+            Assert.True(loaded.AutoCalculate);
+            Assert.Equal(MilestoneReminderRepeatInterval.None, loaded.NormalizedProjectMilestoneReminderRepeatInterval);
+            Assert.Equal(["unit-scale-converter"], loaded.FavoriteToolIds);
+        }
+        finally
+        {
+            var folder = Path.GetDirectoryName(path)!;
+            if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void SettingsKeysAreCanonicalAndCentralized()
+    {
+        Assert.Equal("Theme", SettingsKeys.Theme);
+        Assert.Equal("Language", SettingsKeys.Language);
+        Assert.Equal("ProjectMilestoneNotificationsEnabled", SettingsKeys.ProjectMilestoneNotificationsEnabled);
+        Assert.Equal("ProjectMilestoneReminderRepeatInterval", SettingsKeys.ProjectMilestoneReminderRepeatInterval);
+    }
+
+    [Fact]
+    public void ThemeIsExposedAsAValidatedStrongType()
+    {
+        Assert.Equal(AppTheme.Light, SettingsService.NormalizeTheme("Light"));
+        Assert.Equal(AppTheme.Dark, SettingsService.NormalizeTheme("Dark"));
+        Assert.Equal(AppTheme.System, SettingsService.NormalizeTheme("Banana"));
+    }
 }

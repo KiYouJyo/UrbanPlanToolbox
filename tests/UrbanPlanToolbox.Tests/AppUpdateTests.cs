@@ -16,6 +16,29 @@ public sealed class AppUpdateTests
         Assert.Equal(expected, DistributionChannelIdentity.Identify(name, publisher, publisherId));
 
     [Theory]
+    [InlineData(DistributionChannel.GitHub, "About_ChannelGitHub", true, false, true)]
+    [InlineData(DistributionChannel.Store, "About_ChannelStore", true, true, false)]
+    [InlineData(DistributionChannel.Development, "About_ChannelDevelopment", false, false, false)]
+    public void DistributionContextExposesChannelCapabilities(DistributionChannel channel, string resourceKey, bool canCheck, bool canInstall, bool canOpenReleases)
+    {
+        var context = DistributionChannelContext.For(channel);
+
+        Assert.Equal(resourceKey, context.DisplayResourceKey);
+        Assert.Equal(canCheck, context.CanCheckForUpdates);
+        Assert.Equal(canInstall, context.CanSelfUpdate);
+        Assert.Equal(canOpenReleases, context.CanOpenReleases);
+    }
+
+    [Fact]
+    public async Task DevelopmentUpdateServiceNeverUsesReleaseChannels()
+    {
+        var service = new DevelopmentAppUpdateService();
+
+        Assert.Equal(AppUpdateState.UnsupportedChannel, (await service.CheckForUpdatesAsync()).State);
+        Assert.Equal(AppUpdateState.UnsupportedChannel, (await service.DownloadAndInstallAsync()).State);
+    }
+
+    [Theory]
     [InlineData(FakeAppUpdateScenario.UpToDate, AppUpdateState.UpToDate)]
     [InlineData(FakeAppUpdateScenario.UpdateAvailable, AppUpdateState.UpdateAvailable)]
     [InlineData(FakeAppUpdateScenario.UnsupportedChannel, AppUpdateState.UnsupportedChannel)]

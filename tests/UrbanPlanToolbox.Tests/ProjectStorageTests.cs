@@ -330,6 +330,35 @@ public sealed class ProjectStorageTests
     }
 
     [Fact]
+    public async Task UnversionedLegacyProjectIsTreatedAsSchemaOneAndMigratedSafely()
+    {
+        using var scope = new ProjectScope();
+        var id = Guid.NewGuid();
+        var now = DateTimeOffset.UtcNow;
+        var legacy = new
+        {
+            id,
+            name = "Unversioned legacy",
+            type = ProjectTypeCodes.Personal,
+            todos = new[] { new { id = Guid.NewGuid(), title = "Keep this", isCompleted = false, createdAtUtc = now, displayOrder = 0 } },
+            planningSnapshots = Array.Empty<object>(),
+            isArchived = false,
+            createdAtUtc = now,
+            updatedAtUtc = now
+        };
+        var path = scope.Provider.GetProjectDataFilePath(id);
+        await File.WriteAllTextAsync(path, JsonSerializer.Serialize(legacy, DataStorageJson.Options), new UTF8Encoding(false));
+
+        var read = await scope.Service.ReadAsync(id);
+
+        Assert.Equal(DataStorageStatus.Success, read.Status);
+        Assert.Equal(3, read.SchemaVersion);
+        Assert.Single(read.Value!.Todos);
+        Assert.Contains("\"schemaVersion\": 3", await File.ReadAllTextAsync(path));
+        Assert.True(File.Exists(scope.Provider.GetProjectBackupFilePath(id)));
+    }
+
+    [Fact]
     public async Task SchemaTwoProjectMigratesToDesignDetailsAndKeepsIdentityLifecycleAndFolder()
     {
         using var scope = new ProjectScope();

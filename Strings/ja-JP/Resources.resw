@@ -1682,4 +1682,9 @@
   <data name="FirstRunGuide_SettingsTitle" xml:space="preserve"><value>初回利用ガイド</value></data>
   <data name="FirstRunGuide_SettingsDescription" xml:space="preserve"><value>プロジェクト、ツール、検索、プライバシーの概要をもう一度確認します。</value></data>
   <data name="FirstRunGuide_SettingsAction" xml:space="preserve"><value>再び開く</value></data>
+  <data name="About_ChannelDevelopment" xml:space="preserve"><value>開発ビルド</value></data>
+  <data name="Action_OpenLogsFolder" xml:space="preserve"><value>ログ フォルダーを開く</value></data>
+  <data name="Error_OpenLogsFolderFailed" xml:space="preserve"><value>ログ フォルダーを開けませんでした。</value></data>
+  <data name="About_DiagnosticsTitle.Text" xml:space="preserve"><value>診断とログ</value></data>
+  <data name="About_DiagnosticsSummary.Text" xml:space="preserve"><value>アプリの診断情報をコピーしたり、ローカルのログフォルダーを開いたりして、問題の確認に利用できます。ログは端末内にのみ保存され、自動送信されません。</value></data>
 </root>

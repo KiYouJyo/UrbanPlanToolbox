@@ -8,7 +8,7 @@
 
 ## 获取应用
 
-推荐通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装并接收更新。当前公开版本为 **1.3.0**；GitHub Release 已提供 x64 framework-dependent 自签名旁加载包。两条渠道的身份、Publisher 和更新流程保持独立。
+普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；当前最后实际公开的 Store 版本为 **v1.3.0**。GitHub 最新正式版本为 **v1.4.0**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新，因此 v1.4.0 按本次发布政策跳过 Store，下一 Store 里程碑为 v1.5.0。两条渠道的身份、Publisher 和更新流程保持独立。
 
 ## 关于 UrbanPlanToolbox
 
@@ -26,7 +26,7 @@ UrbanPlanToolbox 是一个面向城乡规划、建筑设计和空间研究的 Wi
 
 ## 安装
 
-Microsoft Store 是普通用户的首选渠道。仓库同时提供 x64 framework-dependent 自签名旁加载包；请从[最新 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) 获取当前包，并在安装前核对校验和。两条渠道身份独立，不能相互覆盖升级。
+Microsoft Store 是普通用户获取稳定里程碑版本的首选渠道。仓库同时提供 x64 framework-dependent 自签名旁加载包；需要最新正式功能时，请从[最新 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) 获取当前包，并在安装前核对校验和。两条渠道身份独立，不能相互覆盖升级。
 
 ## 隐私与离线设计
 
@@ -76,4 +76,4 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 
 ## 许可证与第三方声明
 
-本仓库当前未声明项目许可证；在许可证决定前，请不要将其描述为已授权的开源软件。依赖与外部数据来源见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+UrbanPlanToolbox 使用 [MIT License](LICENSE) 开源。依赖与外部数据来源见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。

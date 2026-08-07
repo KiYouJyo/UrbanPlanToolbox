@@ -10,7 +10,7 @@ namespace UrbanPlanToolbox.Services;
 
 public sealed class BackupDataService
 {
-    public const int BackupFormatVersion = 1;
+    public const int BackupFormatVersion = 2;
     public const int MaximumFileCount = 10_000;
     public const long MaximumSingleFileBytes = 256L * 1024 * 1024;
     public const long MaximumPackageBytes = 2L * 1024 * 1024 * 1024;
@@ -56,7 +56,10 @@ public sealed class BackupDataService
             ValidateLimits(files.Count, files.Sum(file => file.Size), files.Select(file => file.Size));
             var manifest = new BackupManifest
             {
-                BackupFormatVersion = BackupFormatVersion, CreatedAtUtc = DateTimeOffset.UtcNow,
+                Format = BackupManifest.ExpectedFormat,
+                BackupFormatVersion = BackupFormatVersion,
+                DataSchemaVersion = ProjectStorageService.ProjectSchemaVersion,
+                CreatedAtUtc = DateTimeOffset.UtcNow,
                 ExportedByAppVersion = _appVersion, ProjectCount = projects.Projects.Count,
                 ActiveProjectCount = projects.Projects.Count(project => !project.IsArchived),
                 ArchivedProjectCount = projects.Projects.Count(project => project.IsArchived), Files = files
@@ -97,8 +100,13 @@ public sealed class BackupDataService
             BackupManifest? manifest;
             await using (var stream = manifestEntry.Open()) manifest = await JsonSerializer.DeserializeAsync<BackupManifest>(stream, DataStorageJson.Options, cancellationToken).ConfigureAwait(false);
             if (manifest is null) return new(BackupOperationStatus.InvalidPackage, FailureType: "ManifestInvalid");
-            if (manifest.BackupFormatVersion > BackupFormatVersion) return new(BackupOperationStatus.UnsupportedFutureVersion, manifest, "FutureBackupFormat");
-            if (manifest.BackupFormatVersion != BackupFormatVersion || manifest.CreatedAtUtc.Offset != TimeSpan.Zero) return new(BackupOperationStatus.InvalidPackage, manifest, "ManifestInvalid");
+            var formatVersion = manifest.BackupFormatVersion;
+            if (formatVersion > BackupFormatVersion) return new(BackupOperationStatus.UnsupportedFutureVersion, manifest, "FutureBackupFormat");
+            if (formatVersion < 1 || manifest.CreatedAtUtc.Offset != TimeSpan.Zero) return new(BackupOperationStatus.InvalidPackage, manifest, "ManifestInvalid");
+            if (formatVersion >= 2 && !string.Equals(manifest.Format, BackupManifest.ExpectedFormat, StringComparison.Ordinal))
+                return new(BackupOperationStatus.InvalidPackage, manifest, "ManifestFormatMismatch");
+            if (manifest.DataSchemaVersion is > ProjectStorageService.ProjectSchemaVersion)
+                return new(BackupOperationStatus.UnsupportedFutureVersion, manifest, "FutureDataSchema");
             var listed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var file in manifest.Files)
             {

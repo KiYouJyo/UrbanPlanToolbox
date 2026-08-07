@@ -48,7 +48,7 @@ $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version
 if ($projectVersion -notmatch '^\d+\.\d+\.\d+$') { throw "UrbanPlanToolbox.csproj Version must use major.minor.patch format; got '$projectVersion'." }
 $expectedPackageVersion = "$projectVersion.0"
 if ($PackageVersion -ne $expectedPackageVersion) { throw "Store package version must match project version. Project=$projectVersion ExpectedPackage=$expectedPackageVersion ActualPackage=$PackageVersion" }
-if ($PackageVersion -ne '1.3.1.0') { throw 'This v1.3.1 workflow only accepts Store package version 1.3.1.0.' }
+if ($PackageVersion -ne '1.4.0.0') { throw 'This v1.4.0 workflow only accepts Store package version 1.4.0.0.' }
 if (Test-Path -LiteralPath $output) {
     if (@(Get-ChildItem -LiteralPath $output -Force).Count -gt 0) { throw "Store package output directory must be new or empty: $output" }
 }

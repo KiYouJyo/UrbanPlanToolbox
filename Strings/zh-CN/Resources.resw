@@ -1688,4 +1688,9 @@ dwyblchhq</value>
   <data name="FirstRunGuide_SettingsTitle" xml:space="preserve"><value>首次使用向导</value></data>
   <data name="FirstRunGuide_SettingsDescription" xml:space="preserve"><value>重新查看项目、工具、搜索功能和隐私信息的简要介绍。</value></data>
   <data name="FirstRunGuide_SettingsAction" xml:space="preserve"><value>重新打开</value></data>
+  <data name="About_ChannelDevelopment" xml:space="preserve"><value>开发版本</value></data>
+  <data name="Action_OpenLogsFolder" xml:space="preserve"><value>打开日志文件夹</value></data>
+  <data name="Error_OpenLogsFolderFailed" xml:space="preserve"><value>无法打开日志文件夹。</value></data>
+  <data name="About_DiagnosticsTitle.Text" xml:space="preserve"><value>诊断与日志</value></data>
+  <data name="About_DiagnosticsSummary.Text" xml:space="preserve"><value>复制应用诊断信息，或打开本地日志文件夹，用于问题排查。日志仅保存在本机，不会自动上传。</value></data>
 </root>

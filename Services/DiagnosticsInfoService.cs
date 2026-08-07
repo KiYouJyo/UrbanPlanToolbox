@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Windows.ApplicationModel;
 
 namespace UrbanPlanToolbox.Services;
 
@@ -10,27 +11,48 @@ public static class DiagnosticsInfoService
         var settings = new SettingsService().Load();
         var sdk = AppDomain.CurrentDomain.GetAssemblies()
             .FirstOrDefault(assembly => assembly.GetName().Name?.Contains("WindowsApp", StringComparison.OrdinalIgnoreCase) == true)
-            ?.GetName().Version?.ToString() ?? "未记录";
+            ?.GetName().Version?.ToString() ?? "Unavailable";
         return string.Join(Environment.NewLine,
-            $"应用名称: UrbanPlanToolbox",
-            $"应用版本: {AppVersionProvider.DisplayVersion}",
-            $"发行渠道: {GetChannelLabel(DistributionChannelProvider.Current)}",
-            $"系统架构: {RuntimeInformation.OSArchitecture}",
-            $"Windows 版本: {Environment.OSVersion.Version}",
-            $"Windows App SDK 版本: {sdk}",
-            $"当前界面语言: {LanguagePreference.Normalize(settings.Language)}",
-            $"数据架构版本: {AppVersionProvider.DataSchemaVersion}",
-            "通知功能: 本地计划提醒（无自动上传）",
-            $"错误摘要: {Sanitize(errorSummary) ?? "无"}");
+            "Application: UrbanPlanToolbox",
+            $"Display version: {AppVersionProvider.DisplayVersion}",
+            $"Package version: {AppVersionProvider.GetPackageVersion()}",
+            $"Channel: {DistributionChannelProvider.CurrentContext.Channel}",
+            $"Architecture: {RuntimeInformation.OSArchitecture}",
+            $"Windows version: {Environment.OSVersion.Version}",
+            $"Windows App SDK version: {sdk}",
+            $"Language: {LanguagePreference.Normalize(settings.Language)}",
+            $"Theme: {SettingsService.NormalizeTheme(settings.Theme)}",
+            $"Data schema version: {AppVersionProvider.DataSchemaVersion}",
+            "Backup format version: 2",
+            $"Package identity: {GetPackageIdentity()}",
+            "Data handling: local-only diagnostics; no telemetry or project contents",
+            $"Error summary: {Sanitize(errorSummary) ?? "None"}");
     }
 
-    public static string GetChannelLabel(DistributionChannel channel) => channel == DistributionChannel.Store ? "Microsoft Store" : "GitHub 侧载";
+    public static string GetChannelLabel(DistributionChannel channel) => channel switch
+    {
+        DistributionChannel.Store => "Microsoft Store",
+        DistributionChannel.GitHub => "GitHub sideload",
+        _ => "Development"
+    };
+
+    private static string GetPackageIdentity()
+    {
+        try
+        {
+            var id = Package.Current.Id;
+            return $"family={Sanitize(id.FamilyName) ?? "Unavailable"}; fullName={Sanitize(id.FullName) ?? "Unavailable"}";
+        }
+        catch { return "Unpackaged"; }
+    }
 
     private static string? Sanitize(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;
         var text = value.Replace(Environment.NewLine, " ").Replace('\r', ' ').Replace('\n', ' ');
-        text = Regex.Replace(text, @"[A-Za-z]:\\[^\s]+", "[path]", RegexOptions.CultureInvariant);
+        text = Regex.Replace(text, @"(?i)(bearer\s+|token|password|secret|api[-_]?key)\s*[:=]\s*[^\s,;]+", "$1[redacted]", RegexOptions.CultureInvariant);
+        text = Regex.Replace(text, @"(?i)([A-Za-z]:\\|\\\\)[^\s]+", "[path]", RegexOptions.CultureInvariant);
+        text = Regex.Replace(text, @"(?i)(user(name)?|account)\s*[:=]\s*[^\s,;]+", "$1=[redacted]", RegexOptions.CultureInvariant);
         return text.Length <= 240 ? text : text[..240];
     }
 }

@@ -71,11 +71,11 @@ public sealed class FavoriteToolsService
 
     public IReadOnlyList<ToolDefinition> GetFavoriteTools() =>
         _toolRegistry.All
-            .Where(tool => tool.IsAvailable && _favoriteIds.Contains(tool.Id))
+            .Where(tool => tool.IsAvailable && tool.Visibility == ToolVisibility.Visible && tool.SupportsFavorites && _favoriteIds.Contains(tool.Id))
             .ToArray();
 
     private bool IsAvailableTool(string? toolId) =>
-        _toolRegistry.TryGet(toolId, out var tool) && tool is { IsAvailable: true };
+        _toolRegistry.TryGet(toolId, out var tool) && tool is { IsAvailable: true, Visibility: ToolVisibility.Visible, SupportsFavorites: true };
 
     private void PersistAndNotify()
     {

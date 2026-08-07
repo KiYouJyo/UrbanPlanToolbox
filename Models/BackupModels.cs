@@ -1,10 +1,44 @@
+using System.Text.Json.Serialization;
+
 namespace UrbanPlanToolbox.Models;
 
 public sealed class BackupManifest
 {
-    public required int BackupFormatVersion { get; init; }
+    public const string ExpectedFormat = "UrbanPlanToolbox Backup";
+
+    [JsonPropertyName("format")]
+    public string? Format { get; init; }
+
+    [JsonPropertyName("formatVersion")]
+    public int FormatVersion { get; init; }
+
+    [JsonPropertyName("backupFormatVersion")]
+    public int? LegacyBackupFormatVersion { get; init; }
+
+    [JsonIgnore]
+    public int BackupFormatVersion
+    {
+        get => FormatVersion > 0 ? FormatVersion : LegacyBackupFormatVersion ?? 0;
+        init => FormatVersion = value;
+    }
+
+    [JsonPropertyName("dataSchemaVersion")]
+    public int? DataSchemaVersion { get; init; }
+
     public required DateTimeOffset CreatedAtUtc { get; init; }
-    public required string ExportedByAppVersion { get; init; }
+
+    [JsonPropertyName("createdWith")]
+    public string? CreatedWith { get; init; }
+
+    [JsonPropertyName("exportedByAppVersion")]
+    public string? LegacyExportedByAppVersion { get; init; }
+
+    [JsonIgnore]
+    public string ExportedByAppVersion
+    {
+        get => CreatedWith ?? LegacyExportedByAppVersion ?? string.Empty;
+        init => CreatedWith = value;
+    }
     public int ProjectCount { get; init; }
     public int ActiveProjectCount { get; init; }
     public int ArchivedProjectCount { get; init; }

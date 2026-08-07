@@ -217,6 +217,32 @@ public sealed class ToolRegistryTests
         Assert.Throws<ArgumentException>(() => new ToolRegistry(tools));
     }
 
+    [Fact]
+    public void RegistryMetadataControlsSearchFavoritesAndVisibility()
+    {
+        var tool = CreateTool("metadata-tool", 10) with
+        {
+            SupportsFavorites = false,
+            Searchable = false,
+            Visibility = ToolVisibility.Hidden
+        };
+        var registry = new ToolRegistry([tool]);
+
+        Assert.Empty(registry.GetVisibleTools());
+        Assert.False(registry.GetById("metadata-tool").SupportsFavorites);
+        Assert.False(registry.GetById("metadata-tool").Searchable);
+    }
+
+    [Fact]
+    public void NonSearchableToolMayOmitSearchKeywords()
+    {
+        var tool = CreateTool("non-searchable", 10) with { Searchable = false, SearchKeywordsResourceKey = string.Empty };
+
+        var registry = new ToolRegistry([tool]);
+
+        Assert.False(registry.GetById("non-searchable").Searchable);
+    }
+
     private static ToolDefinition CreateTool(string id, int sortOrder) => new(
         id,
         $"{id}_Name",
