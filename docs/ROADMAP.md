@@ -6,8 +6,15 @@ UrbanPlanToolbox 是面向城乡规划、建筑设计与空间研究的离线优
 
 ## 当前发布状态
 
-- GitHub 最新正式版本：`v1.4.1`。
-- Microsoft Store 最后实际公开版本：`v1.3.0`；本次 v1.4.1 不提交 Store。
+- GitHub 最新正式版本：`v1.4.2`。
+- Microsoft Store 最后实际公开版本：`v1.3.0`；本次 v1.4.2 不提交 Store。
+
+## v1.4.2
+
+- 发布“调研照片整理器”，用于规划、设计与 GIS 实地调研照片的 EXIF/GPS 读取、标签备注整理、统一命名和 GIS/CSV 导出。
+- 状态：Released（GitHub）。
+- Microsoft Store：按里程碑政策跳过本版本。
+- 下一 Microsoft Store 里程碑：`v1.5.0`。
 
 ## v1.4.1
 

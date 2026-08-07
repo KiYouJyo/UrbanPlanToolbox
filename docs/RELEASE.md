@@ -2,6 +2,12 @@
 
 本文档是 UrbanPlanToolbox 的可复用发布边界与检查清单。
 
+## v1.4.2 发布决策
+
+- GitHub：发布正式 `v1.4.2` Release、`v1.4.2` 标签和 x64 framework-dependent 自签名旁加载包。
+- Microsoft Store：`SKIPPED BY RELEASE POLICY`。本版本不执行 Store CLI、Partner Center、草稿上传、认证或 listing 修改；下一 Store 里程碑为 `v1.5.0`。
+- 新增“调研照片整理器”，实际能力以 README、CHANGELOG 和正式 Release Notes 为准。
+
 ## v1.4.1 发布决策
 
 - GitHub：发布正式 `v1.4.1` Release、标签和 x64 framework-dependent 自签名旁加载包。

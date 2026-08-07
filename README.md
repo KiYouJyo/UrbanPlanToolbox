@@ -8,7 +8,7 @@
 
 ## 获取应用
 
-普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；当前最后实际公开的 Store 版本为 **v1.3.0**。GitHub 最新正式版本为 **v1.4.1**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新，因此 v1.4.1 按本次发布政策跳过 Store，下一 Store 里程碑为 v1.5.0。两条渠道的身份、Publisher 和更新流程保持独立。
+普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；当前最后实际公开的 Store 版本为 **v1.3.0**。GitHub 最新正式版本为 **v1.4.2**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新，因此 v1.4.2 按本次发布政策跳过 Store，下一 Store 里程碑为 v1.5.0。两条渠道的身份、Publisher 和更新流程保持独立。
 
 ## 关于 UrbanPlanToolbox
 
@@ -23,6 +23,16 @@ UrbanPlanToolbox 是一个面向城乡规划、建筑设计和空间研究的 Wi
 - 坐标系转换器支持 WGS 84、GCJ-02 与 BD-09 点坐标的本地转换，并在本机处理 Shapefile；不支持投影坐标系。
 - 本地工具搜索与收藏；支持 `.uptbackup` 数据导出、导入和恢复。
 - 简体中文、日语和英语；浅色、深色和跟随系统主题。
+
+### 调研照片整理器
+
+面向规划、设计与 GIS 实地调研的本地照片整理工具，可读取照片 EXIF/GPS 信息，整理标签与备注，并导出统一命名的照片副本、GIS 点位及 CSV 数据。
+
+- 批量导入 JPG、JPEG、HEIC、HEIF 和 PNG 照片。
+- 读取 EXIF、GPS、拍摄时间、海拔和方向信息，并提供缩略图预览。
+- 使用自由输入的标签与备注整理照片。
+- 导出 WGS 84 / EPSG:4326 Shapefile 点位和 CSV 元数据；无 GPS 照片不进入点图层，但仍保留在照片和 CSV 输出中。
+- 原始照片只读，照片和 GPS 仅在本机处理；HEIC 预览可能依赖 Windows 图像编解码器，但不影响已支持的元数据读取。
 
 ## 安装
 
@@ -77,6 +87,13 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 ## 许可证与第三方声明
 
 UrbanPlanToolbox 使用 [MIT License](LICENSE) 开源。依赖与外部数据来源见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+
+## v1.4.2 GitHub Release
+
+- 新增“调研照片整理器”（设计工具 → 实地调研），面向规划、设计与 GIS 实地调研照片整理。
+- 支持 EXIF/GPS、拍摄时间、海拔、方向、缩略图、Tags/标签和 Note/备注。
+- 支持统一命名的照片副本、WGS 84 / EPSG:4326 Shapefile 点位和 CSV 元数据导出。
+- 原始照片保持不变，照片和 GPS 仅在本机处理；v1.4.2 仅发布 GitHub，Microsoft Store 按里程碑政策跳过。
 
 ## v1.4.1 GitHub Release
 

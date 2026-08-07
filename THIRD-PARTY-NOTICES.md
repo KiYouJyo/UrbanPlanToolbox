@@ -1,6 +1,6 @@
 # Third-party notices / 第三方声明 / 第三者告知
 
-Version 1.3.0 · Last updated 2026-08-06
+Version 1.4.2 · Last updated 2026-08-07
 
 ## Application dependencies
 
@@ -11,6 +11,8 @@ The project references the following packages in `UrbanPlanToolbox.csproj`:
 - `Microsoft.Windows.SDK.BuildTools.WinApp` `0.5.0` — Microsoft software; see the package license and notices distributed with the package.
 - `NetTopologySuite` `2.6.0` — BSD 3-Clause License.
 - `NetTopologySuite.IO.Esri.Shapefile` `1.2.0` — BSD 3-Clause License; forward-only Esri Shapefile readers and writers.
+- `MetadataExtractor` `2.9.0` — Apache License 2.0; local EXIF/GPS metadata reading.
+- `XmpCore` `6.1.10.1` — transitive metadata dependency; see its package license notice at <https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html>.
 
 Both packages are used only for local geometry and Shapefile I/O. The application does not use an online coordinate conversion service and does not upload Shapefile data.
 

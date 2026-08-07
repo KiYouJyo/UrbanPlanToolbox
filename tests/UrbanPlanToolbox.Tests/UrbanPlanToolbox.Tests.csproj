@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
  <PropertyGroup><TargetFramework>net10.0-windows10.0.26100.0</TargetFramework><Platforms>AnyCPU;x64</Platforms><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><IsPackable>false</IsPackable><IsTestProject>true</IsTestProject></PropertyGroup>
  <ItemGroup><PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" /><PackageReference Include="NetTopologySuite.IO.Esri.Shapefile" Version="1.2.0" /><PackageReference Include="xunit" Version="2.9.3" /><PackageReference Include="xunit.runner.visualstudio" Version="3.0.2"><PrivateAssets>all</PrivateAssets></PackageReference></ItemGroup>
+ <ItemGroup><PackageReference Include="MetadataExtractor" Version="2.9.0" /></ItemGroup>
  <ItemGroup>
   <Compile Include="../../Models/PlanningInput.cs" Link="Models/PlanningInput.cs" />
   <Compile Include="../../Models/PlanningResult.cs" Link="Models/PlanningResult.cs" />
@@ -87,6 +88,11 @@
   <Compile Include="../../Services/ExternalLinkService.cs" Link="Services/ExternalLinkService.cs" />
   <Compile Include="../../Services/ToolRegistry.cs" Link="Services/ToolRegistry.cs" />
   <Compile Include="../../Services/ToolSearchService.cs" Link="Services/ToolSearchService.cs" />
+  <Compile Include="../../Models/FieldSurveyPhotoModels.cs" Link="Models/FieldSurveyPhotoModels.cs" />
+  <Compile Include="../../Services/FieldSurveyPhotoMetadataService.cs" Link="Services/FieldSurveyPhotoMetadataService.cs" />
+  <Compile Include="../../Services/FieldSurveyPhotoImportService.cs" Link="Services/FieldSurveyPhotoImportService.cs" />
+  <Compile Include="../../Services/FieldSurveyNamingService.cs" Link="Services/FieldSurveyNamingService.cs" />
+  <Compile Include="../../Services/FieldSurveyExportService.cs" Link="Services/FieldSurveyExportService.cs" />
   <Compile Include="../../Models/PlanningTerminologyModels.cs" Link="Models/PlanningTerminologyModels.cs" />
   <Compile Include="../../Services/IPlanningTerminologyService.cs" Link="Services/IPlanningTerminologyService.cs" />
   <Compile Include="../../Services/PlanningTerminologyService.cs" Link="Services/PlanningTerminologyService.cs" />
