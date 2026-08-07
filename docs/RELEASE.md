@@ -2,7 +2,14 @@
 
 本文档是 UrbanPlanToolbox 的可复用发布边界与检查清单。
 
-## v1.4.0 发布决策
+## v1.4.1 发布决策
+
+- GitHub：发布正式 `v1.4.1` Release、标签和 x64 framework-dependent 自签名旁加载包。
+- Microsoft Store：`SKIPPED BY RELEASE POLICY`。本版本不执行 Store CLI、Partner Center、草稿上传、认证或 listing 修改。
+- v1.4.1 新增中日英规划术语库，包含 140 条核心术语、三语检索、分类、关系辨析和来源信息。
+- 宽窗口左右栏底部的小幅不齐列为 deferred，不在本版本继续修改。
+
+## v1.4.0 发布决策（历史记录）
 
 - GitHub：发布正式 `v1.4.0` Release、标签和 x64 framework-dependent 自签名旁加载包。
 - Microsoft Store：`SKIPPED BY RELEASE POLICY`。本版本不执行 Store CLI、Partner Center、草稿上传、认证或 listing 修改；下一 Store 里程碑为 `v1.5.0`。

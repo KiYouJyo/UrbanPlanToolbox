@@ -1,0 +1,8 @@
+{
+  "version": "1.4.1",
+  "notes": {
+    "zh-CN": "本地开发候选版本，新增中日英规划术语库。当前版本不提交 Microsoft Store。",
+    "ja-JP": "ローカル開発候補版。中日英都市・空間計画用語集を追加しました。Microsoft Store には提出しません。",
+    "en-US": "Local development candidate with CN-JP-EN planning terminology. This version is not submitted to Microsoft Store."
+  }
+}
