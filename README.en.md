@@ -8,7 +8,7 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 ## Get the app
 
-The last actually published Microsoft Store version is **v1.3.0** for stable milestone users. The latest formal GitHub version is **v1.4.1**. GitHub may publish more frequently; Microsoft Store updates default to `x.0.0` or `x.5.0` milestones, so v1.4.1 is skipped for Store and the next Store milestone is v1.5.0. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
+The last actually published Microsoft Store version is **v1.3.0** for stable milestone users. The latest formal GitHub version is **v1.4.2**. GitHub may publish more frequently; Microsoft Store updates default to `x.0.0` or `x.5.0` milestones, so v1.4.2 is skipped for Store and the next Store milestone is v1.5.0. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
 
 ## About UrbanPlanToolbox
 
@@ -24,6 +24,16 @@ UrbanPlanToolbox is a Windows desktop toolbox for urban planning, architectural 
 - Local tool search and favorites, plus `.uptbackup` export, import, and restore.
 - Simplified Chinese, Japanese, and English; light, dark, and system themes.
 - v1.3.0 adds instant language switching without restarting, plus configurable project-milestone reminders: none, 6/12/24 hours, or 3 days, with up to three repeats and a 09:00 local-time default when no time is set.
+
+### Survey Photo Organizer
+
+A local photo-organizing workflow for planning, design, and GIS field surveys. It reads EXIF/GPS metadata, organizes tags and notes, and exports consistently named photo copies, GIS points, and CSV data.
+
+- Batch import JPG, JPEG, HEIC, HEIF, and PNG photos.
+- Read EXIF, GPS, capture time, altitude, and heading, with thumbnail preview.
+- Organize photos with free-form Tags and Note fields.
+- Export WGS 84 / EPSG:4326 Shapefile points and CSV metadata; photos without GPS remain in the photo and CSV output but are excluded from the point layer.
+- Original photos are read-only and photos/GPS are processed locally. HEIC preview availability may depend on Windows image codec support, without preventing supported metadata reads.
 
 ## Installation
 

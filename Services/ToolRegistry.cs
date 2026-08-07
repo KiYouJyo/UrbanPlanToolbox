@@ -135,7 +135,20 @@ public sealed class ToolRegistry
             CategoryPlacements = [
                 new(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis, 80),
                 new(ToolPrimaryCategory.Research, ToolSecondaryCategory.ResearchPreparation, 15)]
-        }
+        },
+        new(
+            ToolIds.FieldSurveyPhotoGis,
+            "Tool_FieldSurveyPhotoGis_Name",
+            "Tool_FieldSurveyPhotoGis_Description",
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.FieldResearch,
+            "\uE7C5",
+            typeof(Views.FieldSurveyPhotoGisPage),
+            90,
+            true,
+            "shidediaoyanzhaopianshuzhuli",
+            "S",
+            "Tool_FieldSurveyPhotoGis_Keywords")
     ]);
 
     public ToolRegistry(IEnumerable<ToolDefinition> tools)

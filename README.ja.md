@@ -8,7 +8,7 @@
 
 ## アプリを入手
 
-安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。最後に実際に公開された Store 版は **v1.3.0** です。GitHub の最新正式版は **v1.4.1** で、より頻繁に公開できます。Microsoft Store は原則 `x.0.0` または `x.5.0` のマイルストーンで更新するため、v1.4.1 の Store 公開はスキップし、次の Store マイルストーンを v1.5.0 とします。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
+安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。最後に実際に公開された Store 版は **v1.3.0** です。GitHub の最新正式版は **v1.4.2** で、より頻繁に公開できます。Microsoft Store は原則 `x.0.0` または `x.5.0` のマイルストーンで更新するため、v1.4.2 の Store 公開はスキップし、次の Store マイルストーンを v1.5.0 とします。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
 
 ## UrbanPlanToolbox について
 
@@ -23,6 +23,16 @@ UrbanPlanToolbox は、都市・地域計画、建築設計、空間研究のた
 - WGS 84、GCJ-02、BD-09 の点座標をローカルで変換する座標系変換ツール。Shapefile は端末内で処理され、投影座標系には対応しません。
 - ローカル検索とお気に入り、`.uptbackup` のエクスポート、インポート、復元。
 - 中国語（簡体字）、日本語、英語、ライト・ダーク・システムテーマ。
+
+### 調査写真整理ツール
+
+都市・地域計画、設計、GIS の現地調査向けのローカル写真整理ツールです。写真の EXIF/GPS を読み取り、タグとメモを整理し、統一した名前の写真コピー、GIS ポイント、CSV データを出力します。
+
+- JPG、JPEG、HEIC、HEIF、PNG の一括読み込み。
+- EXIF、GPS、撮影時刻、標高、方位、サムネイルの確認。
+- 自由入力のタグとメモ。
+- WGS 84 / EPSG:4326 の Shapefile ポイントと CSV メタデータを出力。GPS のない写真は写真と CSV に残し、ポイントレイヤーから除外します。
+- 元写真は読み取り専用で、写真と GPS はローカルで処理します。HEIC のプレビューは Windows の画像コーデックに依存する場合がありますが、対応するメタデータの読み取りには影響しません。
 
 ## インストール
 

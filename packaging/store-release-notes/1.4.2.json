@@ -1,0 +1,9 @@
+{
+  "version": "1.4.2",
+  "status": "skipped",
+  "notes": {
+    "zh-CN": "v1.4.2 新增离线实地调研照片 GIS 助理；本版本按发布政策不提交 Microsoft Store。",
+    "en-US": "v1.4.2 adds the offline Field Survey Photo GIS Assistant; Microsoft Store submission is skipped by release policy.",
+    "ja-JP": "v1.4.2 ではオフラインの現地調査写真 GIS アシスタントを追加しました。公開方針により Microsoft Store への提出は行いません。"
+  }
+}

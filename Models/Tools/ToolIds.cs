@@ -10,4 +10,5 @@ public static class ToolIds
     public const string DesignConceptDictionary = "design-concept-dictionary";
     public const string CoordinateSystemConverter = "coordinate-system-converter";
     public const string PlanningTerminology = "planning-terminology";
+    public const string FieldSurveyPhotoGis = "field-survey-photo-gis";
 }
