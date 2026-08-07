@@ -25,6 +25,9 @@ public sealed class BackupDataServiceTests
         Assert.True(result.Succeeded);
         Assert.True(inspection.Succeeded);
         Assert.Equal(BackupDataService.BackupFormatVersion, result.Manifest!.BackupFormatVersion);
+        Assert.Equal(BackupManifest.ExpectedFormat, result.Manifest.Format);
+        Assert.Equal(ProjectStorageService.ProjectSchemaVersion, result.Manifest.DataSchemaVersion);
+        Assert.Equal("0.3.9", result.Manifest.CreatedWith);
         Assert.Equal(1, result.Manifest.ProjectCount);
         Assert.Contains(result.Manifest.Files, file => file.RelativePath == $"data/projects/{project.Id:D}/project.json" && file.Sha256.Length == 64);
         Assert.Contains(archive.Entries, entry => entry.FullName == "backup-manifest.json");
@@ -187,7 +190,7 @@ public sealed class BackupDataServiceTests
         {
             var manifestPath = System.IO.Path.Combine(root, "backup-manifest.json");
             var manifest = JsonSerializer.Deserialize<BackupManifest>(File.ReadAllText(manifestPath), DataStorageJson.Options)!;
-            File.WriteAllText(manifestPath, JsonSerializer.Serialize(new BackupManifest { BackupFormatVersion = 2, CreatedAtUtc = manifest.CreatedAtUtc, ExportedByAppVersion = manifest.ExportedByAppVersion, ProjectCount = manifest.ProjectCount, ActiveProjectCount = manifest.ActiveProjectCount, ArchivedProjectCount = manifest.ArchivedProjectCount, Files = manifest.Files }, DataStorageJson.Options));
+            File.WriteAllText(manifestPath, JsonSerializer.Serialize(new BackupManifest { BackupFormatVersion = 99, CreatedAtUtc = manifest.CreatedAtUtc, ExportedByAppVersion = manifest.ExportedByAppVersion, ProjectCount = manifest.ProjectCount, ActiveProjectCount = manifest.ActiveProjectCount, ArchivedProjectCount = manifest.ArchivedProjectCount, Files = manifest.Files }, DataStorageJson.Options));
         });
         Assert.Equal(BackupOperationStatus.UnsupportedFutureVersion, (await scope.Backup.InspectAsync(package)).Status);
 
@@ -199,6 +202,68 @@ public sealed class BackupDataServiceTests
             RefreshManifestFile(root, relative);
         });
         Assert.Equal("FutureProjectFormat", (await scope.Backup.InspectAsync(package)).FailureType);
+    }
+
+    [Fact]
+    public async Task LegacyV1ManifestWithoutFormatMetadataRemainsReadable()
+    {
+        using var scope = new BackupScope();
+        var package = scope.Path("legacy-v1.uptbackup");
+        await scope.Backup.ExportAsync(package);
+        MutateExtractedPackage(package, root =>
+        {
+            var path = System.IO.Path.Combine(root, "backup-manifest.json");
+            var manifest = JsonSerializer.Deserialize<BackupManifest>(File.ReadAllText(path), DataStorageJson.Options)!;
+            var legacy = new
+            {
+                backupFormatVersion = 1,
+                createdAtUtc = manifest.CreatedAtUtc,
+                exportedByAppVersion = manifest.ExportedByAppVersion,
+                manifest.ProjectCount,
+                manifest.ActiveProjectCount,
+                manifest.ArchivedProjectCount,
+                manifest.Files
+            };
+            File.WriteAllText(path, JsonSerializer.Serialize(legacy, DataStorageJson.Options));
+        });
+
+        var inspection = await scope.Backup.InspectAsync(package);
+
+        Assert.True(inspection.Succeeded);
+        Assert.Equal(1, inspection.Manifest!.BackupFormatVersion);
+        Assert.Null(inspection.Manifest.Format);
+        Assert.True((await scope.Backup.ImportAsync(package)).Succeeded);
+    }
+
+    [Fact]
+    public async Task FutureDataSchemaInManifestIsRejectedBeforeImport()
+    {
+        using var scope = new BackupScope();
+        var package = scope.Path("future-schema.uptbackup");
+        await scope.Backup.ExportAsync(package);
+        MutateExtractedPackage(package, root =>
+        {
+            var path = System.IO.Path.Combine(root, "backup-manifest.json");
+            var manifest = JsonSerializer.Deserialize<BackupManifest>(File.ReadAllText(path), DataStorageJson.Options)!;
+            var future = new BackupManifest
+            {
+                Format = manifest.Format,
+                BackupFormatVersion = manifest.BackupFormatVersion,
+                DataSchemaVersion = 99,
+                CreatedAtUtc = manifest.CreatedAtUtc,
+                ExportedByAppVersion = manifest.ExportedByAppVersion,
+                ProjectCount = manifest.ProjectCount,
+                ActiveProjectCount = manifest.ActiveProjectCount,
+                ArchivedProjectCount = manifest.ArchivedProjectCount,
+                Files = manifest.Files
+            };
+            File.WriteAllText(path, JsonSerializer.Serialize(future, DataStorageJson.Options));
+        });
+
+        var inspection = await scope.Backup.InspectAsync(package);
+
+        Assert.Equal(BackupOperationStatus.UnsupportedFutureVersion, inspection.Status);
+        Assert.Equal("FutureDataSchema", inspection.FailureType);
     }
 
     [Fact]

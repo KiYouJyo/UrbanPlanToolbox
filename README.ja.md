@@ -8,7 +8,7 @@
 
 ## アプリを入手
 
-インストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。現在の公開バージョンは **1.3.0** です。GitHub Release には x64 framework-dependent の自己署名サイドロードパッケージを公開しています。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
+安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。最後に実際に公開された Store 版は **v1.3.0** です。GitHub の最新正式版は **v1.4.0** で、より頻繁に公開できます。Microsoft Store は原則 `x.0.0` または `x.5.0` のマイルストーンで更新するため、v1.4.0 の Store 公開はスキップし、次の Store マイルストーンを v1.5.0 とします。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
 
 ## UrbanPlanToolbox について
 
@@ -26,7 +26,7 @@ UrbanPlanToolbox は、都市・地域計画、建築設計、空間研究のた
 
 ## インストール
 
-一般利用者には Microsoft Store を第一の配布経路として案内しています。リポジトリには x64 framework-dependent の自己署名サイドロードパッケージもあります。[最新の GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) の説明とチェックサムを確認してください。
+一般利用者には安定したマイルストーン版を取得できる Microsoft Store を第一の配布経路として案内しています。最新の正式機能版が必要な場合は、リポジトリの x64 framework-dependent 自己署名サイドロードパッケージを [最新の GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) から取得し、説明とチェックサムを確認してください。
 
 ## プライバシーとオフライン設計
 
@@ -63,4 +63,4 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 
 ## ライセンス
 
-このリポジトリには現在、プロジェクトのライセンスが明記されていません。決定されるまで、ライセンス付きオープンソースソフトウェアとは表現しないでください。依存関係と外部データの出典は [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) に記載しています。
+UrbanPlanToolbox は [MIT License](LICENSE) のオープンソースソフトウェアです。依存関係と外部データの出典は [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) に記載しています。

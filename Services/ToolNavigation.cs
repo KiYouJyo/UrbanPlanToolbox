@@ -8,7 +8,7 @@ public static class ToolNavigation
     {
         ArgumentNullException.ThrowIfNull(frame);
 
-        if (!ToolRegistry.Default.TryGet(toolId, out var tool) || tool is null || !tool.IsAvailable)
+        if (!ToolRegistry.Default.TryGet(toolId, out var tool) || tool is null || !tool.IsAvailable || tool.Visibility != Models.Tools.ToolVisibility.Visible)
         {
             return false;
         }

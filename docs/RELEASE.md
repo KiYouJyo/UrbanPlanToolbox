@@ -1,32 +1,32 @@
 # 发布指南
 
-本文档是今后发布 UrbanPlanToolbox 的可复用指南。当前公开版本为 `1.3.0`；GitHub 旁加载包使用 `1.3.0.0`，但身份与更新流程相互独立。
+本文档是 UrbanPlanToolbox 的可复用发布边界与检查清单。
 
-## 产品版本
+## v1.4.0 发布决策
 
-- 应用显示版本：当前为 `1.3.0`，由产品版本和应用资源共同表达。
-- Store 包版本：独立、单调递增，第四段为 `0`。
-- GitHub 旁加载包使用独立的 `Package.appxmanifest` 版本和签名身份。
+- GitHub：发布正式 `v1.4.0` Release、标签和 x64 framework-dependent 自签名旁加载包。
+- Microsoft Store：`SKIPPED BY RELEASE POLICY`。本版本不执行 Store CLI、Partner Center、草稿上传、认证或 listing 修改；下一 Store 里程碑为 `v1.5.0`。
+
+## 发布节奏
+
+每个获准正式版本都可以发布到 GitHub，GitHub 可更频繁发布。Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新，因此 GitHub 最新版本和 Store 当前版本可以不同。文档必须明确写出渠道、产品版本、包版本和发布状态。
 
 ## 通用准备
 
-从最终 `main` 重新构建，记录提交和 SHA-256。不要复用不同提交产生的候选包，不要将证书、私钥、PFX、MSIX 或本机验收文件提交仓库。Store 上传成功后，不要为同一版本随意重建；新版本必须提高对应渠道的包版本。
-
-## Microsoft Store 渠道
-
-1. 使用 `Package.Store.appxmanifest`、正式 Identity `JoKiy.UrbanPlanToolbox` 和 Publisher `CN=C4E4B33A-7B77-4121-897C-7D720A5471F8`。
-2. 使用 `DistributionChannel=Store` 构建；此渠道不调用 GitHub 更新。
-3. 生成 `.msixupload`，在最终主线产物上运行 WACK。
-4. 上传 Partner Center，完成认证和发布后由 Microsoft Store 分发与更新。
-
-`v1.2.1` 的 Store 工作流首次支持手动上传草稿；首次运行必须使用 `submit_for_certification=false`，完成 Partner Center 草稿验收后才可再次手动送认证。GitHub Release 与 Store 提交保持独立。
+从最终 `main` 重新构建并记录提交和 SHA-256。不要复用不同提交产生的候选包，不要将证书、私钥、PFX、MSIX 或本机验收文件提交仓库。标签、GitHub Release、Store 上传和 Store 认证是相互独立的授权步骤。
 
 ## GitHub 旁加载渠道
 
 1. 使用 `Package.appxmanifest` 与 `CN=AppPublisher`。
 2. 仅在确实维护该渠道时发布 x64 framework-dependent 自签名包。
-3. 使用独立的签名、安装和更新流程；旁加载身份不得与 Store 身份混用。
+3. 生成 MSIXBundle、安装 ZIP 和 SHA256SUMS；ZIP 内不包含私钥、PDB、源代码或本机数据。
 4. GitHub 更新检查只在用户主动操作时访问 Releases API。
+
+## Microsoft Store 渠道
+
+仅在版本符合 Store 里程碑政策且取得单独授权时执行：使用 `Package.Store.appxmanifest`、正式 Identity `JoKiy.UrbanPlanToolbox` 和 Publisher `CN=C4E4B33A-7B77-4121-897C-7D720A5471F8`，生成 `.msixupload`，在最终主线产物上运行 WACK，再由维护者手工上传 Partner Center。Store 包版本必须单调递增，发布后的更新由 Microsoft Store 管理。
+
+现有 Store 工作流的上传、认证和发布阶段保持独立；不要把 GitHub 旁加载包上传为 Store 包，也不要在跳过 Store 的版本中调用该工作流。
 
 ## 构建与测试
 
@@ -37,11 +37,4 @@ dotnet build UrbanPlanToolbox.slnx -c Debug -p:Platform=x64 --no-restore
 dotnet build UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore
 ```
 
-发布前还应完成三语资源键集检查、安装包渠道身份检查、WACK（Store 渠道）和人工验收。不要在本流程中重新构建或上传已发布的 Store 包。
-
-## 公开发布原则
-
-- 从最终主线提交构建并保留构建记录和 SHA-256。
-- GitHub Release 只上传经过确认的公开资产，不上传私钥或本机数据。
-- 发布说明准确区分产品版本、两条渠道的包版本与独立身份，并说明 Store 认证状态。
-- 发布、标签、合并和 Store 上传是相互独立的授权步骤。
+发布前还应完成三语资源键集检查、安装包渠道身份检查、Git 差异检查和人工验收。Store 渠道发布时另行完成 WACK。

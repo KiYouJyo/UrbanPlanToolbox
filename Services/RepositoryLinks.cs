@@ -6,6 +6,7 @@ public static class RepositoryLinks
     public static readonly Uri Issues = new("https://github.com/KiYouJyo/UrbanPlanToolbox/issues");
     public static readonly Uri Releases = new("https://github.com/KiYouJyo/UrbanPlanToolbox/releases");
     public static readonly Uri License = new("https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/LICENSE");
+    public static readonly Uri PrivacyPolicy = new("https://kiyoujyo.github.io/UrbanPlanToolbox/privacy/");
     public static readonly Uri LatestReleaseApi = new("https://api.github.com/repos/KiYouJyo/UrbanPlanToolbox/releases/latest");
 
     // Product URL is a published project link, not an update endpoint. Store updates use StoreContext.

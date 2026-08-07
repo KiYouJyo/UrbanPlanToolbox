@@ -135,11 +135,19 @@ public sealed class ToolRegistry
 
         if (ordered.Any(tool => string.IsNullOrWhiteSpace(tool.PinyinSortKey) ||
                                 string.IsNullOrWhiteSpace(tool.PinyinInitial) ||
-                                string.IsNullOrWhiteSpace(tool.SearchKeywordsResourceKey) ||
+                                (tool.Searchable && string.IsNullOrWhiteSpace(tool.SearchKeywordsResourceKey)) ||
                                 string.IsNullOrWhiteSpace(tool.NameResourceKey) ||
                                 string.IsNullOrWhiteSpace(tool.DescriptionResourceKey)))
         {
             throw new ArgumentException("Tool search metadata must be complete.", nameof(tools));
+        }
+
+        if (ordered.Any(tool => !Enum.IsDefined(tool.PrimaryCategory) ||
+                                !Enum.IsDefined(tool.SecondaryCategory) ||
+                                !Enum.IsDefined(tool.Visibility) ||
+                                !tool.PageType.IsClass || tool.PageType.IsAbstract))
+        {
+            throw new ArgumentException("Tool metadata contains an invalid category, visibility, or page type.", nameof(tools));
         }
 
         var duplicateId = ordered
@@ -177,7 +185,7 @@ public sealed class ToolRegistry
         All.Where(tool => tool.GetPlacements().Any(placement => placement.PrimaryCategory == category)).ToArray();
 
     public IReadOnlyList<ToolDefinition> GetAvailableByPrimaryCategory(ToolPrimaryCategory category) =>
-        All.Where(tool => tool.IsAvailable && tool.GetPlacements().Any(placement => placement.PrimaryCategory == category)).ToArray();
+        All.Where(tool => IsVisible(tool) && tool.GetPlacements().Any(placement => placement.PrimaryCategory == category)).ToArray();
 
     public IReadOnlyList<ToolDefinition> GetBySecondaryCategory(ToolSecondaryCategory category) =>
         All.Where(tool => tool.GetPlacements().Any(placement => placement.SecondaryCategory == category)).ToArray();
@@ -185,8 +193,14 @@ public sealed class ToolRegistry
     public IReadOnlyList<ToolDefinition> GetAvailableByCategories(
         ToolPrimaryCategory primaryCategory,
         ToolSecondaryCategory secondaryCategory) =>
-        All.Where(tool => tool.IsAvailable && tool.GetPlacements().Any(placement =>
+        All.Where(tool => IsVisible(tool) && tool.GetPlacements().Any(placement =>
                 placement.PrimaryCategory == primaryCategory &&
                 placement.SecondaryCategory == secondaryCategory))
             .ToArray();
+
+    public IReadOnlyList<ToolDefinition> GetVisibleTools() =>
+        All.Where(IsVisible).ToArray();
+
+    private static bool IsVisible(ToolDefinition tool) =>
+        tool.IsAvailable && tool.Visibility == ToolVisibility.Visible;
 }

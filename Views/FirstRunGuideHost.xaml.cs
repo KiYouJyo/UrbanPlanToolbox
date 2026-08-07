@@ -6,7 +6,6 @@ using Microsoft.UI.Xaml.Media;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Models.Interaction;
 using UrbanPlanToolbox.Services;
-using Windows.Storage;
 using Windows.System;
 
 namespace UrbanPlanToolbox.Views;
@@ -117,14 +116,13 @@ public sealed partial class FirstRunGuideHost : UserControl
 
     private async void OnPrivacy(object sender, RoutedEventArgs e)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "PRIVACY.md");
-        var launched = File.Exists(path) && await Launcher.LaunchFileAsync(await StorageFile.GetFileFromPathAsync(path));
+        var launched = await ExternalLinkService.OpenAsync(RepositoryLinks.PrivacyPolicy.ToString());
         if (!launched)
         {
             AppNotificationService.Default.Notify(new(
                 AppNotificationKind.Error,
                 _localization.GetString("Dialog_OpenFailedTitle"),
-                _localization.GetString("Error_OpenDocumentFailed")));
+                _localization.GetString("Error_OpenExternalLinkFailed")));
         }
     }
 

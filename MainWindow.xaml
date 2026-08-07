@@ -13,7 +13,7 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
+    <Grid x:Name="RootLayout" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" Loaded="OnRootLayoutLoaded">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -35,5 +35,14 @@
                  HorizontalAlignment="Stretch" IsOpen="False" IsClosable="True"
                  />
         <views:FirstRunGuideHost x:Name="FirstRunGuide" Grid.RowSpan="2" Canvas.ZIndex="10" />
+        <Grid x:Name="StartupOverlay" Grid.RowSpan="2" Background="#202020" Canvas.ZIndex="100">
+            <Image x:Name="StartupLogo"
+                   Source="ms-appx:///Assets/SplashScreen.scale-200.png"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   ImageOpened="OnStartupLogoImageOpened"
+                   ImageFailed="OnStartupLogoImageFailed" />
+        </Grid>
     </Grid>
 </Window>

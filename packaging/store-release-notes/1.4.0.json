@@ -1,0 +1,17 @@
+{
+  "version": "1.4.0",
+  "locales": {
+    "zh-CN": [
+      "新增本地诊断信息复制和日志文件夹入口。",
+      "改进应用启动流程和本地数据基础设施。"
+    ],
+    "ja-JP": [
+      "ローカル診断情報のコピーとログ フォルダーの入口を追加しました。",
+      "アプリの起動フローとローカル データ基盤を改善しました。"
+    ],
+    "en-US": [
+      "Added local diagnostic copy and log-folder actions.",
+      "Improved the startup flow and local data foundation."
+    ]
+  }
+}

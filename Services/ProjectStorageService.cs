@@ -21,7 +21,12 @@ public sealed class ProjectStorageService
         Func<string, bool>? deleteFailureInjector = null)
     {
         _paths = paths ?? throw new ArgumentNullException(nameof(paths));
-        _storage = new JsonDataStorage(paths, ProjectSchemaVersion, projectMigrations ?? [new ProjectV1ToV2Migration(), new ProjectV2ToV3Migration()], diagnostics);
+        _storage = new JsonDataStorage(
+            paths,
+            ProjectSchemaVersion,
+            projectMigrations ?? [new ProjectV1ToV2Migration(), new ProjectV2ToV3Migration()],
+            diagnostics,
+            allowUnversionedLegacySchema: true);
         _deleteFailureInjector = deleteFailureInjector;
     }
 

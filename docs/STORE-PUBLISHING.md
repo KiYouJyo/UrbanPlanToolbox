@@ -6,7 +6,9 @@ UrbanPlanToolbox 已在 Microsoft Store 发布。普通用户入口为：
 - Store 协议：`ms-windows-store://pdp/?productid=9MWDPJG1BHKW`
 - Store ID：`9MWDPJG1BHKW`
 
-公开版本、最后已发布 Submission ID 和最后已发布包版本均由 Partner Center 实际状态决定，不在本文档或工作流中写死。
+本仓库 release 记录中的最后实际公开 Store 产品版本为 `v1.3.0`。GitHub 最新正式版本为 `v1.4.0`；v1.4.0 按发布政策跳过 Store，下一 Store 里程碑为 `v1.5.0`。Partner Center 实际状态仍是 Submission ID 和最后已发布包版本的权威来源，不在工作流中写死。
+
+Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 产品里程碑更新。GitHub 与 Store 的最新版本可以不同；本页不把 GitHub v1.4.0 表述为 Store v1.4.0。
 
 ## Store 身份
 

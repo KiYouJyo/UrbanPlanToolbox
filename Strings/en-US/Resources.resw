@@ -1716,4 +1716,9 @@ Latest version: {1}</value>
   <data name="FirstRunGuide_SettingsTitle" xml:space="preserve"><value>First-run guide</value></data>
   <data name="FirstRunGuide_SettingsDescription" xml:space="preserve"><value>Review a short introduction to projects, tools, search, and privacy.</value></data>
   <data name="FirstRunGuide_SettingsAction" xml:space="preserve"><value>Reopen</value></data>
+  <data name="About_ChannelDevelopment" xml:space="preserve"><value>Development build</value></data>
+  <data name="Action_OpenLogsFolder" xml:space="preserve"><value>Open log folder</value></data>
+  <data name="Error_OpenLogsFolderFailed" xml:space="preserve"><value>Could not open the log folder.</value></data>
+  <data name="About_DiagnosticsTitle.Text" xml:space="preserve"><value>Diagnostics &amp; Logs</value></data>
+  <data name="About_DiagnosticsSummary.Text" xml:space="preserve"><value>Copy application diagnostic information or open the local log folder for troubleshooting. Logs are stored locally and are never uploaded automatically.</value></data>
 </root>

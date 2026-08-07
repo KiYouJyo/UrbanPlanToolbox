@@ -11,9 +11,12 @@ public static class AppUpdateServiceFactory
         if (Enum.TryParse<FakeAppUpdateScenario>(scenario, true, out var parsed)) return new FakeAppUpdateService(parsed);
 #endif
         var channelService = new AppDistributionChannelService();
-        return channelService.GetCurrentChannel() == DistributionChannel.Store
-            ? new StoreAppUpdateService(channelService, GetMainWindowHandle)
-            : new GitHubAppUpdateService(new GitHubUpdateService());
+        return channelService.GetCurrentChannel() switch
+        {
+            DistributionChannel.Store => new StoreAppUpdateService(channelService, GetMainWindowHandle),
+            DistributionChannel.GitHub => new GitHubAppUpdateService(new GitHubUpdateService()),
+            _ => new DevelopmentAppUpdateService()
+        };
     }
 
     private static nint? GetMainWindowHandle()

@@ -11,7 +11,9 @@ public sealed class AppDistributionChannelService
             var id = Package.Current.Id;
             return DistributionChannelIdentity.Identify(id.Name, id.Publisher, id.PublisherId);
         }
-        catch (Exception) when (OperatingSystem.IsWindows()) { return DistributionChannel.GitHub; }
+        catch (Exception) when (OperatingSystem.IsWindows()) { return DistributionChannel.Development; }
     }
+
+    public DistributionChannelContext GetContext() => DistributionChannelContext.For(GetCurrentChannel());
 
 }

@@ -1,12 +1,24 @@
 # 更改日志
 
-## Unreleased
+## 1.4.0（GitHub 正式发布）
 
-### v1.3.1 development
+### Foundation 与架构
 
-- Added a four-step first-run guide covering welcome and privacy, projects, tools and search, and completion.
-- Added a reopen action in the Application settings card; guide lifecycle state remains separate from preferences and project data.
-- New installs see the guide automatically, while v1.3.0 and earlier upgrades are migrated without forced onboarding.
+- 完成工具注册、设置、发行渠道、数据模式、导入导出、备份和启动管线的 Foundation 更新。
+- 增加本地日志、诊断信息复制/日志文件夹入口、安全保留策略和启动耗时记录。
+- 保持 GitHub 旁加载与 Microsoft Store 的 Identity、Publisher、更新路径和发布节奏独立。
+
+### UI/UX 与隐私
+
+- About 页面补齐统一卡片布局，并将诊断与日志操作收纳在独立卡片中。
+- 首次启动向导提供四步引导；“查看完整隐私政策”打开在线隐私政策：<https://kiyoujyo.github.io/UrbanPlanToolbox/privacy/>。
+- 保持离线优先设计；诊断日志仅保存在本机，不会自动上传。
+
+### 发布说明
+
+- 本版本作为 GitHub 最新正式版本发布。
+- Microsoft Store 按里程碑节奏跳过 v1.4.0；下一 Store 里程碑为 v1.5.0。
+- Splash Logo 的后续优化保留为已知延期事项，不影响本版本发布。
 
 ## 1.3.0（已正式发布）
 

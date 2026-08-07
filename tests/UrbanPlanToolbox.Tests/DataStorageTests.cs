@@ -142,6 +142,21 @@ public sealed class DataStorageTests
     }
 
     [Fact]
+    public async Task BackupVerificationFailureDoesNotReplaceExistingFile()
+    {
+        using var scope = new TemporaryDataScope(failureInjector: operation => operation == "BackupVerification");
+        var original = new TestPayload("valid", 1);
+        await scope.Storage.SaveAsync(ToolIds.UnitScaleConverter, "records.json", original);
+        var before = await File.ReadAllBytesAsync(scope.DataPath("records.json"));
+
+        var failed = await scope.Storage.SaveAsync(ToolIds.UnitScaleConverter, "records.json", new TestPayload("new", 2));
+
+        Assert.Equal(DataStorageStatus.IoFailure, failed.Status);
+        Assert.Equal(before, await File.ReadAllBytesAsync(scope.DataPath("records.json")));
+        Assert.Equal(original, (await scope.Storage.ReadAsync<TestPayload>(ToolIds.UnitScaleConverter, "records.json")).Value);
+    }
+
+    [Fact]
     public async Task CorruptPrimaryRecoversFromLastValidBackupAndPreservesDiagnosticCopy()
     {
         using var scope = new TemporaryDataScope();
@@ -364,11 +379,11 @@ public sealed class DataStorageTests
 
     private sealed class TemporaryDataScope : IDisposable
     {
-        public TemporaryDataScope(int schemaVersion = 1, IEnumerable<IDataMigration>? migrations = null)
+        public TemporaryDataScope(int schemaVersion = 1, IEnumerable<IDataMigration>? migrations = null, Func<string, bool>? failureInjector = null)
         {
             Root = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-storage-{Guid.NewGuid():N}");
             Provider = new AppDataPathProvider(Root, [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter]);
-            Storage = new JsonDataStorage(Provider, schemaVersion, migrations);
+            Storage = new JsonDataStorage(Provider, schemaVersion, migrations, failureInjector: failureInjector);
         }
 
         public string Root { get; }

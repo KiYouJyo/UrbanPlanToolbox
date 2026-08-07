@@ -13,12 +13,16 @@ public sealed class JsonDataStorage
     private readonly int _currentSchemaVersion;
     private readonly DataMigrationRunner _migrationRunner;
     private readonly IStorageDiagnostics _diagnostics;
+    private readonly bool _allowUnversionedLegacySchema;
+    private readonly Func<string, bool>? _failureInjector;
 
     public JsonDataStorage(
         IAppDataPathProvider pathProvider,
         int currentSchemaVersion,
         IEnumerable<IDataMigration>? migrations = null,
-        IStorageDiagnostics? diagnostics = null)
+        IStorageDiagnostics? diagnostics = null,
+        bool allowUnversionedLegacySchema = false,
+        Func<string, bool>? failureInjector = null)
     {
         ArgumentNullException.ThrowIfNull(pathProvider);
         if (currentSchemaVersion < 1)
@@ -30,6 +34,8 @@ public sealed class JsonDataStorage
         _currentSchemaVersion = currentSchemaVersion;
         _migrationRunner = new DataMigrationRunner(migrations);
         _diagnostics = diagnostics ?? NullStorageDiagnostics.Instance;
+        _allowUnversionedLegacySchema = allowUnversionedLegacySchema;
+        _failureInjector = failureInjector;
     }
 
     public async Task<DataReadResult<T>> ReadAsync<T>(
@@ -360,6 +366,15 @@ public sealed class JsonDataStorage
             {
                 File.Copy(filePath, backupTemporaryPath, overwrite: false);
                 File.Move(backupTemporaryPath, backupPath, overwrite: true);
+                if (_failureInjector?.Invoke("BackupVerification") == true)
+                {
+                    return new(DataStorageStatus.IoFailure, "InjectedBackupVerificationFailure");
+                }
+                var backupVerification = await ReadDocumentAsync(backupPath, cancellationToken).ConfigureAwait(false);
+                if (backupVerification.Status is not DocumentStatus.Valid)
+                {
+                    return new(DataStorageStatus.IoFailure, "BackupVerificationFailed");
+                }
             }
 
             File.Move(temporaryPath, filePath, overwrite: true);
@@ -381,7 +396,26 @@ public sealed class JsonDataStorage
         try
         {
             await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous);
-            var document = await JsonSerializer.DeserializeAsync<EnvelopeDocument>(stream, DataStorageJson.Options, cancellationToken).ConfigureAwait(false);
+            var root = await JsonNode.ParseAsync(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
+            if (root is not JsonObject rootObject)
+            {
+                return new(DocumentStatus.Corrupt, null, null, "InvalidEnvelope");
+            }
+
+            // Project schema 1 predates the envelope in some installations.
+            // Only the project storage boundary opts into this legacy rule;
+            // other stores must continue to reject unversioned JSON.
+            if (!rootObject.TryGetPropertyValue("schemaVersion", out var schemaNode) || schemaNode is null)
+            {
+                if (!_allowUnversionedLegacySchema)
+                {
+                    return new(DocumentStatus.Corrupt, null, null, "MissingSchemaVersion");
+                }
+
+                return new(DocumentStatus.Valid, new EnvelopeDocument(1, DateTimeOffset.UtcNow, rootObject), 1);
+            }
+
+            var document = rootObject.Deserialize<EnvelopeDocument>(DataStorageJson.Options);
             if (document is null || document.SchemaVersion < 1 || document.Payload is null || document.SavedAtUtc.Offset != TimeSpan.Zero)
             {
                 return new(DocumentStatus.Corrupt, null, document?.SchemaVersion, "InvalidEnvelope");

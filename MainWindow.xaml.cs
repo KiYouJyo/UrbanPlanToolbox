@@ -23,10 +23,17 @@ public sealed partial class MainWindow : Window
     private readonly FirstRunExperienceService _firstRunExperience = FirstRunExperienceService.Default;
     private UIElement? _focusBeforeFirstRunGuide;
     private bool _firstRunGuideShowing;
+    private bool _shellInitialized;
+    private bool _shellLoaded;
+    private bool _startupImageReady;
+    private bool _shellReadyRaised;
+
+    public event EventHandler? ShellReady;
 
     public MainWindow()
     {
         InitializeComponent();
+        StartupTiming.Default.Mark("T3 InitializeComponent complete");
 
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
@@ -40,9 +47,53 @@ public sealed partial class MainWindow : Window
 
         // The first page must exist before App activates this window; otherwise
         // native splash dismissal can reveal a title-bar-only black frame.
-        RootFrame.Navigate(typeof(MainPage));
-        if (RootFrame.Content is null) throw new InvalidOperationException("Main window first-frame content was not created.");
         FirstRunGuide.Closed += OnFirstRunGuideClosed;
+    }
+
+    private void OnRootLayoutLoaded(object sender, RoutedEventArgs e)
+    {
+        if (_shellInitialized) return;
+        DispatcherQueue.TryEnqueue(InitializeShell);
+    }
+
+    private void InitializeShell()
+    {
+        if (_shellInitialized) return;
+        _shellInitialized = true;
+        RootFrame.Navigate(typeof(MainPage));
+        if (RootFrame.Content is not FrameworkElement page)
+            throw new InvalidOperationException("Main window first-frame content was not created.");
+        page.Loaded += OnShellLoaded;
+    }
+
+    private void OnShellLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement page) page.Loaded -= OnShellLoaded;
+        _shellLoaded = true;
+        StartupTiming.Default.Mark("T9 Main page Loaded / first usable UI");
+        TryCompleteStartupVisual();
+    }
+
+    private void OnStartupLogoImageOpened(object sender, RoutedEventArgs e)
+    {
+        _startupImageReady = true;
+        TryCompleteStartupVisual();
+    }
+
+    private void OnStartupLogoImageFailed(object sender, ExceptionRoutedEventArgs e)
+    {
+        // Do not leave the application on the startup layer if the image fails;
+        // the shell is still a valid fallback.
+        _startupImageReady = true;
+        TryCompleteStartupVisual();
+    }
+
+    private void TryCompleteStartupVisual()
+    {
+        if (!_shellLoaded || !_startupImageReady || _shellReadyRaised) return;
+        _shellReadyRaised = true;
+        StartupOverlay.Visibility = Visibility.Collapsed;
+        ShellReady?.Invoke(this, EventArgs.Empty);
     }
 
     public void Navigate(Type pageType) => RootFrame.Navigate(pageType);

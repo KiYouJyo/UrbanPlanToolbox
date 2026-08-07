@@ -14,7 +14,18 @@ public sealed record ToolDefinition(
     string PinyinInitial,
     string SearchKeywordsResourceKey)
 {
+    // These flags belong to the registry metadata so consumers do not need
+    // separate per-page lists when a tool is added or temporarily hidden.
+    public bool SupportsFavorites { get; init; } = true;
+    public bool Searchable { get; init; } = true;
+    public ToolVisibility Visibility { get; init; } = ToolVisibility.Visible;
     public IReadOnlyList<ToolPlacement> CategoryPlacements { get; init; } = [];
+}
+
+public enum ToolVisibility
+{
+    Visible,
+    Hidden
 }
 
 public sealed record ToolPlacement(
