@@ -112,4 +112,9 @@ UrbanPlanToolbox 使用 [MIT License](LICENSE) 开源。依赖与外部数据来
 - 更新设计工具 → 前期分析、科研工具 → 前期工具入口，并完成响应式 UI 修复。
 - GitHub 正式发布；Microsoft Store 不在本版本发布范围内。宽窗口双栏底部小幅不齐列为 deferred。
 
+## v1.3.0 GitHub Release
+
+- 支持运行时中日英语言切换，以及项目里程碑提醒设置。
+- GitHub 正式发布；Microsoft Store 当时已公开的稳定版本为 v1.3.0。
+
 <!-- Pages redeploy trigger: recover from cancelled deployment 31102137189 -->

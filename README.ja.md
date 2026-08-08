@@ -75,6 +75,11 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 
 [GitHub Issues](https://github.com/KiYouJyo/UrbanPlanToolbox/issues) または[サポートページ](https://kiyoujyo.github.io/UrbanPlanToolbox/support/)をご利用ください。診断情報を共有する前に、ローカルパス、プロジェクト内容、個人情報を削除してください。
 
+## v1.3.0 GitHub Release
+
+- 実行中の中国語、日本語、英語の切り替えと、プロジェクトマイルストーン通知を追加しました。
+- GitHub で正式公開し、当時の Microsoft Store 公開安定版は v1.3.0 でした。
+
 ## ライセンス
 
 UrbanPlanToolbox は [MIT License](LICENSE) のオープンソースソフトウェアです。依存関係と外部データの出典は [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) に記載しています。
