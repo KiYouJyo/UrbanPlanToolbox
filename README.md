@@ -12,7 +12,7 @@ v1.5.1 新增“坐标点批量格式转换器”，支持 DD、DDM、DMS 坐标
 
 ## 获取应用
 
-普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；Store v1.5.1 是否已公开以 Partner Center 认证结果为准。GitHub 最新正式版本为 **v1.5.1**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。本版本按一次性例外提交 Store，后续 Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新。两条渠道的身份、Publisher 和更新流程保持独立。
+普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；历史上最后实际公开的 Store 版本为 **v1.3.0**，Store v1.5.1 是否已公开以 Partner Center 认证结果为准。GitHub 最新正式版本为 **v1.5.1**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。本版本按一次性例外提交 Store，后续 Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新。两条渠道的身份、Publisher 和更新流程保持独立。
 
 ## 关于 UrbanPlanToolbox
 

@@ -12,7 +12,7 @@ v1.5.1 では、DD・DDM・DMS 形式の一括判定、変換、検証、CSV 出
 
 ## アプリを入手
 
-安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。Store v1.5.1 が公開済みかどうかは Partner Center の認証結果を基準とします。GitHub の最新正式版は **v1.5.1** です。本版では今回限りの Store 例外を使用し、今後の Microsoft Store 更新は原則 `x.0.0` または `x.5.0` のマイルストーンで行います。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
+安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。過去に実際に公開された Store 版は **v1.3.0** です。Store v1.5.1 が公開済みかどうかは Partner Center の認証結果を基準とします。GitHub の最新正式版は **v1.5.1** です。本版では今回限りの Store 例外を使用し、今後の Microsoft Store 更新は原則 `x.0.0` または `x.5.0` のマイルストーンで行います。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
 
 ## UrbanPlanToolbox について
 

@@ -12,7 +12,7 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 ## Get the app
 
-Whether Microsoft Store v1.5.1 is publicly available is determined by the Partner Center certification result. The latest formal GitHub version is **v1.5.1**. This release uses a one-time Store exception; future Microsoft Store updates default to `x.0.0` or `x.5.0` milestones. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
+The historical last actually published Microsoft Store version was **v1.3.0**. Whether Microsoft Store v1.5.1 is publicly available is determined by the Partner Center certification result. The latest formal GitHub version is **v1.5.1**. This release uses a one-time Store exception; future Microsoft Store updates default to `x.0.0` or `x.5.0` milestones. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
 
 ## About UrbanPlanToolbox
 
