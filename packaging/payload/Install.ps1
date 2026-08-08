@@ -88,11 +88,12 @@ try {
 
     $existingPackage = Get-AppxPackage -Name $metadata.Name -ErrorAction SilentlyContinue | Where-Object { $_.Publisher -eq $metadata.Publisher -and $_.Architecture -eq 'X64' -and -not $_.IsDevelopmentMode } | Sort-Object Version -Descending | Select-Object -First 1
     if ($null -ne $existingPackage -and [version]$existingPackage.Version -eq $metadata.Version -and $existingPackage.Status -eq 'Ok') {
-        Write-InstallLog "已安装相同版本 $($metadata.Version)（$($existingPackage.PackageFullName)），无需重新安装。"
-        $installed = $existingPackage
+        Write-InstallLog "已安装相同版本 $($metadata.Version)（$($existingPackage.PackageFullName)），继续重新安装以应用当前 RC 文件。"
+        Remove-AppxPackage -Package $existingPackage.PackageFullName -ErrorAction Stop
+        Write-InstallLog "已移除同版本旧 RC 包，继续安装当前有效载荷。"
     }
-    else {
-        $trustedStore = 'Cert:\LocalMachine\TrustedPeople'
+
+    $trustedStore = 'Cert:\LocalMachine\TrustedPeople'
         $trustedCertificate = Get-ChildItem -Path $trustedStore | Where-Object { $_.Thumbprint -eq $certificateThumbprint } | Select-Object -First 1
         if ($null -eq $trustedCertificate) {
             Import-Certificate -FilePath $cerPath -CertStoreLocation $trustedStore | Out-Null
@@ -104,15 +105,14 @@ try {
         $runtime = Get-AppxPackage -AllUsers -Name 'Microsoft.WindowsAppRuntime.2' | Where-Object { $_.Architecture -eq 'X64' -and $_.Publisher -eq 'CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US' -and [version]$_.Version -ge $metadata.RuntimeMinVersion } | Sort-Object Version -Descending | Select-Object -First 1
         if ($null -ne $runtime) {
             Write-InstallLog "找到兼容 Windows App Runtime $($runtime.Version)；仅安装主 MSIX。"
-            Add-AppxPackage -Path $msixPath
+            Add-AppxPackage -Path $msixPath -ForceApplicationShutdown -ErrorAction Stop
         }
         else {
             Write-InstallLog "未找到 $($metadata.RuntimeMinVersion) 或更高版本的兼容 x64 Windows App Runtime；使用随附依赖。"
-            Add-AppxPackage -Path $msixPath -DependencyPath $dependencyPath
+            Add-AppxPackage -Path $msixPath -DependencyPath $dependencyPath -ForceApplicationShutdown -ErrorAction Stop
         }
 
-        $installed = Get-AppxPackage -Name $metadata.Name | Where-Object { $_.Publisher -eq $metadata.Publisher -and $_.Architecture -eq 'X64' } | Sort-Object Version -Descending | Select-Object -First 1
-    }
+    $installed = Get-AppxPackage -Name $metadata.Name | Where-Object { $_.Publisher -eq $metadata.Publisher -and $_.Architecture -eq 'X64' } | Sort-Object Version -Descending | Select-Object -First 1
     if ($null -eq $installed -or [version]$installed.Version -ne $metadata.Version -or $installed.Status -ne 'Ok' -or $installed.IsDevelopmentMode) { throw '安装后的包身份、版本、状态或开发模式验证失败。' }
     Write-InstallLog "安装验证通过：$($installed.PackageFullName)；Status=$($installed.Status)；IsDevelopmentMode=$($installed.IsDevelopmentMode)。"
     if ($LaunchAfterInstall) {

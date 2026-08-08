@@ -1,5 +1,12 @@
 # 发布指南
 
+## v1.5.1 发布决策
+
+- GitHub：发布正式 `v1.5.1` Release、`v1.5.1` 标签和从最终 `main` 构建的 x64 framework-dependent 自签名旁加载包。
+- Microsoft Store：本版本获得一次性例外授权，使用最终主线构建 Store `.msixupload` 并提交认证；提交后状态记录为认证中，不提前宣称已公开。
+- 后续 Microsoft Store 版本继续遵循 `x.0.0` 或 `x.5.0` 里程碑政策。
+- 新增坐标点批量格式转换器的功能、三语资源、离线处理声明和发布说明必须与本版本实现一致。
+
 本文档是 UrbanPlanToolbox 的可复用发布边界与检查清单。
 
 ## v1.5.0 发布决策

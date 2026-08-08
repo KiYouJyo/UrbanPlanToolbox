@@ -1,14 +1,18 @@
 # Microsoft Store 发布指南
 
+## v1.5.1 当前状态
+
+v1.5.1 是一次性 Store 发布例外：GitHub 正式 Release 完成后，从最终 `main`/标签构建 Store 包并提交认证。Store 认证完成并确认公开前，本项目不将 v1.5.1 标记为已公开；后续版本仍恢复 `x.0.0` 或 `x.5.0` 里程碑节奏。
+
 UrbanPlanToolbox 已在 Microsoft Store 发布。普通用户入口为：
 
 - 产品页：https://apps.microsoft.com/detail/9MWDPJG1BHKW
 - Store 协议：`ms-windows-store://pdp/?productid=9MWDPJG1BHKW`
 - Store ID：`9MWDPJG1BHKW`
 
-本仓库 release 记录中的最后实际公开 Store 产品版本为 `v1.3.0`。GitHub 最新正式版本为 `v1.5.0`；v1.5.0 按本轮发布边界不操作 Store，下一 Store 里程碑为 `v2.0.0`。Partner Center 实际状态仍是 Submission ID 和最后已发布包版本的权威来源，不在工作流中写死。
+本仓库 release 记录中的最后实际公开 Store 产品版本仍以 Partner Center 的真实状态为准。GitHub 最新正式版本为 `v1.5.1`；v1.5.1 按一次性例外提交 Store 认证，认证完成并确认公开前不标记为已公开。后续 Store 里程碑恢复为 `x.0.0` 或 `x.5.0`。Partner Center 实际状态仍是 Submission ID 和最后已发布包版本的权威来源，不在工作流中写死。
 
-Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 产品里程碑更新。GitHub 与 Store 的最新版本可以不同；本页不把 GitHub v1.5.0 表述为 Store v1.5.0。
+Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 产品里程碑更新。v1.5.1 是明确授权的一次性例外；GitHub 与 Store 的最新版本可以不同，本页不把 GitHub v1.5.1 表述为 Store 已公开 v1.5.1。
 
 ## Store 身份
 

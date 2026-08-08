@@ -1,19 +1,21 @@
 # 路线图与版本政策
 
+## v1.5.1 当前发布
+
+- 新增坐标点批量格式转换器，支持 DD、DDM、DMS 的批量识别、转换、检查和 CSV 导出。
+- GitHub：正式发布 v1.5.1。
+- Microsoft Store：本版本按一次性例外提交认证；认证完成前不表示已公开。
+- 后续 Store 更新恢复 `x.0.0` / `x.5.0` 里程碑政策。
+
 ## 当前定位
 
 UrbanPlanToolbox 是面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。核心项目、工具数据和备份保存在本机，面向 x64 Windows 用户提供 Microsoft Store 与 GitHub 旁加载两条独立渠道。
 
 ## 当前发布状态
 
-- GitHub 最新正式版本：`v1.5.0`。
-- Microsoft Store 最后实际公开版本：`v1.3.0`；本次 v1.5.0 不提交 Store。
-
-## v1.5.0
-
-- 发布“图纸版本差异对比器”，支持相同像素尺寸图像的半透明叠加与擦除浏览。
-- 支持 PNG、JPG/JPEG 和 PDF 页面本地加载、适配窗口、缩放、平移与叠加 PNG 导出。
-- 状态：Released（GitHub）；Microsoft Store 本轮未操作，下一 Store 里程碑为 `v2.0.0`。
+- GitHub 最新正式版本：`v1.5.1`。
+- Microsoft Store：v1.5.1 按一次性例外提交认证，认证完成并确认公开前不标记为已公开；最后实际公开版本仍以 Partner Center 状态为准。
+- 历史记录中的最后实际公开 Store 产品版本为 `v1.3.0`。
 
 ## v1.4.2
 

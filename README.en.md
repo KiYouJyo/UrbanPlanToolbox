@@ -2,13 +2,17 @@
 
 # UrbanPlanToolbox
 
+## v1.5.1 release status
+
+v1.5.1 adds the Batch Coordinate Format Converter for batch detection, conversion, validation, and CSV export across DD, DDM, and DMS formats; coordinate data is processed locally. The formal GitHub release and the one-time Microsoft Store submission are being executed through the release workflow; Store publication is not claimed before certification completes. Future Microsoft Store updates remain on the `x.0.0` or `x.5.0` milestone cadence.
+
 An offline-first Windows toolbox for urban planning, architectural design, and spatial research.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
 
 ## Get the app
 
-The last actually published Microsoft Store version is **v1.3.0** for stable milestone users. The latest formal GitHub version is **v1.5.0**. GitHub may publish more frequently; Microsoft Store updates default to `x.0.0` or `x.5.0` milestones, so v1.5.0 is GitHub-only in this release and the next Store milestone is v2.0.0. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
+The historical last actually published Microsoft Store version was **v1.3.0**. Whether Microsoft Store v1.5.1 is publicly available is determined by the Partner Center certification result. The latest formal GitHub version is **v1.5.1**. This release uses a one-time Store exception; future Microsoft Store updates default to `x.0.0` or `x.5.0` milestones. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
 
 ## About UrbanPlanToolbox
 

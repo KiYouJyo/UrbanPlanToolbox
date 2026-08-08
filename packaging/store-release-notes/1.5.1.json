@@ -1,0 +1,26 @@
+{
+  "version": "1.5.1",
+  "locales": {
+    "zh-CN": [
+      "新增坐标点批量格式转换器，可批量整理 GIS 前期分析与科研数据中的经纬度坐标。",
+      "支持十进制度（DD）、度分（DDM）和度分秒（DMS）的自动识别、转换与合法性检查。",
+      "支持批量粘贴以及 CSV、TSV、TXT 数据导入，并可保留其他字段后导出标准化 CSV。",
+      "新增经纬度顺序检测、歧义提示和异常坐标检查，降低 GIS 数据导入前的整理成本。",
+      "坐标处理完全在本机完成，不上传用户坐标数据。"
+    ],
+    "ja-JP": [
+      "GIS の事前分析や研究データ向けに、座標一括フォーマット変換ツールを追加しました。",
+      "十進度（DD）、度分（DDM）、度分秒（DMS）の自動判定、変換、入力値チェックに対応しました。",
+      "一括貼り付けと CSV・TSV・TXT の読み込みに対応し、他の列を保持したまま標準化した CSV を出力できます。",
+      "経度・緯度の順序判定、曖昧な入力の警告、異常座標のチェックを追加しました。",
+      "座標データの処理はすべて端末内で行われ、外部へ自動送信されません。"
+    ],
+    "en-US": [
+      "Added the Batch Coordinate Format Converter for preparing GIS and research coordinate data.",
+      "Added automatic detection, conversion, and validation for Decimal Degrees (DD), Degrees Decimal Minutes (DDM), and Degrees Minutes Seconds (DMS).",
+      "Added batch paste and CSV, TSV, and TXT import while preserving non-coordinate fields for standardized CSV export.",
+      "Added longitude/latitude order detection, ambiguity warnings, and invalid-coordinate checks.",
+      "Coordinate processing remains fully local and coordinate data is never uploaded automatically."
+    ]
+  }
+}

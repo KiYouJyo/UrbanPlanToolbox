@@ -2,13 +2,17 @@
 
 # UrbanPlanToolbox
 
+## v1.5.1 正式发布状态
+
+v1.5.1 新增“坐标点批量格式转换器”，支持 DD、DDM、DMS 坐标格式的批量识别、转换、检查和 CSV 导出，坐标数据仅在本机处理。GitHub 正式发布与一次性 Microsoft Store 提交正在按发布流程执行；Store 认证完成前不宣称已公开。后续 Microsoft Store 仍按 `x.0.0` 或 `x.5.0` 里程碑更新。
+
 面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。
 
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
 
 ## 获取应用
 
-普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；当前最后实际公开的 Store 版本为 **v1.3.0**。GitHub 最新正式版本为 **v1.5.0**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。v1.5.0 仅发布 GitHub，Microsoft Store 本轮不操作；下一 Store 里程碑为 v2.0.0。两条渠道的身份、Publisher 和更新流程保持独立。
+普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；历史上最后实际公开的 Store 版本为 **v1.3.0**，Store v1.5.1 是否已公开以 Partner Center 认证结果为准。GitHub 最新正式版本为 **v1.5.1**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。本版本按一次性例外提交 Store，后续 Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新。两条渠道的身份、Publisher 和更新流程保持独立。
 
 ## 关于 UrbanPlanToolbox
 

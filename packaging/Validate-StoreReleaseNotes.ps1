@@ -8,19 +8,20 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-$source = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json -AsHashtable -Depth 20
-if (-not $source.ContainsKey('version') -or [string]$source.version -ne $Version) {
+$source = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
+if (-not $source.PSObject.Properties['version'] -or [string]$source.version -ne $Version) {
     throw "Release-notes version must be $Version."
 }
-if (-not $source.ContainsKey('locales') -or $source.locales -isnot [System.Collections.IDictionary]) {
+if (-not $source.PSObject.Properties['locales'] -or -not $source.locales) {
     throw "Release-notes JSON is missing the 'locales' object."
 }
 
 $normalized = [ordered]@{ Version = $Version; Locales = [ordered]@{} }
 foreach ($locale in @('zh-CN','ja-JP','en-US')) {
-    $keys = @($source.locales.Keys | Where-Object { [string]::Equals([string]$_, $locale, [StringComparison]::OrdinalIgnoreCase) })
+    $keys = @($source.locales.PSObject.Properties.Name | Where-Object { [string]::Equals([string]$_, $locale, [StringComparison]::OrdinalIgnoreCase) })
     if ($keys.Count -ne 1) { throw "Release-notes JSON must contain exactly one '$locale' entry." }
-    $lines = foreach ($item in @($source.locales[$keys[0]])) {
+    $localeValue = $source.locales.PSObject.Properties[$keys[0]].Value
+    $lines = foreach ($item in @($localeValue)) {
         $line = ([string]$item).Trim()
         if ([string]::IsNullOrWhiteSpace($line) -or $line.Contains("`r") -or $line.Contains("`n")) {
             throw "Each release-note item for $locale must be one non-empty line."
@@ -36,4 +37,5 @@ foreach ($locale in @('zh-CN','ja-JP','en-US')) {
 
 $parent = Split-Path -Parent $OutputPath
 if ($parent) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
-$normalized | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
+$json = $normalized | ConvertTo-Json -Depth 10
+[System.IO.File]::WriteAllText($OutputPath, $json, [System.Text.UTF8Encoding]::new($false))

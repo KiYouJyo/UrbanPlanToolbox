@@ -116,6 +116,8 @@
   <Compile Include="../../Services/DrawingComparisonService.cs" Link="Services/DrawingComparisonService.cs" />
   <Compile Include="../../Services/DifferenceAnalysisService.cs" Link="Services/DifferenceAnalysisService.cs" />
   <Compile Include="../../Services/DrawingExportService.cs" Link="Services/DrawingExportService.cs" />
+  <Compile Include="../../Models/CoordinateBatchModels.cs" Link="Models/CoordinateBatchModels.cs" />
+  <Compile Include="../../Services/CoordinateBatchConversionService.cs" Link="Services/CoordinateBatchConversionService.cs" />
  </ItemGroup>
  <ItemGroup>
   <None Include="../../Strings/**/*.resw" Link="Strings/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
