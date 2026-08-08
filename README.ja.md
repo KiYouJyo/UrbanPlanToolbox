@@ -2,9 +2,9 @@
 
 # UrbanPlanToolbox
 
-## v1.5.1 公開状況
+## v1.5.2 公開状況
 
-v1.5.1 では、DD・DDM・DMS 形式の一括判定、変換、検証、CSV 出力に対応する座標一括フォーマット変換ツールを追加しました。座標データは端末内で処理されます。正式な GitHub Release と、今回限りの Microsoft Store 提出を公開手順に沿って実行中です。認証完了前に Store 公開済みとは表記しません。今後の Microsoft Store 更新は `x.0.0` または `x.5.0` のマイルストーン方式を継続します。
+v1.5.2 では、更新ダイアログのタイトルにリソースキーが表示される問題を修正し、Microsoft Store 更新に実際のダウンロード進捗とダウンロード/展開状態の表示を追加しました。GitHub では正式公開済みです。Microsoft Store v1.5.2 は既存のワークフローで認証に提出し、認証完了と公開確認前に公開済みとは表記しません。今後の Microsoft Store 更新は `x.0.0` または `x.5.0` のマイルストーン方式を継続します。
 
 都市・地域計画、建築設計、空間研究のためのオフライン優先 Windows ツールボックス。
 
@@ -12,7 +12,7 @@ v1.5.1 では、DD・DDM・DMS 形式の一括判定、変換、検証、CSV 出
 
 ## アプリを入手
 
-安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。過去に実際に公開された Store 版は **v1.3.0** です。Store v1.5.1 が公開済みかどうかは Partner Center の認証結果を基準とします。GitHub の最新正式版は **v1.5.1** です。本版では今回限りの Store 例外を使用し、今後の Microsoft Store 更新は原則 `x.0.0` または `x.5.0` のマイルストーンで行います。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
+安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。Store v1.5.2 が公開済みかどうかは Partner Center とユーザー側の取得状態を基準とします。GitHub の最新正式版は **v1.5.2** です。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
 
 ## UrbanPlanToolbox について
 
@@ -74,6 +74,11 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 ## 問い合わせ
 
 [GitHub Issues](https://github.com/KiYouJyo/UrbanPlanToolbox/issues) または[サポートページ](https://kiyoujyo.github.io/UrbanPlanToolbox/support/)をご利用ください。診断情報を共有する前に、ローカルパス、プロジェクト内容、個人情報を削除してください。
+
+## v1.3.0 GitHub Release
+
+- 実行中の中国語、日本語、英語の切り替えと、プロジェクトマイルストーン通知を追加しました。
+- GitHub で正式公開し、当時の Microsoft Store 公開安定版は v1.3.0 でした。
 
 ## ライセンス
 

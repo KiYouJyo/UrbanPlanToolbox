@@ -1,5 +1,11 @@
 # 发布指南
 
+## v1.5.2 发布决策
+
+- GitHub：发布正式 `v1.5.2` Release、`v1.5.2` 标签和从最终 `main` 构建的 x64 framework-dependent 自签名旁加载包。
+- Microsoft Store：使用现有 Store 工作流构建关联 `.msixupload`，创建唯一的 v1.5.2 submission 并提交认证；不把认证中状态描述为已公开。
+- 版本修复范围仅包括更新弹窗标题本地化和 Store 更新进度/状态反馈，不改变项目数据格式或现有工具功能。
+
 ## v1.5.1 发布决策
 
 - GitHub：发布正式 `v1.5.1` Release、`v1.5.1` 标签和从最终 `main` 构建的 x64 framework-dependent 自签名旁加载包。

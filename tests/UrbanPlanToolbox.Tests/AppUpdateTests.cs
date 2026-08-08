@@ -86,7 +86,7 @@ public sealed class AppUpdateTests
     {
         var viewModel = new UpdateViewModel(new FakeAppUpdateService(FakeAppUpdateScenario.UpdateAvailable));
         await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync();
-        Assert.Equal(AppUpdateState.Completed, viewModel.Info.State); Assert.Equal(1, viewModel.Progress);
+        Assert.Equal(AppUpdateState.Completed, viewModel.Info.State); Assert.Null(viewModel.Progress);
     }
 
     [Theory]
@@ -95,4 +95,28 @@ public sealed class AppUpdateTests
     [InlineData("InstallFailed", "Update_ErrorInstall")]
     [InlineData("0x80004005", "Update_ErrorStoreCode")]
     public void ErrorCodesMapToLocalizedResourceKeys(string code, string key) => Assert.Equal(key, AppUpdateErrorMapper.ToResourceKey(code));
+
+    [Fact]
+    public void ProgressValuesAreSafeForTheProgressBar()
+    {
+        Assert.Null(AppUpdateProgress.NormalizeValue(null));
+        Assert.Null(AppUpdateProgress.NormalizeValue(double.NaN));
+        Assert.Equal(0, AppUpdateProgress.NormalizeValue(-1));
+        Assert.Equal(0.53, AppUpdateProgress.NormalizeValue(0.53));
+        Assert.Equal(1, AppUpdateProgress.NormalizeValue(2));
+    }
+
+    [Fact]
+    public void UpdateResourcesContainTheDialogTitleAndProgressTextInAllLanguages()
+    {
+        foreach (var language in ReswCatalog.Languages)
+        {
+            var resources = ReswCatalog.Load(language);
+            Assert.False(resources["About_UpdateTitle.Text"].StartsWith("!", StringComparison.Ordinal));
+            Assert.False(resources["Update_ProgressPercent"].StartsWith("!", StringComparison.Ordinal));
+            Assert.True(resources.ContainsKey("Update_State_Downloading"));
+            Assert.True(resources.ContainsKey("Update_State_Installing"));
+            Assert.True(resources.ContainsKey("Update_State_Failed"));
+        }
+    }
 }

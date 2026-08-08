@@ -1,0 +1,17 @@
+{
+  "version": "1.5.2",
+  "locales": {
+    "zh-CN": [
+      "修复更新管理标题的多语言显示。",
+      "改进 Microsoft Store 更新过程中的下载与安装状态反馈。"
+    ],
+    "ja-JP": [
+      "更新管理タイトルの多言語表示を修正しました。",
+      "Microsoft Store の更新中にダウンロードとインストールの状態を表示するよう改善しました。"
+    ],
+    "en-US": [
+      "Fixed multilingual rendering of the update management title.",
+      "Improved download and installation state feedback for Microsoft Store updates."
+    ]
+  }
+}
