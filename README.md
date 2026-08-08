@@ -2,9 +2,9 @@
 
 # UrbanPlanToolbox
 
-## v1.5.1 正式发布状态
+## v1.5.2 正式发布状态
 
-v1.5.1 新增“坐标点批量格式转换器”，支持 DD、DDM、DMS 坐标格式的批量识别、转换、检查和 CSV 导出，坐标数据仅在本机处理。GitHub 正式发布与一次性 Microsoft Store 提交正在按发布流程执行；Store 认证完成前不宣称已公开。后续 Microsoft Store 仍按 `x.0.0` 或 `x.5.0` 里程碑更新。
+v1.5.2 修复更新弹窗标题显示资源键的问题，并为 Microsoft Store 更新增加真实下载进度和下载/部署状态反馈。GitHub 正式发布；Microsoft Store v1.5.2 通过现有流程提交认证，认证完成并确认公开前不宣称已公开。后续 Microsoft Store 仍按 `x.0.0` 或 `x.5.0` 里程碑更新。
 
 面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。
 
@@ -12,7 +12,7 @@ v1.5.1 新增“坐标点批量格式转换器”，支持 DD、DDM、DMS 坐标
 
 ## 获取应用
 
-普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；历史上最后实际公开的 Store 版本为 **v1.3.0**，Store v1.5.1 是否已公开以 Partner Center 认证结果为准。GitHub 最新正式版本为 **v1.5.1**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。本版本按一次性例外提交 Store，后续 Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新。两条渠道的身份、Publisher 和更新流程保持独立。
+普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；Store v1.5.2 是否已公开以 Partner Center 和用户端可获取状态为准。GitHub 最新正式版本为 **v1.5.2**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。两条渠道的身份、Publisher 和更新流程保持独立。
 
 ## 关于 UrbanPlanToolbox
 

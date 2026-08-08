@@ -1,5 +1,22 @@
 # 更改日志
 
+## 1.5.2（GitHub 正式发布；Microsoft Store 提交认证）
+
+### Fixed
+
+- 修复更新弹窗标题错误显示本地化资源键的问题。
+- Microsoft Store 更新下载显示真实进度，并按 Store 状态区分下载、部署、完成、失败和取消。
+- 改进进度边界保护、失败恢复和重复更新操作保护。
+
+### Localization
+
+- 保持简体中文、日语和英语更新界面资源一致。
+
+### Distribution
+
+- GitHub 正式发布 v1.5.2。
+- Microsoft Store 通过现有流程提交认证；认证和公开状态以 Partner Center 及用户端可获取状态为准。
+
 ## 1.5.1（GitHub 正式发布；Microsoft Store 一次性例外提交）
 
 ### Added

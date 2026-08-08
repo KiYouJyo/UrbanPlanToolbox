@@ -47,7 +47,7 @@ public sealed partial class AboutPage : Page
     private async void OnCheckUpdate(object sender, RoutedEventArgs e) => await _updates.CheckAsync(_pageLifetime.Token);
     private void OnCopyDiagnostics(object sender, RoutedEventArgs e)
     {
-        try { var package = new DataPackage(); package.SetText(DiagnosticsInfoService.Create()); Clipboard.SetContent(package); AppNotificationService.Default.Notify(new(Models.Interaction.AppNotificationKind.Success, T("About_UpdateTitle"), T("Diagnostics_Copied"))); }
+        try { var package = new DataPackage(); package.SetText(DiagnosticsInfoService.Create()); Clipboard.SetContent(package); AppNotificationService.Default.Notify(new(Models.Interaction.AppNotificationKind.Success, T("About_UpdateTitle.Text"), T("Diagnostics_Copied"))); }
         catch (Exception exception) { AppLogger.Default.Error("About", "CopyDiagnosticsFailed", exception, "Copying diagnostics failed."); }
     }
     private async void OnOpenLogs(object sender, RoutedEventArgs e)
@@ -57,7 +57,7 @@ public sealed partial class AboutPage : Page
     }
     private async void OnInstallUpdate(object sender, RoutedEventArgs e)
     {
-        if (await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = T("About_UpdateTitle"), Content = T("Update_SaveBeforeInstall"), PrimaryButtonText = T("Action_DownloadAndInstall"), CloseButtonText = T("Action_Later") }, _pageLifetime.Token) == ContentDialogResult.Primary)
+        if (await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = T("About_UpdateTitle.Text"), Content = T("Update_SaveBeforeInstall"), PrimaryButtonText = T("Action_DownloadAndInstall"), CloseButtonText = T("Action_Later") }, _pageLifetime.Token) == ContentDialogResult.Primary)
             await _updates.DownloadAndInstallAsync(_pageLifetime.Token);
     }
 
@@ -65,10 +65,12 @@ public sealed partial class AboutPage : Page
     {
         var info = _updates.Info; CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && _updates.CanCheck; InstallUpdateButton.Visibility = _channel.CanSelfUpdate && info.IsUpdateAvailable ? Visibility.Visible : Visibility.Collapsed; InstallUpdateButton.IsEnabled = _updates.CanInstall;
         OpenReleasesButton.Visibility = _channel.CanOpenReleases || info.State == AppUpdateState.UnsupportedChannel && _channel.Channel == DistributionChannel.GitHub ? Visibility.Visible : Visibility.Collapsed;
-        UpdateProgress.Visibility = _updates.Progress is null ? Visibility.Collapsed : Visibility.Visible;
+        var isProgressState = info.State is AppUpdateState.Downloading or AppUpdateState.Installing;
+        UpdateProgress.Visibility = isProgressState ? Visibility.Visible : Visibility.Collapsed;
+        UpdateProgress.IsIndeterminate = info.State == AppUpdateState.Installing && _updates.Progress is null;
         if (_updates.Progress is double progress) UpdateProgress.Value = progress;
         UpdateStatusText.Text = T($"Update_State_{info.State}");
-        UpdateDetailText.Text = info.State == AppUpdateState.Failed ? $"{T(AppUpdateErrorMapper.ToResourceKey(info.ErrorCode))}{(string.IsNullOrWhiteSpace(info.ErrorCode) ? string.Empty : $" ({info.ErrorCode})")}" : info.Detail ?? string.Empty;
+        UpdateDetailText.Text = info.State == AppUpdateState.Failed ? $"{T(AppUpdateErrorMapper.ToResourceKey(info.ErrorCode))}{(string.IsNullOrWhiteSpace(info.ErrorCode) ? string.Empty : $" ({info.ErrorCode})")}" : _updates.Progress is double progressValue ? TFormatted("Update_ProgressPercent", progressValue) : info.Detail ?? string.Empty;
     }
 
     private async Task OpenLinkAsync(Uri uri)
@@ -81,5 +83,6 @@ public sealed partial class AboutPage : Page
         catch (Exception) { AppNotificationService.Default.Notify(new(Models.Interaction.AppNotificationKind.Error, T("Dialog_OpenFailedTitle"), T("Error_OpenDocumentFailed"))); }
     }
     private string T(string key) => _localization.GetString(key);
+    private string TFormatted(string key, params object[] arguments) => _localization.GetFormattedString(key, arguments);
     private string ChannelLabel(DistributionChannelContext channel) => T(channel.DisplayResourceKey);
 }

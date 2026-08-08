@@ -2,9 +2,9 @@
 
 # UrbanPlanToolbox
 
-## v1.5.1 release status
+## v1.5.2 release status
 
-v1.5.1 adds the Batch Coordinate Format Converter for batch detection, conversion, validation, and CSV export across DD, DDM, and DMS formats; coordinate data is processed locally. The formal GitHub release and the one-time Microsoft Store submission are being executed through the release workflow; Store publication is not claimed before certification completes. Future Microsoft Store updates remain on the `x.0.0` or `x.5.0` milestone cadence.
+v1.5.2 fixes the update-dialog title localization-key display and adds real Microsoft Store download progress with download/deployment state feedback. It is formally released on GitHub; Microsoft Store v1.5.2 is submitted for certification through the existing workflow and is not described as public before certification and availability are confirmed. Future Microsoft Store updates remain on the `x.0.0` or `x.5.0` milestone cadence.
 
 An offline-first Windows toolbox for urban planning, architectural design, and spatial research.
 
@@ -12,7 +12,7 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 ## Get the app
 
-The historical last actually published Microsoft Store version was **v1.3.0**. Whether Microsoft Store v1.5.1 is publicly available is determined by the Partner Center certification result. The latest formal GitHub version is **v1.5.1**. This release uses a one-time Store exception; future Microsoft Store updates default to `x.0.0` or `x.5.0` milestones. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
+Whether Microsoft Store v1.5.2 is publicly available is determined by Partner Center and user-facing Store availability. The latest formal GitHub version is **v1.5.2**. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
 
 ## About UrbanPlanToolbox
 

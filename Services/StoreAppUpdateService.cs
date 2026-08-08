@@ -35,8 +35,31 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
             var operation = CreateContext().RequestDownloadAndInstallStorePackageUpdatesAsync(_updates);
             operation.Progress = (_, status) =>
             {
-                var amount = Math.Clamp(status.PackageDownloadProgress, 0d, 1d);
-                progress?.Report(new(amount < 0.8 ? AppUpdateState.Downloading : AppUpdateState.Installing, amount));
+                var updateState = status.PackageUpdateState;
+                switch (updateState)
+                {
+                    case StorePackageUpdateState.Downloading:
+                        progress?.Report(new(AppUpdateState.Downloading, AppUpdateProgress.NormalizeValue(status.PackageDownloadProgress)));
+                        break;
+                    case StorePackageUpdateState.Deploying:
+                        progress?.Report(new(AppUpdateState.Installing));
+                        break;
+                    case StorePackageUpdateState.Completed:
+                        progress?.Report(new(AppUpdateState.Completed, 1d));
+                        break;
+                    case StorePackageUpdateState.Canceled:
+                        progress?.Report(new(AppUpdateState.Cancelled));
+                        break;
+                    case StorePackageUpdateState.OtherError:
+                    case StorePackageUpdateState.ErrorLowBattery:
+                    case StorePackageUpdateState.ErrorWiFiRecommended:
+                    case StorePackageUpdateState.ErrorWiFiRequired:
+                        progress?.Report(new(AppUpdateState.Failed, Detail: updateState.ToString()));
+                        break;
+                    default:
+                        progress?.Report(new(AppUpdateState.Downloading));
+                        break;
+                }
             };
             var result = await operation.AsTask(cancellationToken);
             var state = result.OverallState.ToString();
