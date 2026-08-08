@@ -111,6 +111,11 @@
   <Compile Include="../../Services/MilestoneReminderPlanner.cs" Link="Services/MilestoneReminderPlanner.cs" />
   <Compile Include="../../Services/MilestoneReminderMigration.cs" Link="Services/MilestoneReminderMigration.cs" />
   <Compile Include="../../Services/MilestoneReminderIdentity.cs" Link="Services/MilestoneReminderIdentity.cs" />
+  <Compile Include="../../Models/DrawingComparisonModels.cs" Link="Models/DrawingComparisonModels.cs" />
+  <Compile Include="../../Services/DrawingLoadService.cs" Link="Services/DrawingLoadService.cs" />
+  <Compile Include="../../Services/DrawingComparisonService.cs" Link="Services/DrawingComparisonService.cs" />
+  <Compile Include="../../Services/DifferenceAnalysisService.cs" Link="Services/DifferenceAnalysisService.cs" />
+  <Compile Include="../../Services/DrawingExportService.cs" Link="Services/DrawingExportService.cs" />
   <Compile Include="../../Models/CoordinateBatchModels.cs" Link="Models/CoordinateBatchModels.cs" />
   <Compile Include="../../Services/CoordinateBatchConversionService.cs" Link="Services/CoordinateBatchConversionService.cs" />
  </ItemGroup>

@@ -11,5 +11,6 @@ public static class ToolIds
     public const string CoordinateSystemConverter = "coordinate-system-converter";
     public const string PlanningTerminology = "planning-terminology";
     public const string FieldSurveyPhotoGis = "field-survey-photo-gis";
+    public const string DrawingVersionComparator = "drawing-version-comparator";
     public const string CoordinateBatchFormatConverter = "coordinate-batch-format-converter";
 }
