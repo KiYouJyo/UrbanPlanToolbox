@@ -39,6 +39,10 @@ A local photo-organizing workflow for planning, design, and GIS field surveys. I
 - Export WGS 84 / EPSG:4326 Shapefile points and CSV metadata; photos without GPS remain in the photo and CSV output but are excluded from the point layer.
 - Original photos are read-only and photos/GPS are processed locally. HEIC preview availability may depend on Windows image codec support, without preventing supported metadata reads.
 
+### Drawing Version Comparator
+
+v1.5.0 adds a local comparator for two PNG, JPG/JPEG, or PDF-page images with identical pixel dimensions. It provides semi-transparent overlay and wipe browsing, fit-to-window, zoom, pan, and overlay PNG export without modifying the original files.
+
 ## Installation
 
 The Microsoft Store is the primary channel for ordinary users who want stable milestones. The repository also provides an x64 framework-dependent self-signed sideloading package; obtain the latest formal feature release from [the latest GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) and verify its checksums before installation. The two channel identities cannot update each other in place.

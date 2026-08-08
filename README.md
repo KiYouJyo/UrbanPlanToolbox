@@ -92,6 +92,12 @@ dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug 
 
 UrbanPlanToolbox 使用 [MIT License](LICENSE) 开源。依赖与外部数据来源见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
 
+## v1.5.0 GitHub Release
+
+- 新增“图纸版本差异对比器”，本地比较两张像素尺寸完全一致的 PNG、JPG/JPEG 或 PDF 页面图像。
+- 提供半透明叠加和擦除浏览两种模式，支持保持比例、缩放、平移、适配窗口和叠加结果 PNG 导出。
+- 原始文件不被覆盖；本版本仅发布 GitHub，Microsoft Store 不执行任何操作。
+
 ## v1.4.2 GitHub Release
 
 - 新增“调研照片整理器”（设计工具 → 实地调研），面向规划、设计与 GIS 实地调研照片整理。

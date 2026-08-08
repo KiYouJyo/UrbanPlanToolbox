@@ -8,12 +8,27 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class AppUpdateTests
 {
     [Theory]
-    [InlineData("JoKiy.UrbanPlanToolbox", "CN=C4E4B33A-7B77-4121-897C-7D720A5471F8", "c4e4b33a7b774121897c7d720a5471f8", DistributionChannel.Store)]
-    [InlineData("556F80C5-C4D4-452B-93B4-00DE3FA7AC29", "CN=AppPublisher", "00000000000000000000000000000000", DistributionChannel.GitHub)]
-    [InlineData("JoKiy.UrbanPlanToolbox", "CN=AppPublisher", "c4e4b33a7b774121897c7d720a5471f8", DistributionChannel.GitHub)]
-    [InlineData("JoKiy.UrbanPlanToolbox", "CN=C4E4B33A-7B77-4121-897C-7D720A5471F8", "", DistributionChannel.GitHub)]
-    public void PackageIdentityMustMatchStoreIdentityExactly(string name, string publisher, string publisherId, DistributionChannel expected) =>
-        Assert.Equal(expected, DistributionChannelIdentity.Identify(name, publisher, publisherId));
+    [InlineData(true, false, DistributionChannel.Store)]
+    [InlineData(true, true, DistributionChannel.Store)]
+    [InlineData(false, true, DistributionChannel.GitHub)]
+    [InlineData(false, false, DistributionChannel.Development)]
+    public void BuildChannelDecisionUsesBuildChannelBeforePackageAvailability(bool storeBuild, bool packageAvailable, DistributionChannel expected) =>
+        Assert.Equal(expected, DistributionChannelDecision.ForBuild(storeBuild, packageAvailable));
+
+    [Theory]
+    [InlineData("JoKiy.UrbanPlanToolbox", "CN=C4E4B33A-7B77-4121-897C-7D720A5471F8", StoreIdentityValidationResult.Valid)]
+    [InlineData("Other.Name", "CN=C4E4B33A-7B77-4121-897C-7D720A5471F8", StoreIdentityValidationResult.NameMismatch)]
+    [InlineData("JoKiy.UrbanPlanToolbox", "CN=Other", StoreIdentityValidationResult.PublisherMismatch)]
+    [InlineData(null, null, StoreIdentityValidationResult.PackageUnavailable)]
+    public void StoreIdentityValidationUsesOnlyNameAndPublisher(string? name, string? publisher, StoreIdentityValidationResult expected) =>
+        Assert.Equal(expected, DistributionChannelIdentity.ValidateStoreIdentity(name, publisher));
+
+    [Theory]
+    [InlineData(DistributionChannel.Store, AppUpdateProviderKind.Store)]
+    [InlineData(DistributionChannel.GitHub, AppUpdateProviderKind.GitHub)]
+    [InlineData(DistributionChannel.Development, AppUpdateProviderKind.Development)]
+    public void ProviderDecisionMatchesDistributionChannel(DistributionChannel channel, AppUpdateProviderKind expected) =>
+        Assert.Equal(expected, AppUpdateProviderDecision.ForChannel(channel));
 
     [Theory]
     [InlineData(DistributionChannel.GitHub, "About_ChannelGitHub", true, false, true)]

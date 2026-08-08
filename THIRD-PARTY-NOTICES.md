@@ -13,6 +13,7 @@ The project references the following packages in `UrbanPlanToolbox.csproj`:
 - `NetTopologySuite.IO.Esri.Shapefile` `1.2.0` — BSD 3-Clause License; forward-only Esri Shapefile readers and writers.
 - `MetadataExtractor` `2.9.0` — Apache License 2.0; local EXIF/GPS metadata reading.
 - `XmpCore` `6.1.10.1` — transitive metadata dependency; see its package license notice at <https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html>.
+- `OpenCvSharp4` `4.11.0.20250506` and `OpenCvSharp4.runtime.win` `4.11.0.20250506` — Apache License 2.0; local feature matching, geometric registration, ECC refinement, morphology, and connected-components analysis. The packaged native runtime is Windows x64 only.
 
 Both packages are used only for local geometry and Shapefile I/O. The application does not use an online coordinate conversion service and does not upload Shapefile data.
 

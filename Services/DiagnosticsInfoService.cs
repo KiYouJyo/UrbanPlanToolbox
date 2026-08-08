@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Windows.ApplicationModel;
 
 namespace UrbanPlanToolbox.Services;
 
@@ -9,6 +8,9 @@ public static class DiagnosticsInfoService
     public static string Create(string? errorSummary = null)
     {
         var settings = new SettingsService().Load();
+        var channelService = new AppDistributionChannelService();
+        var channel = channelService.GetCurrentChannel();
+        var identity = channelService.GetPackageIdentity();
         var sdk = AppDomain.CurrentDomain.GetAssemblies()
             .FirstOrDefault(assembly => assembly.GetName().Name?.Contains("WindowsApp", StringComparison.OrdinalIgnoreCase) == true)
             ?.GetName().Version?.ToString() ?? "Unavailable";
@@ -16,7 +18,9 @@ public static class DiagnosticsInfoService
             "Application: UrbanPlanToolbox",
             $"Display version: {AppVersionProvider.DisplayVersion}",
             $"Package version: {AppVersionProvider.GetPackageVersion()}",
-            $"Channel: {DistributionChannelProvider.CurrentContext.Channel}",
+            $"Distribution channel: {GetChannelLabel(channel)}",
+            $"Build channel: {GetBuildChannelLabel(channel)}",
+            $"Update provider: {AppUpdateProviderDecision.ForChannel(channel)}",
             $"Architecture: {RuntimeInformation.OSArchitecture}",
             $"Windows version: {Environment.OSVersion.Version}",
             $"Windows App SDK version: {sdk}",
@@ -24,7 +28,12 @@ public static class DiagnosticsInfoService
             $"Theme: {SettingsService.NormalizeTheme(settings.Theme)}",
             $"Data schema version: {AppVersionProvider.DataSchemaVersion}",
             "Backup format version: 2",
-            $"Package identity: {GetPackageIdentity()}",
+            $"Package identity name: {Sanitize(identity.Name) ?? "Unavailable / Development"}",
+            $"Package publisher: {Sanitize(identity.Publisher) ?? "Unavailable / Development"}",
+            $"Package publisher ID: {Sanitize(identity.PublisherId) ?? "Unavailable / Development"}",
+            $"Package family name: {Sanitize(identity.FamilyName) ?? "Unavailable / Development"}",
+            $"Package full name: {Sanitize(identity.FullName) ?? "Unavailable / Development"}",
+            $"Store identity validation: {GetStoreValidationLabel(channelService, channel)}",
             "Data handling: local-only diagnostics; no telemetry or project contents",
             $"Error summary: {Sanitize(errorSummary) ?? "None"}");
     }
@@ -36,15 +45,15 @@ public static class DiagnosticsInfoService
         _ => "Development"
     };
 
-    private static string GetPackageIdentity()
-    {
-        try
+    private static string GetBuildChannelLabel(DistributionChannel channel) => channel switch
         {
-            var id = Package.Current.Id;
-            return $"family={Sanitize(id.FamilyName) ?? "Unavailable"}; fullName={Sanitize(id.FullName) ?? "Unavailable"}";
-        }
-        catch { return "Unpackaged"; }
-    }
+            DistributionChannel.Store => "Store",
+            DistributionChannel.GitHub => "GitHub",
+            _ => "Development"
+        };
+
+    private static string GetStoreValidationLabel(AppDistributionChannelService service, DistributionChannel channel) =>
+        channel == DistributionChannel.Development ? "Unavailable / Development" : service.GetStoreIdentityValidation().ToString();
 
     private static string? Sanitize(string? value)
     {
