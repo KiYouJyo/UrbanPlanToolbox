@@ -148,7 +148,25 @@ public sealed class ToolRegistry
             true,
             "shidediaoyanzhaopianshuzhuli",
             "S",
-            "Tool_FieldSurveyPhotoGis_Keywords")
+            "Tool_FieldSurveyPhotoGis_Keywords"),
+        new(
+            ToolIds.CoordinateBatchFormatConverter,
+            "Tool_CoordinateBatchFormatConverter_Name",
+            "Tool_CoordinateBatchFormatConverter_Description",
+            ToolPrimaryCategory.Design,
+            ToolSecondaryCategory.PreliminaryAnalysis,
+            "\uE8A4",
+            typeof(Views.CoordinateBatchFormatConverterPage),
+            95,
+            true,
+            "zuobiaodianpilianggeshizhuanhuanqi",
+            "Z",
+            "Tool_CoordinateBatchFormatConverter_Keywords")
+        {
+            CategoryPlacements = [
+                new(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis, 95),
+                new(ToolPrimaryCategory.Research, ToolSecondaryCategory.DataTools, 95)]
+        }
     ]);
 
     public ToolRegistry(IEnumerable<ToolDefinition> tools)

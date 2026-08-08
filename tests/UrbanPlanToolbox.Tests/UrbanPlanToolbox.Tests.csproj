@@ -111,6 +111,8 @@
   <Compile Include="../../Services/MilestoneReminderPlanner.cs" Link="Services/MilestoneReminderPlanner.cs" />
   <Compile Include="../../Services/MilestoneReminderMigration.cs" Link="Services/MilestoneReminderMigration.cs" />
   <Compile Include="../../Services/MilestoneReminderIdentity.cs" Link="Services/MilestoneReminderIdentity.cs" />
+  <Compile Include="../../Models/CoordinateBatchModels.cs" Link="Models/CoordinateBatchModels.cs" />
+  <Compile Include="../../Services/CoordinateBatchConversionService.cs" Link="Services/CoordinateBatchConversionService.cs" />
  </ItemGroup>
  <ItemGroup>
   <None Include="../../Strings/**/*.resw" Link="Strings/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
