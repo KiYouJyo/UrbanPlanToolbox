@@ -216,7 +216,7 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("$notesPath = \"packaging/store-release-notes/$projectVersion.json\"", workflow);
         Assert.DoesNotContain("EXPECTED_PRODUCT_VERSION", workflow);
 
-        Assert.Contains("$expectedPackageVersion = if ($projectVersion -split '\\.').Count -eq 4", script);
+        Assert.Contains("$expectedPackageVersion = if (($projectVersion -split '\\.').Count -eq 4)", script);
         Assert.Contains("$PackageVersion -ne $expectedPackageVersion", script);
         Assert.DoesNotMatch(new Regex(@"PackageVersion\s+-ne\s+'\d+\.\d+\.\d+\.\d+'"), script);
         Assert.Contains("DistributionChannel=Store", script);

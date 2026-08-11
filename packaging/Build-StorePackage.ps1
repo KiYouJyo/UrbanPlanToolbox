@@ -46,7 +46,7 @@ $projectPath = Join-Path $repoRoot 'UrbanPlanToolbox.csproj'
 $project = Read-XmlDocument -Path $projectPath
 $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
 if ($projectVersion -notmatch '^\d+\.\d+\.\d+(\.\d+)?$') { throw "UrbanPlanToolbox.csproj Version must use three- or four-part numeric format; got '$projectVersion'." }
-$expectedPackageVersion = if ($projectVersion -split '\.').Count -eq 4 { $projectVersion } else { "$projectVersion.0" }
+$expectedPackageVersion = if (($projectVersion -split '\.').Count -eq 4) { $projectVersion } else { "$projectVersion.0" }
 if ($PackageVersion -ne $expectedPackageVersion) { throw "Store package version must match project version. Project=$projectVersion ExpectedPackage=$expectedPackageVersion ActualPackage=$PackageVersion" }
 if (Test-Path -LiteralPath $output) {
     if (@(Get-ChildItem -LiteralPath $output -Force).Count -gt 0) { throw "Store package output directory must be new or empty: $output" }
