@@ -13,7 +13,7 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="RootLayout" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" Loaded="OnRootLayoutLoaded">
+    <Grid x:Name="RootLayout" Loaded="OnRootLayoutLoaded">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

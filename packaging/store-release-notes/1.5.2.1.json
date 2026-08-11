@@ -1,0 +1,14 @@
+{
+  "version": "1.5.2.1",
+  "locales": {
+    "zh-CN": [
+      "修复界面背景材质显示异常，恢复 Windows 11 Mica 视觉效果，并改进应用更新体验。"
+    ],
+    "ja-JP": [
+      "アプリの背景マテリアル表示の問題を修正し、Windows 11 の Mica 表現を復元しました。また、アプリの更新機能を改善しました。"
+    ],
+    "en-US": [
+      "Fixed an issue with the app background material, restoring the Windows 11 Mica visual effect, with improvements to the app update experience."
+    ]
+  }
+}
