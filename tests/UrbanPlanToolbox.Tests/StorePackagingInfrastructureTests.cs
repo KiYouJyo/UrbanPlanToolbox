@@ -202,21 +202,21 @@ public sealed class StorePackagingInfrastructureTests
         var script = File.ReadAllText(Path.Combine(root, "packaging", "Build-StorePackage.ps1"));
         var workflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "publish-microsoft-store.yml"));
 
-        var versionMatch = Regex.Match(project, @"<Version>(\d+\.\d+\.\d+(?:\.\d+)?)</Version>");
-        Assert.True(versionMatch.Success, "UrbanPlanToolbox.csproj must contain a three- or four-part Version.");
+        var versionMatch = Regex.Match(project, @"<Version>(\d+\.\d+\.\d+)</Version>");
+        Assert.True(versionMatch.Success, "UrbanPlanToolbox.csproj must contain a major.minor.patch Version.");
         var productVersion = versionMatch.Groups[1].Value;
-        var expectedPackageVersion = productVersion.Split('.').Length == 4 ? productVersion : $"{productVersion}.0";
+        var expectedPackageVersion = $"{productVersion}.0";
 
         Assert.Contains($"Version=\"{expectedPackageVersion}\"", githubManifest);
         Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", storeManifest);
         Assert.Contains("Publisher=\"CN=C4E4B33A-7B77-4121-897C-7D720A5471F8\"", storeManifest);
         Assert.Contains($"Version=\"{expectedPackageVersion}\"", storeManifest);
 
-        Assert.Contains("$expectedPackageVersion = if (($projectVersion -split '\\.').Count -eq 4)", workflow);
+        Assert.Contains("$expectedPackageVersion = \"$projectVersion.0\"", workflow);
         Assert.Contains("$notesPath = \"packaging/store-release-notes/$projectVersion.json\"", workflow);
         Assert.DoesNotContain("EXPECTED_PRODUCT_VERSION", workflow);
 
-        Assert.Contains("$expectedPackageVersion = if (($projectVersion -split '\\.').Count -eq 4)", script);
+        Assert.Contains("$expectedPackageVersion = \"$projectVersion.0\"", script);
         Assert.Contains("$PackageVersion -ne $expectedPackageVersion", script);
         Assert.DoesNotMatch(new Regex(@"PackageVersion\s+-ne\s+'\d+\.\d+\.\d+\.\d+'"), script);
         Assert.Contains("DistributionChannel=Store", script);
