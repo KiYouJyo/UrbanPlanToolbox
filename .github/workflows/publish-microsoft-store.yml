@@ -50,8 +50,8 @@ jobs:
           [xml]$githubManifest = Get-Content -LiteralPath Package.appxmanifest -Raw
           [xml]$storeManifest = Get-Content -LiteralPath Package.Store.appxmanifest -Raw
           $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
-          if ($projectVersion -notmatch '^\d+\.\d+\.\d+$') { throw "UrbanPlanToolbox.csproj Version must use major.minor.patch format; got '$projectVersion'." }
-          $expectedPackageVersion = "$projectVersion.0"
+          if ($projectVersion -notmatch '^\d+\.\d+\.\d+(\.\d+)?$') { throw "UrbanPlanToolbox.csproj Version must use three- or four-part numeric format; got '$projectVersion'." }
+          $expectedPackageVersion = if (($projectVersion -split '\.').Count -eq 4) { $projectVersion } else { "$projectVersion.0" }
           $githubPackageVersion = [string]$githubManifest.Package.Identity.Version
           $storePackageVersion = [string]$storeManifest.Package.Identity.Version
           if ($githubPackageVersion -ne $expectedPackageVersion -or $storePackageVersion -ne $expectedPackageVersion) { throw "Version mismatch. Project=$projectVersion ExpectedPackage=$expectedPackageVersion GitHubManifest=$githubPackageVersion StoreManifest=$storePackageVersion" }
