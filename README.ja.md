@@ -2,6 +2,12 @@
 
 # UrbanPlanToolbox
 
+## v1.5.6 正式公開
+
+v1.5.6 では、GitHub サイドロード版にユーザー操作による App Installer アプリ内更新を追加しました。初回インストールには v1.5.6 GitHub Release のワンクリック インストーラーを使用してください。既存の `CN=AppPublisher` 公開証明書を検証し、必要な場合だけ UAC で証明書を信頼済みにしてから、安定した App Installer URI を通じて Windows App Installer を起動します。以後のバージョンは About から確認、ダウンロード、インストールできます。
+
+ワンクリック インストーラーは通常のアプリインストールに `Add-AppxPackage` を使用しません。実際のアプリインストールと App Installer association は Windows App Installer が担当します。Microsoft Store チャネルは分離され、このリリースでは操作しません。
+
 ## v1.5.4 公開状況
 
 v1.5.4 では、更新ダイアログのタイトル、Microsoft Store アプリ内更新の進捗、インストール状態、ライフサイクル、診断ログを改善しました。GitHub では正式公開済みです。Microsoft Store v1.5.4 の認証・公開状態は Partner Center とユーザー側の取得状態を基準とします。

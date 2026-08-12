@@ -17,7 +17,7 @@ public sealed record DistributionChannelContext(
     public static DistributionChannelContext For(DistributionChannel channel) => channel switch
     {
         DistributionChannel.Store => new(channel, "About_ChannelStore", true, true, false),
-        DistributionChannel.GitHub => new(channel, "About_ChannelGitHub", true, false, true),
+        DistributionChannel.GitHub => new(channel, "About_ChannelGitHub", true, true, false),
         _ => new(DistributionChannel.Development, "About_ChannelDevelopment", false, false, false)
     };
 }

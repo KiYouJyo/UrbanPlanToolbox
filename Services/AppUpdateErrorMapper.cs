@@ -10,6 +10,8 @@ public static class AppUpdateErrorMapper
         "InstallFailed" or "StoreInstallFailed" => "Update_ErrorInstall",
         "NoPendingUpdate" => "Update_ErrorNoPending",
         "StoreWindowUnavailable" => "Update_ErrorWindowUnavailable",
+        "LegacyMigrationRequired" => "Update_ErrorLegacyMigration",
+        "AppInstallerUnavailable" => "Update_ErrorAppInstallerUnavailable",
         _ when code?.StartsWith("0x", StringComparison.Ordinal) == true => "Update_ErrorStoreCode",
         _ => "Update_ErrorGeneric"
     };
