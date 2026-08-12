@@ -18,10 +18,8 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService) : 
         var result = await _updateService.CheckForUpdatesAsync(_localVersion, cancellationToken);
         return result.Status switch
         {
-            UpdateCheckStatus.UpdateAvailable => SetPending(result, new(AppUpdateState.UpdateAvailable, result.RemoteVersion?.ToString(), result.Release?.Body,
-                Source: UpdateInstallSource.GitHub, ReleaseNotes: result.Release?.Body)),
-            UpdateCheckStatus.UpToDate or UpdateCheckStatus.LocalVersionNewer => SetPending(result, new(AppUpdateState.UpToDate, result.RemoteVersion?.ToString(), result.Release?.Body,
-                Source: UpdateInstallSource.GitHub, ReleaseNotes: result.Release?.Body)),
+            UpdateCheckStatus.UpdateAvailable => SetPending(result, new(AppUpdateState.UpdateAvailable, result.RemoteVersion?.ToString(), Source: UpdateInstallSource.GitHub)),
+            UpdateCheckStatus.UpToDate or UpdateCheckStatus.LocalVersionNewer => SetPending(result, new(AppUpdateState.UpToDate, result.RemoteVersion?.ToString(), Source: UpdateInstallSource.GitHub)),
             UpdateCheckStatus.NoRelease => Fail("ReleaseNotFound"),
             UpdateCheckStatus.InvalidRemoteVersion or UpdateCheckStatus.InvalidResponse => Fail("InvalidReleaseResponse"),
             UpdateCheckStatus.RateLimited => Fail("GitHubRateLimited"),

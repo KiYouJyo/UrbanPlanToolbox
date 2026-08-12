@@ -184,13 +184,14 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public void AboutInstallCommandDoesNotCreateAnApplicationConfirmationDialog()
+    public void AboutPageUsesOneConfirmationDialogAndNoInlineInstallControls()
     {
         var root = FindRepositoryRoot();
         var source = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
-        Assert.Contains("private async void OnInstallUpdate(object sender, RoutedEventArgs e) => await _updates.DownloadAndInstallAsync(_updateLifetime.Token);", source, StringComparison.Ordinal);
-        Assert.DoesNotContain("Dialog_UpdateAvailableTitle", source, StringComparison.Ordinal);
-        Assert.DoesNotContain("Update_SaveBeforeInstall", source, StringComparison.Ordinal);
+        Assert.Contains("ShowUpdateDialogAsync", source, StringComparison.Ordinal);
+        Assert.Contains("Update_DialogInstall", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("InstallUpdateButton", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("UpdateProgress", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -223,6 +224,43 @@ public sealed class AppUpdateTests
         }
     }
 
+    [Fact]
+    public void AboutCopyrightResourceUsesTheExactUtf8Text()
+    {
+        var root = FindRepositoryRoot();
+        var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
+        Assert.DoesNotContain("Copyright 漏 2026 KiYouJyo", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Uid=\"About_CopyrightText\"", xaml, StringComparison.Ordinal);
+        foreach (var language in ReswCatalog.Languages)
+            Assert.Equal("Copyright © 2026 KiYouJyo", ReswCatalog.Load(language)["About_CopyrightText.Text"]);
+    }
+
+    [Theory]
+    [InlineData("1.5.6", AppUpdateState.UpToDate, false)]
+    [InlineData("1.5.7", AppUpdateState.UpToDate, false)]
+    [InlineData("1.5.8", AppUpdateState.UpdateAvailable, true)]
+    public async Task UpdateCardAlwaysUsesLocalVersionAndOnlyAvailableUpdatesShowDialog(string availableVersion, AppUpdateState expectedState, bool expectedDialog)
+    {
+        var viewModel = new UpdateViewModel(new FixedUpdateService(expectedState, availableVersion));
+
+        await viewModel.CheckAsync();
+
+        Assert.Equal("v1.5.7", viewModel.CurrentVersion);
+        Assert.Equal(expectedState, viewModel.Info.State);
+        Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
+        Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
+    }
+
+    [Fact]
+    public void AboutUpdateCardBindsCurrentVersionToLocalVersionOnly()
+    {
+        var root = FindRepositoryRoot();
+        var source = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
+        Assert.Contains("UpdateVersionText.Text = AppVersionProvider.DisplayVersion", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("UpdateVersionText.Text = info.AvailableVersion", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("UpdateVersionText.Text = info.Version", source, StringComparison.Ordinal);
+    }
+
     private static string FindRepositoryRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
@@ -234,7 +272,7 @@ public sealed class AppUpdateTests
 internal sealed class PendingProgressService : IAppUpdateService
 {
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.5.6"));
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, AvailableVersion: "1.5.7"));
 
     public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
     {
@@ -244,4 +282,13 @@ internal sealed class PendingProgressService : IAppUpdateService
         progress?.Report(new(AppUpdateState.Installing));
         return new AppUpdateResult(AppUpdateState.Installing);
     }
+}
+
+internal sealed class FixedUpdateService(AppUpdateState state, string availableVersion) : IAppUpdateService
+{
+    public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateInfo(state, AvailableVersion: availableVersion));
+
+    public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateResult(AppUpdateState.Completed));
 }

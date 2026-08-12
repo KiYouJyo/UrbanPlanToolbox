@@ -4,11 +4,12 @@ public enum UpdateInstallSource { Unknown, GitHub, AppInstaller, LegacyGitHub }
 
 public sealed record AppUpdateInfo(
     AppUpdateState State,
-    string? Version = null,
+    string? AvailableVersion = null,
     string? Detail = null,
     string? ErrorCode = null,
     string? ReleaseNotes = null,
-    UpdateInstallSource Source = UpdateInstallSource.Unknown)
+    UpdateInstallSource Source = UpdateInstallSource.Unknown,
+    LocalizedReleaseNotes? LocalizedReleaseNotes = null)
 {
     public bool IsUpdateAvailable => State == AppUpdateState.UpdateAvailable;
 }

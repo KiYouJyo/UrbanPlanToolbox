@@ -1,5 +1,20 @@
 # 更改日志
 
+## 1.5.7
+
+### Changed
+
+- Unified update-check UI across GitHub and Microsoft Store distributions.
+- Added localized themed update confirmation dialogs.
+- Removed user-visible update progress percentage and progress bar.
+- Separated installed and available version display semantics.
+
+### Fixed
+
+- Fixed raw GitHub Release body appearing in the About page.
+- Fixed incorrect current-version display in the update card.
+- Fixed copyright-symbol encoding corruption.
+
 ## 1.5.6（GitHub 正式发布）
 
 - GitHub 旁加载版支持用户主动触发的 App Installer 应用内更新。

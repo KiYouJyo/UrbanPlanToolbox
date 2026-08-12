@@ -1,0 +1,20 @@
+{
+  "version": "1.5.7",
+  "locales": {
+    "zh-CN": [
+      "统一 GitHub 与 Microsoft Store 的更新检查体验。",
+      "修复更新管理中的当前版本显示错误和 About 页面版权符号编码问题。",
+      "移除不可靠的下载进度百分比，仅显示当前更新状态。"
+    ],
+    "ja-JP": [
+      "GitHub 版と Microsoft Store 版の更新確認体験を統一しました。",
+      "更新管理画面の現在のバージョン表示と About ページの著作権記号の文字化けを修正しました。",
+      "信頼できないダウンロード進捗率を削除し、現在の更新状態だけを表示します。"
+    ],
+    "en-US": [
+      "Unified the update-check experience for GitHub and Microsoft Store installations.",
+      "Fixed the current-version display and the copyright-symbol encoding on the About page.",
+      "Removed unreliable download percentages and kept state-only update feedback."
+    ]
+  }
+}
