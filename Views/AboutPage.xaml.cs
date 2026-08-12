@@ -48,12 +48,15 @@ public sealed partial class AboutPage : Page
     private async void OnOpenNotices(object sender, RoutedEventArgs e) => await OpenDocumentAsync("THIRD-PARTY-NOTICES.md");
     private async void OnCheckUpdate(object sender, RoutedEventArgs e)
     {
-        await _updates.CheckAsync(_pageLifetime.Token);
         if (_updates.Info.IsUpdateAvailable)
         {
             await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
-            await ShowUpdateDialogAsync(_pageLifetime.Token);
+            await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
+            return;
         }
+        await _updates.CheckAsync(_pageLifetime.Token);
+        if (_updates.Info.IsUpdateAvailable)
+            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
     }
     private void OnCopyDiagnostics(object sender, RoutedEventArgs e)
     {
@@ -65,28 +68,10 @@ public sealed partial class AboutPage : Page
         try { AppDataPathProvider.Default.EnsureInfrastructureDirectories(); if (!await Launcher.LaunchFolderPathAsync(AppDataPathProvider.Default.Paths.LogsDirectory)) throw new InvalidOperationException(); }
         catch (Exception exception) { AppLogger.Default.Error("About", "OpenLogsFailed", exception, "Opening the log folder failed."); AppNotificationService.Default.Notify(new(Models.Interaction.AppNotificationKind.Error, T("Dialog_OpenFailedTitle"), T("Error_OpenLogsFolderFailed"))); }
     }
-    private async Task ShowUpdateDialogAsync(CancellationToken cancellationToken)
-    {
-        var info = _updates.Info;
-        var note = info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage));
-        var content = new StackPanel { Spacing = 12, MaxWidth = 560 };
-        content.Children.Add(new TextBlock { Text = TFormatted("Update_DialogVersion", info.AvailableVersion ?? string.Empty), TextWrapping = TextWrapping.Wrap });
-        content.Children.Add(new TextBlock { Text = note?.Title ?? T("Update_DialogNotesTitle"), Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"] });
-        content.Children.Add(new ScrollViewer { MaxHeight = 380, Content = new TextBlock { Text = note is null ? TFormatted("Update_FallbackMessage", info.AvailableVersion ?? string.Empty) : string.Join(Environment.NewLine, note.Items.Select(item => $"• {item}")), TextWrapping = TextWrapping.Wrap } });
-        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Update_DialogAvailableTitle"), Content = content, PrimaryButtonText = T("Update_DialogInstall"), CloseButtonText = T("Update_DialogLater"), DefaultButton = ContentDialogButton.Primary };
-        if (await AppDialogService.Default.ShowAsync(dialog, cancellationToken) == ContentDialogResult.Primary)
-        {
-            await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
-            if (_updates.RestartFailureReason is not null)
-            {
-                var restartDialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Setting_Language_RestartTitle"), Content = new TextBlock { Text = T("Setting_Language_RestartFailed"), TextWrapping = TextWrapping.Wrap }, PrimaryButtonText = T("Setting_Language_RestartNow"), CloseButtonText = T("Update_DialogLater"), DefaultButton = ContentDialogButton.Primary };
-                if (await AppDialogService.Default.ShowAsync(restartDialog, cancellationToken) == ContentDialogResult.Primary) _updates.TryRestartAgain();
-            }
-        }
-    }
     private void RenderUpdate()
     {
-        var info = _updates.Info; UpdateVersionText.Text = AppVersionProvider.DisplayVersion; CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && _updates.CanCheck;
+        var info = _updates.Info; UpdateVersionText.Text = AppVersionProvider.DisplayVersion; UpdateTargetText.Text = info.AvailableVersion is null ? T("About_Unavailable") : $"v{info.AvailableVersion}"; UpdateNotesText.Text = info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage)) is { } note ? string.Join(Environment.NewLine, note.Items.Select(item => $"• {item}")) : T("About_Unavailable"); CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
+        CheckUpdateButton.Content = info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
         UpdateStatusText.Text = T($"Update_State_{info.State}");
         var progressVisible = info.State is AppUpdateState.Downloading or AppUpdateState.Installing or AppUpdateState.Restarting;
         UpdateProgressBar.Visibility = progressVisible ? Visibility.Visible : Visibility.Collapsed;

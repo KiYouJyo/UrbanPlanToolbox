@@ -95,12 +95,12 @@ public sealed class AppUpdateTests
     [InlineData(AppUpdateState.Failed, false)]
     [InlineData(AppUpdateState.Cancelled, false)]
     [InlineData(AppUpdateState.UpToDate, false)]
-    public async Task UpdateCompletionRequestsRestartOnlyForInstalledUpdates(AppUpdateState resultState, bool expectedRestart)
+    public async Task UpdateCompletionDoesNotRequestAnAppOwnedRestart(AppUpdateState resultState, bool _)
     {
         var restart = new UpdateRestartStub(true);
         var viewModel = new UpdateViewModel(new InstallResultUpdateService(resultState), restart);
         await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync();
-        Assert.Equal(expectedRestart ? 1 : 0, restart.CallCount);
+        Assert.Equal(0, restart.CallCount);
     }
 
     [Theory]
@@ -202,10 +202,23 @@ public sealed class AppUpdateTests
     {
         var root = FindRepositoryRoot();
         var source = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
-        Assert.Contains("ShowUpdateDialogAsync", source, StringComparison.Ordinal);
-        Assert.Contains("Update_DialogInstall", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("ShowUpdateDialogAsync", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Update_DialogInstall", source, StringComparison.Ordinal);
         Assert.DoesNotContain("InstallUpdateButton", source, StringComparison.Ordinal);
         Assert.Contains("UpdateProgressBar", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ReleaseNotesRequestUsesAbsoluteGitHubPagesUriAndRejectsVersionMismatch()
+    {
+        var handler = new ReleaseNotesHandler();
+        var service = new LocalizedReleaseNotesService(new HttpClient(handler));
+        var notes = await service.GetAsync("1.5.9", "en-US");
+        Assert.NotNull(notes);
+        Assert.Equal("https://kiyoujyo.github.io/UrbanPlanToolbox/release-notes/1.5.9.json", handler.RequestUri?.ToString());
+
+        handler.Payload = "{\"schemaVersion\":1,\"version\":\"1.5.8\",\"notes\":{\"en-US\":{\"title\":\"x\",\"items\":[\"y\"]}}}";
+        Assert.Null(await service.GetAsync("1.5.9", "en-US"));
     }
 
     [Fact]
@@ -259,7 +272,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.5.8", viewModel.CurrentVersion);
+        Assert.Equal("v1.5.9", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -280,6 +293,17 @@ public sealed class AppUpdateTests
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
             if (File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.slnx"))) return directory.FullName;
         throw new DirectoryNotFoundException();
+    }
+
+    private sealed class ReleaseNotesHandler : HttpMessageHandler
+    {
+        public Uri? RequestUri { get; private set; }
+        public string Payload { get; set; } = "{\"schemaVersion\":1,\"version\":\"1.5.9\",\"notes\":{\"en-US\":{\"title\":\"x\",\"items\":[\"y\"]}}}";
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            RequestUri = request.RequestUri;
+            return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(Payload, System.Text.Encoding.UTF8, "application/json") });
+        }
     }
 }
 

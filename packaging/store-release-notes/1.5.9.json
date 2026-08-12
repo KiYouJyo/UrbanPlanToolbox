@@ -1,0 +1,8 @@
+{
+  "version": "1.5.9",
+  "locales": {
+    "zh-CN": ["修复 Release Notes 加载、Microsoft Store 目标版本显示和重复更新确认弹窗问题。"],
+    "ja-JP": ["Release Notes の読み込み、Microsoft Store の更新対象バージョン表示、重複する更新確認ダイアログを修正しました。"],
+    "en-US": ["Fixed Release Notes loading, Microsoft Store target-version display, and duplicate update confirmation dialogs."]
+  }
+}

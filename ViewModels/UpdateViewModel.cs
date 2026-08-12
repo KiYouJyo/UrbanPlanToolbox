@@ -57,16 +57,7 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
             });
             var result = await _service.DownloadAndInstallAsync(progress, cancellationToken);
             var finalState = result.State;
-            if (result.State is AppUpdateState.Completed or AppUpdateState.Restarting)
-            {
-                AppLogger.Default.Info("Update", "RestartRequested", $"Source={Info.Source}; UpdateResult={result.State}; RestartRequested=YES");
-                if (!_restartService.TryRestart(out var failureReason))
-                {
-                    RestartFailureReason = failureReason ?? "RestartReturned";
-                    AppLogger.Default.Info("Update", "RestartReturned", $"Source={Info.Source}; UpdateResult={result.State}; RestartRequested=YES; AppInstance.Restart returned={RestartFailureReason}");
-                    finalState = AppUpdateState.Completed;
-                }
-            }
+            // Store and App Installer own shutdown/restart. The app must not ask for a second confirmation.
             Progress = null;
             OnChanged(nameof(Progress));
             Info = new(finalState, Detail: result.Detail, ErrorCode: result.ErrorCode);
