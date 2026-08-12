@@ -2,7 +2,6 @@
 param(
     [Parameter(Mandatory)][string]$SignedBundlePath,
     [Parameter(Mandatory)][string]$PublicCertificatePath,
-    [Parameter(Mandatory)][string]$AppInstallerPath,
     [Parameter(Mandatory)][string]$OutputDirectory,
     [Parameter(Mandatory)][string]$DisplayVersion,
     [Parameter(Mandatory)][string]$PackageVersion
@@ -14,27 +13,21 @@ $out = [IO.Path]::GetFullPath($OutputDirectory)
 $repoPrefix = $repo.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 if ($out -eq $repo -or $out.StartsWith($repoPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Output must be outside the repository.' }
 if ($DisplayVersion -notmatch '^\d+\.\d+\.\d+$' -or $PackageVersion -notmatch '^\d+\.\d+\.\d+\.\d+$' -or -not $PackageVersion.StartsWith("$DisplayVersion.")) { throw 'Invalid version input.' }
-foreach ($path in @($SignedBundlePath, $PublicCertificatePath, $AppInstallerPath)) { if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Missing input: $path" } }
+foreach ($path in @($SignedBundlePath, $PublicCertificatePath)) { if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Missing input: $path" } }
 
 $bundle = Get-Item -LiteralPath $SignedBundlePath
 $cert = [Security.Cryptography.X509Certificates.X509Certificate2]::new((Resolve-Path $PublicCertificatePath))
 if ($cert.HasPrivateKey -or $cert.Subject -cne 'CN=AppPublisher') { throw 'Invalid public certificate.' }
-$appInstaller = [xml](Get-Content -Raw -LiteralPath $AppInstallerPath)
-$appInstallerRoot = $appInstaller.SelectSingleNode("/*[local-name()='AppInstaller']")
-$bundleNode = $appInstaller.SelectSingleNode("/*[local-name()='AppInstaller']/*[local-name()='MainBundle']")
-if ($null -eq $appInstallerRoot -or $appInstallerRoot.Uri -ne 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller' -or $null -eq $bundleNode -or $bundleNode.Version -ne $PackageVersion) { throw 'App Installer does not describe the requested stable online package.' }
-$remoteBundleUri = [Uri]$bundleNode.Uri
-if ($bundleNode.Name -ne '556F80C5-C4D4-452B-93B4-00DE3FA7AC29' -or [IO.Path]::GetFileName($remoteBundleUri.AbsolutePath) -ne $bundle.Name -or -not $remoteBundleUri.IsAbsoluteUri -or $remoteBundleUri.Scheme -ne 'https' -or $remoteBundleUri.Host -ne 'github.com' -or $bundleNode.Publisher -ne 'CN=AppPublisher') { throw 'App Installer MainBundle is not a valid GitHub package target.' }
 
 $root = Join-Path $out "UrbanPlanToolbox-v$DisplayVersion-x64-one-click"
 if (Test-Path -LiteralPath $root) { throw 'Output already exists.' }
 $payload = Join-Path $root 'payload'
 New-Item -ItemType Directory -Path $payload -Force | Out-Null
 $metadata = [ordered]@{
-    schemaVersion = 2; displayVersion = $DisplayVersion; packageVersion = $PackageVersion
+    schemaVersion = 3; displayVersion = $DisplayVersion; packageVersion = $PackageVersion; releaseTag = "v$DisplayVersion"
     packageIdentityName = '556F80C5-C4D4-452B-93B4-00DE3FA7AC29'; publisher = 'CN=AppPublisher'; architecture = 'x64'
     remoteBundleFileName = $bundle.Name; certificateFileName = "UrbanPlanToolbox-v$DisplayVersion-Framework-Dependent.cer"
-    appInstallerUri = 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller'
+    releaseApiUri = 'https://api.github.com/repos/KiYouJyo/UrbanPlanToolbox/releases/latest'; checksumFileName = 'SHA256SUMS.txt'
 }
 $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'InstallerMetadata.json') -Encoding UTF8
 $rootEntryScripts = @(Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.cmd' | Sort-Object Name)

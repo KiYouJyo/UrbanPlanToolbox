@@ -62,12 +62,12 @@
 
 ### GitHub 首次安装与 App Installer 架构
 
-GitHub 首次安装使用轻量 one-click Bootstrap。Bootstrap 仅携带公开证书、脚本、metadata 和 SHA256 清单，不携带 MSIXBundle 或 `.appinstaller`。安装时从固定 Pages 地址获取 `UrbanPlanToolbox.appinstaller`，校验其版本、Publisher、Package Identity 以及 GitHub Release HTTPS bundle URI，然后通过 `Add-AppxPackage -AppInstallerFile` 完成部署。
+GitHub 首次安装使用轻量 one-click Bootstrap。Bootstrap 仅携带公开证书、脚本、metadata 和 SHA256 清单，不携带 MSIXBundle 或 `.appinstaller`。安装时查询 GitHub Releases API，下载 MSIXBundle 与 SHA256 清单到临时目录，校验 SHA256 和 `CN=AppPublisher` 签名，然后通过本地 `Add-AppxPackage -Path` 完成部署。Pages AppInstaller 仅保留为 legacy compatibility infrastructure。
 
 正式分发关系保持唯一：
 
 ```text
-one-click bootstrap → Pages UrbanPlanToolbox.appinstaller → GitHub Release MSIXBundle
+one-click bootstrap → GitHub Releases API/assets → local SHA256/signature verification → local MSIXBundle deployment
 ```
 
 GitHub Release 资产为 one-click ZIP、MSIXBundle 和 `SHA256SUMS.txt`；`.appinstaller` 只作为 Pages 基础设施保留在稳定地址 `https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller`，不作为 Release Asset。
