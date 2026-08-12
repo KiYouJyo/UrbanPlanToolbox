@@ -134,6 +134,10 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService) : 
         {
             package = Package.Current;
             installerInfo = package.GetAppInstallerInfo();
+            if (installerInfo is not null)
+            {
+                AppLogger.Default.Info("GitHubUpdate", "AppInstallerAssociationDetected", $"Version={installerInfo.Version}; Uri={installerInfo.Uri}");
+            }
             return installerInfo is not null;
         }
         catch (Exception exception)

@@ -1,4 +1,4 @@
-name: Publish GitHub Release
+name: Prepare GitHub Release Assets
 
 on:
   workflow_dispatch:
@@ -9,28 +9,106 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-test-package:
     runs-on: windows-2025-vs2026
+    env:
+      RELEASE_CERTIFICATE_BASE64: ${{ secrets.GH_RELEASE_CERTIFICATE_BASE64 }}
+      RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+
+      - name: Validate signing configuration
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_BASE64) -or [string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_PASSWORD)) {
+            throw 'GitHub release signing secrets are not configured.'
+          }
+
       - name: Restore and test
         shell: pwsh
         run: |
           dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Release -p:Platform=x64
           dotnet test UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore
-      - name: Build x64 MSIX bundle
+
+      - name: Build unsigned x64 MSIX bundle
         shell: pwsh
         run: |
           $output = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-AppPackages'
           dotnet build UrbanPlanToolbox.csproj -c Release -p:Platform=x64 -p:GenerateAppxPackageOnBuild=true -p:AppxPackageSigningEnabled=false -p:AppxBundle=Always -p:AppxBundlePlatforms=x64 -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxPackageDir="$output\"
           $bundle = Get-ChildItem $output -Recurse -Filter '*.msixbundle' | Select-Object -First 1
           if (-not $bundle) { throw 'MSIX bundle was not produced.' }
-          $installer = Join-Path $output 'UrbanPlanToolbox.appinstaller'
-          & ./packaging/New-AppInstallerFile.ps1 -OutputPath $installer -DisplayVersion '${{ inputs.version }}' -BundleFileName $bundle.Name
-          & ./packaging/Test-AppInstallerFile.ps1 -Path $installer -ExpectedVersion '${{ inputs.version }}' -ExpectedBundleFileName $bundle.Name
+          "BUNDLE_PATH=$($bundle.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "BUNDLE_FILE_NAME=$($bundle.Name)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Sign bundle and export public certificate
+        shell: pwsh
+        run: |
+          $work = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'
+          New-Item -ItemType Directory -Force -Path $work | Out-Null
+          $pfx = Join-Path $work 'release-signing.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:RELEASE_CERTIFICATE_BASE64))
+          $securePassword = ConvertTo-SecureString $env:RELEASE_CERTIFICATE_PASSWORD -AsPlainText -Force
+          $certificate = Import-PfxCertificate -FilePath $pfx -CertStoreLocation Cert:\CurrentUser\My -Password $securePassword
+          if ($certificate.Subject -cne 'CN=AppPublisher') { throw "Unexpected signing subject: $($certificate.Subject)" }
+          $cer = Join-Path $work "UrbanPlanToolbox-${{ inputs.version }}-Framework-Dependent.cer"
+          Export-Certificate -Cert $certificate -FilePath $cer | Out-Null
+          $signtool = Get-ChildItem "$env:ProgramFiles(x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe | Where-Object FullName -match '\\x64\\signtool.exe$' | Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw 'signtool.exe was not found.' }
+          & $signtool.FullName sign /fd SHA256 /sha1 $certificate.Thumbprint /tr http://timestamp.digicert.com /td SHA256 $env:BUNDLE_PATH
+          if ($LASTEXITCODE -ne 0) { throw "signtool sign failed: $LASTEXITCODE" }
+          & $signtool.FullName verify /pa /all /v $env:BUNDLE_PATH
+          if ($LASTEXITCODE -ne 0) { throw "signtool verify failed: $LASTEXITCODE" }
+          "CERTIFICATE_PATH=$cer" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Generate and validate App Installer
+        shell: pwsh
+        run: |
+          $installer = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets\UrbanPlanToolbox.appinstaller'
+          & ./packaging/New-AppInstallerFile.ps1 -OutputPath $installer -DisplayVersion '${{ inputs.version }}' -BundleFileName $env:BUNDLE_FILE_NAME
+          & ./packaging/Test-AppInstallerFile.ps1 -Path $installer -ExpectedVersion '${{ inputs.version }}' -ExpectedBundleFileName $env:BUNDLE_FILE_NAME
+          "APPINSTALLER_PATH=$installer" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Generate and validate final one-click package
+        shell: pwsh
+        run: |
+          $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'
+          $staging = Join-Path $assets 'staging'
+          & ./packaging/New-GitHubOneClickInstallerPackage.ps1 -SignedBundlePath $env:BUNDLE_PATH -PublicCertificatePath $env:CERTIFICATE_PATH -AppInstallerPath $env:APPINSTALLER_PATH -OutputDirectory $staging -DisplayVersion '${{ inputs.version }}' -PackageVersion '${{ inputs.version }}.0'
+          $packageRoot = Join-Path $staging "UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click"
+          & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory $packageRoot
+          $zip = Join-Path $assets "UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click.zip"
+          Compress-Archive -Path $packageRoot -DestinationPath $zip -CompressionLevel Optimal
+          $extracted = Join-Path $assets 'extracted'
+          Expand-Archive -LiteralPath $zip -DestinationPath $extracted -Force
+          & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory (Join-Path $extracted "UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click") -ZipPath $zip
+          Copy-Item -LiteralPath $env:BUNDLE_PATH -Destination (Join-Path $assets $env:BUNDLE_FILE_NAME) -Force
+
+      - name: Prepare SHA256 release manifest
+        shell: pwsh
+        run: |
+          $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'
+          $releaseFiles = @(
+            (Join-Path $assets "UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click.zip"),
+            $env:BUNDLE_PATH
+          )
+          $manifest = foreach ($file in $releaseFiles) {
+            $item = Get-Item -LiteralPath $file
+            "{0}  {1}" -f (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant(), $item.Name
+          }
+          Set-Content -LiteralPath (Join-Path $assets 'SHA256SUMS.txt') -Value $manifest -Encoding ascii
+
+      - name: Upload release asset artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: UrbanPlanToolbox-${{ inputs.version }}-github-release-assets
+          path: |
+            ${{ runner.temp }}/UrbanPlanToolbox-ReleaseAssets/UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click.zip
+            ${{ runner.temp }}/UrbanPlanToolbox-ReleaseAssets/*.msixbundle
+            ${{ runner.temp }}/UrbanPlanToolbox-ReleaseAssets/SHA256SUMS.txt
+          if-no-files-found: error

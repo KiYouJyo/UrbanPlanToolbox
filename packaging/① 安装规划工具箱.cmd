@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal DisableDelayedExpansion
 set "ROOT=%~dp0"
 set "LAUNCHER=%ROOT%payload\InstallLauncher.ps1"
@@ -27,7 +28,7 @@ if not "%EXITCODE%"=="0" (
   exit /b %EXITCODE%
 )
 
-echo Installation completed successfully.
+echo Installation completed. See PowerShell output for package verification.
 echo Log: %ENTRYLOG%
 call :wait
 exit /b 0

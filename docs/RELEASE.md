@@ -60,6 +60,18 @@
 3. 生成 MSIXBundle、安装 ZIP 和 SHA256SUMS；ZIP 内不包含私钥、PDB、源代码或本机数据。
 4. GitHub 更新检查只在用户主动操作时访问 Releases API。
 
+### GitHub 首次安装与 App Installer 架构
+
+GitHub 首次安装使用轻量 one-click Bootstrap。Bootstrap 仅携带公开证书、脚本、metadata 和 SHA256 清单，不携带 MSIXBundle 或 `.appinstaller`。安装时从固定 Pages 地址获取 `UrbanPlanToolbox.appinstaller`，校验其版本、Publisher、Package Identity 以及 GitHub Release HTTPS bundle URI，然后通过 `Add-AppxPackage -AppInstallerFile` 完成部署。
+
+正式分发关系保持唯一：
+
+```text
+one-click bootstrap → Pages UrbanPlanToolbox.appinstaller → GitHub Release MSIXBundle
+```
+
+GitHub Release 资产为 one-click ZIP、MSIXBundle 和 `SHA256SUMS.txt`；`.appinstaller` 只作为 Pages 基础设施保留在稳定地址 `https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller`，不作为 Release Asset。
+
 ## Microsoft Store 渠道
 
 仅在版本符合 Store 里程碑政策且取得单独授权时执行：使用 `Package.Store.appxmanifest`、正式 Identity `JoKiy.UrbanPlanToolbox` 和 Publisher `CN=C4E4B33A-7B77-4121-897C-7D720A5471F8`，生成 `.msixupload`，在最终主线产物上运行 WACK，再由维护者手工上传 Partner Center。Store 包版本必须单调递增，发布后的更新由 Microsoft Store 管理。

@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal DisableDelayedExpansion
 set "ROOT=%~dp0"
 set "LAUNCHER=%ROOT%payload\UninstallLauncher.ps1"
