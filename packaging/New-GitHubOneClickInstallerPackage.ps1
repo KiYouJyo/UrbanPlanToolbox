@@ -27,7 +27,7 @@ $metadata = [ordered]@{
     schemaVersion = 3; displayVersion = $DisplayVersion; packageVersion = $PackageVersion; releaseTag = "v$DisplayVersion"
     packageIdentityName = '556F80C5-C4D4-452B-93B4-00DE3FA7AC29'; publisher = 'CN=AppPublisher'; architecture = 'x64'
     remoteBundleFileName = $bundle.Name; certificateFileName = "UrbanPlanToolbox-v$DisplayVersion-Framework-Dependent.cer"
-    releaseApiUri = 'https://api.github.com/repos/KiYouJyo/UrbanPlanToolbox/releases/latest'; checksumFileName = 'SHA256SUMS.txt'
+    releaseApiUri = "https://api.github.com/repos/KiYouJyo/UrbanPlanToolbox/releases/tags/v$DisplayVersion"; checksumFileName = 'SHA256SUMS.txt'
 }
 $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'InstallerMetadata.json') -Encoding UTF8
 $rootEntryScripts = @(Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.cmd' | Sort-Object Name)
@@ -44,6 +44,7 @@ Copy-PayloadPowerShellScript 'payload\UninstallAppInstaller.ps1' 'Uninstall.ps1'
 Copy-PayloadPowerShellScript 'payload\InstallAppInstallerLauncher.ps1' 'InstallLauncher.ps1'
 Copy-PayloadPowerShellScript 'payload\UninstallLauncher.ps1' 'UninstallLauncher.ps1'
 Copy-PayloadPowerShellScript 'payload\InstallerMetadataAppInstaller.ps1' 'InstallerMetadata.ps1'
+Copy-PayloadPowerShellScript 'payload\ChecksumResolver.ps1' 'ChecksumResolver.ps1'
 Copy-Item -LiteralPath $PublicCertificatePath -Destination (Join-Path $payload $metadata.certificateFileName)
 $hashLines = Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object Name -ne 'SHA256SUMS.txt' | Sort-Object FullName | ForEach-Object { "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToUpperInvariant()) *$($_.FullName.Substring($payload.Length).TrimStart('\'))" }
 Set-Content -LiteralPath (Join-Path $payload 'SHA256SUMS.txt') -Value $hashLines -Encoding UTF8

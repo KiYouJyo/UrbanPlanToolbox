@@ -3,6 +3,7 @@ param([switch]$LaunchAfterInstall, [switch]$ImportCertificateOnly, [string]$Bund
 $ErrorActionPreference = 'Stop'
 $payloadRoot = $PSScriptRoot
 . (Join-Path $payloadRoot 'InstallerMetadata.ps1')
+. (Join-Path $payloadRoot 'ChecksumResolver.ps1')
 $logDirectory = Join-Path $env:LOCALAPPDATA 'UrbanPlanToolbox\Logs'
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 $logPath = Join-Path $logDirectory ("Install-{0:yyyyMMdd-HHmmss}.log" -f (Get-Date))
@@ -43,11 +44,20 @@ try {
         $release = Invoke-RestMethod -Uri $metadata.releaseApiUri -Headers @{ Accept='application/vnd.github+json'; 'User-Agent'="UrbanPlanToolbox/$($metadata.displayVersion)" } -Method Get
         if ($release.tag_name -ne $metadata.releaseTag -or $release.draft -or $release.prerelease) { throw "Release not found or not stable: $($metadata.releaseTag)" }
         $bundleAssets = @($release.assets | Where-Object { $_.name -like '*.msixbundle' }); $bundleAsset = @($bundleAssets | Where-Object name -eq $metadata.remoteBundleFileName); $checksumAsset = @($release.assets | Where-Object name -eq $metadata.checksumFileName)
-        if ($bundleAssets.Count -ne 1 -or $bundleAsset.Count -ne 1 -or $checksumAsset.Count -ne 1) { throw 'Release assets are incomplete.' }
+        if ($bundleAssets.Count -ne 1 -or $bundleAsset.Count -ne 1) { throw 'Release assets are incomplete.' }
+        $bundleDigest = Get-ValidSha256Digest $bundleAsset[0].digest
         $checksumPath = Join-Path $tempRoot $metadata.checksumFileName
-        Invoke-WebRequest -Uri $checksumAsset[0].browser_download_url -UseBasicParsing -OutFile $checksumPath -ErrorAction Stop
-        $expected = (Get-Content $checksumPath | Where-Object { $_ -match "^(?<hash>[A-Fa-f0-9]{64})\s+\*?$([regex]::Escape($metadata.remoteBundleFileName))$" } | ForEach-Object { $matches.hash.ToUpperInvariant() } | Select-Object -First 1)
-        if ([string]::IsNullOrWhiteSpace($expected)) { throw 'Checksum is missing.' }
+        $manifestHash = $null
+        Log "ReleaseTag=$($metadata.releaseTag); ExpectedBundleName=$($metadata.remoteBundleFileName); ChecksumAssetFound=$($checksumAsset.Count -eq 1); BundleDigest=$($bundleAsset[0].digest)"
+        if ($checksumAsset.Count -eq 1) {
+            Invoke-WebRequest -Uri $checksumAsset[0].browser_download_url -UseBasicParsing -OutFile $checksumPath -ErrorAction Stop
+            $manifestHash = Resolve-Sha256ManifestHash $checksumPath $metadata.remoteBundleFileName
+            Log "ChecksumManifestDownloaded=YES; ChecksumManifestMatched=$([bool]$manifestHash)"
+        }
+        if ($bundleDigest -and $manifestHash -and $bundleDigest -cne $manifestHash) { throw 'Release checksum sources disagree.' }
+        $expected = if ($bundleDigest) { $bundleDigest } else { $manifestHash }
+        if ([string]::IsNullOrWhiteSpace($expected)) { throw "No valid SHA-256 was available for $($metadata.remoteBundleFileName)." }
+        Log "ChecksumSource=$(if ($bundleDigest) { 'GitHubAssetDigest' } else { 'SHA256SUMS' }); ExpectedSHA256=$expected"
         Invoke-WebRequest -Uri $bundleAsset[0].browser_download_url -UseBasicParsing -OutFile $localBundlePath -ErrorAction Stop
         $actual = (Get-FileHash -LiteralPath $localBundlePath -Algorithm SHA256).Hash.ToUpperInvariant(); Log "Downloaded $($metadata.releaseTag), Bytes=$((Get-Item $localBundlePath).Length), SHA256=$actual."
         if ($actual -ne $expected) { throw 'Checksum mismatch.' }
