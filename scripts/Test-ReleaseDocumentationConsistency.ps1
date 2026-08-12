@@ -21,9 +21,6 @@ foreach ($readme in $readmes) {
     Assert-Contains $readme 'https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest'
 }
 
-foreach ($readme in $readmes) {
-    Assert-Contains $readme '1.3.0'
-}
 Assert-Contains (Join-Path $RepositoryRoot 'CHANGELOG.md') '## 1.3.0'
 Assert-Contains (Join-Path $RepositoryRoot 'docs/ROADMAP.md') '1.3.0'
 Assert-Contains (Join-Path $RepositoryRoot 'docs/index.html') '<h2>1.3.0</h2>'

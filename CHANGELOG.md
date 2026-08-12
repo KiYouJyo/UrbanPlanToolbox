@@ -1,5 +1,13 @@
 # 更改日志
 
+## 1.5.6（GitHub 正式发布）
+
+- GitHub 旁加载版支持用户主动触发的 App Installer 应用内更新。
+- GitHub 与 Microsoft Store 更新渠道保持隔离。
+- 首次安装一键包改为证书 bootstrap 加 Windows App Installer 安装链。
+- 增加 Legacy GitHub 安装迁移支持。
+- 本版本发布范围为 GitHub Release；不包含 Microsoft Store 操作。
+
 ## 1.5.4（GitHub 正式发布；Microsoft Store 正式提交）
 
 ### Fixed

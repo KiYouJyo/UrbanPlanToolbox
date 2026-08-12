@@ -34,7 +34,9 @@ $metadata = [ordered]@{
     appInstallerFileName = 'UrbanPlanToolbox.appinstaller'; appInstallerUri = 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller'
 }
 $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'InstallerMetadata.json') -Encoding UTF8
-foreach ($file in @('① 安装规划工具箱.cmd','② 卸载规划工具箱.cmd')) { Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination $root }
+$rootEntryScripts = @(Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.cmd' | Sort-Object Name)
+if ($rootEntryScripts.Count -ne 2) { throw "Expected exactly two root CMD entry scripts, found $($rootEntryScripts.Count)." }
+foreach ($entryScript in $rootEntryScripts) { Copy-Item -LiteralPath $entryScript.FullName -Destination $root }
 $readme = Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.txt' | Select-Object -First 1
 (Get-Content -Raw -LiteralPath $readme.FullName -Encoding UTF8).Replace('{{DISPLAY_VERSION}}',$DisplayVersion).Replace('{{PACKAGE_VERSION}}',$PackageVersion) | Set-Content -LiteralPath (Join-Path $root $readme.Name) -Encoding UTF8
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'payload\InstallAppInstaller.ps1') -Destination (Join-Path $payload 'Install.ps1')

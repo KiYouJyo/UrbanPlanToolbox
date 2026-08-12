@@ -1,104 +1,79 @@
-简体中文 | [日本語](README.ja.md) | English
+English | [简体中文](README.md) | [日本語](README.ja.md)
 
 # UrbanPlanToolbox
 
-## v1.5.6 release status
-
-v1.5.6 adds user-triggered GitHub in-app updates through Windows App Installer. For first-time GitHub installation, use the one-click installer package in the [v1.5.6 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.6). It validates the existing self-signed `CN=AppPublisher` certificate, imports the public certificate only when required, and starts Windows App Installer. Later versions can be checked, downloaded, and installed from About without manually downloading another package.
-
-The GitHub one-click installer does not install the application with `Add-AppxPackage`; Windows App Installer performs the real installation and creates the future update association. Microsoft Store remains a separate channel and is not involved in this release.
-
-## v1.5.4 release status
-
-v1.5.4 fixes the update-dialog title resource issue and improves Microsoft Store in-app update progress, installation state, lifecycle handling, and diagnostics. It is formally released on GitHub; Microsoft Store v1.5.4 certification and public availability follow Partner Center and user-facing Store status.
-
 An offline-first Windows toolbox for urban planning, architectural design, and spatial research.
 
-[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows)](https://github.com/KiYouJyo/UrbanPlanToolbox) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
 
 ## Get the app
 
-Whether Microsoft Store v1.5.4 is publicly available is determined by Partner Center and user-facing Store availability. The latest formal GitHub version is **v1.5.4**. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
+- [Latest formal GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest): more frequent x64 sideloaded releases.
+- [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW): for users who prefer Microsoft Store installation and updates.
 
-## About UrbanPlanToolbox
+The two channels have independent identities and update paths and cannot upgrade over each other. See [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) and [CHANGELOG.md](CHANGELOG.md) for version details.
 
-UrbanPlanToolbox is a Windows desktop toolbox for urban planning, architectural design, and spatial research. Projects, tool data, and backups are kept on the device by default. Core features do not require an account, cloud sync, or an internet connection.
-
-## Features
+## Core features
 
 - Design and research project management, project home, workspace, archive, and restore.
-- Project milestones with Windows local reminders and work-folder access.
-- Planning-metrics calculator and unit and scale converter.
-- Palette recorder, workflow review checklist, architecture and planning regulations index, and design-concept dictionary.
-- Coordinate System Converter for local WGS 84, GCJ-02, and BD-09 point conversion. Shapefile files are processed locally; projected coordinate systems are not supported.
-- Local tool search and favorites, plus `.uptbackup` export, import, and restore.
+- Project milestones, local reminders, and work-folder access.
+- Planning metrics, unit and scale conversion, palette records, and workflow checklists.
+- Architecture and planning regulations, design-concept dictionary, local search, and favorites.
+- Local WGS 84, GCJ-02, and BD-09 point conversion with Shapefile processing.
+- Survey photo organization, EXIF/GPS reading, GIS points, and CSV export.
 - Simplified Chinese, Japanese, and English; light, dark, and system themes.
-- v1.3.0 adds instant language switching without restarting, plus configurable project-milestone reminders: none, 6/12/24 hours, or 3 days, with up to three repeats and a 09:00 local-time default when no time is set.
 
-### Survey Photo Organizer
+## Installation and updates
 
-A local photo-organizing workflow for planning, design, and GIS field surveys. It reads EXIF/GPS metadata, organizes tags and notes, and exports consistently named photo copies, GIS points, and CSV data.
+### First GitHub installation
 
-- Batch import JPG, JPEG, HEIC, HEIF, and PNG photos.
-- Read EXIF, GPS, capture time, altitude, and heading, with thumbnail preview.
-- Organize photos with free-form Tags and Note fields.
-- Export WGS 84 / EPSG:4326 Shapefile points and CSV metadata; photos without GPS remain in the photo and CSV output but are excluded from the point layer.
-- Original photos are read-only and photos/GPS are processed locally. HEIC preview availability may depend on Windows image codec support, without preventing supported metadata reads.
+Download the one-click installer from the [latest GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest). It completes the required certificate setup and installs the app through Windows App Installer so later updates can be performed in-app. The bare `.appinstaller` file is not the recommended first-install entry point.
 
-### Drawing Version Comparator
+### Later updates
 
-v1.5.0 adds a local comparator for two PNG, JPG/JPEG, or PDF-page images with identical pixel dimensions. It provides semi-transparent overlay and wipe browsing, fit-to-window, zoom, pan, and overlay PNG export without modifying the original files.
+Open About and choose Check for updates. GitHub builds download and install later versions through Windows App Installer; Microsoft Store builds continue to be managed by Microsoft Store.
 
-## Installation
+### Advanced installation
 
-The Microsoft Store is the primary channel for ordinary users who want stable milestones. The repository also provides an x64 framework-dependent self-signed sideloading package; obtain the latest formal feature release from [the latest GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) and verify its checksums before installation. The two channel identities cannot update each other in place.
+Release Assets also include the `.appinstaller`, `.msixbundle`, and SHA-256 manifest for manual deployment or verification.
 
 ## Privacy and offline design
 
-Microsoft Store updates are managed by Microsoft Store. The sideloaded build accesses the GitHub Releases API only when the user explicitly checks for updates; external regulations, support, and project links open only after the user selects them. The app requires no account and has no ads, telemetry, tracking, automatic crash upload, or automatic upload of user data. Project and tool data stays on the device.
-
-GCJ-02 and BD-09 results use public approximation algorithms for map overlay, data preparation, and research support only. They are not surveying-, approval-, construction-, or legal-grade coordinate transformations.
-
-See [PRIVACY.md](PRIVACY.md) and the [online privacy policy](https://kiyoujyo.github.io/UrbanPlanToolbox/privacy/).
+Core features require no account, cloud sync, or internet connection. Projects, tool data, and backups stay on the device by default; update checks access the relevant channel only after the user requests them. Photos, GPS, and coordinate data are processed locally.
 
 ## Requirements
 
-Windows 10 17763 or later, x64. Development requires .NET 10, WinUI 3, Windows App SDK, and Windows SDK 10.0.26100.0.
+Windows 10 17763 or later, x64.
 
 ## Data and backups
 
-App data is stored in the local application-data directory. Settings provides `.uptbackup` export, import, and restore with a manifest and SHA-256 checks. Work-folder contents are not uploaded or copied into a backup; an imported backup requires the folder to be selected again.
+Settings supports `.uptbackup` export, import, and restore with a manifest and SHA-256 checks. Work-folder contents are not uploaded or copied into backups; imported backups require the folder to be selected again.
 
 ## Languages
 
-The interface supports Simplified Chinese, 日本語, and English. Choose a language in Settings; it takes effect immediately.
+The interface supports Simplified Chinese, 日本語, and English, with immediate language switching in Settings.
 
 ## Documentation
 
 - [Roadmap and version policy](docs/ROADMAP.md)
 - [Release guide](docs/RELEASE.md)
-- [Microsoft Store publishing guide](docs/STORE-PUBLISHING.md)
-- [Data storage](docs/DATA_STORAGE.md), [data backup](docs/DATA_BACKUP.md)
+- [Data storage](docs/DATA_STORAGE.md) · [Data backup](docs/DATA_BACKUP.md)
 - [Changelog](CHANGELOG.md)
-- [Third-party notices](THIRD-PARTY-NOTICES.md)
+- [Privacy policy](PRIVACY.md) · [Third-party notices](THIRD-PARTY-NOTICES.md)
 
 ## Development and build
 
 ```powershell
 dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Debug -p:Platform=x64
-dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug -p:Platform=x64
+dotnet test UrbanPlanToolbox.slnx -c Debug -p:Platform=x64 --no-restore
 ```
 
-See [docs/RELEASE.md](docs/RELEASE.md) for build, channel separation, WACK, and publishing procedures.
+See [docs/RELEASE.md](docs/RELEASE.md) for the complete build and release process.
 
 ## Feedback
 
-Report issues through [GitHub Issues](https://github.com/KiYouJyo/UrbanPlanToolbox/issues) or visit the [support page](https://kiyoujyo.github.io/UrbanPlanToolbox/support/). Remove local paths, project content, and personal data before sharing diagnostics.
-
-## Roadmap
-
-See [docs/ROADMAP.md](docs/ROADMAP.md) for completed work and future directions. The roadmap communicates direction and is not a promise of features or dates.
+Report issues through [GitHub Issues](https://github.com/KiYouJyo/UrbanPlanToolbox/issues) or the [support page](https://kiyoujyo.github.io/UrbanPlanToolbox/support/). Remove local paths and personal data before sharing diagnostics.
 
 ## License
 
-UrbanPlanToolbox is open source under the [MIT License](LICENSE). Dependencies and external data sources are listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Use [Issues](https://github.com/KiYouJyo/UrbanPlanToolbox/issues) for reports and suggestions, and submit pull requests when appropriate.
+UrbanPlanToolbox is open source under the [MIT License](LICENSE).
