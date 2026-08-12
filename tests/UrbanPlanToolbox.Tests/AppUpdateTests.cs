@@ -84,9 +84,23 @@ public sealed class AppUpdateTests
     [Fact]
     public async Task ViewModelReportsProgressAndCompletion()
     {
-        var viewModel = new UpdateViewModel(new FakeAppUpdateService(FakeAppUpdateScenario.UpdateAvailable));
+        var viewModel = new UpdateViewModel(new FakeAppUpdateService(FakeAppUpdateScenario.UpdateAvailable), new UpdateRestartStub(true));
         await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync();
         Assert.Equal(AppUpdateState.Completed, viewModel.Info.State); Assert.Null(viewModel.Progress);
+    }
+
+    [Theory]
+    [InlineData(AppUpdateState.Completed, true)]
+    [InlineData(AppUpdateState.Restarting, true)]
+    [InlineData(AppUpdateState.Failed, false)]
+    [InlineData(AppUpdateState.Cancelled, false)]
+    [InlineData(AppUpdateState.UpToDate, false)]
+    public async Task UpdateCompletionRequestsRestartOnlyForInstalledUpdates(AppUpdateState resultState, bool expectedRestart)
+    {
+        var restart = new UpdateRestartStub(true);
+        var viewModel = new UpdateViewModel(new InstallResultUpdateService(resultState), restart);
+        await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync();
+        Assert.Equal(expectedRestart ? 1 : 0, restart.CallCount);
     }
 
     [Theory]
@@ -191,7 +205,7 @@ public sealed class AppUpdateTests
         Assert.Contains("ShowUpdateDialogAsync", source, StringComparison.Ordinal);
         Assert.Contains("Update_DialogInstall", source, StringComparison.Ordinal);
         Assert.DoesNotContain("InstallUpdateButton", source, StringComparison.Ordinal);
-        Assert.DoesNotContain("UpdateProgress", source, StringComparison.Ordinal);
+        Assert.Contains("UpdateProgressBar", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -284,11 +298,27 @@ internal sealed class PendingProgressService : IAppUpdateService
     }
 }
 
-internal sealed class FixedUpdateService(AppUpdateState state, string availableVersion) : IAppUpdateService
+internal sealed class FixedUpdateService(AppUpdateState resultState, string availableVersion) : IAppUpdateService
 {
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateInfo(state, AvailableVersion: availableVersion));
+        Task.FromResult(new AppUpdateInfo(resultState, AvailableVersion: availableVersion));
 
     public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateResult(AppUpdateState.Completed));
+        Task.FromResult(new AppUpdateResult(resultState));
+}
+
+internal sealed class InstallResultUpdateService(AppUpdateState resultState) : IAppUpdateService
+{
+    public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, AvailableVersion: "1.5.8"));
+
+    public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateResult(resultState));
+}
+
+internal sealed class UpdateRestartStub(bool result) : IApplicationRestartService
+{
+    public int CallCount { get; private set; }
+    public bool TryRestart() => TryRestart(out _);
+    public bool TryRestart(out string? failureReason) { CallCount++; failureReason = result ? null : "StubFailure"; return result; }
 }

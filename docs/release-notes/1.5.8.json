@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.5.8",
+  "notes": {
+    "zh-CN": { "title": "更新内容", "items": ["恢复更新下载进度条，可直观看到更新下载进度。", "修复更新安装完成后 UrbanPlanToolbox 无法自动重新启动的问题。", "修复 GitHub 一键安装包中的卸载脚本无法正常运行的问题。", "保持 GitHub 与 Microsoft Store 统一的更新确认与本地化版本说明体验。", "GitHub 与 Microsoft Store 继续使用各自独立的下载和安装机制。"] },
+    "ja-JP": { "title": "更新内容", "items": ["更新のダウンロード進行状況バーを復元しました。", "更新のインストール完了後に UrbanPlanToolbox が自動再起動しない問題を修正しました。", "GitHub ワンクリックインストーラーに含まれるアンインストールスクリプトを修正しました。", "GitHub 版と Microsoft Store 版で、統一されたローカライズ更新確認体験を維持しています。", "GitHub と Microsoft Store は引き続き独立したダウンロードおよびインストール経路を使用します。"] },
+    "en-US": { "title": "What's new", "items": ["Restored the update download progress bar.", "Fixed an issue where UrbanPlanToolbox did not automatically restart after an update was installed.", "Fixed the uninstall script included with the GitHub one-click installer.", "Preserved the unified localized update confirmation experience across GitHub and Microsoft Store installations.", "GitHub and Microsoft Store continue to use independent download and installation pipelines."] }
+  }
+}

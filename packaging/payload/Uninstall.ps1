@@ -1,6 +1,6 @@
 ﻿[CmdletBinding()]
 param(
-    [switch]$RemoveTestCertificate
+    [switch]$RemoveCertificate
 )
 
 $ErrorActionPreference = 'Stop'
@@ -17,22 +17,17 @@ function Write-UninstallLog([string]$Message) {
 
 try {
     $installerMetadata = Get-InstallerMetadata $payloadRoot
-    $msixPath = Get-SafePayloadFilePath $payloadRoot $installerMetadata.msixFileName
-    $cerPath = Get-SafePayloadFilePath $payloadRoot $installerMetadata.certificateFileName
-    if (-not (Test-Path -LiteralPath $msixPath -PathType Leaf)) { throw '找不到主 MSIX，无法确定准确包身份。' }
-    if (-not (Test-Path -LiteralPath $cerPath -PathType Leaf)) { throw '找不到测试 CER，无法确定准确证书指纹。' }
-    $metadata = Get-MsixPackageMetadata $msixPath
-    Assert-MetadataMatchesMsix $installerMetadata $metadata
-    $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($cerPath)
-    if ($certificate.HasPrivateKey -or $certificate.Subject -cne $metadata.Publisher) { throw 'CER 与该 MSIX 的发布者不匹配或包含私钥。' }
-    $thumbprint = $certificate.Thumbprint.ToUpperInvariant()
-
-    $packages = @(Get-AppxPackage -AllUsers -Name $metadata.Name | Where-Object { $_.Publisher -eq $metadata.Publisher })
+    $packages = @(Get-AppxPackage -Name '556F80C5-C4D4-452B-93B4-00DE3FA7AC29' | Where-Object { $_.Publisher -eq 'CN=AppPublisher' })
     foreach ($package in $packages) {
         Write-UninstallLog "卸载 $($package.PackageFullName)。"
-        Remove-AppxPackage -Package $package.PackageFullName -AllUsers
+        Remove-AppxPackage -Package $package.PackageFullName
     }
-    if ($RemoveTestCertificate) {
+    if ($RemoveCertificate) {
+        $cerPath = Get-SafePayloadFilePath $payloadRoot $installerMetadata.certificateFileName
+        if (-not (Test-Path -LiteralPath $cerPath -PathType Leaf)) { throw '找不到测试 CER，无法确定准确证书指纹。' }
+        $certificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($cerPath)
+        if ($certificate.HasPrivateKey -or $certificate.Subject -cne 'CN=AppPublisher') { throw 'CER 与 GitHub 包发布者不匹配或包含私钥。' }
+        $thumbprint = $certificate.Thumbprint.ToUpperInvariant()
         $certificatePath = "Cert:\LocalMachine\TrustedPeople\$thumbprint"
         if (Test-Path -LiteralPath $certificatePath) {
             Remove-Item -LiteralPath $certificatePath

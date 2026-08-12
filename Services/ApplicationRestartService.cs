@@ -4,9 +4,23 @@ namespace UrbanPlanToolbox.Services;
 
 public sealed class ApplicationRestartService : IApplicationRestartService
 {
-    public bool TryRestart()
+    public bool TryRestart() => TryRestart(out _);
+
+    public bool TryRestart(out string? failureReason)
     {
-        try { return string.Equals(AppInstance.Restart(string.Empty).ToString(), "RestartPending", StringComparison.Ordinal); }
-        catch (Exception) { return false; }
+        failureReason = null;
+        try
+        {
+            var result = AppInstance.Restart(string.Empty);
+            failureReason = result.ToString();
+            AppLogger.Default.Info("ApplicationRestart", "RestartReturned", $"AppInstance.Restart returned={failureReason}");
+            return false;
+        }
+        catch (Exception exception)
+        {
+            failureReason = exception.Message;
+            AppLogger.Default.Error("ApplicationRestart", "RestartFailed", exception, $"FailureReason={failureReason}");
+            return false;
+        }
     }
 }
