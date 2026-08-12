@@ -27,7 +27,9 @@ if not "%EXITCODE%"=="0" (
   exit /b %EXITCODE%
 )
 
-echo Installation completed successfully.
+echo Windows 应用安装程序已打开。
+echo 请在应用安装程序窗口中确认安装 UrbanPlanToolbox。
+echo 安装完成后即可关闭此窗口。
 echo Log: %ENTRYLOG%
 call :wait
 exit /b 0

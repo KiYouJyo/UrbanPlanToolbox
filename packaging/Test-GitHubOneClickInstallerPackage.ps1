@@ -12,14 +12,27 @@ $metadata = Get-Content -Raw -LiteralPath (Join-Path $payload 'InstallerMetadata
 if ([int]$metadata.schemaVersion -ne 2 -or $metadata.displayVersion -ne '1.5.6' -or $metadata.packageVersion -ne '1.5.6.0') { throw 'One-click metadata version mismatch.' }
 foreach ($file in @($metadata.bundleFileName,$metadata.certificateFileName,$metadata.appInstallerFileName,'Install.ps1','Uninstall.ps1','InstallLauncher.ps1','UninstallLauncher.ps1','InstallerMetadata.ps1','SHA256SUMS.txt')) { if (-not (Test-Path -LiteralPath (Join-Path $payload $file) -PathType Leaf)) { throw "Missing one-click payload file: $file" } }
 $install = Get-Content -Raw -LiteralPath (Join-Path $payload 'Install.ps1')
-if ($install -match '(?i)\bAdd-AppxPackage\b') { throw 'One-click installer must not install the application with Add-AppxPackage.' }
-if ($install -notmatch 'ms-appinstaller:' -or $metadata.appInstallerUri -ne 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller') { throw 'One-click installer does not invoke the stable App Installer URI.' }
+$installLauncher = Get-Content -Raw -LiteralPath (Join-Path $payload 'InstallLauncher.ps1')
 $installCommand = Get-Content -Raw -LiteralPath $rootCmdFiles[0].FullName
+$forbiddenProtocolFiles = @{
+    'Install.ps1' = $install
+    'InstallLauncher.ps1' = $installLauncher
+    $rootCmdFiles[0].Name = $installCommand
+}
+foreach ($entry in $forbiddenProtocolFiles.GetEnumerator()) {
+    if ($entry.Value -match '(?i)ms-appinstaller:') { throw "One-click installer must not rely on the disabled ms-appinstaller URI protocol: $($entry.Key)" }
+}
+if ($install -match '(?i)\bAdd-AppxPackage\b') { throw 'One-click installer must not install the application with Add-AppxPackage.' }
+if ($metadata.appInstallerUri -ne 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller') { throw 'One-click metadata does not retain the stable App Installer URI.' }
+if ($install -notmatch '(?i)\$localAppInstallerPath\s*=\s*Get-SafePayloadFilePath' -or $install -notmatch '(?i)Start-Process\s+-FilePath\s+\$localAppInstallerPath') { throw 'One-click installer does not open the packaged .appinstaller file through file association.' }
+if ($install -match '(?i)explorer\.exe') { throw 'One-click installer must not use explorer.exe as an App Installer launcher.' }
+if ($install -match '(?i)Installation completed successfully') { throw 'Bootstrap must not claim that the application was installed before user confirmation.' }
 $uninstallCommand = Get-Content -Raw -LiteralPath $rootCmdFiles[1].FullName
 if ($installCommand -notmatch '(?i)payload\\InstallLauncher\.ps1') { throw 'Install root command does not reference payload\\InstallLauncher.ps1.' }
 if ($uninstallCommand -notmatch '(?i)payload\\UninstallLauncher\.ps1') { throw 'Uninstall root command does not reference payload\\UninstallLauncher.ps1.' }
 if ($installCommand -match '(?i)(Install\.ps1|Add-AppxPackage|\.msixbundle)') { throw 'Install root command references a legacy payload or direct package installation.' }
 if ($uninstallCommand -match '(?i)(Uninstall\.ps1|\.msixbundle)') { throw 'Uninstall root command references a legacy payload or package filename.' }
+if ($installCommand -match '(?i)Installation completed successfully') { throw 'Install root command must not claim application installation before App Installer confirmation.' }
 [xml]$appInstaller = Get-Content -Raw -LiteralPath (Join-Path $payload $metadata.appInstallerFileName)
 $bundle = $appInstaller.SelectSingleNode("/*[local-name()='AppInstaller']/*[local-name()='MainBundle']")
 if ($null -eq $bundle -or $bundle.Version -ne $metadata.packageVersion -or $bundle.Publisher -ne $metadata.publisher) { throw 'Embedded App Installer metadata mismatch.' }
