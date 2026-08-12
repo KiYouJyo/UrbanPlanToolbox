@@ -1,5 +1,18 @@
 # Microsoft Store 应用内更新测试
 
+## 两版本验证门槛
+
+任何修改 `StoreAppUpdateService`、Store updater、Store install flow、Store progress、Store identity 或 Store restart behavior 的版本，都不能仅凭单元测试、构建或本地 MSIX 宣布验证完成。
+
+- Source version：`1.5.4.0`，包含 updater 修复。
+- Target version：`1.5.5.0`，仅作为真实更新目标；本轮不创建或构建 v1.5.5。
+
+真实验收流程为：`v1.5.4 → v1.5.5`。只有观察到弹窗标题、非零下载进度、Downloading → Installing、安装完成和自动重启均正确，才可将 Store updater 验收标记为 PASS。
+
+v1.5.5 后续应尽量只包含版本号、必要 release metadata 及与 updater 无关的小型内容；禁止再次修改 Store updater 实现，除非出现新的已证实缺陷。
+
+当前状态：PENDING。
+
 本地开发使用与正式服务相同的 `IAppUpdateService` 接口。仅 Debug 构建可通过环境变量 `URBANPLANTOOLBOX_FAKE_UPDATE_SCENARIO` 选择 `UpToDate`、`UpdateAvailable`、`Cancelled`、`NetworkError`、`StoreUnavailable`、`DownloadFailed`、`InstallFailed`、`UnsupportedChannel` 或 `InstallWillCloseApp`。Release 构建忽略该变量。
 
 真实 Microsoft Store 更新需要已经由 Store 安装、并具有 Store 包身份的旧版本。将更高的包版本上传至 Partner Center Package Flight，把测试 Microsoft 帐户加入 flight，等待该帐户接收更新。为避免 Store 自动更新抢先完成测试，请在隔离的测试设备或虚拟机中关闭自动更新，并从旧版本的“关于”页依次执行检查、下载和安装。

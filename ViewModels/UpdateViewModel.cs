@@ -20,7 +20,7 @@ public sealed class UpdateViewModel(IAppUpdateService service) : INotifyProperty
     {
         if (Interlocked.Exchange(ref _busy, 1) != 0) return;
         try { Progress = null; OnChanged(nameof(Progress)); Info = new(AppUpdateState.Checking); Info = await _service.CheckForUpdatesAsync(cancellationToken); }
-        catch (OperationCanceledException) { Info = new(AppUpdateState.Cancelled); }
+        catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = new(AppUpdateState.Cancelled); }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
     }
 
@@ -29,13 +29,27 @@ public sealed class UpdateViewModel(IAppUpdateService service) : INotifyProperty
         if (!CanInstall || Interlocked.Exchange(ref _busy, 1) != 0) return;
         try
         {
-            var progress = new Progress<AppUpdateProgress>(value => { Progress = AppUpdateProgress.NormalizeValue(value.Value); Info = new(value.State, Detail: value.Detail); OnChanged(nameof(Progress)); });
+            var progress = new Progress<AppUpdateProgress>(value =>
+            {
+                var normalized = AppUpdateProgress.NormalizeValue(value.Value);
+                if (value.State == AppUpdateState.Downloading)
+                {
+                    if (normalized is double) Progress = normalized;
+                }
+                else if (value.State is AppUpdateState.Installing or AppUpdateState.Completed or AppUpdateState.Failed or AppUpdateState.Cancelled)
+                {
+                    Progress = value.State == AppUpdateState.Completed ? 1d : null;
+                }
+
+                Info = new(value.State, Detail: value.Detail);
+                OnChanged(nameof(Progress));
+            });
             var result = await _service.DownloadAndInstallAsync(progress, cancellationToken);
             Progress = null;
             OnChanged(nameof(Progress));
             Info = new(result.State, Detail: result.Detail, ErrorCode: result.ErrorCode);
         }
-        catch (OperationCanceledException) { Info = new(AppUpdateState.Cancelled); }
+        catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = new(AppUpdateState.Cancelled); }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
     }
 
