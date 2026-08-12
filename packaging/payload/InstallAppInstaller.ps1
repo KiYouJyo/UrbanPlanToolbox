@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param([switch]$LaunchAfterInstall, [switch]$ImportCertificateOnly)
 $ErrorActionPreference = 'Stop'
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; $OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 $payloadRoot = $PSScriptRoot
 . (Join-Path $payloadRoot 'InstallerMetadata.ps1')
 $logDirectory = Join-Path $env:LOCALAPPDATA 'UrbanPlanToolbox\Logs'
@@ -9,6 +10,7 @@ $logPath = Join-Path $logDirectory ("Install-{0:yyyyMMdd-HHmmss}.log" -f (Get-Da
 function Log([string]$Message) { "{0:u} {1}" -f (Get-Date), $Message | Tee-Object -FilePath $logPath -Append }
 function Is-Administrator { $p = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent()); $p.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator) }
 try {
+    Write-Output '正在验证安装包...'
     $metadata = Get-InstallerMetadata $payloadRoot
     $hashMap = @{}
     Get-Content -LiteralPath (Join-Path $payloadRoot 'SHA256SUMS.txt') | ForEach-Object { if ($_ -match '^(?<hash>[A-Fa-f0-9]{64}) \*(?<name>.+)$') { $hashMap[$matches.name.Replace('/','\')] = $matches.hash.ToUpperInvariant() } }
@@ -22,6 +24,7 @@ try {
     if ($certificate.HasPrivateKey -or $certificate.Subject -cne $metadata.publisher) { throw 'Certificate publisher mismatch.' }
     $thumbprint = $certificate.Thumbprint.ToUpperInvariant()
     Log "Validated $($metadata.displayVersion), Publisher=$($metadata.publisher), Thumbprint=$thumbprint."
+    Write-Output '正在检查证书...'
     $trusted = Get-ChildItem "Cert:\LocalMachine\TrustedPeople" -ErrorAction SilentlyContinue | Where-Object Thumbprint -eq $thumbprint
     if (-not $trusted -and $ImportCertificateOnly) {
         if (-not (Is-Administrator)) { throw 'Certificate trust requires elevation.' }
@@ -48,12 +51,24 @@ try {
     if ($bundleNode.Name -ne $metadata.packageIdentityName -or $bundleNode.Publisher -ne $metadata.publisher -or $bundleNode.Version -ne $metadata.packageVersion) { throw 'The local App Installer package identity does not match the package metadata.' }
     if ([IO.Path]::GetFileName(([Uri]$bundleNode.Uri).AbsolutePath) -ne $metadata.bundleFileName) { throw 'The local App Installer bundle filename does not match the packaged bundle.' }
     Log "Validated local App Installer: $localAppInstallerPath; stable URI=$($metadata.appInstallerUri)."
+    Log 'Starting Appx deployment through Add-AppxPackage -AppInstallerFile.'
+    Write-Output '正在安装 UrbanPlanToolbox...'
     try {
-        Start-Process -FilePath $localAppInstallerPath -PassThru -ErrorAction Stop | Out-Null
+        Add-AppxPackage -Path $localAppInstallerPath -AppInstallerFile -ErrorAction Stop
     } catch {
-        throw "Windows App Installer could not open '$localAppInstallerPath'. Please install Microsoft App Installer or double-click this file manually. $($_.Exception.Message)"
+        $detail = $_ | Out-String
+        Log "AppInstaller deployment failed: $detail"
+        throw "AppInstaller deployment failed. Please verify Microsoft App Installer support and the package certificate. $($_.Exception.Message)"
     }
-    Log 'Windows App Installer was opened through the .appinstaller file association. User confirmation is still required.'
-    Write-Output 'Windows App Installer opened successfully. Please confirm installation in the App Installer window.'
+
+    $installed = @(Get-AppxPackage -Name $metadata.packageIdentityName -ErrorAction SilentlyContinue | Where-Object Publisher -eq $metadata.publisher)
+    if ($installed.Count -ne 1) { throw "Package verification failed: expected one installed GitHub package, found $($installed.Count)." }
+    $package = $installed[0]
+    if ([string]$package.Version -ne $metadata.packageVersion) { throw "Package version mismatch: expected $($metadata.packageVersion), found $($package.Version)." }
+    if ([string]$package.Architecture -ne 'X64') { throw "Package architecture mismatch: expected X64, found $($package.Architecture)." }
+    if ([string]$package.Status -ne 'Ok') { throw "Package status is not Ok: $($package.Status)." }
+    Log "Verified installed package: Name=$($package.Name); Publisher=$($package.Publisher); Version=$($package.Version); Architecture=$($package.Architecture); Status=$($package.Status)."
+    Write-Output "UrbanPlanToolbox v$($metadata.displayVersion) 安装完成。"
+    Write-Output '后续更新关联将由应用通过 Package.GetAppInstallerInfo() 诊断。'
     exit 0
 } catch { Log "Installation bootstrap failed: $($_.Exception.Message)"; Write-Error $_; exit 1 } finally { Write-Output "INSTALL_LOG_PATH=$logPath" }

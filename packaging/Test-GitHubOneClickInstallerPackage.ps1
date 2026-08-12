@@ -14,6 +14,8 @@ foreach ($file in @($metadata.bundleFileName,$metadata.certificateFileName,$meta
 $install = Get-Content -Raw -LiteralPath (Join-Path $payload 'Install.ps1')
 $installLauncher = Get-Content -Raw -LiteralPath (Join-Path $payload 'InstallLauncher.ps1')
 $installCommand = Get-Content -Raw -LiteralPath $rootCmdFiles[0].FullName
+$uninstallCommand = Get-Content -Raw -LiteralPath $rootCmdFiles[1].FullName
+foreach ($entry in @($installCommand, $uninstallCommand)) { if ($entry.ToCharArray() | Where-Object { [int]$_ -gt 127 }) { throw 'Root CMD entry files must contain ASCII-only content.' } }
 $forbiddenProtocolFiles = @{
     'Install.ps1' = $install
     'InstallLauncher.ps1' = $installLauncher
@@ -22,12 +24,13 @@ $forbiddenProtocolFiles = @{
 foreach ($entry in $forbiddenProtocolFiles.GetEnumerator()) {
     if ($entry.Value -match '(?i)ms-appinstaller:') { throw "One-click installer must not rely on the disabled ms-appinstaller URI protocol: $($entry.Key)" }
 }
-if ($install -match '(?i)\bAdd-AppxPackage\b') { throw 'One-click installer must not install the application with Add-AppxPackage.' }
+if ($install -notmatch '(?i)Add-AppxPackage\s+-Path\s+\$localAppInstallerPath\s+-AppInstallerFile') { throw 'One-click installer must deploy through Add-AppxPackage -AppInstallerFile.' }
+if ($install -match '(?i)Add-AppxPackage\s+-Path\s+[^\r\n]*bundle|Add-AppxPackage\s+-Path\s+\$bundle') { throw 'One-click installer must not install the MSIXBundle directly.' }
 if ($metadata.appInstallerUri -ne 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller') { throw 'One-click metadata does not retain the stable App Installer URI.' }
-if ($install -notmatch '(?i)\$localAppInstallerPath\s*=\s*Get-SafePayloadFilePath' -or $install -notmatch '(?i)Start-Process\s+-FilePath\s+\$localAppInstallerPath') { throw 'One-click installer does not open the packaged .appinstaller file through file association.' }
-if ($install -match '(?i)explorer\.exe') { throw 'One-click installer must not use explorer.exe as an App Installer launcher.' }
-if ($install -match '(?i)Installation completed successfully') { throw 'Bootstrap must not claim that the application was installed before user confirmation.' }
-$uninstallCommand = Get-Content -Raw -LiteralPath $rootCmdFiles[1].FullName
+if ($install -notmatch '(?i)\$localAppInstallerPath\s*=\s*Get-SafePayloadFilePath') { throw 'One-click installer does not resolve the packaged .appinstaller file.' }
+if ($install -match '(?i)explorer\.exe|Start-Process\s+-FilePath\s+\$localAppInstallerPath') { throw 'One-click installer must not use GUI/file-association launching as the normal installation path.' }
+if ($install -match '(?i)Installation completed successfully') { throw 'Bootstrap must not claim application installation before deployment verification.' }
+foreach ($required in @('Get-AppxPackage','packageIdentityName','publisher','packageVersion','Architecture','Status')) { if ($install -notmatch [regex]::Escape($required)) { throw "One-click installer is missing package verification: $required" } }
 if ($installCommand -notmatch '(?i)payload\\InstallLauncher\.ps1') { throw 'Install root command does not reference payload\\InstallLauncher.ps1.' }
 if ($uninstallCommand -notmatch '(?i)payload\\UninstallLauncher\.ps1') { throw 'Uninstall root command does not reference payload\\UninstallLauncher.ps1.' }
 if ($installCommand -match '(?i)(Install\.ps1|Add-AppxPackage|\.msixbundle)') { throw 'Install root command references a legacy payload or direct package installation.' }

@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal DisableDelayedExpansion
 set "ROOT=%~dp0"
 set "LAUNCHER=%ROOT%payload\InstallLauncher.ps1"
@@ -27,9 +28,7 @@ if not "%EXITCODE%"=="0" (
   exit /b %EXITCODE%
 )
 
-echo Windows 应用安装程序已打开。
-echo 请在应用安装程序窗口中确认安装 UrbanPlanToolbox。
-echo 安装完成后即可关闭此窗口。
+echo Installation completed. See PowerShell output for package verification.
 echo Log: %ENTRYLOG%
 call :wait
 exit /b 0

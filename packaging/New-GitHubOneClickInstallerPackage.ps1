@@ -39,11 +39,15 @@ if ($rootEntryScripts.Count -ne 2) { throw "Expected exactly two root CMD entry 
 foreach ($entryScript in $rootEntryScripts) { Copy-Item -LiteralPath $entryScript.FullName -Destination $root }
 $readme = Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.txt' | Select-Object -First 1
 (Get-Content -Raw -LiteralPath $readme.FullName -Encoding UTF8).Replace('{{DISPLAY_VERSION}}',$DisplayVersion).Replace('{{PACKAGE_VERSION}}',$PackageVersion) | Set-Content -LiteralPath (Join-Path $root $readme.Name) -Encoding UTF8
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'payload\InstallAppInstaller.ps1') -Destination (Join-Path $payload 'Install.ps1')
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'payload\UninstallAppInstaller.ps1') -Destination (Join-Path $payload 'Uninstall.ps1')
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'payload\InstallAppInstallerLauncher.ps1') -Destination (Join-Path $payload 'InstallLauncher.ps1')
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'payload\UninstallLauncher.ps1') -Destination $payload
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'payload\InstallerMetadataAppInstaller.ps1') -Destination (Join-Path $payload 'InstallerMetadata.ps1')
+function Copy-PayloadPowerShellScript([string]$SourceName, [string]$DestinationName) {
+    $content = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot $SourceName) -Encoding UTF8
+    [IO.File]::WriteAllText((Join-Path $payload $DestinationName), $content, [Text.UTF8Encoding]::new($true))
+}
+Copy-PayloadPowerShellScript 'payload\InstallAppInstaller.ps1' 'Install.ps1'
+Copy-PayloadPowerShellScript 'payload\UninstallAppInstaller.ps1' 'Uninstall.ps1'
+Copy-PayloadPowerShellScript 'payload\InstallAppInstallerLauncher.ps1' 'InstallLauncher.ps1'
+Copy-PayloadPowerShellScript 'payload\UninstallLauncher.ps1' 'UninstallLauncher.ps1'
+Copy-PayloadPowerShellScript 'payload\InstallerMetadataAppInstaller.ps1' 'InstallerMetadata.ps1'
 Copy-Item -LiteralPath $SignedBundlePath -Destination (Join-Path $payload $bundle.Name)
 Copy-Item -LiteralPath $PublicCertificatePath -Destination (Join-Path $payload $metadata.certificateFileName)
 Copy-Item -LiteralPath $AppInstallerPath -Destination (Join-Path $payload $metadata.appInstallerFileName)
