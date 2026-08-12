@@ -10,10 +10,11 @@ if ($rootTextFiles.Count -ne 1 -or $rootTextFiles[0].Name[0] -ne [char]0x8BF7) {
 if (-not (Test-Path -LiteralPath $payload -PathType Container)) { throw 'Missing one-click payload directory: payload' }
 $metadata = Get-Content -Raw -LiteralPath (Join-Path $payload 'InstallerMetadata.json') -Encoding UTF8 | ConvertFrom-Json
 if ([int]$metadata.schemaVersion -ne 3 -or $metadata.displayVersion -notmatch '^\d+\.\d+\.\d+$' -or $metadata.packageVersion -ne "$($metadata.displayVersion).0") { throw 'One-click metadata version mismatch.' }
-foreach ($file in @($metadata.certificateFileName,'Install.ps1','Uninstall.ps1','InstallLauncher.ps1','UninstallLauncher.ps1','InstallerMetadata.ps1','ChecksumResolver.ps1','SHA256SUMS.txt')) { if (-not (Test-Path -LiteralPath (Join-Path $payload $file) -PathType Leaf)) { throw "Missing one-click payload file: $file" } }
+foreach ($file in @($metadata.certificateFileName,'Install.ps1','Uninstall.ps1','InstallLauncher.ps1','UninstallLauncher.ps1','InstallerMetadata.ps1','ChecksumResolver.ps1','ReleaseDownloadResolver.ps1','SHA256SUMS.txt')) { if (-not (Test-Path -LiteralPath (Join-Path $payload $file) -PathType Leaf)) { throw "Missing one-click payload file: $file" } }
 $embeddedPackages = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object { $_.Extension.ToLowerInvariant() -in @('.msix','.msixbundle','.appinstaller','.pfx','.p12') })
 if ($embeddedPackages.Count -gt 0) { throw "One-click bootstrap must not embed application packages or App Installer files: $($embeddedPackages.Name -join ', ')" }
 $install = Get-Content -Raw -LiteralPath (Join-Path $payload 'Install.ps1')
+$downloadResolver = Get-Content -Raw -LiteralPath (Join-Path $payload 'ReleaseDownloadResolver.ps1')
 $installLauncher = Get-Content -Raw -LiteralPath (Join-Path $payload 'InstallLauncher.ps1')
 $uninstall = Get-Content -Raw -LiteralPath (Join-Path $payload 'Uninstall.ps1')
 $uninstallLauncher = Get-Content -Raw -LiteralPath (Join-Path $payload 'UninstallLauncher.ps1')
@@ -29,7 +30,11 @@ foreach ($entry in $forbiddenProtocolFiles.GetEnumerator()) {
     if ($entry.Value -match '(?i)ms-appinstaller:') { throw "One-click installer must not rely on the disabled ms-appinstaller URI protocol: $($entry.Key)" }
 }
 if ($install -match '(?i)Add-AppxPackage\s+-AppInstallerFile|RequestAddPackageByAppInstallerFileAsync|GetAppInstallerInfo|ms-appinstaller:') { throw 'One-click installer must not use App Installer deployment or association.' }
-if ($install -notmatch '(?i)Invoke-RestMethod\s+-Uri\s+\$metadata\.releaseApiUri' -or $install -notmatch '(?i)Invoke-WebRequest\s+-Uri\s+\$bundleAsset') { throw 'One-click installer does not download the GitHub Release assets.' }
+if ($install -notmatch '(?i)Invoke-ReleaseMetadataWithRetry\s+\$metadata\.releaseApiUri' -or $install -notmatch '(?i)Download-ReleaseAssetRobust') { throw 'One-click installer does not use the resilient GitHub Release bundle downloader.' }
+if ($install -notmatch '(?i)Download-SmallReleaseAssetWithRetry') { throw 'One-click installer does not retry the checksum asset download.' }
+if ($downloadResolver -notmatch '(?i)Start-BitsTransfer' -or $downloadResolver -notmatch '(?i)RetryInterval' -or $downloadResolver -notmatch '(?i)RetryTimeout') { throw 'One-click installer is missing BITS retry support.' }
+if ($downloadResolver -notmatch '(?i)ExpectedBytes|IncompleteDownload|ActualBytes') { throw 'One-click installer does not validate the downloaded bundle size.' }
+if ($downloadResolver -notmatch '(?i)DownloadMethod=BITS|DownloadMethod=InvokeWebRequest|BundleDownloadCompleted|BundleDownloadFailed') { throw 'One-click installer is missing download diagnostics.' }
 if ($install -notmatch '(?i)Get-FileHash\s+-LiteralPath\s+\$localBundlePath\s+-Algorithm\s+SHA256') { throw 'One-click installer does not verify the downloaded bundle checksum.' }
 if ($install -notmatch '(?i)Get-AuthenticodeSignature') { throw 'One-click installer does not verify the bundle signature.' }
 if ($install -notmatch '(?i)Add-AppxPackage\s+-Path\s+\$localBundlePath') { throw 'One-click installer must deploy the verified local MSIXBundle.' }

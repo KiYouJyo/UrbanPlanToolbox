@@ -45,6 +45,7 @@ Copy-PayloadPowerShellScript 'payload\InstallAppInstallerLauncher.ps1' 'InstallL
 Copy-PayloadPowerShellScript 'payload\UninstallLauncher.ps1' 'UninstallLauncher.ps1'
 Copy-PayloadPowerShellScript 'payload\InstallerMetadataAppInstaller.ps1' 'InstallerMetadata.ps1'
 Copy-PayloadPowerShellScript 'payload\ChecksumResolver.ps1' 'ChecksumResolver.ps1'
+Copy-PayloadPowerShellScript 'payload\ReleaseDownloadResolver.ps1' 'ReleaseDownloadResolver.ps1'
 Copy-Item -LiteralPath $PublicCertificatePath -Destination (Join-Path $payload $metadata.certificateFileName)
 $hashLines = Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object Name -ne 'SHA256SUMS.txt' | Sort-Object FullName | ForEach-Object { "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToUpperInvariant()) *$($_.FullName.Substring($payload.Length).TrimStart('\'))" }
 Set-Content -LiteralPath (Join-Path $payload 'SHA256SUMS.txt') -Value $hashLines -Encoding UTF8
