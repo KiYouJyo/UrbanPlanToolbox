@@ -5,7 +5,7 @@ function Get-InstallerMetadata([string]$PayloadRoot) {
     if ([int]$metadata.schemaVersion -ne 3 -or $metadata.architecture -cne 'x64') { throw 'Unsupported installer metadata.' }
     if ($metadata.displayVersion -notmatch '^\d+\.\d+\.\d+$' -or $metadata.packageVersion -notmatch '^\d+\.\d+\.\d+\.\d+$') { throw 'Invalid installer version.' }
     if ([IO.Path]::GetFileName($metadata.remoteBundleFileName) -cne $metadata.remoteBundleFileName -or [IO.Path]::GetExtension($metadata.remoteBundleFileName) -cne '.msixbundle') { throw 'Invalid remote bundle filename.' }
-    if ($metadata.releaseTag -cne "v$($metadata.displayVersion)" -or $metadata.releaseApiUri -cne 'https://api.github.com/repos/KiYouJyo/UrbanPlanToolbox/releases/latest' -or $metadata.checksumFileName -cne 'SHA256SUMS.txt') { throw 'Invalid GitHub release metadata.' }
+    if ($metadata.releaseTag -cne "v$($metadata.displayVersion)" -or $metadata.releaseApiUri -cne "https://api.github.com/repos/KiYouJyo/UrbanPlanToolbox/releases/tags/v$($metadata.displayVersion)" -or $metadata.checksumFileName -cne 'SHA256SUMS.txt') { throw 'Invalid GitHub release metadata.' }
     $metadata
 }
 function Get-SafePayloadFilePath([string]$PayloadRoot, [string]$FileName) {
