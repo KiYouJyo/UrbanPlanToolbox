@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([switch]$LaunchAfterInstall, [switch]$ImportCertificateOnly)
+param([switch]$LaunchAfterInstall, [switch]$ImportCertificateOnly, [string]$AppInstallerPathOverride)
 $ErrorActionPreference = 'Stop'
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; $OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 $payloadRoot = $PSScriptRoot
@@ -14,7 +14,7 @@ try {
     $metadata = Get-InstallerMetadata $payloadRoot
     $hashMap = @{}
     Get-Content -LiteralPath (Join-Path $payloadRoot 'SHA256SUMS.txt') | ForEach-Object { if ($_ -match '^(?<hash>[A-Fa-f0-9]{64}) \*(?<name>.+)$') { $hashMap[$matches.name.Replace('/','\')] = $matches.hash.ToUpperInvariant() } }
-    foreach ($name in @($metadata.bundleFileName, $metadata.certificateFileName, $metadata.appInstallerFileName, 'SHA256SUMS.txt')) {
+    foreach ($name in @($metadata.certificateFileName, 'SHA256SUMS.txt')) {
         $path = Get-SafePayloadFilePath $payloadRoot $name
         if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Missing payload file: $name" }
         if ($name -ne 'SHA256SUMS.txt' -and $hashMap[$name] -ne (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()) { throw "SHA-256 mismatch: $name" }
@@ -42,14 +42,34 @@ try {
         Log "Imported the existing public certificate into LocalMachine TrustedPeople."
     } else { Log 'The matching public certificate is already trusted; no duplicate import performed.' }
 
-    $localAppInstallerPath = Get-SafePayloadFilePath $payloadRoot $metadata.appInstallerFileName
+    $tempRoot = Join-Path ([IO.Path]::GetTempPath()) ("UrbanPlanToolbox-" + [Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $tempRoot -Force | Out-Null
+    $localAppInstallerPath = Join-Path $tempRoot 'UrbanPlanToolbox.appinstaller'
+    if ($AppInstallerPathOverride) {
+        if (-not (Test-Path -LiteralPath $AppInstallerPathOverride -PathType Leaf)) { throw "Test AppInstaller override does not exist: $AppInstallerPathOverride" }
+        Copy-Item -LiteralPath $AppInstallerPathOverride -Destination $localAppInstallerPath -Force
+        Log "Using local AppInstaller override for controlled E2E test: $localAppInstallerPath."
+    } else {
+        if (-not $metadata.appInstallerUri.StartsWith('https://', [StringComparison]::OrdinalIgnoreCase)) { throw 'The AppInstaller URI must use HTTPS.' }
+        try {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            Invoke-WebRequest -Uri $metadata.appInstallerUri -UseBasicParsing -OutFile $localAppInstallerPath -ErrorAction Stop
+        } catch {
+            Log "AppInstaller download failed: URI=$($metadata.appInstallerUri); Error=$($_.Exception.Message)"
+            throw '无法获取 UrbanPlanToolbox 安装信息。请检查网络连接后重试。'
+        }
+        Log "Downloaded AppInstaller from $($metadata.appInstallerUri) to the temporary bootstrap directory."
+    }
+    if (-not (Test-Path -LiteralPath $localAppInstallerPath -PathType Leaf)) { throw 'Downloaded AppInstaller file is missing.' }
     [xml]$appInstaller = Get-Content -Raw -LiteralPath $localAppInstallerPath -Encoding UTF8
     $appInstallerRoot = $appInstaller.SelectSingleNode("/*[local-name()='AppInstaller']")
     $bundleNode = $appInstaller.SelectSingleNode("/*[local-name()='AppInstaller']/*[local-name()='MainBundle']")
     if ($null -eq $appInstallerRoot -or $null -eq $bundleNode) { throw 'The local App Installer file is missing AppInstaller/MainBundle metadata.' }
-    if ($appInstallerRoot.Version -ne $metadata.packageVersion -or $appInstallerRoot.Uri -ne $metadata.appInstallerUri) { throw 'The local App Installer version or stable URI does not match the package metadata.' }
-    if ($bundleNode.Name -ne $metadata.packageIdentityName -or $bundleNode.Publisher -ne $metadata.publisher -or $bundleNode.Version -ne $metadata.packageVersion) { throw 'The local App Installer package identity does not match the package metadata.' }
-    if ([IO.Path]::GetFileName(([Uri]$bundleNode.Uri).AbsolutePath) -ne $metadata.bundleFileName) { throw 'The local App Installer bundle filename does not match the packaged bundle.' }
+    if ($appInstallerRoot.Version -ne $metadata.packageVersion -or $appInstallerRoot.Uri -ne $metadata.appInstallerUri) { throw 'The downloaded App Installer version or stable URI does not match the package metadata.' }
+    if ($bundleNode.Name -ne $metadata.packageIdentityName -or $bundleNode.Publisher -ne $metadata.publisher -or $bundleNode.Version -ne $metadata.packageVersion) { throw 'The downloaded App Installer package identity does not match the package metadata.' }
+    $bundleUri = [Uri]$bundleNode.Uri
+    if ([IO.Path]::GetFileName($bundleUri.AbsolutePath) -ne $metadata.remoteBundleFileName) { throw 'The App Installer bundle filename does not match the remote package metadata.' }
+    if (-not $AppInstallerPathOverride -and ($bundleUri.Scheme -ne 'https' -or $bundleUri.Host -ne 'github.com' -or $bundleUri.AbsolutePath -notmatch '^/KiYouJyo/UrbanPlanToolbox/releases/download/v[^/]+/[^/]+$')) { throw 'The downloaded App Installer bundle URI is not an allowed GitHub Release HTTPS target.' }
     Log "Validated local App Installer: $localAppInstallerPath; stable URI=$($metadata.appInstallerUri)."
     Log 'Starting Appx deployment through Add-AppxPackage -AppInstallerFile.'
     Write-Output '正在安装 UrbanPlanToolbox...'

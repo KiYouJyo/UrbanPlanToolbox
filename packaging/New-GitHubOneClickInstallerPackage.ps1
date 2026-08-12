@@ -20,8 +20,11 @@ $bundle = Get-Item -LiteralPath $SignedBundlePath
 $cert = [Security.Cryptography.X509Certificates.X509Certificate2]::new((Resolve-Path $PublicCertificatePath))
 if ($cert.HasPrivateKey -or $cert.Subject -cne 'CN=AppPublisher') { throw 'Invalid public certificate.' }
 $appInstaller = [xml](Get-Content -Raw -LiteralPath $AppInstallerPath)
+$appInstallerRoot = $appInstaller.SelectSingleNode("/*[local-name()='AppInstaller']")
 $bundleNode = $appInstaller.SelectSingleNode("/*[local-name()='AppInstaller']/*[local-name()='MainBundle']")
-if ($null -eq $bundleNode -or $bundleNode.Version -ne $PackageVersion) { throw 'App Installer does not describe the requested package version.' }
+if ($null -eq $appInstallerRoot -or $appInstallerRoot.Uri -ne 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller' -or $null -eq $bundleNode -or $bundleNode.Version -ne $PackageVersion) { throw 'App Installer does not describe the requested stable online package.' }
+$remoteBundleUri = [Uri]$bundleNode.Uri
+if ($bundleNode.Name -ne '556F80C5-C4D4-452B-93B4-00DE3FA7AC29' -or [IO.Path]::GetFileName($remoteBundleUri.AbsolutePath) -ne $bundle.Name -or -not $remoteBundleUri.IsAbsoluteUri -or $remoteBundleUri.Scheme -ne 'https' -or $remoteBundleUri.Host -ne 'github.com' -or $bundleNode.Publisher -ne 'CN=AppPublisher') { throw 'App Installer MainBundle is not a valid GitHub package target.' }
 
 $root = Join-Path $out "UrbanPlanToolbox-v$DisplayVersion-x64-one-click"
 if (Test-Path -LiteralPath $root) { throw 'Output already exists.' }
@@ -30,8 +33,8 @@ New-Item -ItemType Directory -Path $payload -Force | Out-Null
 $metadata = [ordered]@{
     schemaVersion = 2; displayVersion = $DisplayVersion; packageVersion = $PackageVersion
     packageIdentityName = '556F80C5-C4D4-452B-93B4-00DE3FA7AC29'; publisher = 'CN=AppPublisher'; architecture = 'x64'
-    bundleFileName = $bundle.Name; certificateFileName = "UrbanPlanToolbox-v$DisplayVersion-Framework-Dependent.cer"
-    appInstallerFileName = 'UrbanPlanToolbox.appinstaller'; appInstallerUri = 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller'
+    remoteBundleFileName = $bundle.Name; certificateFileName = "UrbanPlanToolbox-v$DisplayVersion-Framework-Dependent.cer"
+    appInstallerUri = 'https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller'
 }
 $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'InstallerMetadata.json') -Encoding UTF8
 $rootEntryScripts = @(Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.cmd' | Sort-Object Name)
@@ -48,9 +51,7 @@ Copy-PayloadPowerShellScript 'payload\UninstallAppInstaller.ps1' 'Uninstall.ps1'
 Copy-PayloadPowerShellScript 'payload\InstallAppInstallerLauncher.ps1' 'InstallLauncher.ps1'
 Copy-PayloadPowerShellScript 'payload\UninstallLauncher.ps1' 'UninstallLauncher.ps1'
 Copy-PayloadPowerShellScript 'payload\InstallerMetadataAppInstaller.ps1' 'InstallerMetadata.ps1'
-Copy-Item -LiteralPath $SignedBundlePath -Destination (Join-Path $payload $bundle.Name)
 Copy-Item -LiteralPath $PublicCertificatePath -Destination (Join-Path $payload $metadata.certificateFileName)
-Copy-Item -LiteralPath $AppInstallerPath -Destination (Join-Path $payload $metadata.appInstallerFileName)
 $hashLines = Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object Name -ne 'SHA256SUMS.txt' | Sort-Object FullName | ForEach-Object { "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToUpperInvariant()) *$($_.FullName.Substring($payload.Length).TrimStart('\'))" }
 Set-Content -LiteralPath (Join-Path $payload 'SHA256SUMS.txt') -Value $hashLines -Encoding UTF8
 Write-Output $root

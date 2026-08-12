@@ -1,5 +1,16 @@
 # 版本中立的自签名测试安装包脚本
 
+## GitHub one-click bootstrap
+
+`New-GitHubOneClickInstallerPackage.ps1` 生成的是轻量在线 Bootstrap，不是自包含离线安装包。它只携带安装/卸载脚本、metadata、公开 CER 和校验清单，不携带 MSIXBundle 或 `.appinstaller`。安装时由 Bootstrap 从固定 GitHub Pages 地址获取并校验 `.appinstaller`，再通过 `Add-AppxPackage -AppInstallerFile` 部署 Pages 清单指向的 GitHub Release bundle。
+
+正式 GitHub 分发结构为：
+
+```text
+GitHub Release: one-click ZIP + MSIXBundle + SHA256SUMS
+GitHub Pages:   UrbanPlanToolbox.appinstaller
+```
+
 本目录只保存脚本和模板，不保存证书、MSIX、依赖、ZIP、日志或构建输出。`New-PreviewInstallerPackage.ps1` 需要显式传入 `DisplayVersion` 与 `PackageVersion`；两者必须分别是三段和四段版本，且必须与实际 MSIX manifest 一致。
 
 打包脚本从输入 MSIX 读取身份、Publisher、架构和版本，生成 `payload/InstallerMetadata.json`。安装、卸载和布局验证都从该文件读取 MSIX/CER 文件名和包身份，不依赖固定版本字符串。

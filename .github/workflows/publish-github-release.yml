@@ -86,7 +86,7 @@ jobs:
           Compress-Archive -Path $packageRoot -DestinationPath $zip -CompressionLevel Optimal
           $extracted = Join-Path $assets 'extracted'
           Expand-Archive -LiteralPath $zip -DestinationPath $extracted -Force
-          & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory (Join-Path $extracted "UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click")
+          & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory (Join-Path $extracted "UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click") -ZipPath $zip
           Copy-Item -LiteralPath $env:BUNDLE_PATH -Destination (Join-Path $assets $env:BUNDLE_FILE_NAME) -Force
 
       - name: Prepare SHA256 release manifest
@@ -95,7 +95,6 @@ jobs:
           $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'
           $releaseFiles = @(
             (Join-Path $assets "UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click.zip"),
-            $env:APPINSTALLER_PATH,
             $env:BUNDLE_PATH
           )
           $manifest = foreach ($file in $releaseFiles) {
@@ -110,7 +109,6 @@ jobs:
           name: UrbanPlanToolbox-${{ inputs.version }}-github-release-assets
           path: |
             ${{ runner.temp }}/UrbanPlanToolbox-ReleaseAssets/UrbanPlanToolbox-v${{ inputs.version }}-x64-one-click.zip
-            ${{ runner.temp }}/UrbanPlanToolbox-ReleaseAssets/UrbanPlanToolbox.appinstaller
             ${{ runner.temp }}/UrbanPlanToolbox-ReleaseAssets/*.msixbundle
             ${{ runner.temp }}/UrbanPlanToolbox-ReleaseAssets/SHA256SUMS.txt
           if-no-files-found: error

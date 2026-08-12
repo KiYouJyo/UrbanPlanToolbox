@@ -27,7 +27,7 @@
 
 ### 首次 GitHub 安装
 
-请从 [最新 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) 下载一键安装包。它会完成所需的证书配置，并通过 Windows App Installer 安装应用，以便后续直接在应用内更新。不要把裸 `.appinstaller` 作为普通首次安装入口。
+请从 [最新 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) 下载体积较小的一键安装包。它会完成所需的证书配置，并在线获取当前正式版本后安装应用，以便后续直接在应用内更新。
 
 ### 后续更新
 
@@ -35,7 +35,7 @@
 
 ### 高级安装
 
-Release Assets 也提供 `.appinstaller`、`.msixbundle` 和 SHA-256 清单，适合手动部署或验证。
+高级用户可在 Release Assets 获取 `.msixbundle` 和 SHA-256 清单进行手动部署或验证；固定的 App Installer 清单由项目 Pages 地址提供。
 
 ## 隐私与离线设计
 

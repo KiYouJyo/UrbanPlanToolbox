@@ -27,7 +27,7 @@ The two channels have independent identities and update paths and cannot upgrade
 
 ### First GitHub installation
 
-Download the one-click installer from the [latest GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest). It completes the required certificate setup and installs the app through Windows App Installer so later updates can be performed in-app. The bare `.appinstaller` file is not the recommended first-install entry point.
+Download the lightweight one-click installer from the [latest GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest). It completes the required certificate setup, obtains the current formal package online, and installs the app so later updates can be performed in-app.
 
 ### Later updates
 
@@ -35,7 +35,7 @@ Open About and choose Check for updates. GitHub builds download and install late
 
 ### Advanced installation
 
-Release Assets also include the `.appinstaller`, `.msixbundle`, and SHA-256 manifest for manual deployment or verification.
+Advanced users can obtain the `.msixbundle` and SHA-256 manifest from Release Assets for manual deployment or verification. The stable App Installer manifest is provided by the project Pages URL.
 
 ## Privacy and offline design
 

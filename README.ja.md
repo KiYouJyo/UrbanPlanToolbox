@@ -27,7 +27,7 @@
 
 ### GitHub 初回インストール
 
-[最新 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) からワンクリックインストーラーをダウンロードしてください。必要な証明書設定を完了し、Windows App Installer でアプリをインストールするため、その後はアプリ内で更新できます。裸の `.appinstaller` は通常の初回インストール入口として推奨しません。
+[最新 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) から軽量なワンクリックインストーラーをダウンロードしてください。必要な証明書設定を完了し、現在の正式パッケージをオンラインで取得してインストールするため、その後はアプリ内で更新できます。
 
 ### その後の更新
 
@@ -35,7 +35,7 @@ About を開き、「更新を確認」を選択してください。GitHub 版�
 
 ### 上級者向けインストール
 
-手動配置や検証用に、Release Assets から `.appinstaller`、`.msixbundle`、SHA-256 マニフェストを取得できます。
+上級者は、手動配置や検証用に Release Assets から `.msixbundle` と SHA-256 マニフェストを取得できます。安定した App Installer マニフェストはプロジェクトの Pages URL で提供します。
 
 ## プライバシーとオフライン設計
 
