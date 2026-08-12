@@ -2,9 +2,9 @@
 
 # UrbanPlanToolbox
 
-## v1.5.2 release status
+## v1.5.4 release status
 
-v1.5.2 fixes the update-dialog title localization-key display and adds real Microsoft Store download progress with download/deployment state feedback. It is formally released on GitHub; Microsoft Store v1.5.2 is submitted for certification through the existing workflow and is not described as public before certification and availability are confirmed. Future Microsoft Store updates remain on the `x.0.0` or `x.5.0` milestone cadence.
+v1.5.4 fixes the update-dialog title resource issue and improves Microsoft Store in-app update progress, installation state, lifecycle handling, and diagnostics. It is formally released on GitHub; Microsoft Store v1.5.4 certification and public availability follow Partner Center and user-facing Store status.
 
 An offline-first Windows toolbox for urban planning, architectural design, and spatial research.
 
@@ -12,7 +12,7 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 ## Get the app
 
-Whether Microsoft Store v1.5.2 is publicly available is determined by Partner Center and user-facing Store availability. The latest formal GitHub version is **v1.5.2**. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
+Whether Microsoft Store v1.5.4 is publicly available is determined by Partner Center and user-facing Store availability. The latest formal GitHub version is **v1.5.4**. Microsoft Store and GitHub sideloading remain separate channels with independent identities, publishers, and update paths.
 
 ## About UrbanPlanToolbox
 

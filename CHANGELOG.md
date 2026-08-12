@@ -1,5 +1,25 @@
 # 更改日志
 
+## 1.5.4（GitHub 正式发布；Microsoft Store 正式提交）
+
+### Fixed
+
+- 修复更新确认弹窗标题可能显示本地化资源键的问题。
+- 统一 Microsoft Store progress bridge，改用 `AsTask(cancellationToken, IProgress<StorePackageUpdateStatus>)`。
+- 改进总体下载进度、package 进度和实际下载字节数的映射与回退处理。
+- 修复无效 callback 清空已有下载进度的问题。
+- 修复离开 About 页面可能取消 Store 更新操作的问题。
+
+### Diagnostics and localization
+
+- 增强 Store 更新状态、进度来源和版本诊断日志。
+- 完善简体中文、日语和英语更新界面资源及 PRI 验证。
+
+### Distribution
+
+- GitHub 正式发布 v1.5.4。
+- Microsoft Store 提交正式 v1.5.4.0；认证和公开状态以 Partner Center 及用户端可获取状态为准。
+
 ## 1.5.2（GitHub 正式发布；Microsoft Store 提交认证）
 
 ### Fixed

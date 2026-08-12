@@ -10,6 +10,9 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
     private readonly AppDistributionChannelService _channelService = channelService;
     private readonly Func<nint?> _windowHandleProvider = windowHandleProvider;
     private IReadOnlyList<StorePackageUpdate> _updates = Array.Empty<StorePackageUpdate>();
+    private double? _lastDownloadProgress;
+    private StorePackageUpdateState? _lastLoggedState;
+    private int _lastLoggedProgressBucket = -1;
 
     public async Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default)
     {
@@ -32,36 +35,15 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
         if (_updates.Count == 0) return new(AppUpdateState.Failed, "NoPendingUpdate");
         try
         {
+            _lastDownloadProgress = null;
+            _lastLoggedState = null;
+            _lastLoggedProgressBucket = -1;
             var operation = CreateContext().RequestDownloadAndInstallStorePackageUpdatesAsync(_updates);
-            operation.Progress = (_, status) =>
+            var storeProgress = new Progress<StorePackageUpdateStatus>(status =>
             {
-                var updateState = status.PackageUpdateState;
-                switch (updateState)
-                {
-                    case StorePackageUpdateState.Downloading:
-                        progress?.Report(new(AppUpdateState.Downloading, AppUpdateProgress.NormalizeValue(status.PackageDownloadProgress)));
-                        break;
-                    case StorePackageUpdateState.Deploying:
-                        progress?.Report(new(AppUpdateState.Installing));
-                        break;
-                    case StorePackageUpdateState.Completed:
-                        progress?.Report(new(AppUpdateState.Completed, 1d));
-                        break;
-                    case StorePackageUpdateState.Canceled:
-                        progress?.Report(new(AppUpdateState.Cancelled));
-                        break;
-                    case StorePackageUpdateState.OtherError:
-                    case StorePackageUpdateState.ErrorLowBattery:
-                    case StorePackageUpdateState.ErrorWiFiRecommended:
-                    case StorePackageUpdateState.ErrorWiFiRequired:
-                        progress?.Report(new(AppUpdateState.Failed, Detail: updateState.ToString()));
-                        break;
-                    default:
-                        progress?.Report(new(AppUpdateState.Downloading));
-                        break;
-                }
-            };
-            var result = await operation.AsTask(cancellationToken);
+                HandleStoreProgress(status, progress);
+            });
+            var result = await operation.AsTask(cancellationToken, storeProgress);
             var state = result.OverallState.ToString();
             if (state.Equals("Canceled", StringComparison.OrdinalIgnoreCase) || state.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Cancelled);
             if (state.Equals("Completed", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Completed);
@@ -71,6 +53,59 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
         catch (InvalidOperationException exception) when (exception.Message == "StoreWindowUnavailable") { return new(AppUpdateState.Failed, exception.Message); }
         catch (COMException exception) { return new(AppUpdateState.Failed, $"0x{exception.HResult:X8}"); }
         catch (Exception) { return new(AppUpdateState.Failed, "StoreInstallFailed"); }
+    }
+
+    private void HandleStoreProgress(StorePackageUpdateStatus status, IProgress<AppUpdateProgress>? progress)
+    {
+        var updateState = status.PackageUpdateState;
+        var resolution = StoreUpdateProgressResolver.ResolveDownloadProgress(
+            status.TotalDownloadProgress,
+            status.PackageDownloadProgress,
+            status.PackageBytesDownloaded,
+            status.PackageDownloadSizeInBytes);
+        switch (updateState)
+        {
+            case StorePackageUpdateState.Pending:
+            case StorePackageUpdateState.Downloading:
+                if (resolution.Value is double currentProgress)
+                    _lastDownloadProgress = Math.Max(_lastDownloadProgress ?? 0d, currentProgress);
+                progress?.Report(new(AppUpdateState.Downloading, _lastDownloadProgress));
+                LogProgress(status, AppUpdateState.Downloading, _lastDownloadProgress, resolution.Source);
+                break;
+            case StorePackageUpdateState.Deploying:
+                progress?.Report(new(AppUpdateState.Installing));
+                LogProgress(status, AppUpdateState.Installing, null, "None");
+                break;
+            case StorePackageUpdateState.Completed:
+                progress?.Report(new(AppUpdateState.Completed, 1d));
+                LogProgress(status, AppUpdateState.Completed, 1d, "Total");
+                break;
+            case StorePackageUpdateState.Canceled:
+                progress?.Report(new(AppUpdateState.Cancelled));
+                LogProgress(status, AppUpdateState.Cancelled, null, "None");
+                break;
+            case StorePackageUpdateState.OtherError:
+            case StorePackageUpdateState.ErrorLowBattery:
+            case StorePackageUpdateState.ErrorWiFiRecommended:
+            case StorePackageUpdateState.ErrorWiFiRequired:
+                progress?.Report(new(AppUpdateState.Failed, Detail: updateState.ToString()));
+                LogProgress(status, AppUpdateState.Failed, null, "None");
+                break;
+            default:
+                progress?.Report(new(AppUpdateState.Downloading, _lastDownloadProgress));
+                LogProgress(status, AppUpdateState.Downloading, _lastDownloadProgress, "LastValid");
+                break;
+        }
+    }
+
+    private void LogProgress(StorePackageUpdateStatus status, AppUpdateState mappedState, double? uiProgress, string source)
+    {
+        var bucket = uiProgress is double value ? (int)Math.Floor(value * 20d) : -1;
+        if (_lastLoggedState == status.PackageUpdateState && bucket == _lastLoggedProgressBucket) return;
+        _lastLoggedState = status.PackageUpdateState;
+        _lastLoggedProgressBucket = bucket;
+        var message = $"AppVersion={AppVersionProvider.Version};StoreState={status.PackageUpdateState};PackageDownloadProgress={status.PackageDownloadProgress:0.###};TotalDownloadProgress={status.TotalDownloadProgress:0.###};PackageBytesDownloaded={status.PackageBytesDownloaded};PackageDownloadSizeInBytes={status.PackageDownloadSizeInBytes};MappedAppState={mappedState};MappedUiProgress={(uiProgress?.ToString("0.###") ?? "null")};ProgressSource={source};PackageFamilyName={status.PackageFamilyName}";
+        AppLogger.Default.Info("StoreUpdate", "StoreUpdateProgress", message);
     }
 
     private StoreContext CreateContext()

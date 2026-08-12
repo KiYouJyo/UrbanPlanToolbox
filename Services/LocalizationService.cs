@@ -75,7 +75,7 @@ public sealed class LocalizationService : ILocalizationService
         {
             ResourceLoader resourceLoader;
             lock (_gate) resourceLoader = _resourceLoader;
-            var value = resourceLoader.GetString(resourceKey);
+            var value = resourceLoader.GetString(MrtResourceKeyNormalizer.Normalize(resourceKey));
             return string.IsNullOrEmpty(value) ? CreatePlaceholder(resourceKey) : value;
         }
         catch (Exception)
@@ -84,6 +84,7 @@ public sealed class LocalizationService : ILocalizationService
             return CreatePlaceholder(resourceKey);
         }
     }
+
 
     public string GetFormattedString(string resourceKey, params object[] arguments)
     {

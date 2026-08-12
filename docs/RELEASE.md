@@ -1,5 +1,11 @@
 # 发布指南
 
+# v1.5.4 发布决策
+
+- GitHub：发布正式 `v1.5.4` Release、`v1.5.4` 标签和从最终 `main` 构建的 x64 framework-dependent 自签名旁加载包。
+- Microsoft Store：使用现有正式工作流构建 `1.5.4.0` Store 包，创建正式公开 submission 并提交认证；不使用 Package Flight，不把认证中状态描述为已公开。
+- Store updater 的真实 `v1.5.4 → v1.5.5` 更新验证留待下一版本目标包出现后执行。
+
 ## v1.5.2 发布决策
 
 - GitHub：发布正式 `v1.5.2` Release、`v1.5.2` 标签和从最终 `main` 构建的 x64 framework-dependent 自签名旁加载包。

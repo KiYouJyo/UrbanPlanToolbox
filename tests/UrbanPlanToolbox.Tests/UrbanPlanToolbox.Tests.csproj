@@ -64,6 +64,8 @@
   <Compile Include="../../Services/IAppUpdateService.cs" Link="Services/IAppUpdateService.cs" />
   <Compile Include="../../Services/FakeAppUpdateService.cs" Link="Services/FakeAppUpdateService.cs" />
   <Compile Include="../../Services/AppUpdateErrorMapper.cs" Link="Services/AppUpdateErrorMapper.cs" />
+  <Compile Include="../../Services/MrtResourceKeyNormalizer.cs" Link="Services/MrtResourceKeyNormalizer.cs" />
+  <Compile Include="../../Services/StoreUpdateProgressResolver.cs" Link="Services/StoreUpdateProgressResolver.cs" />
   <Compile Include="../../ViewModels/UpdateViewModel.cs" Link="ViewModels/UpdateViewModel.cs" />
   <Compile Include="../../Services/DistributionChannel.cs" Link="Services/DistributionChannel.cs" />
   <Compile Include="../../Services/DistributionChannelIdentity.cs" Link="Services/DistributionChannelIdentity.cs" />

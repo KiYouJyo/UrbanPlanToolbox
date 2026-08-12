@@ -2,9 +2,9 @@
 
 # UrbanPlanToolbox
 
-## v1.5.2 公開状況
+## v1.5.4 公開状況
 
-v1.5.2 では、更新ダイアログのタイトルにリソースキーが表示される問題を修正し、Microsoft Store 更新に実際のダウンロード進捗とダウンロード/展開状態の表示を追加しました。GitHub では正式公開済みです。Microsoft Store v1.5.2 は既存のワークフローで認証に提出し、認証完了と公開確認前に公開済みとは表記しません。今後の Microsoft Store 更新は `x.0.0` または `x.5.0` のマイルストーン方式を継続します。
+v1.5.4 では、更新ダイアログのタイトル、Microsoft Store アプリ内更新の進捗、インストール状態、ライフサイクル、診断ログを改善しました。GitHub では正式公開済みです。Microsoft Store v1.5.4 の認証・公開状態は Partner Center とユーザー側の取得状態を基準とします。
 
 都市・地域計画、建築設計、空間研究のためのオフライン優先 Windows ツールボックス。
 
@@ -12,7 +12,7 @@ v1.5.2 では、更新ダイアログのタイトルにリソースキーが表�
 
 ## アプリを入手
 
-安定したマイルストーン版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。Store v1.5.2 が公開済みかどうかは Partner Center とユーザー側の取得状態を基準とします。GitHub の最新正式版は **v1.5.2** です。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
+安定版のインストールと更新には [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) を推奨します。Store v1.5.4 が公開済みかどうかは Partner Center とユーザー側の取得状態を基準とします。GitHub の最新正式版は **v1.5.4** です。Microsoft Store 版と GitHub サイドロード版の ID、Publisher、更新経路は別々です。
 
 ## UrbanPlanToolbox について
 

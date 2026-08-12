@@ -2,9 +2,9 @@
 
 # UrbanPlanToolbox
 
-## v1.5.2 正式发布状态
+## v1.5.4 正式发布状态
 
-v1.5.2 修复更新弹窗标题显示资源键的问题，并为 Microsoft Store 更新增加真实下载进度和下载/部署状态反馈。GitHub 正式发布；Microsoft Store v1.5.2 通过现有流程提交认证，认证完成并确认公开前不宣称已公开。后续 Microsoft Store 仍按 `x.0.0` 或 `x.5.0` 里程碑更新。
+v1.5.4 修复更新弹窗标题资源显示异常，改进 Microsoft Store 应用内更新进度、安装状态、生命周期和诊断日志。GitHub 已正式发布；Microsoft Store v1.5.4 的认证和公开状态以 Partner Center 及用户端可获取状态为准。
 
 面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。
 
@@ -12,7 +12,7 @@ v1.5.2 修复更新弹窗标题显示资源键的问题，并为 Microsoft Store
 
 ## 获取应用
 
-普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定里程碑版本；Store v1.5.2 是否已公开以 Partner Center 和用户端可获取状态为准。GitHub 最新正式版本为 **v1.5.2**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。两条渠道的身份、Publisher 和更新流程保持独立。
+普通用户可通过 [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW) 安装稳定版本；Store v1.5.4 是否已公开以 Partner Center 和用户端可获取状态为准。GitHub 最新正式版本为 **v1.5.4**，并可更频繁发布 x64 framework-dependent 自签名旁加载包。两条渠道的身份、Publisher 和更新流程保持独立。
 
 ## 关于 UrbanPlanToolbox
 

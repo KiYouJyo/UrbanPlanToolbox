@@ -1,0 +1,14 @@
+{
+  "version": "1.5.4",
+  "locales": {
+    "zh-CN": [
+      "修复更新确认弹窗标题资源加载问题，并修复 Microsoft Store 更新下载进度显示。"
+    ],
+    "ja-JP": [
+      "更新確認ダイアログのタイトル リソース読み込みと、Microsoft Store 更新のダウンロード進捗表示を修正しました。"
+    ],
+    "en-US": [
+      "Fixed update confirmation title resource loading and Microsoft Store update download progress reporting."
+    ]
+  }
+}

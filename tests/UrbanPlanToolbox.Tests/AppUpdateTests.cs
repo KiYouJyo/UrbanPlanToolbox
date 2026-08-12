@@ -107,16 +107,118 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
+    public async Task ViewModelRetainsPendingDownloadProgressWhenNextCallbackHasNoValue()
+    {
+        var viewModel = new UpdateViewModel(new PendingProgressService());
+        var observed = new List<double?>();
+        viewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(viewModel.Progress)) observed.Add(viewModel.Progress);
+        };
+
+        await viewModel.CheckAsync();
+        await viewModel.DownloadAndInstallAsync();
+
+        Assert.Contains(0.15, observed);
+        Assert.DoesNotContain(0d, observed);
+    }
+
+    [Theory]
+    [InlineData(0.15, 0, 0, 0, 0.15)]
+    [InlineData(double.NaN, 0.15, 0, 0, 0.1875)]
+    [InlineData(double.NaN, double.NaN, 15, 100, 0.15)]
+    [InlineData(0.30, 0.15, 15, 100, 0.30)]
+    public void StoreProgressUsesValidOverallPackageOrByteProgress(double total, double package, ulong bytes, ulong size, double expected) =>
+        Assert.True(Math.Abs(expected - StoreUpdateProgressResolver.ResolveDownloadProgress(total, package, bytes, size).Value!.Value) < 1e-12);
+
+    [Fact]
+    public void StoreProgressDoesNotInventProgressWhenAllSourcesAreInvalid() =>
+        Assert.Null(StoreUpdateProgressResolver.ResolveDownloadProgress(double.NaN, double.NaN, 0, 0).Value);
+
+    [Fact]
+    public void StoreProgressMappingUsesExplicitSourcesAndCombinedApiPackageScale()
+    {
+        var total = StoreUpdateProgressResolver.ResolveDownloadProgress(0.15, 0.40, 0, 0);
+        var package = StoreUpdateProgressResolver.ResolveDownloadProgress(double.NaN, 0.40, 0, 0);
+        var bytes = StoreUpdateProgressResolver.ResolveDownloadProgress(double.NaN, double.NaN, 360900, 1110000);
+
+        Assert.Equal("Total", total.Source);
+        Assert.Equal(0.15, total.Value);
+        Assert.Equal("PackageNormalized", package.Source);
+        Assert.Equal(0.5, package.Value);
+        Assert.Equal("Bytes", bytes.Source);
+        Assert.Equal(360900d / 1110000d, bytes.Value);
+    }
+
+    [Fact]
+    public void StoreProgressBridgeUsesSingleAsTaskProgressSubscription()
+    {
+        var root = FindRepositoryRoot();
+        var source = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
+        Assert.DoesNotContain("operation.Progress", source, StringComparison.Ordinal);
+        Assert.Contains("AsTask(cancellationToken, storeProgress)", source, StringComparison.Ordinal);
+        Assert.Contains("HandleStoreProgress(status, progress)", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StoreUpdateIsNotBoundToAboutPageUnloadToken()
+    {
+        var root = FindRepositoryRoot();
+        var source = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
+        Assert.Contains("_updates.DownloadAndInstallAsync(_updateLifetime.Token)", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("_updates.DownloadAndInstallAsync(_pageLifetime.Token)", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StoreProgressDiagnosticsContainVersionAndSourceFields()
+    {
+        var root = FindRepositoryRoot();
+        var source = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
+        foreach (var field in new[] { "AppVersion=", "StoreState=", "PackageDownloadProgress=", "TotalDownloadProgress=", "PackageBytesDownloaded=", "PackageDownloadSizeInBytes=", "MappedAppState=", "MappedUiProgress=", "ProgressSource=" })
+            Assert.Contains(field, source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DottedPropertyKeysUseMrtCorePropertyPath() {
+        Assert.Equal("About_UpdateTitle/Text", MrtResourceKeyNormalizer.Normalize("About_UpdateTitle.Text"));
+        Assert.Equal("Setting_Language_System/Content", MrtResourceKeyNormalizer.Normalize("Setting_Language_System.Content"));
+        Assert.Equal("Action_DownloadAndInstall", MrtResourceKeyNormalizer.Normalize("Action_DownloadAndInstall"));
+    }
+
+    [Fact]
     public void UpdateResourcesContainTheDialogTitleAndProgressTextInAllLanguages()
     {
         foreach (var language in ReswCatalog.Languages)
         {
             var resources = ReswCatalog.Load(language);
             Assert.False(resources["About_UpdateTitle.Text"].StartsWith("!", StringComparison.Ordinal));
+            Assert.False(resources["Dialog_UpdateAvailableTitle"].StartsWith("!", StringComparison.Ordinal));
             Assert.False(resources["Update_ProgressPercent"].StartsWith("!", StringComparison.Ordinal));
             Assert.True(resources.ContainsKey("Update_State_Downloading"));
             Assert.True(resources.ContainsKey("Update_State_Installing"));
             Assert.True(resources.ContainsKey("Update_State_Failed"));
         }
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
+            if (File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.slnx"))) return directory.FullName;
+        throw new DirectoryNotFoundException();
+    }
+}
+
+internal sealed class PendingProgressService : IAppUpdateService
+{
+    public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.5.4"));
+
+    public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        progress?.Report(new(AppUpdateState.Downloading, 0.15));
+        progress?.Report(new(AppUpdateState.Downloading));
+        await Task.Delay(25, cancellationToken);
+        progress?.Report(new(AppUpdateState.Installing));
+        return new AppUpdateResult(AppUpdateState.Installing);
     }
 }

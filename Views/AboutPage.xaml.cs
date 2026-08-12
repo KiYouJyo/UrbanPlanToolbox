@@ -14,6 +14,7 @@ public sealed partial class AboutPage : Page
 {
     private const string PublisherDisplayName = "Jo Kiyō";
     private readonly CancellationTokenSource _pageLifetime = new();
+    private readonly CancellationTokenSource _updateLifetime = new();
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private readonly DistributionChannelContext _channel = new AppDistributionChannelService().GetContext();
     private readonly UpdateViewModel _updates = new(AppUpdateServiceFactory.CreateDefault());
@@ -57,8 +58,8 @@ public sealed partial class AboutPage : Page
     }
     private async void OnInstallUpdate(object sender, RoutedEventArgs e)
     {
-        if (await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = T("About_UpdateTitle.Text"), Content = T("Update_SaveBeforeInstall"), PrimaryButtonText = T("Action_DownloadAndInstall"), CloseButtonText = T("Action_Later") }, _pageLifetime.Token) == ContentDialogResult.Primary)
-            await _updates.DownloadAndInstallAsync(_pageLifetime.Token);
+        if (await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = T("Dialog_UpdateAvailableTitle"), Content = T("Update_SaveBeforeInstall"), PrimaryButtonText = T("Action_DownloadAndInstall"), CloseButtonText = T("Action_Later") }, _pageLifetime.Token) == ContentDialogResult.Primary)
+            await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
     }
 
     private void RenderUpdate()
