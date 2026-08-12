@@ -25,7 +25,7 @@ public sealed partial class AboutPage : Page
         PopulateApplicationInfo();
         PrivacyButton.Content = T("Action_Privacy"); NoticesButton.Content = T("Action_ThirdPartyNotices");
         RepositoryButton.Content = T("Action_GitHubRepository"); ReleasesButton.Content = T("Action_Releases"); IssuesButton.Content = T("Action_SubmitIssue"); LicenseButton.Content = T("Action_ViewMitLicense");
-        CheckUpdateButton.Content = T("Action_CheckForUpdates"); InstallUpdateButton.Content = T("Action_DownloadAndInstall"); MigrateUpdateButton.Content = T("Action_EnableAppInstaller"); OpenReleasesButton.Content = T("Action_OpenReleases");
+        CheckUpdateButton.Content = T("Action_CheckForUpdates"); InstallUpdateButton.Content = T("Action_DownloadAndInstall"); OpenReleasesButton.Content = T("Action_OpenReleases");
         CopyDiagnosticsButton.Content = T("Action_CopyDiagnostics"); OpenLogsButton.Content = T("Action_OpenLogsFolder");
         _updates.PropertyChanged += (_, _) => DispatcherQueue.TryEnqueue(RenderUpdate);
         RenderUpdate(); Unloaded += (_, _) => _pageLifetime.Cancel();
@@ -57,16 +57,9 @@ public sealed partial class AboutPage : Page
         catch (Exception exception) { AppLogger.Default.Error("About", "OpenLogsFailed", exception, "Opening the log folder failed."); AppNotificationService.Default.Notify(new(Models.Interaction.AppNotificationKind.Error, T("Dialog_OpenFailedTitle"), T("Error_OpenLogsFolderFailed"))); }
     }
     private async void OnInstallUpdate(object sender, RoutedEventArgs e) => await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
-    private async void OnMigrateUpdate(object sender, RoutedEventArgs e)
-    {
-        try { if (!await AppInstallerMigrationService.LaunchAsync()) throw new InvalidOperationException(); }
-        catch (Exception exception) { AppLogger.Default.Error("About", "AppInstallerMigrationFailed", exception, "Opening App Installer migration failed."); AppNotificationService.Default.Notify(new(Models.Interaction.AppNotificationKind.Error, T("Dialog_OpenFailedTitle"), T("Update_ErrorAppInstallerUnavailable"))); }
-    }
-
     private void RenderUpdate()
     {
-        var info = _updates.Info; UpdateVersionText.Text = info.Version ?? AppVersionProvider.DisplayVersion; CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && _updates.CanCheck; InstallUpdateButton.Visibility = _channel.CanSelfUpdate && info.IsUpdateAvailable && info.Source == UpdateInstallSource.AppInstaller ? Visibility.Visible : Visibility.Collapsed; InstallUpdateButton.IsEnabled = _updates.CanInstall;
-        MigrateUpdateButton.Visibility = info.IsUpdateAvailable && info.Source == UpdateInstallSource.LegacyGitHub ? Visibility.Visible : Visibility.Collapsed;
+        var info = _updates.Info; UpdateVersionText.Text = info.Version ?? AppVersionProvider.DisplayVersion; CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && _updates.CanCheck; InstallUpdateButton.Visibility = _channel.CanSelfUpdate && info.IsUpdateAvailable ? Visibility.Visible : Visibility.Collapsed; InstallUpdateButton.IsEnabled = _updates.CanInstall;
         OpenReleasesButton.Visibility = _channel.CanOpenReleases ? Visibility.Visible : Visibility.Collapsed;
         var isProgressState = info.State is AppUpdateState.Downloading or AppUpdateState.Installing;
         UpdateProgress.Visibility = isProgressState ? Visibility.Visible : Visibility.Collapsed;

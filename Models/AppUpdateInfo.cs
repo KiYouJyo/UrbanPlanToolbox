@@ -1,6 +1,6 @@
 namespace UrbanPlanToolbox.Models;
 
-public enum UpdateInstallSource { Unknown, AppInstaller, LegacyGitHub }
+public enum UpdateInstallSource { Unknown, GitHub, AppInstaller, LegacyGitHub }
 
 public sealed record AppUpdateInfo(
     AppUpdateState State,

@@ -32,6 +32,21 @@ public sealed class DistributionChannelInfrastructureTests
     }
 
     [Fact]
+    public void GitHubUpdaterUsesReleaseAssetsAndLocalDeployment()
+    {
+        var root = FindRepositoryRoot();
+        var updater = File.ReadAllText(Path.Combine(root, "Services", "GitHubAppUpdateService.cs"));
+        var releaseService = File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs"));
+
+        Assert.Contains("DownloadAndVerifyBundleAsync", releaseService, StringComparison.Ordinal);
+        Assert.Contains("AddPackageAsync", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("GetAppInstallerInfo", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("RequestAddPackageByAppInstallerFileAsync", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("CheckUpdateAvailabilityAsync", updater, StringComparison.Ordinal);
+        Assert.Contains("UpdateInstallSource.GitHub", updater, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void PackagingKeepsTheTwoManifestsAndStoreBuildFlagSeparate()
     {
         var root = FindRepositoryRoot();
