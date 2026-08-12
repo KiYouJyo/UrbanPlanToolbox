@@ -56,11 +56,7 @@ public sealed partial class AboutPage : Page
         try { AppDataPathProvider.Default.EnsureInfrastructureDirectories(); if (!await Launcher.LaunchFolderPathAsync(AppDataPathProvider.Default.Paths.LogsDirectory)) throw new InvalidOperationException(); }
         catch (Exception exception) { AppLogger.Default.Error("About", "OpenLogsFailed", exception, "Opening the log folder failed."); AppNotificationService.Default.Notify(new(Models.Interaction.AppNotificationKind.Error, T("Dialog_OpenFailedTitle"), T("Error_OpenLogsFolderFailed"))); }
     }
-    private async void OnInstallUpdate(object sender, RoutedEventArgs e)
-    {
-        if (await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = T("Dialog_UpdateAvailableTitle"), Content = T("Update_SaveBeforeInstall"), PrimaryButtonText = T("Action_DownloadAndInstall"), CloseButtonText = T("Action_Later") }, _pageLifetime.Token) == ContentDialogResult.Primary)
-            await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
-    }
+    private async void OnInstallUpdate(object sender, RoutedEventArgs e) => await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
 
     private void RenderUpdate()
     {

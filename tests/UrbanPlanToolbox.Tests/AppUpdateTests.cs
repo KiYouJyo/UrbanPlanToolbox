@@ -170,6 +170,16 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
+    public void AboutInstallCommandDoesNotCreateAnApplicationConfirmationDialog()
+    {
+        var root = FindRepositoryRoot();
+        var source = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
+        Assert.Contains("private async void OnInstallUpdate(object sender, RoutedEventArgs e) => await _updates.DownloadAndInstallAsync(_updateLifetime.Token);", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Dialog_UpdateAvailableTitle", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("Update_SaveBeforeInstall", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void StoreProgressDiagnosticsContainVersionAndSourceFields()
     {
         var root = FindRepositoryRoot();
@@ -192,7 +202,6 @@ public sealed class AppUpdateTests
         {
             var resources = ReswCatalog.Load(language);
             Assert.False(resources["About_UpdateTitle.Text"].StartsWith("!", StringComparison.Ordinal));
-            Assert.False(resources["Dialog_UpdateAvailableTitle"].StartsWith("!", StringComparison.Ordinal));
             Assert.False(resources["Update_ProgressPercent"].StartsWith("!", StringComparison.Ordinal));
             Assert.True(resources.ContainsKey("Update_State_Downloading"));
             Assert.True(resources.ContainsKey("Update_State_Installing"));
@@ -211,7 +220,7 @@ public sealed class AppUpdateTests
 internal sealed class PendingProgressService : IAppUpdateService
 {
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.5.4"));
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.5.5"));
 
     public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
     {

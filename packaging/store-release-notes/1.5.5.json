@@ -1,0 +1,17 @@
+{
+  "version": "1.5.5",
+  "locales": {
+    "zh-CN": [
+      "优化 Microsoft Store 应用内更新流程，移除重复的更新确认弹窗。",
+      "保留系统更新确认与安装流程，并包含更新稳定性和本地化改进。"
+    ],
+    "ja-JP": [
+      "Microsoft Store アプリ内更新フローを改善し、重複する更新確認ダイアログを削除しました。",
+      "システムの更新確認とインストール フローは維持し、更新の安定性と言語リソースを改善しました。"
+    ],
+    "en-US": [
+      "Streamlined the Microsoft Store in-app update flow by removing the duplicate update confirmation dialog.",
+      "The system update confirmation and installation flow remain unchanged, with minor reliability and localization improvements."
+    ]
+  }
+}
