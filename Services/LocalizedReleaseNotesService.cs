@@ -19,7 +19,8 @@ public sealed class LocalizedReleaseNotesService : IReleaseNotesProvider
         var normalizedLocale = NormalizeLocale(locale);
         try
         {
-            var document = await _client.GetFromJsonAsync<LocalizedReleaseNotes>($"{expected.Major}.{expected.Minor}.{expected.Build}.json", cancellationToken);
+            var requestUri = new Uri(BaseUri, $"{expected.Major}.{expected.Minor}.{expected.Build}.json");
+            var document = await _client.GetFromJsonAsync<LocalizedReleaseNotes>(requestUri, cancellationToken);
             if (document is null || document.SchemaVersion != 1 || !VersionMatches(document.Version, expected) ||
                 !document.Notes.TryGetValue(normalizedLocale, out var note) || string.IsNullOrWhiteSpace(note.Title) || note.Items.Count == 0 || note.Items.Any(string.IsNullOrWhiteSpace)) return null;
             return document;

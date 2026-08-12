@@ -5,10 +5,11 @@ using Windows.Services.Store;
 namespace UrbanPlanToolbox.Services;
 
 /// <summary>Store-only update provider. It never opens a Store page or downloads a GitHub package.</summary>
-public sealed class StoreAppUpdateService(AppDistributionChannelService channelService, Func<nint?> windowHandleProvider) : IAppUpdateService
+public sealed class StoreAppUpdateService(AppDistributionChannelService channelService, Func<nint?> windowHandleProvider, UpdateManifestService? manifestService = null) : IAppUpdateService
 {
     private readonly AppDistributionChannelService _channelService = channelService;
     private readonly Func<nint?> _windowHandleProvider = windowHandleProvider;
+    private readonly UpdateManifestService _manifestService = manifestService ?? UpdateManifestService.Default;
     private IReadOnlyList<StorePackageUpdate> _updates = Array.Empty<StorePackageUpdate>();
     private double? _lastDownloadProgress;
     private StorePackageUpdateState? _lastLoggedState;
@@ -22,8 +23,7 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
             var context = CreateContext();
             _updates = await context.GetAppAndOptionalStorePackageUpdatesAsync().AsTask(cancellationToken);
             if (_updates.Count == 0) return new(AppUpdateState.UpToDate, Source: UpdateInstallSource.Unknown);
-            var version = _updates[0].Package?.Id?.Version;
-            var versionText = version is null ? null : $"{version.Value.Major}.{version.Value.Minor}.{version.Value.Build}";
+            var versionText = await _manifestService.GetVersionAsync(DistributionChannel.Store, cancellationToken);
             return new(AppUpdateState.UpdateAvailable, versionText, Source: UpdateInstallSource.Unknown);
         }
         catch (OperationCanceledException) { return new(AppUpdateState.Cancelled); }

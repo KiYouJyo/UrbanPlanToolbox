@@ -62,9 +62,11 @@
   <Compile Include="../../Models/AppUpdateProgress.cs" Link="Models/AppUpdateProgress.cs" />
   <Compile Include="../../Models/AppUpdateResult.cs" Link="Models/AppUpdateResult.cs" />
   <Compile Include="../../Models/LocalizedReleaseNotes.cs" Link="Models/LocalizedReleaseNotes.cs" />
+  <Compile Include="../../Models/UpdateManifest.cs" Link="Models/UpdateManifest.cs" />
   <Compile Include="../../Services/IAppUpdateService.cs" Link="Services/IAppUpdateService.cs" />
   <Compile Include="../../Services/IReleaseNotesProvider.cs" Link="Services/IReleaseNotesProvider.cs" />
   <Compile Include="../../Services/LocalizedReleaseNotesService.cs" Link="Services/LocalizedReleaseNotesService.cs" />
+  <Compile Include="../../Services/UpdateManifestService.cs" Link="Services/UpdateManifestService.cs" />
   <Compile Include="../../Services/FakeAppUpdateService.cs" Link="Services/FakeAppUpdateService.cs" />
   <Compile Include="../../Services/AppUpdateErrorMapper.cs" Link="Services/AppUpdateErrorMapper.cs" />
   <Compile Include="../../Services/MrtResourceKeyNormalizer.cs" Link="Services/MrtResourceKeyNormalizer.cs" />

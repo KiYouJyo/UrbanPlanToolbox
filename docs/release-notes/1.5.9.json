@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.5.9",
+  "notes": {
+    "zh-CN": { "title": "更新内容", "items": ["修复 Release Notes 无法正确加载的问题。", "修复 Microsoft Store 更新目标版本显示错误的问题。", "重新设计更新流程：GitHub 使用 Windows App Installer，Microsoft Store 使用 Windows 官方确认界面，避免重复弹窗。"] },
+    "ja-JP": { "title": "更新内容", "items": ["Release Notes が正しく読み込まれない問題を修正しました。", "Microsoft Store の更新対象バージョン表示を修正しました。", "更新フローを再設計し、GitHub は Windows App Installer、Microsoft Store は Windows の公式確認 UI を使用するようにしました。"] },
+    "en-US": { "title": "What's new", "items": ["Fixed Release Notes loading.", "Fixed the Microsoft Store target-version display.", "Unified updates around official Windows UI: App Installer for GitHub and Microsoft Store confirmation for Store installations, without duplicate dialogs."] }
+  }
+}

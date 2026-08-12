@@ -32,18 +32,28 @@ public sealed class DistributionChannelInfrastructureTests
     }
 
     [Fact]
-    public void GitHubUpdaterUsesReleaseAssetsAndLocalDeployment()
+    public void GitHubUpdaterUsesOfficialAppInstaller()
     {
         var root = FindRepositoryRoot();
         var updater = File.ReadAllText(Path.Combine(root, "Services", "GitHubAppUpdateService.cs"));
         var releaseService = File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs"));
 
         Assert.Contains("DownloadAndVerifyBundleAsync", releaseService, StringComparison.Ordinal);
-        Assert.Contains("AddPackageAsync", updater, StringComparison.Ordinal);
-        Assert.DoesNotContain("GetAppInstallerInfo", updater, StringComparison.Ordinal);
-        Assert.DoesNotContain("RequestAddPackageByAppInstallerFileAsync", updater, StringComparison.Ordinal);
-        Assert.DoesNotContain("CheckUpdateAvailabilityAsync", updater, StringComparison.Ordinal);
+        Assert.Contains("RepositoryLinks.AppInstaller", updater, StringComparison.Ordinal);
+        Assert.Contains("ExternalLinkService.OpenAsync", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("AddPackageAsync", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("PackageManager", updater, StringComparison.Ordinal);
         Assert.Contains("UpdateInstallSource.GitHub", updater, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AboutPageDoesNotCreateAnUpdateConfirmationDialog()
+    {
+        var root = FindRepositoryRoot();
+        var about = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
+        Assert.DoesNotContain("ShowUpdateDialogAsync", about, StringComparison.Ordinal);
+        Assert.DoesNotContain("Update_DialogInstall", about, StringComparison.Ordinal);
+        Assert.Contains("Action_DownloadAndInstall", about, StringComparison.Ordinal);
     }
 
     [Fact]
