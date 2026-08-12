@@ -39,5 +39,6 @@ public sealed class LanguageRestartPromptCoordinatorTests
     {
         public int CallCount { get; private set; }
         public bool TryRestart() { CallCount++; return result; }
+        public bool TryRestart(out string? failureReason) { failureReason = result ? null : "StubFailure"; CallCount++; return result; }
     }
 }

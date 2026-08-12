@@ -66,8 +66,8 @@ try {
         exit $child.ExitCode
     }
 
-    Write-EntryLog 'Running Uninstall.ps1 in elevated process with -RemoveTestCertificate.'
-    & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $payloadScript -RemoveTestCertificate
+    Write-EntryLog 'Running Uninstall.ps1 in one UAC-elevated process with -RemoveCertificate.'
+    & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $payloadScript -RemoveCertificate
     $payloadExitCode = $LASTEXITCODE
     Write-EntryLog "Uninstall.ps1 exit code=$payloadExitCode"
     exit $payloadExitCode

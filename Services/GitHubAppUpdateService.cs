@@ -1,4 +1,7 @@
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Security.Cryptography;
+using Windows.ApplicationModel;
 using UrbanPlanToolbox.Models;
 using Windows.Management.Deployment;
 
@@ -37,8 +40,15 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService) : 
             var bundlePath = await _updateService.DownloadAndVerifyBundleAsync(_pendingRelease, bundleName, progress, cancellationToken);
             if (bundlePath is null) return new(AppUpdateState.Failed, "BundleVerificationFailed");
 
-            progress?.Report(new(AppUpdateState.Installing));
-            using var restart = ApplicationRestartRegistration.Register();
+            progress?.Report(new(AppUpdateState.Installing, Detail: "Verified; deployment queued"));
+            var bundleInfo = new FileInfo(bundlePath);
+            var bundleHash = Convert.ToHexString(await SHA256.HashDataAsync(File.OpenRead(bundlePath), cancellationToken));
+            var current = Package.Current.Id;
+            if (!VersionParser.TryParseTag(_pendingRelease.TagName, out var targetVersion)) return new(AppUpdateState.Failed, "InvalidRemoteVersion");
+            var deploymentStarted = Stopwatch.GetTimestamp();
+            AppLogger.Default.Info("GitHubUpdate", "DeploymentStarting", $"CurrentName={current.Name}; CurrentPackageFullName={current.FullName}; CurrentPackageFamilyName={current.FamilyName}; CurrentVersion={current.Version}; TargetVersion={targetVersion}; LocalBundlePath={bundlePath}; LocalBundleUri={new Uri(bundlePath).AbsoluteUri}; BundleSize={bundleInfo.Length}; BundleSHA256={bundleHash}; Publisher={current.Publisher}; DeploymentOptions={DeploymentOptions.ForceApplicationShutdown}; Timestamp={DateTimeOffset.UtcNow:O}");
+            using var restart = ApplicationRestartRegistration.Register(out var restartHresult);
+            AppLogger.Default.Info("GitHubUpdate", "RegisterApplicationRestart", $"HRESULT=0x{restartHresult:X8}; Succeeded={restartHresult == 0}");
             var manager = new PackageManager();
             var operation = manager.AddPackageAsync(new Uri(bundlePath), null, DeploymentOptions.ForceApplicationShutdown);
             var deploymentProgress = new Progress<DeploymentProgress>(value =>
@@ -48,9 +58,11 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService) : 
                 progress?.Report(new(state, percentage, $"Deployment {value.percentage}%"));
             });
             var result = await operation.AsTask(cancellationToken, deploymentProgress);
+            var elapsed = Stopwatch.GetElapsedTime(deploymentStarted);
+            AppLogger.Default.Info("GitHubUpdate", "DeploymentResult", $"IsRegistered={result.IsRegistered}; ActivityId={result.ActivityId}; ExtendedErrorCode={result.ExtendedErrorCode}; ErrorText={result.ErrorText}; FinalState={(result.IsRegistered ? "Registered" : "Failed")}; ElapsedMs={elapsed.TotalMilliseconds:0}");
             if (!result.IsRegistered)
             {
-                AppLogger.Default.Error("GitHubUpdate", "PackageDeploymentFailed", null, $"Error={result.ErrorText}; ExtendedError={result.ExtendedErrorCode}");
+                AppLogger.Default.Error("GitHubUpdate", "PackageDeploymentFailed", null, $"ActivityId={result.ActivityId}; Error={result.ErrorText}; ExtendedError={result.ExtendedErrorCode}");
                 return new(AppUpdateState.Failed, "PackageDeploymentFailed");
             }
             AppLogger.Default.Info("GitHubUpdate", "PackageDeploymentCompleted", $"Version={_pendingRelease.TagName}; Bundle={Path.GetFileName(bundlePath)}");
@@ -85,10 +97,11 @@ internal static class ApplicationRestartRegistration
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     private static extern int RegisterApplicationRestart(string? commandLine, uint flags);
 
-    public static IDisposable Register()
+    public static IDisposable Register(out int hresult)
     {
         var result = RegisterApplicationRestart(null, 0);
-        if (result < 0) throw new COMException("RegisterApplicationRestart failed.", result);
+        hresult = result;
+        if (result != 0) throw new COMException("RegisterApplicationRestart failed.", result);
         return new Registration();
     }
 

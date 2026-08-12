@@ -1,5 +1,19 @@
 # 更改日志
 
+## 1.5.8
+
+### Fixed
+
+- Restored the real GitHub and Microsoft Store update download ProgressBar.
+- Restart the application through the existing ApplicationRestartService after a completed update, with a localized manual-restart fallback when Windows returns a failure reason.
+- Fixed the GitHub one-click uninstall contract to use `-RemoveCertificate` and remove only the GitHub package identity.
+
+### Release
+
+- GitHub package version: `1.5.8.0`.
+- Microsoft Store package version: `1.5.8.0`.
+- GitHub and Microsoft Store continue to use independent update pipelines.
+
 ## 1.5.7
 
 ### Changed

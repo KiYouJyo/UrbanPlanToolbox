@@ -17,7 +17,7 @@ public sealed partial class AboutPage : Page
     private readonly CancellationTokenSource _updateLifetime = new();
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private readonly DistributionChannelContext _channel = new AppDistributionChannelService().GetContext();
-    private readonly UpdateViewModel _updates = new(AppUpdateServiceFactory.CreateDefault());
+    private readonly UpdateViewModel _updates = new(AppUpdateServiceFactory.CreateDefault(), new ApplicationRestartService());
     private readonly IReleaseNotesProvider _releaseNotes = LocalizedReleaseNotesService.Default;
 
     public AboutPage()
@@ -74,12 +74,24 @@ public sealed partial class AboutPage : Page
         content.Children.Add(new TextBlock { Text = note?.Title ?? T("Update_DialogNotesTitle"), Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"] });
         content.Children.Add(new ScrollViewer { MaxHeight = 380, Content = new TextBlock { Text = note is null ? TFormatted("Update_FallbackMessage", info.AvailableVersion ?? string.Empty) : string.Join(Environment.NewLine, note.Items.Select(item => $"• {item}")), TextWrapping = TextWrapping.Wrap } });
         var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Update_DialogAvailableTitle"), Content = content, PrimaryButtonText = T("Update_DialogInstall"), CloseButtonText = T("Update_DialogLater"), DefaultButton = ContentDialogButton.Primary };
-        if (await AppDialogService.Default.ShowAsync(dialog, cancellationToken) == ContentDialogResult.Primary) await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
+        if (await AppDialogService.Default.ShowAsync(dialog, cancellationToken) == ContentDialogResult.Primary)
+        {
+            await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
+            if (_updates.RestartFailureReason is not null)
+            {
+                var restartDialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Setting_Language_RestartTitle"), Content = new TextBlock { Text = T("Setting_Language_RestartFailed"), TextWrapping = TextWrapping.Wrap }, PrimaryButtonText = T("Setting_Language_RestartNow"), CloseButtonText = T("Update_DialogLater"), DefaultButton = ContentDialogButton.Primary };
+                if (await AppDialogService.Default.ShowAsync(restartDialog, cancellationToken) == ContentDialogResult.Primary) _updates.TryRestartAgain();
+            }
+        }
     }
     private void RenderUpdate()
     {
         var info = _updates.Info; UpdateVersionText.Text = AppVersionProvider.DisplayVersion; CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && _updates.CanCheck;
         UpdateStatusText.Text = T($"Update_State_{info.State}");
+        var progressVisible = info.State is AppUpdateState.Downloading or AppUpdateState.Installing or AppUpdateState.Restarting;
+        UpdateProgressBar.Visibility = progressVisible ? Visibility.Visible : Visibility.Collapsed;
+        UpdateProgressBar.IsIndeterminate = info.State is AppUpdateState.Installing or AppUpdateState.Restarting || _updates.Progress is null;
+        if (_updates.Progress is double progress) UpdateProgressBar.Value = progress * 100d;
         if (info.State == AppUpdateState.Failed) UpdateStatusText.Text = $"{T(AppUpdateErrorMapper.ToResourceKey(info.ErrorCode))}{(string.IsNullOrWhiteSpace(info.ErrorCode) ? string.Empty : $" ({info.ErrorCode})")}";
     }
 

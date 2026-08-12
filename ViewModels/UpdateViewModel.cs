@@ -5,14 +5,16 @@ using UrbanPlanToolbox.Services;
 
 namespace UrbanPlanToolbox.ViewModels;
 
-public sealed class UpdateViewModel(IAppUpdateService service) : INotifyPropertyChanged
+public sealed class UpdateViewModel(IAppUpdateService service, IApplicationRestartService? restartService = null) : INotifyPropertyChanged
 {
     private readonly IAppUpdateService _service = service;
+    private readonly IApplicationRestartService _restartService = restartService ?? new NoOpApplicationRestartService();
     private int _busy;
     private AppUpdateInfo _info = new(AppUpdateState.NotChecked);
     public event PropertyChangedEventHandler? PropertyChanged;
     public AppUpdateInfo Info { get => _info; private set { _info = value; OnChanged(); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); } }
     public double? Progress { get; private set; }
+    public string? RestartFailureReason { get; private set; }
     public bool CanCheck => Volatile.Read(ref _busy) == 0;
     public bool CanInstall => CanCheck && Info.IsUpdateAvailable;
     public string CurrentVersion => AppVersionProvider.DisplayVersion;
@@ -37,6 +39,7 @@ public sealed class UpdateViewModel(IAppUpdateService service) : INotifyProperty
         if (!CanInstall || Interlocked.Exchange(ref _busy, 1) != 0) return;
         try
         {
+            RestartFailureReason = null;
             var progress = new Progress<AppUpdateProgress>(value =>
             {
                 var normalized = AppUpdateProgress.NormalizeValue(value.Value);
@@ -53,13 +56,32 @@ public sealed class UpdateViewModel(IAppUpdateService service) : INotifyProperty
                 OnChanged(nameof(Progress));
             });
             var result = await _service.DownloadAndInstallAsync(progress, cancellationToken);
+            var finalState = result.State;
+            if (result.State is AppUpdateState.Completed or AppUpdateState.Restarting)
+            {
+                AppLogger.Default.Info("Update", "RestartRequested", $"Source={Info.Source}; UpdateResult={result.State}; RestartRequested=YES");
+                if (!_restartService.TryRestart(out var failureReason))
+                {
+                    RestartFailureReason = failureReason ?? "RestartReturned";
+                    AppLogger.Default.Info("Update", "RestartReturned", $"Source={Info.Source}; UpdateResult={result.State}; RestartRequested=YES; AppInstance.Restart returned={RestartFailureReason}");
+                    finalState = AppUpdateState.Completed;
+                }
+            }
             Progress = null;
             OnChanged(nameof(Progress));
-            Info = new(result.State, Detail: result.Detail, ErrorCode: result.ErrorCode);
+            Info = new(finalState, Detail: result.Detail, ErrorCode: result.ErrorCode);
         }
         catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = new(AppUpdateState.Cancelled); }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
     }
 
+    public bool TryRestartAgain() => _restartService.TryRestart(out _);
+
     private void OnChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new(name));
+
+    private sealed class NoOpApplicationRestartService : IApplicationRestartService
+    {
+        public bool TryRestart() => false;
+        public bool TryRestart(out string? failureReason) { failureReason = "RestartServiceUnavailable"; return false; }
+    }
 }
