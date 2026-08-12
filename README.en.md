@@ -2,6 +2,12 @@
 
 # UrbanPlanToolbox
 
+## v1.5.6 release status
+
+v1.5.6 adds user-triggered GitHub in-app updates through Windows App Installer. For first-time GitHub installation, use the one-click installer package in the [v1.5.6 GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.6). It validates the existing self-signed `CN=AppPublisher` certificate, imports the public certificate only when required, and starts Windows App Installer. Later versions can be checked, downloaded, and installed from About without manually downloading another package.
+
+The GitHub one-click installer does not install the application with `Add-AppxPackage`; Windows App Installer performs the real installation and creates the future update association. Microsoft Store remains a separate channel and is not involved in this release.
+
 ## v1.5.4 release status
 
 v1.5.4 fixes the update-dialog title resource issue and improves Microsoft Store in-app update progress, installation state, lifecycle handling, and diagnostics. It is formally released on GitHub; Microsoft Store v1.5.4 certification and public availability follow Partner Center and user-facing Store status.

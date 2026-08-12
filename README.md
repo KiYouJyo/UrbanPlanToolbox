@@ -2,6 +2,12 @@
 
 # UrbanPlanToolbox
 
+## v1.5.6 正式发布
+
+v1.5.6 为 GitHub 旁加载版增加了用户主动触发的 App Installer 应用内更新。首次安装请使用 v1.5.6 GitHub Release 中的一键安装包：它会验证现有 `CN=AppPublisher` 公钥证书，仅在需要时请求 UAC 导入证书，然后通过稳定的 App Installer URI 启动 Windows App Installer。后续版本可以直接在“关于”页面检查、下载和安装，不需要再次手动下载更新包。
+
+一键安装包不会使用 `Add-AppxPackage` 完成正常应用安装；真正的应用安装和 App Installer association 由 Windows App Installer 完成。Microsoft Store 渠道保持独立，本版本不涉及 Store 操作。
+
 ## v1.5.4 正式发布状态
 
 v1.5.4 修复更新弹窗标题资源显示异常，改进 Microsoft Store 应用内更新进度、安装状态、生命周期和诊断日志。GitHub 已正式发布；Microsoft Store v1.5.4 的认证和公开状态以 Partner Center 及用户端可获取状态为准。

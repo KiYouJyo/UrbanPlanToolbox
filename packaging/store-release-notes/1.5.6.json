@@ -1,0 +1,8 @@
+{
+  "version": "1.5.6",
+  "locales": {
+    "zh-CN": ["增加 GitHub App Installer 应用内更新，并保持 Microsoft Store 更新渠道独立。"],
+    "ja-JP": ["GitHub App Installer のアプリ内更新を追加し、Microsoft Store の更新チャネルを分離しました。"],
+    "en-US": ["Added GitHub App Installer in-app updates while keeping the Microsoft Store update channel independent."]
+  }
+}

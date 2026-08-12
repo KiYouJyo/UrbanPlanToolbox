@@ -41,7 +41,7 @@ public sealed class UpdateViewModel(IAppUpdateService service) : INotifyProperty
                     Progress = value.State == AppUpdateState.Completed ? 1d : null;
                 }
 
-                Info = new(value.State, Detail: value.Detail);
+                Info = Info with { State = value.State, Detail = value.Detail };
                 OnChanged(nameof(Progress));
             });
             var result = await _service.DownloadAndInstallAsync(progress, cancellationToken);

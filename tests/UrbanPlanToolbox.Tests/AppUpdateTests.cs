@@ -31,7 +31,7 @@ public sealed class AppUpdateTests
         Assert.Equal(expected, AppUpdateProviderDecision.ForChannel(channel));
 
     [Theory]
-    [InlineData(DistributionChannel.GitHub, "About_ChannelGitHub", true, false, true)]
+    [InlineData(DistributionChannel.GitHub, "About_ChannelGitHub", true, true, false)]
     [InlineData(DistributionChannel.Store, "About_ChannelStore", true, true, false)]
     [InlineData(DistributionChannel.Development, "About_ChannelDevelopment", false, false, false)]
     public void DistributionContextExposesChannelCapabilities(DistributionChannel channel, string resourceKey, bool canCheck, bool canInstall, bool canOpenReleases)
@@ -104,6 +104,20 @@ public sealed class AppUpdateTests
         Assert.Equal(0, AppUpdateProgress.NormalizeValue(-1));
         Assert.Equal(0.53, AppUpdateProgress.NormalizeValue(0.53));
         Assert.Equal(1, AppUpdateProgress.NormalizeValue(2));
+    }
+
+    [Theory]
+    [InlineData(AppUpdateState.NotChecked, false)]
+    [InlineData(AppUpdateState.UpdateAvailable, true)]
+    public void UpdateInfoOnlyEnablesInstallForAnAvailableUpdate(AppUpdateState state, bool expected) =>
+        Assert.Equal(expected, new AppUpdateInfo(state).IsUpdateAvailable);
+
+    [Fact]
+    public void GitHubChannelSupportsInAppInstallAndDoesNotOpenReleasesByDefault()
+    {
+        var context = DistributionChannelContext.For(DistributionChannel.GitHub);
+        Assert.True(context.CanSelfUpdate);
+        Assert.False(context.CanOpenReleases);
     }
 
     [Fact]
@@ -220,7 +234,7 @@ public sealed class AppUpdateTests
 internal sealed class PendingProgressService : IAppUpdateService
 {
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.5.5"));
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.5.6"));
 
     public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
     {
