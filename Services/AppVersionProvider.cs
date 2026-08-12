@@ -4,8 +4,8 @@ namespace UrbanPlanToolbox.Services;
 
 public static class AppVersionProvider
 {
-    public const string Version = "1.5.6";
-    public const string DisplayVersion = "v1.5.6";
+    public const string Version = "1.5.7";
+    public const string DisplayVersion = "v1.5.7";
     public const int DataSchemaVersion = 1;
 
     public static Version GetCurrentVersion()

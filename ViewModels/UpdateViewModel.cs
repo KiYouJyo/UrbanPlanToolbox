@@ -15,6 +15,14 @@ public sealed class UpdateViewModel(IAppUpdateService service) : INotifyProperty
     public double? Progress { get; private set; }
     public bool CanCheck => Volatile.Read(ref _busy) == 0;
     public bool CanInstall => CanCheck && Info.IsUpdateAvailable;
+    public string CurrentVersion => AppVersionProvider.DisplayVersion;
+    public bool ShouldShowUpdateDialog => Info.IsUpdateAvailable;
+    public async Task SetLocalizedNotesAsync(IReleaseNotesProvider provider, string locale, CancellationToken cancellationToken = default)
+    {
+        if (!Info.IsUpdateAvailable || string.IsNullOrWhiteSpace(Info.AvailableVersion)) return;
+        var notes = await provider.GetAsync(Info.AvailableVersion, locale, cancellationToken);
+        if (notes is not null) Info = Info with { LocalizedReleaseNotes = notes, ReleaseNotes = null };
+    }
 
     public async Task CheckAsync(CancellationToken cancellationToken = default)
     {

@@ -9,12 +9,8 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $source = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
-if (-not $source.PSObject.Properties['version'] -or [string]$source.version -ne $Version) {
-    throw "Release-notes version must be $Version."
-}
-if (-not $source.PSObject.Properties['locales'] -or -not $source.locales) {
-    throw "Release-notes JSON is missing the 'locales' object."
-}
+if (-not $source.PSObject.Properties['version'] -or [string]$source.version -ne $Version) { throw "Release-notes version must be $Version." }
+if (-not $source.PSObject.Properties['locales'] -or -not $source.locales) { throw "Release-notes JSON is missing the 'locales' object." }
 
 $normalized = [ordered]@{ Version = $Version; Locales = [ordered]@{} }
 foreach ($locale in @('zh-CN','ja-JP','en-US')) {
@@ -23,10 +19,8 @@ foreach ($locale in @('zh-CN','ja-JP','en-US')) {
     $localeValue = $source.locales.PSObject.Properties[$keys[0]].Value
     $lines = foreach ($item in @($localeValue)) {
         $line = ([string]$item).Trim()
-        if ([string]::IsNullOrWhiteSpace($line) -or $line.Contains("`r") -or $line.Contains("`n")) {
-            throw "Each release-note item for $locale must be one non-empty line."
-        }
-        "• $line"
+        if ([string]::IsNullOrWhiteSpace($line) -or $line.Contains("`r") -or $line.Contains("`n")) { throw "Each release-note item for $locale must be one non-empty line." }
+        "- $line"
     }
     if (@($lines).Count -eq 0) { throw "Release notes for $locale are empty." }
     $text = $lines -join "`n"
