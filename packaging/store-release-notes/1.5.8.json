@@ -1,0 +1,8 @@
+{
+  "version": "1.5.8",
+  "locales": {
+    "zh-CN": ["本地测试版本：修复 GitHub 更新部署与 one-click 卸载链。"],
+    "ja-JP": ["ローカルテスト版：GitHub 更新デプロイとワンクリック アンインストールを修正しました。"],
+    "en-US": ["Local test build: fixed GitHub update deployment and one-click uninstall."]
+  }
+}

@@ -21,6 +21,19 @@
 
 本文档是 UrbanPlanToolbox 的可复用发布边界与检查清单。
 
+## v1.5.8 release gate (mandatory)
+
+`v1.5.8` is LOCAL TEST ONLY until every item below has evidence. A passing unit test or build is not sufficient.
+
+- Run `packaging/Test-GitHubUpdateDeploymentE2E.ps1` with a signed local bundle and verify package N -> N+1, exact GitHub identity, and unchanged `JoKiy.UrbanPlanToolbox`.
+- On a Windows test machine, install public v1.5.7, keep the app running for at least 60 seconds, invoke the in-app GitHub updater, and record Download, Verify, DeploymentQueued, Installing, Restarting, and Completed separately.
+- Record `ActivityId`, `ExtendedErrorCode`, and `ErrorText` from the deployment result. Download at 100% is not deployment success.
+- Verify automatic shutdown, registration of 1.5.8.0, automatic relaunch, and `AppVersionProvider = 1.5.8`.
+- Verify v1.5.8 one-click fresh install, one-click uninstall, not-installed uninstall, and Store package untouched.
+- Keep the GitHub and Store identities separate; no Store submission is implied by this gate.
+
+If the in-process updater cannot complete the running-app E2E on the target Windows environment, leave the release blocked and investigate the recorded ActivityId through `Get-AppPackageLog -ActivityID <GUID>` or Event Viewer. Do not replace it with a timer or claim success from a direct package install.
+
 ## v1.5.0 发布决策
 
 - GitHub：发布正式 `v1.5.0` Release、`v1.5.0` 标签和从最终 `main` 构建的 x64 旁加载包。
