@@ -4,6 +4,8 @@
 
 GitHub 正式版本为 `v1.5.4`，对应 Store 包版本 `1.5.4.0`。本版本按正式公开提交流程处理，不使用 Package Flight、测试版本或预览通道。提交前后的认证与发布状态以 Partner Center 实际返回为准；在获得明确的认证完成和公开可用证据前，统一记为 Store certification pending，不记为 Published。
 
+本次正式提交已完成：Source commit 为 `c33e3d85cc7ad488d3dcddfa777999184fb91351`，Submission ID 为 `1152921505701637171`，包文件为 `UrbanPlanToolbox_1.5.4.0_x64_bundle.msixupload`，包 SHA-256 为 `B77BFDC176EF30C5D2B803F9CB8E1FA3530238219181311F908F88E1803169EF`，提交后 Partner Center 状态为 `CommitStarted`。这表示认证流程已启动，不表示 Store 已公开可用；WACK 未在 GitHub Actions 中执行，结果为 `NotRun`。
+
 v1.5.4 的真实应用内更新验收仍为后续 `v1.5.4 → v1.5.5`，当前状态为 PENDING；本轮不创建或构建 v1.5.5。
 
 ## v1.5.2 当前状态
