@@ -1,7 +1,5 @@
 ## 简体中文
 
-**简体中文**
-
 - 新增「调研照片整理器」，用于规划、设计与 GIS 实地调研照片整理。
 - 支持批量选择和拖放导入 JPG、JPEG、HEIC、HEIF、PNG 照片，并提供缩略图预览。
 - 读取照片 EXIF、GPS、拍摄时间、海拔和方向信息。
@@ -10,7 +8,7 @@
 - 原始照片保持不变；照片和 GPS 仅在本机处理。HEIC 预览可能依赖 Windows 图像编解码器，但不影响已支持的元数据读取。
 - 工具入口：设计工具 → 实地调研 → 调研照片整理器。
 
-**日本語**
+## 日本語
 
 - 「調査写真整理ツール」を追加しました。都市・地域計画、設計、GIS の現地調査写真を整理できます。
 - JPG、JPEG、HEIC、HEIF、PNG の一括選択とドラッグ＆ドロップによる読み込み、サムネイル表示に対応します。
@@ -20,7 +18,7 @@
 - 元写真は変更せず、写真と GPS はローカルで処理します。HEIC のプレビューは Windows の画像コーデックに依存する場合がありますが、対応するメタデータの読み取りには影響しません。
 - ツール入口：設計ツール → 現地調査 → 調査写真整理ツール。
 
-**English**
+## English
 
 - Added Survey Photo Organizer for planning, design, and GIS field-survey photos.
 - Supports batch selection and drag-and-drop import of JPG, JPEG, HEIC, HEIF, and PNG photos with thumbnail preview.
@@ -35,11 +33,3 @@
 GitHub 正式发布，Microsoft Store 不在 v1.4.2 发布范围内；下一 Store 里程碑为 v1.5.0。
 Microsoft Store には公開せず、GitHub のみで正式リリースします。次の Store マイルストーンは v1.5.0 です。
 Officially released on GitHub; Microsoft Store is not included in v1.4.2. The next Store milestone is v1.5.0.
-
-## 日本語
-
-See the release description above for this release.
-
-## English
-
-See the release description above for the details of this release.
