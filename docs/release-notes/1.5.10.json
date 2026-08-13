@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.5.10",
+  "notes": {
+    "zh-CN": { "title": "更新内容", "items": ["修复当前已是最新版本时可用版本显示为不可用的问题。", "修复当前已是最新版本时 Release Notes 无法显示的问题。", "优化尚未检查更新时的状态显示，改为显示未检查。"] },
+    "ja-JP": { "title": "更新内容", "items": ["最新バージョン使用時に利用可能バージョンが利用不可と表示される問題を修正しました。", "最新バージョン使用時に Release Notes が表示されない問題を修正しました。", "更新確認前の表示を改善し、未確認と表示するようにしました。"] },
+    "en-US": { "title": "What's new", "items": ["Fixed the available version being shown as unavailable when the app is already up to date.", "Fixed release notes not being shown when the app is already up to date.", "Improved the pre-check state by showing Not checked instead of Unavailable."] }
+  }
+}

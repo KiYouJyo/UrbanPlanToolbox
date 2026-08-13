@@ -56,6 +56,7 @@
   <Compile Include="../../Services/RepositoryLinks.cs" Link="Services/RepositoryLinks.cs" />
   <Compile Include="../../Services/VersionParser.cs" Link="Services/VersionParser.cs" />
   <Compile Include="../../Services/GitHubUpdateService.cs" Link="Services/GitHubUpdateService.cs" />
+  <Compile Include="../../Services/GitHubAppUpdateService.cs" Link="Services/GitHubAppUpdateService.cs" />
   <Compile Include="../../Services/AppVersionProvider.cs" Link="Services/AppVersionProvider.cs" />
   <Compile Include="../../Models/AppUpdateState.cs" Link="Models/AppUpdateState.cs" />
   <Compile Include="../../Models/AppUpdateInfo.cs" Link="Models/AppUpdateInfo.cs" />

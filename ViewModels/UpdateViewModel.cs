@@ -21,7 +21,7 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     public bool ShouldShowUpdateDialog => Info.IsUpdateAvailable;
     public async Task SetLocalizedNotesAsync(IReleaseNotesProvider provider, string locale, CancellationToken cancellationToken = default)
     {
-        if (!Info.IsUpdateAvailable || string.IsNullOrWhiteSpace(Info.AvailableVersion)) return;
+        if (string.IsNullOrWhiteSpace(Info.AvailableVersion)) return;
         var notes = await provider.GetAsync(Info.AvailableVersion, locale, cancellationToken);
         if (notes is not null) Info = Info with { LocalizedReleaseNotes = notes, ReleaseNotes = null };
     }
