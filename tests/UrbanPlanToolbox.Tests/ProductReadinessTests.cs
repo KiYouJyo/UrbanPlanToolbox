@@ -12,7 +12,7 @@ public sealed class ProductReadinessTests
     {
         var text = DiagnosticsInfoService.Create("failed at C:\\Users\\secret\\project.json");
         Assert.Contains("UrbanPlanToolbox", text);
-        Assert.Contains("v1.6.0", text);
+        Assert.Contains("v1.6.1", text);
         Assert.Contains("Data schema version", text);
         Assert.DoesNotContain("C:\\Users", text);
         Assert.Contains(RuntimeInformation.OSArchitecture.ToString(), text);

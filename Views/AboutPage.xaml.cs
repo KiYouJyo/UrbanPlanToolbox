@@ -48,7 +48,7 @@ public sealed partial class AboutPage : Page
     private async void OnOpenNotices(object sender, RoutedEventArgs e) => await OpenDocumentAsync("THIRD-PARTY-NOTICES.md");
     private async void OnCheckUpdate(object sender, RoutedEventArgs e)
     {
-        if (_updates.Info.IsUpdateAvailable)
+        if (_updates.Info.IsUpdateAvailable || _updates.Info.IsReadyToInstall)
         {
             await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
             await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
@@ -74,6 +74,8 @@ public sealed partial class AboutPage : Page
         var notChecked = info.State == AppUpdateState.NotChecked;
         var checking = info.State == AppUpdateState.Checking;
         var hasAvailableVersion = info.State == AppUpdateState.UpdateAvailable && !string.IsNullOrWhiteSpace(info.AvailableVersion);
+        var hasPendingVersion = (info.State is AppUpdateState.Downloading or AppUpdateState.ReadyToInstall or AppUpdateState.Installing or AppUpdateState.Restarting) && !string.IsNullOrWhiteSpace(info.AvailableVersion);
+        hasAvailableVersion |= hasPendingVersion;
         var localizedNotes = info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage));
         var hasReleaseNotes = info.State == AppUpdateState.UpdateAvailable && localizedNotes is not null && localizedNotes.Items.Count > 0;
 
@@ -92,7 +94,7 @@ public sealed partial class AboutPage : Page
         UpdateNotesText.Text = hasReleaseNotes ? string.Join(Environment.NewLine, localizedNotes!.Items.Select(item => $"• {item}")) : string.Empty;
 
         CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
-        CheckUpdateButton.Content = info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
+        CheckUpdateButton.Content = info.IsReadyToInstall ? T("Action_RestartAndUpdate") : info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
         UpdateStatusText.Text = T($"Update_State_{info.State}");
         var progressVisible = info.State is AppUpdateState.Downloading or AppUpdateState.Installing or AppUpdateState.Restarting;
         UpdateProgressBar.Visibility = progressVisible ? Visibility.Visible : Visibility.Collapsed;

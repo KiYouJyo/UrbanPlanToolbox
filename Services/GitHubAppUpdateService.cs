@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Security.Cryptography;
+using System.Text.Json;
 using Windows.ApplicationModel;
 using Windows.Management.Deployment;
 using UrbanPlanToolbox.Models;
@@ -14,7 +15,9 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
     private readonly UpdateManifestService _manifestService = manifestService ?? UpdateManifestService.Default;
     private Version _localVersion = AppVersionProvider.GetCurrentVersion();
     private GitHubRelease? _pendingRelease;
+    private string? _pendingBundlePath;
     private bool _updateAvailable;
+    private static string PendingStatePath => Path.Combine(AppDataPathProvider.Default.Paths.CacheDirectory, "github-pending-update.json");
 
     public async Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default)
     {
@@ -23,7 +26,7 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
         return result.Status switch
         {
             UpdateCheckStatus.UpdateAvailable => await SetPendingAsync(result, cancellationToken),
-            UpdateCheckStatus.UpToDate or UpdateCheckStatus.LocalVersionNewer => SetPending(result, new(AppUpdateState.UpToDate, AvailableVersion: GetRemoteVersion(result), Source: UpdateInstallSource.AppInstaller)),
+            UpdateCheckStatus.UpToDate or UpdateCheckStatus.LocalVersionNewer => SetPending(result, new(AppUpdateState.UpToDate, AvailableVersion: GetRemoteVersion(result), Source: UpdateInstallSource.GitHub)),
             UpdateCheckStatus.NoRelease => Fail("ReleaseNotFound"),
             UpdateCheckStatus.InvalidRemoteVersion or UpdateCheckStatus.InvalidResponse => Fail("InvalidReleaseResponse"),
             UpdateCheckStatus.RateLimited => Fail("GitHubRateLimited"),
@@ -42,6 +45,26 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
             var bundlePath = await _updateService.DownloadAndVerifyBundleAsync(_pendingRelease, bundleName, progress, cancellationToken);
             if (bundlePath is null) return new(AppUpdateState.Failed, "BundleVerificationFailed");
 
+            _pendingBundlePath = bundlePath;
+            SavePendingState(_pendingRelease.TagName, bundlePath);
+            progress?.Report(new(AppUpdateState.ReadyToInstall, Detail: "Verified; ready to install"));
+            return new(AppUpdateState.ReadyToInstall, "ReadyToInstall", "Verified; ready to install");
+        }
+        catch (OperationCanceledException) { return new(AppUpdateState.Cancelled, "Cancelled"); }
+        catch (Exception exception)
+        {
+            AppLogger.Default.Error("GitHubUpdate", "PackageDownloadFailed", exception, exception.Message);
+            return new(AppUpdateState.Failed, "PackageDownloadFailed");
+        }
+    }
+
+    public async Task<AppUpdateResult> InstallPendingAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        if (_pendingRelease is null || string.IsNullOrWhiteSpace(_pendingBundlePath) || !File.Exists(_pendingBundlePath)) return new(AppUpdateState.Failed, "NoPendingUpdate");
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var bundlePath = _pendingBundlePath;
             progress?.Report(new(AppUpdateState.Installing, Detail: "Verified; deployment queued"));
             var bundleInfo = new FileInfo(bundlePath);
             var bundleHash = Convert.ToHexString(await SHA256.HashDataAsync(File.OpenRead(bundlePath), cancellationToken));
@@ -68,6 +91,8 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
                 return new(AppUpdateState.Failed, "PackageDeploymentFailed");
             }
             AppLogger.Default.Info("GitHubUpdate", "PackageDeploymentCompleted", $"Version={_pendingRelease.TagName}; Bundle={Path.GetFileName(bundlePath)}");
+            _pendingBundlePath = null;
+            TryDeletePendingState();
             progress?.Report(new(AppUpdateState.Restarting));
             return new(AppUpdateState.Restarting);
         }
@@ -89,7 +114,10 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
         _pendingRelease = result.Release;
         _updateAvailable = result.Status == UpdateCheckStatus.UpdateAvailable;
         var displayVersion = GetRemoteVersion(result) ?? await _manifestService.GetVersionAsync(DistributionChannel.GitHub, cancellationToken);
-        return new(AppUpdateState.UpdateAvailable, displayVersion, Source: UpdateInstallSource.AppInstaller);
+        LoadPendingState();
+        if (_updateAvailable && _pendingBundlePath is not null && File.Exists(_pendingBundlePath))
+            return new(AppUpdateState.ReadyToInstall, displayVersion, ReleaseNotes: result.Release?.Body, Source: UpdateInstallSource.GitHub);
+        return new(AppUpdateState.UpdateAvailable, displayVersion, ReleaseNotes: result.Release?.Body, Source: UpdateInstallSource.GitHub);
     }
 
     private static AppUpdateInfo Fail(string code) => new(AppUpdateState.Failed, ErrorCode: code, Source: UpdateInstallSource.GitHub);
@@ -104,6 +132,32 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
     private static string? GetRemoteVersion(UpdateCheckResult result) => result.RemoteVersion is { } version
         ? $"{version.Major}.{version.Minor}.{version.Build}"
         : null;
+
+    private void LoadPendingState()
+    {
+        try
+        {
+            if (!File.Exists(PendingStatePath)) return;
+            var state = JsonSerializer.Deserialize<PendingUpdateState>(File.ReadAllText(PendingStatePath));
+            var bundlePath = state?.BundlePath;
+            if (state?.TagName == _pendingRelease?.TagName && !string.IsNullOrWhiteSpace(bundlePath) && File.Exists(bundlePath)) _pendingBundlePath = bundlePath;
+        }
+        catch (Exception exception) { AppLogger.Default.Warning("GitHubUpdate", "PendingStateLoadFailed", exception.Message); }
+    }
+
+    private static void SavePendingState(string tagName, string bundlePath)
+    {
+        AppDataPathProvider.Default.EnsureInfrastructureDirectories();
+        File.WriteAllText(PendingStatePath, JsonSerializer.Serialize(new PendingUpdateState(tagName, bundlePath)));
+    }
+
+    private static void TryDeletePendingState()
+    {
+        try { if (File.Exists(PendingStatePath)) File.Delete(PendingStatePath); }
+        catch (Exception exception) { AppLogger.Default.Warning("GitHubUpdate", "PendingStateCleanupFailed", exception.Message); }
+    }
+
+    private sealed record PendingUpdateState(string TagName, string BundlePath);
 }
 
 internal static class ApplicationRestartRegistration
