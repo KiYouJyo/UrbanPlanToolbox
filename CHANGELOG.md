@@ -1,5 +1,17 @@
 # 更改日志
 
+## 1.6.4
+
+### Changed
+
+- Unified the visual background of NavigationView's expanded and small-window overlay panes for both light and dark themes.
+- Preserved the existing responsive pane behavior, pane measurements, navigation items, main-window Mica backdrop, and content layout.
+
+### Release boundary
+
+- GitHub Releases only; Microsoft Store is not included.
+- This release is the real-world target for validating the v1.6.3 GitHub restart-and-update flow after publication.
+
 ## 1.6.3
 
 ### Fixed

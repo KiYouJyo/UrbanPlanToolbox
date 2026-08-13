@@ -32,11 +32,42 @@ function Write-EntryLog([string]$Message) {
     "{0:u} [Install] {1}" -f (Get-Date), $Message | Add-Content -LiteralPath $EntryLogPath -Encoding UTF8
 }
 
+function Test-IsAdministrator {
+    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = [Security.Principal.WindowsPrincipal]::new($identity)
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function Quote-Argument([string]$Value) {
+    if ($Value.Contains('"')) { throw 'Windows paths cannot contain a quotation mark.' }
+    return '"{0}"' -f $Value
+}
+
 try {
+    $isAdministrator = Test-IsAdministrator
     $payloadScript = Join-Path $PSScriptRoot 'Install.ps1'
-    Write-EntryLog "CMD=$EntryCommandPath; WorkingDirectory=$EntryWorkingDirectory; Launcher=$PSCommandPath; Payload=$payloadScript; ElevatedArgument=$Elevated"
+    Write-EntryLog "CMD=$EntryCommandPath; WorkingDirectory=$EntryWorkingDirectory; Launcher=$PSCommandPath; Payload=$payloadScript; IsAdministrator=$isAdministrator; ElevatedArgument=$Elevated"
     if (-not (Test-Path -LiteralPath $payloadScript -PathType Leaf)) { throw "Missing payload script: $payloadScript" }
-    Write-EntryLog 'Running Install.ps1 in the current user context; only certificate trust setup may request UAC.'
+
+    if (-not $isAdministrator) {
+        Write-EntryLog 'Requesting UAC elevation for machine certificate trust and package deployment.'
+        $argumentLine = @(
+            '-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
+            (Quote-Argument $PSCommandPath), '-EntryLogPath', (Quote-Argument $EntryLogPath), '-EntryCommandPath', (Quote-Argument $EntryCommandPath), '-EntryWorkingDirectory', (Quote-Argument $EntryWorkingDirectory), '-Elevated'
+        ) -join ' '
+        try {
+            $child = Start-Process -FilePath 'powershell.exe' -ArgumentList $argumentLine -Verb RunAs -Wait -PassThru
+        }
+        catch {
+            Write-EntryLog "UAC request failed or was cancelled: $($_.Exception.Message)"
+            Write-Error 'UAC elevation was cancelled or could not be started.'
+            exit 1223
+        }
+        Write-EntryLog "UAC child exit code=$($child.ExitCode)"
+        exit $child.ExitCode
+    }
+
+    Write-EntryLog 'Running Install.ps1 in an elevated process.'
     & powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $payloadScript
     $payloadExitCode = $LASTEXITCODE
     Write-EntryLog "Install.ps1 exit code=$payloadExitCode"

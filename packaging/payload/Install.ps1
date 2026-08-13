@@ -102,7 +102,7 @@ try {
         }
         else { Write-InstallLog "准确测试证书已在 LocalMachine TrustedPeople 中受信任。" }
 
-        $runtime = Get-AppxPackage -AllUsers -Name 'Microsoft.WindowsAppRuntime.2' | Where-Object { $_.Architecture -eq 'X64' -and $_.Publisher -eq 'CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US' -and [version]$_.Version -ge $metadata.RuntimeMinVersion } | Sort-Object Version -Descending | Select-Object -First 1
+        $runtime = Get-AppxPackage -Name 'Microsoft.WindowsAppRuntime.2' | Where-Object { $_.Architecture -eq 'X64' -and $_.Publisher -eq 'CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US' -and [version]$_.Version -ge $metadata.RuntimeMinVersion } | Sort-Object Version -Descending | Select-Object -First 1
         if ($null -ne $runtime) {
             Write-InstallLog "找到兼容 Windows App Runtime $($runtime.Version)；仅安装主 MSIX。"
             Add-AppxPackage -Path $msixPath -ForceApplicationShutdown -ErrorAction Stop

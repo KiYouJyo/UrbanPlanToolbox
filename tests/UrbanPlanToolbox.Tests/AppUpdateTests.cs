@@ -391,10 +391,10 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public void PackagedReleaseNotes162And163ContainAllLocales()
+    public void PackagedReleaseNotes162Through164ContainAllLocales()
     {
         var root = FindRepositoryRoot();
-        foreach (var version in new[] { "1.6.2", "1.6.3" })
+        foreach (var version in new[] { "1.6.2", "1.6.3", "1.6.4" })
         {
             var document = System.Text.Json.JsonSerializer.Deserialize<LocalizedReleaseNotes>(File.ReadAllText(Path.Combine(root, "Assets", "Data", "ReleaseNotes", $"{version}.json")), new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             Assert.NotNull(document);
@@ -496,7 +496,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.6.3", viewModel.CurrentVersion);
+        Assert.Equal("v1.6.4", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -636,7 +636,7 @@ internal sealed class LateDownloadingCallbackService(AppUpdateState finalState) 
 {
     private IProgress<AppUpdateProgress>? _progress;
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, AvailableVersion: "1.6.3"));
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, AvailableVersion: "1.6.4"));
 
     public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
     {

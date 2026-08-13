@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.4",
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.6.4", "items": ["统一大窗口常驻导航栏与小窗口覆盖式导航栏的背景视觉。", "小窗口打开汉堡菜单后，左侧导航栏沿用与大窗口相同的导航背景样式。", "保留 NavigationView 原有的响应式布局、覆盖式行为、主窗口 Mica 和内容区域视觉。", "v1.6.4 仅通过 GitHub Releases 发布；Microsoft Store 不在本次发布范围内。"] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.6.4", "items": ["大きなウィンドウの常時表示ナビゲーションと小さなウィンドウのオーバーレイ ナビゲーションの背景表現を統一しました。", "小さなウィンドウでハンバーガー メニューを開いた場合も、大きなウィンドウと同じナビゲーション背景スタイルを使用します。", "NavigationView のレスポンシブ レイアウト、オーバーレイ動作、メイン ウィンドウの Mica、コンテンツ領域の外観を維持しています。", "v1.6.4 は GitHub Releases のみで公開され、Microsoft Store は今回の対象外です。"] },
+    "en-US": { "title": "UrbanPlanToolbox v1.6.4", "items": ["Unified the background appearance of the persistent large-window navigation pane and the small-window overlay pane.", "The navigation pane opened from the hamburger menu now uses the same visual background style as the large-window pane.", "Preserved the existing responsive NavigationView layout, overlay behavior, main-window Mica backdrop, and content-area appearance.", "v1.6.4 is released through GitHub Releases only; Microsoft Store is not part of this release."] }
+  }
+}

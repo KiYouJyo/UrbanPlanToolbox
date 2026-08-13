@@ -1,0 +1,8 @@
+{
+  "version": "1.6.4",
+  "locales": {
+    "zh-CN": ["统一 NavigationView 在展开与覆盖式窗格中的导航背景视觉。", "保留现有自适应布局、Mica 背景和更新流程。", "本版本仅通过 GitHub Releases 发布，未提交 Microsoft Store。"],
+    "ja-JP": ["NavigationView の展開ペインとオーバーレイ ペインでナビゲーション背景の見た目を統一しました。", "既存のレスポンシブ レイアウト、Mica 背景、更新フローを維持しています。", "このバージョンは GitHub Releases のみで公開し、Microsoft Store には提出していません。"],
+    "en-US": ["Unified the NavigationView background appearance in expanded and overlay panes.", "Preserved the existing responsive layout, Mica backdrop, and update flow.", "This version is released through GitHub Releases only and is not submitted to the Microsoft Store."]
+  }
+}

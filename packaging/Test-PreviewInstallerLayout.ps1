@@ -8,6 +8,10 @@ $payload = Join-Path $root 'payload'
 $metadata = Get-InstallerMetadata $payload
 $msixPath = Get-SafePayloadFilePath $payload $metadata.msixFileName
 $cerPath = Get-SafePayloadFilePath $payload $metadata.certificateFileName
+$installScript = Get-Content -LiteralPath (Join-Path $payload 'Install.ps1') -Raw -Encoding UTF8
+if ($installScript -match '(?i)Get-AppxPackage\s+-AllUsers\s+-Name\s+[''\"]Microsoft\.WindowsAppRuntime\.2') { throw 'Preview installer must not query all users from its non-elevated deployment path.' }
+$installLauncher = Get-Content -LiteralPath (Join-Path $payload 'InstallLauncher.ps1') -Raw -Encoding UTF8
+if ($installLauncher -notmatch '(?i)Start-Process\s+-FilePath\s+[''\"]powershell\.exe[''\"].*-Verb\s+RunAs') { throw 'Preview installer must request UAC elevation before machine certificate trust and deployment.' }
 $rootCommands = @(Get-ChildItem -LiteralPath $root -File -Filter '*.cmd')
 $rootReadmes = @(Get-ChildItem -LiteralPath $root -File -Filter '*.txt')
 if ($rootCommands.Count -ne 2 -or $rootReadmes.Count -ne 1) { throw 'Release root command or readme files are incomplete.' }
