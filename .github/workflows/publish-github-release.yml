@@ -19,19 +19,26 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: github-release-${{ github.ref_name || inputs.version }}
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: windows-2025-vs2026
-    env:
-      RELEASE_CERTIFICATE_BASE64: ${{ secrets.GH_RELEASE_CERTIFICATE_BASE64 }}
-      RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
+    timeout-minutes: 45
     steps:
       - name: Resolve version and source ref
         id: version
         shell: pwsh
         run: |
           $isTag = '${{ github.event_name }}' -eq 'push'
-          $tagVersion = if ($isTag) { '${{ github.ref_name }}'.TrimStart('v') } else { '${{ inputs.version }}' }
+          if ($isTag) {
+            $refName = '${{ github.ref_name }}'
+            if ($refName -notmatch '^v\d+\.\d+\.\d+$') { throw "Invalid release tag: $refName" }
+            $tagVersion = $refName.Substring(1)
+          }
+          else { $tagVersion = '${{ inputs.version }}' }
           if ($tagVersion -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid release version: $tagVersion" }
           $sourceRef = "refs/tags/v$tagVersion"
           "version=$tagVersion" | Out-File $env:GITHUB_OUTPUT -Encoding utf8 -Append
@@ -62,6 +69,9 @@ jobs:
 
       - name: Validate signing configuration
         shell: pwsh
+        env:
+          RELEASE_CERTIFICATE_BASE64: ${{ secrets.GH_RELEASE_CERTIFICATE_BASE64 }}
+          RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
         run: |
           if ([string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_BASE64) -or [string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_PASSWORD)) { throw 'GitHub release signing secrets are not configured.' }
 
@@ -85,6 +95,9 @@ jobs:
 
       - name: Sign bundle and export public certificate
         shell: pwsh
+        env:
+          RELEASE_CERTIFICATE_BASE64: ${{ secrets.GH_RELEASE_CERTIFICATE_BASE64 }}
+          RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
         run: |
           $work = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'
           New-Item -ItemType Directory -Force -Path $work | Out-Null
@@ -106,7 +119,12 @@ jobs:
           $signature = Get-AuthenticodeSignature -FilePath $env:BUNDLE_PATH
           if (-not $signature.SignerCertificate) { throw "Signed bundle has no Authenticode signer certificate. Status=$($signature.Status)" }
           if ($signature.SignerCertificate.Subject -cne 'CN=AppPublisher' -or $signature.SignerCertificate.Thumbprint -cne $certificate.Thumbprint) { throw "Signed bundle signer mismatch: Subject=$($signature.SignerCertificate.Subject); Thumbprint=$($signature.SignerCertificate.Thumbprint)" }
-          if ($signature.Status -notin @('Valid', 'Unknown', 'UnknownError')) { throw "Signed bundle Authenticode status is not acceptable: $($signature.Status) / $($signature.StatusMessage)" }
+          if ($signature.Status -eq 'UnknownError') {
+            if ($signature.StatusMessage -notmatch '(?i)not trusted|trust provider|untrusted|self-signed') { throw "UnknownError is not the permitted self-signed trust limitation: $($signature.StatusMessage)" }
+          }
+          elseif ($signature.Status -ne 'Valid') { throw "Signed bundle Authenticode status is not acceptable: $($signature.Status) / $($signature.StatusMessage)" }
+          Write-Output "Authenticode status: $($signature.Status)"
+          Write-Output "Authenticode status message: $($signature.StatusMessage)"
           Write-Output "Authenticode signer verified: $($signature.SignerCertificate.Subject) / $($signature.SignerCertificate.Thumbprint); status=$($signature.Status)"
           "CERTIFICATE_PATH=$cer" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -155,29 +173,90 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $version = '${{ steps.version.outputs.version }}'; $tag = "v$version"; $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'
-          $releaseJson = gh api "repos/${{ github.repository }}/releases/tags/$tag" 2>$null
+          $releaseJson = gh api "repos/${{ github.repository }}/releases/tags/$tag" 2>&1
           if ($LASTEXITCODE -eq 0 -and $releaseJson) { $release = $releaseJson | ConvertFrom-Json }
-          else {
-            gh release create $tag --verify-tag --title "UrbanPlanToolbox $tag" --notes-file (Join-Path $env:RUNNER_TEMP 'release-notes.md')
+          elseif (($releaseJson -join ' ') -match '(?i)404|not found') {
+            & gh release create $tag --verify-tag --title "UrbanPlanToolbox $tag" --notes-file (Join-Path $env:RUNNER_TEMP 'release-notes.md')
             if ($LASTEXITCODE -ne 0) { throw "GitHub Release creation failed: $LASTEXITCODE" }
-            $release = (gh api "repos/${{ github.repository }}/releases/tags/$tag") | ConvertFrom-Json
+            $releaseJson = gh api "repos/${{ github.repository }}/releases/tags/$tag" 2>&1
+            if ($LASTEXITCODE -ne 0 -or -not $releaseJson) { throw "Created Release could not be read back: $($releaseJson -join ' ')" }
+            $release = $releaseJson | ConvertFrom-Json
           }
+          else { throw "Release lookup failed without a confirmed 404: $($releaseJson -join ' ')" }
           $expected = @("UrbanPlanToolbox_${version}.0_x64.msixbundle", "UrbanPlanToolbox-v$version-x64-one-click.zip", 'SHA256SUMS.txt')
-          $localFiles = @((Join-Path $assets $expected[0]),(Join-Path $assets $expected[1]),(Join-Path $assets $expected[2]))
-          $remote = gh api "repos/${{ github.repository }}/releases/$($release.id)/assets" | ConvertFrom-Json
+          $remote = gh api "repos/${{ github.repository }}/releases/$($release.id)/assets" 2>&1
+          if ($LASTEXITCODE -ne 0) { throw "Release asset list read failed: $($remote -join ' ')" }
+          $remote = $remote | ConvertFrom-Json
           foreach($name in $expected) {
             $local = Get-Item -LiteralPath (Join-Path $assets $name)
             $existing = @($remote | Where-Object name -eq $name)
             if($existing.Count -gt 0) {
               $localHash = (Get-FileHash $local.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-              if($existing[0].digest -and $existing[0].digest -ne "sha256:$localHash") { throw "Existing asset hash conflict: $name" }
+              if($existing.Count -gt 1) { throw "Duplicate remote asset names: $name" }
+              if($existing[0].digest) {
+                if($existing[0].digest -ne "sha256:$localHash") { throw "Existing asset hash conflict: $name" }
+              }
+              else {
+                $downloadDir = Join-Path $env:RUNNER_TEMP "remote-$([guid]::NewGuid().ToString('N'))"
+                New-Item -ItemType Directory -Force -Path $downloadDir | Out-Null
+                & gh release download $tag --pattern $name --dir $downloadDir
+                if ($LASTEXITCODE -ne 0) { throw "Failed to download existing asset for hash verification: $name" }
+                $downloaded = Get-Item -LiteralPath (Join-Path $downloadDir $name)
+                $remoteHash = (Get-FileHash $downloaded.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+                if ($remoteHash -ne $localHash) { throw "Existing asset hash conflict without digest: $name" }
+              }
               continue
             }
-            gh release upload $tag $local.FullName
+            & gh release upload $tag $local.FullName
+            if ($LASTEXITCODE -ne 0) { throw "GitHub Release asset upload failed: $name" }
           }
 
+      - name: Verify published GitHub Release
+        if: steps.version.outputs.dry_run != 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = '${{ steps.version.outputs.version }}'; $tag = "v$version"; $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'; $notesPath = Join-Path $env:RUNNER_TEMP 'release-notes.md'
+          $releaseJson = gh api "repos/${{ github.repository }}/releases/tags/$tag" 2>&1
+          if ($LASTEXITCODE -ne 0) { throw "Published Release read failed: $($releaseJson -join ' ')" }
+          $release = $releaseJson | ConvertFrom-Json
+          if ($release.tag_name -ne $tag -or $release.draft -or $release.prerelease) { throw "Published Release metadata mismatch." }
+          $normalize = { param($value) (($value -replace "`r`n", "`n") -replace "`r", "`n").TrimEnd() }
+          if (&$normalize $release.body -ne (&$normalize (Get-Content $notesPath -Raw))) { throw 'Published Release Notes do not match the notes file.' }
+          if ($release.body -match '`n|\\n') { throw 'Published Release Notes contain literal newline escapes.' }
+          $expected = @("UrbanPlanToolbox_${version}.0_x64.msixbundle", "UrbanPlanToolbox-v$version-x64-one-click.zip", 'SHA256SUMS.txt')
+          $remote = gh api "repos/${{ github.repository }}/releases/$($release.id)/assets" 2>&1
+          if ($LASTEXITCODE -ne 0) { throw "Published asset list read failed: $($remote -join ' ')" }
+          $remote = $remote | ConvertFrom-Json
+          if (@($remote).Count -ne $expected.Count) { throw "Published Release must contain exactly three assets; found $(@($remote).Count)." }
+          foreach ($name in $expected) {
+            $remoteAsset = @($remote | Where-Object name -eq $name)
+            if ($remoteAsset.Count -ne 1) { throw "Published Release asset set mismatch: $name" }
+            $local = Get-Item -LiteralPath (Join-Path $assets $name)
+            $localHash = (Get-FileHash $local.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($remoteAsset[0].digest) {
+              if ($remoteAsset[0].digest -ne "sha256:$localHash") { throw "Published asset digest mismatch: $name" }
+            }
+            else {
+              $downloadDir = Join-Path $env:RUNNER_TEMP "published-$([guid]::NewGuid().ToString('N'))"
+              New-Item -ItemType Directory -Force -Path $downloadDir | Out-Null
+              & gh release download $tag --pattern $name --dir $downloadDir
+              if ($LASTEXITCODE -ne 0) { throw "Published asset download failed: $name" }
+              $remoteHash = (Get-FileHash (Join-Path $downloadDir $name) -Algorithm SHA256).Hash.ToLowerInvariant()
+              if ($remoteHash -ne $localHash) { throw "Published asset downloaded hash mismatch: $name" }
+            }
+          }
+          $publishedSha = Join-Path $env:RUNNER_TEMP 'published-sha'
+          New-Item -ItemType Directory -Force -Path $publishedSha | Out-Null
+          & gh release download $tag --pattern SHA256SUMS.txt --dir $publishedSha
+          if ($LASTEXITCODE -ne 0) { throw 'Published SHA256SUMS.txt download failed.' }
+          $localSha = Get-Content (Join-Path $assets 'SHA256SUMS.txt') -Raw
+          $remoteSha = Get-Content (Join-Path $publishedSha 'SHA256SUMS.txt') -Raw
+          if (&$normalize $localSha -ne (&$normalize $remoteSha)) { throw 'Published SHA256SUMS.txt does not match the local manifest.' }
+
       - name: Upload release asset artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: UrbanPlanToolbox-${{ steps.version.outputs.version }}-github-release-assets
           path: |
