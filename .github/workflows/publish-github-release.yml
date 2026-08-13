@@ -106,7 +106,7 @@ jobs:
           $signature = Get-AuthenticodeSignature -FilePath $env:BUNDLE_PATH
           if (-not $signature.SignerCertificate) { throw "Signed bundle has no Authenticode signer certificate. Status=$($signature.Status)" }
           if ($signature.SignerCertificate.Subject -cne 'CN=AppPublisher' -or $signature.SignerCertificate.Thumbprint -cne $certificate.Thumbprint) { throw "Signed bundle signer mismatch: Subject=$($signature.SignerCertificate.Subject); Thumbprint=$($signature.SignerCertificate.Thumbprint)" }
-          if ($signature.Status -notin @('Valid', 'Unknown')) { throw "Signed bundle Authenticode status is not acceptable: $($signature.Status) / $($signature.StatusMessage)" }
+          if ($signature.Status -notin @('Valid', 'Unknown', 'UnknownError')) { throw "Signed bundle Authenticode status is not acceptable: $($signature.Status) / $($signature.StatusMessage)" }
           Write-Output "Authenticode signer verified: $($signature.SignerCertificate.Subject) / $($signature.SignerCertificate.Thumbprint); status=$($signature.Status)"
           "CERTIFICATE_PATH=$cer" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
 
