@@ -22,8 +22,8 @@ public sealed class GitHubUpdateServiceTests
     [Fact]
     public void UnpackagedDevelopmentDoesNotPretendToBeAGitHubInstall()
     {
-        Assert.Equal("1.6.4", AppVersionProvider.Version);
-        Assert.Equal("v1.6.4", AppVersionProvider.DisplayVersion);
+        Assert.Equal("1.6.5", AppVersionProvider.Version);
+        Assert.Equal("v1.6.5", AppVersionProvider.DisplayVersion);
         Assert.Equal(DistributionChannel.Development, DistributionChannelProvider.Current);
         Assert.False(DistributionChannelProvider.UsesGitHubUpdates);
     }
@@ -73,7 +73,77 @@ public sealed class GitHubUpdateServiceTests
     {
         var handler = new StubHandler(HttpStatusCode.OK, ReleaseJson("v0.3.9"));
         await new GitHubUpdateService(new HttpClient(handler)).CheckForUpdatesAsync(new Version(0, 3, 8, 0));
-        Assert.Equal("UrbanPlanToolbox/1.6.4", handler.UserAgent);
+        Assert.Equal("UrbanPlanToolbox/1.6.5", handler.UserAgent);
+    }
+
+    [Theory]
+    [InlineData(true, "BundleSignatureVerified", "CN=AppPublisher", "BD85AD77A651C86CA01A480C8E9BC64952993F98", null)]
+    [InlineData(false, "SignatureMissing", null, null, "SignatureMissing")]
+    [InlineData(false, "SignatureInvalid", null, null, "SignatureInvalid")]
+    [InlineData(true, "BundleSignatureVerified", "CN=WrongPublisher", "BD85AD77A651C86CA01A480C8E9BC64952993F98", "SignerSubjectMismatch")]
+    [InlineData(true, "BundleSignatureVerified", "CN=AppPublisher", "0123456789ABCDEF0123456789ABCDEF01234567", "SignerThumbprintMismatch")]
+    public async Task DownloadVerificationRequiresValidSignatureSubjectAndThumbprint(bool isValid, string verifierCode, string? subject, string? thumbprint, string? expectedFailure)
+    {
+        var bytes = Encoding.UTF8.GetBytes("test bundle bytes");
+        var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes));
+        var bundleName = "UrbanPlanToolbox_1.6.4.0_x64.msixbundle";
+        var release = new GitHubRelease("v1.6.4", "v1.6.4", "", new Uri("https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.4"), null,
+        [
+            new(bundleName, new Uri("https://github.com/KiYouJyo/UrbanPlanToolbox/releases/download/v1.6.4/" + bundleName), bytes.Length, null),
+            new("SHA256SUMS.txt", new Uri("https://github.com/KiYouJyo/UrbanPlanToolbox/releases/download/v1.6.4/SHA256SUMS.txt"), hash.Length + bundleName.Length + 4, null)
+        ]);
+        var handler = new BundleDownloadHandler(bytes, $"{hash}  {bundleName}\n");
+        var service = new GitHubUpdateService(new HttpClient(handler), new FixedSignatureVerifier(new(isValid, verifierCode, subject, thumbprint)));
+
+        var result = await service.DownloadAndVerifyBundleAsync(release, bundleName);
+
+        Assert.Equal(expectedFailure, result.FailureCode);
+        Assert.Equal(expectedFailure is null, result.BundlePath is not null);
+        if (result.BundlePath is { } path && File.Exists(path)) File.Delete(path);
+    }
+
+    [Fact]
+    public void OfficialV164BundlePassesTheWindowsVerifierWhenProvidedForIntegrationTesting()
+    {
+        var bundlePath = Environment.GetEnvironmentVariable("URBANPLANTOOLBOX_OFFICIAL_BUNDLE");
+        if (string.IsNullOrWhiteSpace(bundlePath)) return;
+
+        var result = new MsixBundleSignatureVerifier().Verify(bundlePath);
+
+        Assert.True(result.IsValid, $"{result.FailureCode}; HRESULT=0x{result.HResult:X8}");
+        Assert.Equal(GitHubUpdateService.ExpectedSignerSubject, result.SignerSubject);
+        Assert.Equal(GitHubUpdateService.ExpectedSignerThumbprint, result.SignerThumbprint, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void TamperedBundleFailsTheWindowsVerifierWhenProvidedForIntegrationTesting()
+    {
+        var bundlePath = Environment.GetEnvironmentVariable("URBANPLANTOOLBOX_TAMPERED_BUNDLE");
+        if (string.IsNullOrWhiteSpace(bundlePath)) return;
+
+        var result = new MsixBundleSignatureVerifier().Verify(bundlePath);
+
+        Assert.False(result.IsValid);
+        Assert.Contains(result.FailureCode, new[] { "SignatureInvalid", "SignatureMissing" });
+    }
+
+    [Fact]
+    public void UnsignedBundleFailsTheWindowsVerifier()
+    {
+        var bundlePath = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-unsigned-{Guid.NewGuid():N}.msixbundle");
+        try
+        {
+            File.WriteAllBytes(bundlePath, [0x50, 0x4B, 0x03, 0x04]);
+
+            var result = new MsixBundleSignatureVerifier().Verify(bundlePath);
+
+            Assert.False(result.IsValid);
+            Assert.Contains(result.FailureCode, new[] { "SignatureInvalid", "SignatureMissing" });
+        }
+        finally
+        {
+            if (File.Exists(bundlePath)) File.Delete(bundlePath);
+        }
     }
 
     private static GitHubUpdateService CreateService(HttpStatusCode statusCode, string content) => new(new HttpClient(new StubHandler(statusCode, content)));
@@ -88,5 +158,19 @@ public sealed class GitHubUpdateServiceTests
             UserAgent = request.Headers.UserAgent.ToString();
             return Task.FromResult(new HttpResponseMessage(statusCode) { Content = new StringContent(content, Encoding.UTF8, "application/json") });
         }
+    }
+
+    private sealed class BundleDownloadHandler(byte[] bundle, string checksums) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent(request.RequestUri!.AbsolutePath.EndsWith("SHA256SUMS.txt", StringComparison.Ordinal) ? Encoding.UTF8.GetBytes(checksums) : bundle)
+            });
+    }
+
+    private sealed class FixedSignatureVerifier(BundleSignatureVerificationResult result) : IBundleSignatureVerifier
+    {
+        public BundleSignatureVerificationResult Verify(string bundlePath) => result;
     }
 }

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.5",
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.6.5", "items": ["修复 GitHub 更新器对 MSIXBundle 签名者的错误读取方式。", "下载包现在先经过 Windows 原生签名验证，再同时校验签名者 Subject 和固定证书指纹。", "v1.6.5 仅通过 GitHub Releases 发布；Microsoft Store 不在本次发布范围内。"] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.6.5", "items": ["GitHub アップデーターによる MSIXBundle 署名者の誤った読み取りを修正しました。", "ダウンロード済みパッケージは Windows のネイティブ署名検証後に、署名者 Subject と固定証明書の拇印を両方確認します。", "v1.6.5 は GitHub Releases のみで公開され、Microsoft Store は今回の対象外です。"] },
+    "en-US": { "title": "UrbanPlanToolbox v1.6.5", "items": ["Fixed the GitHub updater reading an MSIXBundle as if it were a certificate file.", "Downloaded packages now pass Windows native signature verification and must match both the signer subject and pinned certificate thumbprint.", "v1.6.5 is released through GitHub Releases only; Microsoft Store is not part of this release."] }
+  }
+}

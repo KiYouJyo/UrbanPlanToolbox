@@ -1,5 +1,18 @@
 # 更改日志
 
+## 1.6.5
+
+### Fixed
+
+- Replaced incorrect certificate-file parsing for MSIXBundle verification with Windows Authenticode/MSIX validation.
+- Verify the signed package with WinVerifyTrust, extract the signer from AppxSignature.p7x, and pin both Subject and Thumbprint.
+- Preserve granular checksum and signature verification failures, with negative security coverage for invalid, unsigned, and mismatched signers.
+
+### Release boundary
+
+- GitHub Releases only; Microsoft Store is not included.
+- v1.6.5 fixes bundle verification. The next real updater end-to-end acceptance target is v1.6.5 to v1.6.6 after manually installing the official v1.6.5 release.
+
 ## 1.6.4
 
 ### Changed
