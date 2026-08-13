@@ -1,5 +1,18 @@
 # 更改日志
 
+## 1.6.1
+
+### Fixed
+
+- GitHub sideload updates now preserve release metadata while downloading and expose a distinct `ReadyToInstall` state.
+- Added a user-triggered “Restart and update” action after the verified package is ready.
+- GitHub installation continues through Windows package deployment; Microsoft Store was not part of this release.
+
+### Release
+
+- GitHub package version: `1.6.1.0`.
+- GitHub Release tag: `v1.6.1`.
+
 ## 1.5.8
 
 ### Fixed

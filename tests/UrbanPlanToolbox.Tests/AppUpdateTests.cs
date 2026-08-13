@@ -151,6 +151,28 @@ public sealed class AppUpdateTests
         Assert.DoesNotContain(0d, observed);
     }
 
+    [Fact]
+    public async Task ViewModelKeepsReleaseMetadataAndRequiresSecondActionAfterDownload()
+    {
+        var service = new ReadyToInstallUpdateService();
+        var viewModel = new UpdateViewModel(service);
+
+        await viewModel.CheckAsync();
+        await viewModel.DownloadAndInstallAsync();
+
+        Assert.Equal(AppUpdateState.ReadyToInstall, viewModel.Info.State);
+        Assert.Equal("1.6.1", viewModel.Info.AvailableVersion);
+        Assert.True(viewModel.CanInstall);
+        Assert.Equal(1, service.DownloadCalls);
+        Assert.Equal(0, service.InstallCalls);
+
+        await viewModel.DownloadAndInstallAsync();
+
+        Assert.Equal(AppUpdateState.Restarting, viewModel.Info.State);
+        Assert.Equal("1.6.1", viewModel.Info.AvailableVersion);
+        Assert.Equal(1, service.InstallCalls);
+    }
+
     [Theory]
     [InlineData(0.15, 0, 0, 0, 0.15)]
     [InlineData(double.NaN, 0.15, 0, 0, 0.1875)]
@@ -332,7 +354,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.6.0", viewModel.CurrentVersion);
+        Assert.Equal("v1.6.1", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -380,6 +402,28 @@ public sealed class AppUpdateTests
             });
     }
 
+}
+
+internal sealed class ReadyToInstallUpdateService : IAppUpdateService
+{
+    public int DownloadCalls { get; private set; }
+    public int InstallCalls { get; private set; }
+
+    public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, AvailableVersion: "1.6.1", ReleaseNotes: "notes"));
+
+    public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        DownloadCalls++;
+        progress?.Report(new(AppUpdateState.ReadyToInstall));
+        return Task.FromResult(new AppUpdateResult(AppUpdateState.ReadyToInstall));
+    }
+
+    public Task<AppUpdateResult> InstallPendingAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        InstallCalls++;
+        return Task.FromResult(new AppUpdateResult(AppUpdateState.Restarting));
+    }
 }
 
 internal sealed class PendingProgressService : IAppUpdateService

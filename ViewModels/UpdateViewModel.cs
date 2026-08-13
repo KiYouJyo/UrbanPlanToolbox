@@ -16,7 +16,7 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     public double? Progress { get; private set; }
     public string? RestartFailureReason { get; private set; }
     public bool CanCheck => Volatile.Read(ref _busy) == 0;
-    public bool CanInstall => CanCheck && Info.IsUpdateAvailable;
+    public bool CanInstall => CanCheck && (Info.IsUpdateAvailable || Info.IsReadyToInstall);
     public string CurrentVersion => AppVersionProvider.DisplayVersion;
     public bool ShouldShowUpdateDialog => Info.IsUpdateAvailable;
     public async Task SetLocalizedNotesAsync(IReleaseNotesProvider provider, string locale, CancellationToken cancellationToken = default)
@@ -55,12 +55,14 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
                 Info = Info with { State = value.State, Detail = value.Detail };
                 OnChanged(nameof(Progress));
             });
-            var result = await _service.DownloadAndInstallAsync(progress, cancellationToken);
+            var result = Info.IsReadyToInstall
+                ? await _service.InstallPendingAsync(progress, cancellationToken)
+                : await _service.DownloadAndInstallAsync(progress, cancellationToken);
             var finalState = result.State;
             // Store and App Installer own shutdown/restart. The app must not ask for a second confirmation.
             Progress = null;
             OnChanged(nameof(Progress));
-            Info = new(finalState, Detail: result.Detail, ErrorCode: result.ErrorCode);
+            Info = Info with { State = finalState, Detail = result.Detail, ErrorCode = result.ErrorCode };
         }
         catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = new(AppUpdateState.Cancelled); }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }

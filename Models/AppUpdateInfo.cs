@@ -12,4 +12,5 @@ public sealed record AppUpdateInfo(
     LocalizedReleaseNotes? LocalizedReleaseNotes = null)
 {
     public bool IsUpdateAvailable => State == AppUpdateState.UpdateAvailable;
+    public bool IsReadyToInstall => State == AppUpdateState.ReadyToInstall;
 }

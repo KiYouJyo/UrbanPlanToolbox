@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.1",
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.6.1", "items": ["Improved GitHub sideload update state handling.", "Added a user-triggered Restart and update action after download and verification.", "Released through GitHub only; not submitted to Microsoft Store."] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.6.1", "items": ["Improved GitHub sideload update state handling.", "Added a user-triggered Restart and update action after download and verification.", "Released through GitHub only; not submitted to Microsoft Store."] },
+    "en-US": { "title": "UrbanPlanToolbox v1.6.1", "items": ["Improved state handling after a GitHub sideload update finishes downloading.", "Added a user-triggered Restart and update action after the package is downloaded and verified.", "Released through GitHub Releases only; Microsoft Store is not part of this release."] }
+  }
+}

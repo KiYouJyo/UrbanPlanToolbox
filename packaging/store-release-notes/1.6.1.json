@@ -1,0 +1,8 @@
+{
+  "version": "1.6.1",
+  "locales": {
+    "zh-CN": ["Improved GitHub sideload update state display and added a restart-and-update action."],
+    "ja-JP": ["Improved GitHub sideload update state display and added a restart-and-update action."],
+    "en-US": ["Fixed GitHub sideload update state display and added a restart-and-update action."]
+  }
+}
