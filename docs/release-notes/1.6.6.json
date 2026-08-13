@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.6",
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.6.6", "items": ["优化启动画面与主窗口 Mica 的视觉衔接，并在快速启动时保留约 0.5 秒的完整 Logo 展示。", "优化启动淡出过渡；浅色模式使用黑色 Logo，深色模式使用白色 Logo，并统一尺寸、清晰度和 DPI 表现。", "新增窗口尺寸和最大化状态记忆，并在显示器工作区变化时安全调整恢复尺寸。", "v1.6.6 仅通过 GitHub Releases 发布；Microsoft Store 不在本次发布范围内。"] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.6.6", "items": ["起動画面とメインウィンドウの Mica 表示を改善し、高速起動時でも Logo を約 0.5 秒以上表示します。", "起動画面のフェードアウトを改善し、ライトとダークの Logo のサイズ、鮮明さ、DPI 表示を統一しました。", "ウィンドウサイズと最大化状態を記憶し、作業領域の変更時も安全に復元します。", "v1.6.6 は GitHub Releases のみで公開します。Microsoft Store は今回の対象外です。"] },
+    "en-US": { "title": "UrbanPlanToolbox v1.6.6", "items": ["Improved startup-to-Mica visual continuity, with a complete startup logo shown for about 0.5 seconds on fast launches.", "Refined startup fade-out and unified Light and Dark logo sizing, sharpness, and DPI behavior.", "Added restoration of window size and maximized state, safely constrained when display work area changes.", "v1.6.6 is released through GitHub Releases only; Microsoft Store is not part of this release."] }
+  }
+}

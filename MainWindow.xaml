@@ -14,30 +14,38 @@
     </Window.SystemBackdrop>
 
     <Grid x:Name="RootLayout" Loaded="OnRootLayoutLoaded">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        <Grid x:Name="MainContent" Opacity="0" IsHitTestVisible="False">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <TitleBar x:Name="AppTitleBar" Title="UrbanPlanToolbox">
-            <TitleBar.IconSource>
-                <ImageIconSource ImageSource="Assets/UrbanPlanToolbox.ico" />
-            </TitleBar.IconSource>
-        </TitleBar>
+            <TitleBar x:Name="AppTitleBar" Title="UrbanPlanToolbox">
+                <TitleBar.IconSource>
+                    <ImageIconSource ImageSource="Assets/UrbanPlanToolbox.ico" />
+                </TitleBar.IconSource>
+            </TitleBar>
 
-        <!--
-            The Frame hosts pages for your application content. Add your UI to
-            MainPage.xaml rather than here so you can use Page features such as
-            navigation events and the Loaded lifecycle.
-        -->
-        <Frame x:Name="RootFrame" Grid.Row="1" />
-        <InfoBar x:Name="NotificationBar" Grid.Row="1" Margin="24" VerticalAlignment="Top"
-                 HorizontalAlignment="Stretch" IsOpen="False" IsClosable="True"
-                 />
-        <views:FirstRunGuideHost x:Name="FirstRunGuide" Grid.RowSpan="2" Canvas.ZIndex="10" />
-        <Grid x:Name="StartupOverlay" Grid.RowSpan="2" Background="#202020" Canvas.ZIndex="100">
-            <Image x:Name="StartupLogo"
-                   Source="ms-appx:///Assets/SplashScreen.scale-200.png"
+            <!-- The shell prepares behind the transparent startup overlay. -->
+            <Frame x:Name="RootFrame" Grid.Row="1" />
+            <InfoBar x:Name="NotificationBar" Grid.Row="1" Margin="24" VerticalAlignment="Top"
+                     HorizontalAlignment="Stretch" IsOpen="False" IsClosable="True" />
+            <views:FirstRunGuideHost x:Name="FirstRunGuide" Grid.RowSpan="2" Canvas.ZIndex="10" />
+        </Grid>
+        <Grid x:Name="StartupOverlay" Background="Transparent" Canvas.ZIndex="100">
+            <Image x:Name="StartupDarkLogo"
+                   Source="ms-appx:///Assets/Icon-Large-Dark-1024.png"
+                   Width="183"
+                   Height="183"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   ImageOpened="OnStartupLogoImageOpened"
+                   ImageFailed="OnStartupLogoImageFailed" />
+            <Image x:Name="StartupLightLogo"
+                   Source="ms-appx:///Assets/Icon-Large-Light-1024.png"
+                   Width="183"
+                   Height="183"
                    Stretch="Uniform"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"

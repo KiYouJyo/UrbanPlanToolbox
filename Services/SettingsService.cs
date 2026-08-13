@@ -35,6 +35,9 @@ public sealed class SettingsService
             TryRead(root, SettingsKeys.ProjectMilestoneNotificationsEnabled, (bool? value) => settings.ProjectMilestoneNotificationsEnabled = value);
             TryRead(root, SettingsKeys.ProjectMilestoneReminderRepeatInterval, (MilestoneReminderRepeatInterval value) => settings.ProjectMilestoneReminderRepeatInterval = value);
             TryRead(root, SettingsKeys.FavoriteToolIds, (List<string> value) => settings.FavoriteToolIds = value);
+            TryRead(root, SettingsKeys.LastNormalWindowWidth, (int? value) => settings.LastNormalWindowWidth = value);
+            TryRead(root, SettingsKeys.LastNormalWindowHeight, (int? value) => settings.LastNormalWindowHeight = value);
+            TryRead(root, SettingsKeys.WasWindowMaximized, (bool value) => settings.WasWindowMaximized = value);
             return Normalize(settings);
         }
         catch (JsonException) { return CreateDefaults(); }

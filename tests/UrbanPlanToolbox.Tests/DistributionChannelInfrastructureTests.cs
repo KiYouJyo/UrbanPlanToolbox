@@ -13,6 +13,8 @@ public sealed class DistributionChannelInfrastructureTests
 
         Assert.DoesNotContain("c4e4b33a7b774121897c7d720a5471f8", identity, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("StorePublisherId", identity, StringComparison.Ordinal);
+        Assert.Contains("GitHubSideloadName = \"556F80C5-C4D4-452B-93B4-00DE3FA7AC29\"", identity);
+        Assert.Contains("GitHubSideloadPublisher = \"CN=AppPublisher\"", identity);
         Assert.Contains("#if URBANPLANTOOLBOX_STORE", channelService);
         Assert.Contains("Package identity is diagnostic only", channelService);
     }
