@@ -10,8 +10,8 @@
 
 ### Release boundary
 
-- GitHub-only candidate; Microsoft Store submission is not included.
-- Formal release and v1.6.1 to v1.6.2 acceptance remain pending.
+- GitHub-only release; Microsoft Store submission is not included.
+- v1.6.1 to v1.6.2 real upgrade acceptance remains pending after publication.
 
 ## 1.6.1
 
