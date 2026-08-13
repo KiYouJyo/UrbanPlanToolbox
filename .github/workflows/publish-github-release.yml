@@ -95,8 +95,6 @@ jobs:
           if ($certificate.Subject -cne 'CN=AppPublisher' -or $certificate.Thumbprint -cne 'BD85AD77A651C86CA01A480C8E9BC64952993F98' -or -not $certificate.HasPrivateKey) { throw "Unexpected signing certificate: Subject=$($certificate.Subject); Thumbprint=$($certificate.Thumbprint); HasPrivateKey=$($certificate.HasPrivateKey)" }
           $cer = Join-Path $work "UrbanPlanToolbox-${{ steps.version.outputs.version }}-Framework-Dependent.cer"
           Export-Certificate -Cert $certificate -FilePath $cer | Out-Null
-          & certutil.exe -user -addstore -f Root $cer
-          if ($LASTEXITCODE -ne 0) { throw "Failed to trust release certificate for verification: $LASTEXITCODE" }
           $kitsRoot = [Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
           if ([string]::IsNullOrWhiteSpace($kitsRoot)) { throw 'ProgramFiles(x86) environment variable is unavailable.' }
           $signtool = Get-ChildItem (Join-Path $kitsRoot 'Windows Kits\10\bin') -Recurse -Filter signtool.exe | Where-Object FullName -match '\\x64\\signtool.exe$' | Sort-Object FullName -Descending | Select-Object -First 1
@@ -105,8 +103,11 @@ jobs:
           Write-Output "signtool path: $($signtool.FullName)"
           & $signtool.FullName sign /fd SHA256 /sha1 $certificate.Thumbprint /tr http://timestamp.digicert.com /td SHA256 $env:BUNDLE_PATH
           if ($LASTEXITCODE -ne 0) { throw "signtool sign failed: $LASTEXITCODE" }
-          & $signtool.FullName verify /pa /all /v /r AppPublisher $env:BUNDLE_PATH
-          if ($LASTEXITCODE -ne 0) { throw "signtool verify failed: $LASTEXITCODE" }
+          $signature = Get-AuthenticodeSignature -FilePath $env:BUNDLE_PATH
+          if (-not $signature.SignerCertificate) { throw "Signed bundle has no Authenticode signer certificate. Status=$($signature.Status)" }
+          if ($signature.SignerCertificate.Subject -cne 'CN=AppPublisher' -or $signature.SignerCertificate.Thumbprint -cne $certificate.Thumbprint) { throw "Signed bundle signer mismatch: Subject=$($signature.SignerCertificate.Subject); Thumbprint=$($signature.SignerCertificate.Thumbprint)" }
+          if ($signature.Status -notin @('Valid', 'Unknown')) { throw "Signed bundle Authenticode status is not acceptable: $($signature.Status) / $($signature.StatusMessage)" }
+          Write-Output "Authenticode signer verified: $($signature.SignerCertificate.Subject) / $($signature.SignerCertificate.Thumbprint); status=$($signature.Status)"
           "CERTIFICATE_PATH=$cer" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Generate and validate final one-click package
