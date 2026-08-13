@@ -1,5 +1,3 @@
-# UrbanPlanToolbox v1.5.11
-
 ## 简体中文
 
 - 修复 GitHub 侧载版点击下载并安装后跳转浏览器的问题。

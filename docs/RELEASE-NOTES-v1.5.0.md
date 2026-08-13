@@ -1,31 +1,49 @@
-# UrbanPlanToolbox v1.5.0
-
 ## 简体中文
 
-v1.5.0 新增“图纸版本差异对比器”，用于在本机快速查看两张像素尺寸完全一致的图像版本。
+**新增**
 
-- 支持 PNG、JPG/JPEG 和 PDF 指定页面。
-- 支持半透明叠加和擦除浏览。
-- 支持适配窗口、缩放、平移和叠加结果 PNG 导出。
+- 新增“图纸版本差异对比器”（设计工具 → 详细设计）。
+- 支持在本机比较两张像素尺寸完全一致的 PNG、JPG/JPEG 或 PDF 指定页面图像。
+- 提供半透明叠加和擦除浏览两种查看方式，支持适配窗口、缩放、平移和叠加结果 PNG 导出。
 - 原始 A/B 文件不会被覆盖或修改。
-- 本版本仅发布 GitHub，Microsoft Store 本轮未操作。
+
+**发布说明**
+
+- v1.4.3 未发布工作树中的有效修改与本版本一并进入 v1.5.0。
+- 本版本为 GitHub 正式发布；Microsoft Store 本轮未操作，下一 Store 里程碑为 v2.0.0。
 
 ## 日本語
 
-v1.5.0 では、同一ピクセルサイズの2枚の画像をローカルで確認する「図面バージョン比較」を追加しました。
+**追加**
 
-- PNG、JPG/JPEG、PDF の指定ページに対応。
-- 半透明重ね合わせとワイプ表示に対応。
-- ウィンドウに合わせる、ズーム、パン、重ね合わせ結果 PNG 出力に対応。
+- 「図面バージョン比較」（設計ツール → 詳細設計）を追加しました。
+- 同一ピクセルサイズの PNG、JPG/JPEG、PDF 指定ページをローカルで比較できます。
+- 半透明重ね合わせとワイプ表示、ウィンドウに合わせる、ズーム、パン、重ね合わせ結果 PNG 出力に対応します。
 - 元の A/B ファイルは上書き・変更しません。
-- 本リリースは GitHub のみで、Microsoft Store は操作していません。
+
+**リリースノート**
+
+- 未公開だった v1.4.3 作業ツリーの有効な変更を v1.5.0 に含めています。
+- GitHub 正式版として公開します。今回 Microsoft Store は操作せず、次の Store マイルストーンは v2.0.0 です。
 
 ## English
 
-v1.5.0 adds Drawing Version Comparator for quickly viewing two same-size image versions locally.
+**Added**
 
-- Supports PNG, JPG/JPEG, and selected PDF pages.
-- Provides semi-transparent overlay and wipe browsing.
-- Provides fit-to-window, zoom, pan, and overlay PNG export.
+- Added Drawing Version Comparator under Design Tools → Detailed Design.
+- Compare two local PNG, JPG/JPEG, or selected PDF-page images with identical pixel dimensions.
+- Provides semi-transparent overlay and wipe browsing, fit-to-window, zoom, pan, and overlay PNG export.
 - Original A/B files are never overwritten or modified.
-- This release is GitHub-only; Microsoft Store was not touched.
+
+**Release notes**
+
+- Valid changes from the unpublished v1.4.3 worktree are included in v1.5.0; v1.4.3 is not released separately.
+- This is the formal GitHub release. Microsoft Store was not touched; the next Store milestone is v2.0.0.
+
+**Assets**
+
+- `UrbanPlanToolbox-v1.5.0-x64-framework-dependent-self-signed.zip`
+- `UrbanPlanToolbox_1.5.0.0_x64.msixbundle`
+- `SHA256SUMS.txt`
+
+The sideload package is self-signed and requires the included public certificate. Verify `SHA256SUMS.txt` before installation. Store and GitHub identities remain separate.
