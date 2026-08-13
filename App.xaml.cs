@@ -63,7 +63,7 @@ public partial class App : Application
         _window = MainWindow = new MainWindow(settings.Theme, systemUsesLightTheme);
         StartupTiming.Default.Mark("Startup.WindowCreated");
         StartupTiming.Default.Mark("T4 Root content ready");
-        ThemePreference.Apply((FrameworkElement)_window.Content, settings.Theme);
+        MainWindow.ApplyTheme(settings.Theme);
         StartupTiming.Default.Mark("Startup.ThemeResolved");
         StartupTiming.Default.Mark("T5 Theme ready");
         var startupWorkCompleted = false;

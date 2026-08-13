@@ -5,11 +5,11 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class VisualPolishPackagingTests
 {
     [Fact]
-    public void VersionAndUserAgentAre166()
+    public void VersionAndUserAgentAre167()
     {
         var root = FindRepositoryRoot();
-        Assert.Contains("Version=\"1.6.6.0\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
-        Assert.Contains("<Version>1.6.6</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
+        Assert.Contains("Version=\"1.6.7.0\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
+        Assert.Contains("<Version>1.6.7</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
         Assert.Contains("UrbanPlanToolbox/", File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs")));
     }
 
@@ -32,7 +32,7 @@ public sealed class VisualPolishPackagingTests
         var manifest = File.ReadAllText(Path.Combine(root, "Package.Store.appxmanifest"));
         Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", manifest);
         Assert.Contains("Publisher=\"CN=C4E4B33A-7B77-4121-897C-7D720A5471F8\"", manifest);
-        Assert.Contains("Version=\"1.6.6.0\"", manifest);
+        Assert.Contains("Version=\"1.6.7.0\"", manifest);
         Assert.Contains("<PublisherDisplayName>Jo Kiyō</PublisherDisplayName>", manifest);
         Assert.DoesNotContain("556F80C5-C4D4-452B-93B4-00DE3FA7AC29", manifest, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("PhoneIdentity", manifest, StringComparison.Ordinal);
@@ -97,6 +97,53 @@ public sealed class VisualPolishPackagingTests
         var dark = ReadPngDimensions(Path.Combine(root, "Assets", "Icon-Large-Dark-1024.png"));
         Assert.Equal((1024, 1024), light);
         Assert.Equal(light, dark);
+    }
+
+    [Fact]
+    public void WindowChromeAndShellCandidatesFollowTheirSeparateThemeSources()
+    {
+        var root = FindRepositoryRoot();
+        var window = File.ReadAllText(Path.Combine(root, "MainWindow.xaml.cs"));
+        var project = File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj"));
+
+        Assert.Contains("WindowIconTheme.Resolve", window);
+        Assert.Contains("AppWindow.SetIcon(iconPath)", window);
+        Assert.Contains("AppTitleBar.IconSource", window);
+        Assert.Contains("PreferredTheme", window);
+        Assert.Contains("ColorValuesChanged", window);
+        Assert.Contains("WindowIcon-ForDarkTheme.ico", project);
+        Assert.Contains("WindowIcon-ForLightTheme.ico", project);
+
+        foreach (var size in new[] { 16, 20, 24, 30, 32, 36, 40, 44, 48, 60, 64, 72, 80, 96, 256 })
+        {
+            var darkShell = Path.Combine(root, "Assets", $"Square44x44Logo.targetsize-{size}_altform-unplated.png");
+            var lightShell = Path.Combine(root, "Assets", $"Square44x44Logo.targetsize-{size}_altform-unplated_theme-light.png");
+            Assert.True(File.Exists(darkShell), $"Missing default/Dark Shell candidate: {Path.GetFileName(darkShell)}");
+            Assert.True(File.Exists(lightShell), $"Missing Light Shell candidate: {Path.GetFileName(lightShell)}");
+            Assert.Equal(ReadPngDimensions(darkShell), ReadPngDimensions(lightShell));
+        }
+
+        Assert.True(File.Exists(Path.Combine(root, "Assets", "WindowIcon-ForDarkTheme.ico")));
+        Assert.True(File.Exists(Path.Combine(root, "Assets", "WindowIcon-ForLightTheme.ico")));
+    }
+
+    [Fact]
+    public void ThemeAssetConventionDocumentsAppAndShellMappings()
+    {
+        var root = FindRepositoryRoot();
+        var convention = File.ReadAllText(Path.Combine(root, "docs", "ASSET-CONVENTIONS.md"));
+        var mapping = File.ReadAllText(Path.Combine(root, "Services", "WindowIconTheme.cs"));
+        var generator = File.ReadAllText(Path.Combine(root, "scripts", "Generate-ThemeIconAssets.ps1"));
+
+        foreach (var required in new[] { "Theme names describe the target environment", "App Dark Theme", "App Light Theme", "Windows Shell Dark Theme", "Windows Shell Light Theme", "theme-light", "ForDarkShellTheme", "ForLightShellTheme", "Dark target environment", "Light target environment" })
+            Assert.Contains(required, convention);
+        Assert.Contains("IconForDarkThemeRelativePath", mapping);
+        Assert.Contains("IconForLightThemeRelativePath", mapping);
+        Assert.Contains("WhiteIconSourceRelativePath", mapping);
+        Assert.Contains("BlackIconSourceRelativePath", mapping);
+        Assert.Contains("$forDarkShellTheme", generator);
+        Assert.Contains("$forLightShellTheme", generator);
+        Assert.Contains("$blackSource", generator);
     }
 
     [Fact]

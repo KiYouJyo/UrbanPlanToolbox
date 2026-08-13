@@ -1,0 +1,14 @@
+{
+  "version": "1.6.7",
+  "locales": {
+    "zh-CN": [
+      "修复浅色和深色主题下的应用图标与标题栏显示问题，优化任务栏、开始菜单和窗口标题栏图标的主题适配与清晰度。"
+    ],
+    "ja-JP": [
+      "ライト / ダークテーマにおけるアプリアイコンとタイトルバー表示を修正し、タスクバー、スタートメニュー、タイトルバーのテーマ対応と視認性を改善しました。"
+    ],
+    "en-US": [
+      "Fixed icon and title-bar appearance across light and dark themes, improving theme-aware rendering and visibility in the taskbar, Start menu, and application title bar."
+    ]
+  }
+}

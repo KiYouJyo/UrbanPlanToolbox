@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Graphics;
 using UrbanPlanToolbox.Models.Interaction;
 using UrbanPlanToolbox.Services;
@@ -26,6 +27,8 @@ public sealed partial class MainWindow : Window
     private readonly LocalizationService _localization = LocalizationService.Default;
     private readonly FirstRunExperienceService _firstRunExperience = FirstRunExperienceService.Default;
     private readonly WindowPlacementService _windowPlacement = new();
+    private readonly Windows.UI.ViewManagement.UISettings _uiSettings = new();
+    private string? _themePreference;
     private UIElement? _focusBeforeFirstRunGuide;
     private bool _firstRunGuideShowing;
     private bool _shellInitialized;
@@ -49,8 +52,9 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
 
-        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "UrbanPlanToolbox.ico");
-        AppWindow.SetIcon(iconPath);
+        _themePreference = startupThemePreference;
+        ApplyWindowChromeTheme(WindowIconTheme.Resolve(_themePreference, systemUsesLightTheme));
+        _uiSettings.ColorValuesChanged += OnSystemColorValuesChanged;
         RestoreWindowPlacement();
         AppWindow.Changed += OnAppWindowChanged;
         Closed += OnWindowClosed;
@@ -59,6 +63,8 @@ public sealed partial class MainWindow : Window
         StartupTiming.Default.Mark("Startup.MicaReady");
 
         var splashTheme = StartupSplashPresentation.ResolveTheme(startupThemePreference, systemUsesLightTheme);
+        // Existing XAML names are retained to avoid changing the accepted asset surface;
+        // they represent the target app theme, not the glyph color.
         _selectedStartupLogo = splashTheme == StartupSplashTheme.Light ? StartupLightLogo : StartupDarkLogo;
         StartupDarkLogo.Visibility = splashTheme == StartupSplashTheme.Dark ? Visibility.Visible : Visibility.Collapsed;
         StartupLightLogo.Visibility = splashTheme == StartupSplashTheme.Light ? Visibility.Visible : Visibility.Collapsed;
@@ -105,9 +111,40 @@ public sealed partial class MainWindow : Window
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         AppWindow.Changed -= OnAppWindowChanged;
+        _uiSettings.ColorValuesChanged -= OnSystemColorValuesChanged;
         Closed -= OnWindowClosed;
         try { _windowPlacement.Save(_lastNormalWindowSize, _wasWindowMaximized); }
         catch (Exception exception) { AppLogger.Default.Error("WindowPlacement", "SaveFailed", exception, "Could not save window placement."); }
+    }
+
+    /// <summary>Applies the app theme and synchronizes only runtime window chrome.</summary>
+    public void ApplyTheme(string? preference)
+    {
+        _themePreference = preference;
+        ThemePreference.Apply(Content as FrameworkElement, preference);
+        ApplyWindowChromeTheme(WindowIconTheme.Resolve(preference, SystemUsesLightTheme()));
+    }
+
+    private void OnSystemColorValuesChanged(Windows.UI.ViewManagement.UISettings sender, object args)
+    {
+        if (SettingsService.NormalizeTheme(_themePreference) != AppTheme.System) return;
+        DispatcherQueue.TryEnqueue(() => ApplyWindowChromeTheme(WindowIconTheme.Resolve(_themePreference, SystemUsesLightTheme())));
+    }
+
+    private bool SystemUsesLightTheme()
+    {
+        var background = _uiSettings.GetColorValue(Windows.UI.ViewManagement.UIColorType.Background);
+        return (0.2126 * background.R) + (0.7152 * background.G) + (0.0722 * background.B) >= 128;
+    }
+
+    private void ApplyWindowChromeTheme(AppTheme resolvedTheme)
+    {
+        var iconPath = Path.Combine(AppContext.BaseDirectory, WindowIconTheme.GetIconRelativePath(resolvedTheme));
+        AppWindow.SetIcon(iconPath);
+        AppTitleBar.IconSource = new ImageIconSource { ImageSource = new BitmapImage(new Uri(WindowIconTheme.GetLogoUri(resolvedTheme))) };
+
+        if (!AppWindowTitleBar.IsCustomizationSupported()) return;
+        AppWindow.TitleBar.PreferredTheme = resolvedTheme == AppTheme.Dark ? TitleBarTheme.Dark : TitleBarTheme.Light;
     }
 
     private void OnRootLayoutLoaded(object sender, RoutedEventArgs e)

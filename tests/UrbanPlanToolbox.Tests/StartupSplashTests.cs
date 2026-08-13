@@ -25,10 +25,10 @@ public sealed class StartupSplashTests
     }
 
     [Theory]
-    [InlineData("Dark", true, StartupSplashTheme.Dark, StartupSplashPresentation.DarkLogoAssetUri)]
-    [InlineData("Light", false, StartupSplashTheme.Light, StartupSplashPresentation.LightLogoAssetUri)]
-    [InlineData("System", false, StartupSplashTheme.Dark, StartupSplashPresentation.DarkLogoAssetUri)]
-    [InlineData("System", true, StartupSplashTheme.Light, StartupSplashPresentation.LightLogoAssetUri)]
+    [InlineData("Dark", true, StartupSplashTheme.Dark, StartupSplashPresentation.LogoForDarkThemeAssetUri)]
+    [InlineData("Light", false, StartupSplashTheme.Light, StartupSplashPresentation.LogoForLightThemeAssetUri)]
+    [InlineData("System", false, StartupSplashTheme.Dark, StartupSplashPresentation.LogoForDarkThemeAssetUri)]
+    [InlineData("System", true, StartupSplashTheme.Light, StartupSplashPresentation.LogoForLightThemeAssetUri)]
     public void ThemeSelectionUsesPersistedPreferenceOrSystemFallback(string preference, bool systemUsesLightTheme, StartupSplashTheme expectedTheme, string expectedAsset)
     {
         var theme = StartupSplashPresentation.ResolveTheme(preference, systemUsesLightTheme);
@@ -39,7 +39,7 @@ public sealed class StartupSplashTests
     [Fact]
     public void ThemeAssetsUseTheMatchingLargeLogoPair()
     {
-        Assert.Equal("ms-appx:///Assets/Icon-Large-Dark-1024.png", StartupSplashPresentation.DarkLogoAssetUri);
-        Assert.Equal("ms-appx:///Assets/Icon-Large-Light-1024.png", StartupSplashPresentation.LightLogoAssetUri);
+        Assert.Equal("ms-appx:///Assets/Icon-Large-Dark-1024.png", StartupSplashPresentation.LogoForDarkThemeAssetUri);
+        Assert.Equal("ms-appx:///Assets/Icon-Large-Light-1024.png", StartupSplashPresentation.LogoForLightThemeAssetUri);
     }
 }

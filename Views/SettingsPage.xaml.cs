@@ -87,7 +87,7 @@ public sealed partial class SettingsPage : Page
     private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
     private void OnReopenFirstRunGuide(object sender, RoutedEventArgs e) => App.MainWindow?.ShowFirstRunGuideFromSettings();
     private static void ConfigureAccessibility(FrameworkElement control, string name, string helpText) { AutomationProperties.SetName(control, name); AutomationProperties.SetHelpText(control, helpText); }
-    private static void ApplyTheme(string theme) => ThemePreference.Apply(App.MainWindow?.Content as FrameworkElement, theme);
+    private static void ApplyTheme(string theme) => App.MainWindow?.ApplyTheme(theme);
     private async void OnMilestoneNotificationsToggled(object sender, RoutedEventArgs e)
     {
         if (_isApplying) return;
