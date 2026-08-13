@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.2",
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.6.2", "items": ["Stable GitHub update card fields.", "Keep version and release-note metadata during checking, downloading, and ReadyToInstall.", "GitHub-only release; not submitted to Microsoft Store."] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.6.2", "items": ["Stable GitHub update card fields.", "Keep version and release-note metadata during checking, downloading, and ReadyToInstall.", "GitHub-only release; not submitted to Microsoft Store."] },
+    "en-US": { "title": "UrbanPlanToolbox v1.6.2", "items": ["Stabilized the GitHub update-management card layout.", "Preserved version and release-note metadata during checking, downloading, and ReadyToInstall.", "GitHub-only release; not submitted to the Microsoft Store."] }
+  }
+}

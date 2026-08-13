@@ -231,7 +231,7 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public void AboutPageUsesNativeProgressRingsOnlyWhileChecking()
+    public void AboutPageKeepsUpdateFieldsStableAndScopesProgressRingsToChecking()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
@@ -243,6 +243,11 @@ public sealed class AppUpdateTests
         Assert.Contains("var checking = info.State == AppUpdateState.Checking", code, StringComparison.Ordinal);
         Assert.Contains("UpdateTargetProgressRing.IsActive = checking", code, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesProgressRing.IsActive = checking", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateTargetLabel.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateTargetText.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateNotesLabel.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateNotesContainer.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateNotesText.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateTargetProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
     }
@@ -272,6 +277,23 @@ public sealed class AppUpdateTests
         Assert.Equal(AppUpdateState.UpToDate, info.State);
         Assert.Equal(expectedVersion, info.AvailableVersion);
         Assert.False(info.IsUpdateAvailable);
+    }
+
+    [Fact]
+    public async Task CheckRetainsReleaseMetadataWhileChecking()
+    {
+        var service = new BlockingUpdateService();
+        var viewModel = new UpdateViewModel(service);
+        await viewModel.CheckAsync();
+        var check = viewModel.CheckAsync();
+
+        await service.Started;
+        Assert.Equal(AppUpdateState.Checking, viewModel.Info.State);
+        Assert.Equal("1.6.2", viewModel.Info.AvailableVersion);
+        Assert.Equal("latest notes", viewModel.Info.ReleaseNotes);
+
+        service.Release();
+        await check;
     }
 
     [Fact]
@@ -310,6 +332,16 @@ public sealed class AppUpdateTests
         var source = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
         foreach (var field in new[] { "AppVersion=", "StoreState=", "PackageDownloadProgress=", "TotalDownloadProgress=", "PackageBytesDownloaded=", "PackageDownloadSizeInBytes=", "MappedAppState=", "MappedUiProgress=", "ProgressSource=" })
             Assert.Contains(field, source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StoreUpdatePresentationKeepsVersionAndSourceWhenNoPackageUpdateExists()
+    {
+        var root = FindRepositoryRoot();
+        var source = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
+        Assert.Contains("AppUpdateState.UpToDate, AvailableVersion: AppVersionProvider.Version", source, StringComparison.Ordinal);
+        Assert.Contains("Source: UpdateInstallSource.Store", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("AppUpdateState.UpToDate, Source: UpdateInstallSource.Unknown", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -354,7 +386,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.6.1", viewModel.CurrentVersion);
+        Assert.Equal("v1.6.2", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -368,7 +400,7 @@ public sealed class AppUpdateTests
         Assert.Contains("UpdateVersionText.Text = AppVersionProvider.DisplayVersion", source, StringComparison.Ordinal);
         Assert.DoesNotContain("UpdateVersionText.Text = info.AvailableVersion", source, StringComparison.Ordinal);
         Assert.DoesNotContain("UpdateVersionText.Text = info.Version", source, StringComparison.Ordinal);
-        Assert.Contains("info.State == AppUpdateState.UpdateAvailable && !string.IsNullOrWhiteSpace(info.AvailableVersion)", source, StringComparison.Ordinal);
+        Assert.Contains("string.IsNullOrWhiteSpace(info.AvailableVersion)", source, StringComparison.Ordinal);
         Assert.Contains("UpdateTargetLabel.Visibility", source, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesLabel.Visibility", source, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesContainer.Visibility", source, StringComparison.Ordinal);
@@ -448,6 +480,33 @@ internal sealed class FixedUpdateService(AppUpdateState resultState, string avai
 
     public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(new AppUpdateResult(resultState));
+}
+
+internal sealed class BlockingUpdateService : IAppUpdateService
+{
+    private int _calls;
+    private readonly TaskCompletionSource _started = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource _release = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    public Task Started => _started.Task;
+
+    public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default)
+    {
+        if (Interlocked.Increment(ref _calls) == 1)
+            return Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, AvailableVersion: "1.6.2", ReleaseNotes: "latest notes"));
+        _started.TrySetResult();
+        return WaitAsync(cancellationToken);
+    }
+
+    private async Task<AppUpdateInfo> WaitAsync(CancellationToken cancellationToken)
+    {
+        await _release.Task.WaitAsync(cancellationToken);
+        return new(AppUpdateState.UpToDate, AvailableVersion: "1.6.2", ReleaseNotes: "latest notes");
+    }
+
+    public void Release() => _release.TrySetResult();
+
+    public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateResult(AppUpdateState.Failed));
 }
 
 internal sealed class InstallResultUpdateService(AppUpdateState resultState) : IAppUpdateService

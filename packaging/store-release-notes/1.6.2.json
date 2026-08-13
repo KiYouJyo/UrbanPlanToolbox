@@ -1,0 +1,8 @@
+{
+  "version": "1.6.2",
+  "locales": {
+    "zh-CN": ["Shared update-card presentation was stabilized for the GitHub-only v1.6.2 candidate. This file is packaging metadata only; no Microsoft Store submission was made."],
+    "ja-JP": ["Shared update-card presentation was stabilized for the GitHub-only v1.6.2 candidate. This file is packaging metadata only; no Microsoft Store submission was made."],
+    "en-US": ["Shared update-card presentation was stabilized for the GitHub-only v1.6.2 candidate. This file is packaging metadata only; no Microsoft Store submission was made."]
+  }
+}

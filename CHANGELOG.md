@@ -1,5 +1,18 @@
 # 更改日志
 
+## 1.6.2
+
+### Fixed
+
+- GitHub update-management cards now keep their fields and release metadata stable while checking, downloading, and waiting for installation.
+- Inline progress indicators remain attached to their corresponding update fields.
+- GitHub UpToDate results now retain the latest Release Notes for display.
+
+### Release boundary
+
+- GitHub-only candidate; Microsoft Store submission is not included.
+- Formal release and v1.6.1 to v1.6.2 acceptance remain pending.
+
 ## 1.6.1
 
 ### Fixed
