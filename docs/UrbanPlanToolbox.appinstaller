@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2" xmlns:s4="http://schemas.microsoft.com/appx/appinstaller/2021" Version="1.5.10.0" Uri="https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller">
-  <MainBundle Name="556F80C5-C4D4-452B-93B4-00DE3FA7AC29" Publisher="CN=AppPublisher" Version="1.5.10.0" Uri="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/download/v1.5.10/UrbanPlanToolbox_1.5.10.0_x64.msixbundle" />
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2" xmlns:s4="http://schemas.microsoft.com/appx/appinstaller/2021" Version="1.5.11.0" Uri="https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller">
+  <MainBundle Name="556F80C5-C4D4-452B-93B4-00DE3FA7AC29" Publisher="CN=AppPublisher" Version="1.5.11.0" Uri="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/download/v1.5.11/UrbanPlanToolbox_1.5.11.0_x64.msixbundle" />
 </AppInstaller>
