@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.3",
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.6.3", "items": ["修复 GitHub 更新状态机中的延迟进度回调竞态。", "新增更新验证状态，并在下载完成后稳定显示“重启并更新”。", "修复更新管理卡片占位符和多语言更新说明显示。"] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.6.3", "items": ["GitHub 更新の状態遷移で遅延した進捗コールバックが競合する問題を修正しました。", "更新の検証状態を追加し、ダウンロード後に「再起動して更新」を安定して表示します。", "更新管理カードのプレースホルダーと多言語の更新内容表示を修正しました。"] },
+    "en-US": { "title": "UrbanPlanToolbox v1.6.3", "items": ["Fixed delayed progress-callback races in the GitHub update state machine.", "Added a verifying state and reliably exposes Restart and update after download completion.", "Fixed update-card placeholders and localized release-note display."] }
+  }
+}
