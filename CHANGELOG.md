@@ -10,7 +10,7 @@
 
 ### Release boundary
 
-- v1.6.7 is prepared for coordinated GitHub Releases and Microsoft Store publication.
+- GitHub Release v1.6.7 is published; Microsoft Store v1.6.7 is submitted for certification.
 
 ## 1.6.6
 
