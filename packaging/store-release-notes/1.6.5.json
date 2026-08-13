@@ -1,0 +1,8 @@
+{
+  "version": "1.6.5",
+  "notes": {
+    "zh-CN": "修复 GitHub MSIXBundle 签名验证；本包仅用于验收，不提交 Microsoft Store。",
+    "ja-JP": "GitHub MSIXBundle の署名検証を修正しました。このパッケージは受け入れ確認専用で、Microsoft Store には提出しません。",
+    "en-US": "Fixed GitHub MSIXBundle signature verification. This package is for acceptance only and will not be submitted to Microsoft Store."
+  }
+}

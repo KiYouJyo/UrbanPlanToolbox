@@ -42,12 +42,12 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
         {
             cancellationToken.ThrowIfCancellationRequested();
             var bundleName = $"UrbanPlanToolbox_{_pendingRelease.TagName.TrimStart('v')}.0_x64.msixbundle";
-            var bundlePath = await _updateService.DownloadAndVerifyBundleAsync(_pendingRelease, bundleName, progress, cancellationToken);
-            if (bundlePath is null) return new(AppUpdateState.Failed, "BundleVerificationFailed");
+            var bundleVerification = await _updateService.DownloadAndVerifyBundleAsync(_pendingRelease, bundleName, progress, cancellationToken);
+            if (bundleVerification.BundlePath is null) return new(AppUpdateState.Failed, bundleVerification.FailureCode ?? "BundleVerificationFailed");
 
             progress?.Report(new(AppUpdateState.Verifying, Detail: "Bundle verification completed"));
-            _pendingBundlePath = bundlePath;
-            SavePendingState(_pendingRelease.TagName, bundlePath);
+            _pendingBundlePath = bundleVerification.BundlePath;
+            SavePendingState(_pendingRelease.TagName, bundleVerification.BundlePath);
             progress?.Report(new(AppUpdateState.ReadyToInstall, Detail: "Verified; ready to install"));
             return new(AppUpdateState.ReadyToInstall, "ReadyToInstall", "Verified; ready to install");
         }
