@@ -14,6 +14,9 @@ public sealed class AppSettings
     public bool? ProjectMilestoneNotificationsEnabled { get; set; }
     public MilestoneReminderRepeatInterval ProjectMilestoneReminderRepeatInterval { get; set; } = MilestoneReminderRepeatInterval.None;
     public List<string> FavoriteToolIds { get; set; } = [];
+    public int? LastNormalWindowWidth { get; set; }
+    public int? LastNormalWindowHeight { get; set; }
+    public bool WasWindowMaximized { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore]
     public bool IsProjectMilestoneNotificationsEnabled =>

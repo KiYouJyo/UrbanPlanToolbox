@@ -57,9 +57,14 @@ public partial class App : Application
         LocalizationService.Default.ApplyPersistedLanguage(settings);
         StartupTiming.Default.Mark("T7 Language applied");
         StartupTiming.Default.Mark("T2 MainWindow creation start");
-        _window = MainWindow = new MainWindow();
+        var systemBackground = new Windows.UI.ViewManagement.UISettings()
+            .GetColorValue(Windows.UI.ViewManagement.UIColorType.Background);
+        var systemUsesLightTheme = (0.2126 * systemBackground.R) + (0.7152 * systemBackground.G) + (0.0722 * systemBackground.B) >= 128;
+        _window = MainWindow = new MainWindow(settings.Theme, systemUsesLightTheme);
+        StartupTiming.Default.Mark("Startup.WindowCreated");
         StartupTiming.Default.Mark("T4 Root content ready");
         ThemePreference.Apply((FrameworkElement)_window.Content, settings.Theme);
+        StartupTiming.Default.Mark("Startup.ThemeResolved");
         StartupTiming.Default.Mark("T5 Theme ready");
         var startupWorkCompleted = false;
         MainWindow!.ShellReady += (_, _) =>
@@ -67,6 +72,7 @@ public partial class App : Application
             if (startupWorkCompleted) MainWindow?.ShowFirstRunGuideIfNeeded();
         };
         _window.Activate();
+        StartupTiming.Default.Mark("Startup.WindowActivated");
         StartupTiming.Default.Mark("T8 Activate called");
         // Defer disk and notification work until a complete first frame is available.
         _window.DispatcherQueue.TryEnqueue(async () =>

@@ -11,4 +11,7 @@ public static class SettingsKeys
     public const string ProjectMilestoneNotificationsEnabled = "ProjectMilestoneNotificationsEnabled";
     public const string ProjectMilestoneReminderRepeatInterval = "ProjectMilestoneReminderRepeatInterval";
     public const string FavoriteToolIds = "FavoriteToolIds";
+    public const string LastNormalWindowWidth = "LastNormalWindowWidth";
+    public const string LastNormalWindowHeight = "LastNormalWindowHeight";
+    public const string WasWindowMaximized = "WasWindowMaximized";
 }

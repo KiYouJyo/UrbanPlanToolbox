@@ -2,6 +2,8 @@ namespace UrbanPlanToolbox.Services;
 
 public static class DistributionChannelIdentity
 {
+    public const string GitHubSideloadName = "556F80C5-C4D4-452B-93B4-00DE3FA7AC29";
+    public const string GitHubSideloadPublisher = "CN=AppPublisher";
     public const string StoreName = "JoKiy.UrbanPlanToolbox";
     public const string StorePublisher = "CN=C4E4B33A-7B77-4121-897C-7D720A5471F8";
 

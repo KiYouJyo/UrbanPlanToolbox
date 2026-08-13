@@ -1,5 +1,19 @@
 # 更改日志
 
+## 1.6.6
+
+### Changed
+
+- Improved visual continuity between the startup overlay and the main-window Mica backdrop.
+- Kept the startup logo visible for at least 500 ms on fast launches, while longer initialization naturally extends the presentation.
+- Refined the startup fade-out transition.
+- Unified Light and Dark startup-logo sizing, sharpness, and DPI behavior.
+- Persist the last normal window size and maximized state, with safe restoration when the display work area changes.
+
+### Release boundary
+
+- Released through GitHub Releases only; Microsoft Store is not part of this release.
+
 ## 1.6.5
 
 ### Fixed

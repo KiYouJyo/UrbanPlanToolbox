@@ -22,8 +22,8 @@ public sealed class GitHubUpdateServiceTests
     [Fact]
     public void UnpackagedDevelopmentDoesNotPretendToBeAGitHubInstall()
     {
-        Assert.Equal("1.6.5", AppVersionProvider.Version);
-        Assert.Equal("v1.6.5", AppVersionProvider.DisplayVersion);
+        Assert.Equal("1.6.6", AppVersionProvider.Version);
+        Assert.Equal("v1.6.6", AppVersionProvider.DisplayVersion);
         Assert.Equal(DistributionChannel.Development, DistributionChannelProvider.Current);
         Assert.False(DistributionChannelProvider.UsesGitHubUpdates);
     }
@@ -73,7 +73,7 @@ public sealed class GitHubUpdateServiceTests
     {
         var handler = new StubHandler(HttpStatusCode.OK, ReleaseJson("v0.3.9"));
         await new GitHubUpdateService(new HttpClient(handler)).CheckForUpdatesAsync(new Version(0, 3, 8, 0));
-        Assert.Equal("UrbanPlanToolbox/1.6.5", handler.UserAgent);
+        Assert.Equal("UrbanPlanToolbox/1.6.6", handler.UserAgent);
     }
 
     [Theory]

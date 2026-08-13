@@ -16,6 +16,7 @@ public sealed class StartupTiming
         if (string.IsNullOrWhiteSpace(name)) return;
         var point = new StartupTimingPoint(name, _clock.ElapsedMilliseconds, Environment.CurrentManagedThreadId);
         lock (_gate) _points.Add(point);
+        AppLogger.Default.Info("Startup", name, $"elapsedMs={point.ElapsedMilliseconds}; threadId={point.ThreadId}");
 #if DEBUG
         Debug.WriteLine($"UrbanPlanToolbox startup {point.Name}: {point.ElapsedMilliseconds} ms, thread {point.ThreadId}");
 #endif
