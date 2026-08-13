@@ -18,10 +18,10 @@
     <Nullable>enable</Nullable>
     <!-- Never let generated test outputs participate in WinUI PRI resource discovery. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);tests\**\*</DefaultItemExcludes>
-    <Version>1.6.6</Version>
-    <AssemblyVersion>1.6.6</AssemblyVersion>
-    <FileVersion>1.6.6</FileVersion>
-    <InformationalVersion>1.6.6</InformationalVersion>
+    <Version>1.6.7</Version>
+    <AssemblyVersion>1.6.7</AssemblyVersion>
+    <FileVersion>1.6.7</FileVersion>
+    <InformationalVersion>1.6.7</InformationalVersion>
     <DefineConstants Condition="'$(DistributionChannel)' == 'Store'">$(DefineConstants);URBANPLANTOOLBOX_STORE</DefineConstants>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <!-- The preview is a single offline MSIX: language candidates stay in its main PRI. -->
@@ -45,6 +45,8 @@
     <Content Include="Assets\Square44x44Logo*.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\UrbanPlanToolbox.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Assets\WindowIcon-ForDarkTheme.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Assets\WindowIcon-ForLightTheme.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- Store builds use an isolated, Partner Center-associated package manifest. -->

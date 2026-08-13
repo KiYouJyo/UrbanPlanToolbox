@@ -1,5 +1,17 @@
 # 更改日志
 
+## 1.6.7
+
+### Fixed
+
+- Corrected title-bar, taskbar, and Start-menu icon contrast for Light and Dark themes.
+- Separated app-theme window chrome from Windows Shell package-icon resource selection.
+- Added theme-specific icon resources across packaged DPI and target-size variants.
+
+### Release boundary
+
+- v1.6.7 is prepared for coordinated GitHub Releases and Microsoft Store publication.
+
 ## 1.6.6
 
 ### Changed

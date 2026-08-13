@@ -83,6 +83,7 @@
   <Compile Include="../../Services/AppLogger.cs" Link="Services/AppLogger.cs" />
   <Compile Include="../../Services/StartupTiming.cs" Link="Services/StartupTiming.cs" />
   <Compile Include="../../Services/StartupSplashPresentation.cs" Link="Services/StartupSplashPresentation.cs" />
+  <Compile Include="../../Services/WindowIconTheme.cs" Link="Services/WindowIconTheme.cs" />
   <Compile Include="../../Services/StartupSplashTiming.cs" Link="Services/StartupSplashTiming.cs" />
   <Compile Include="../../Services/WindowPlacementService.cs" Link="Services/WindowPlacementService.cs" />
   <Compile Include="../../Services/StartupPipeline.cs" Link="Services/StartupPipeline.cs" />

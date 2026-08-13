@@ -9,8 +9,12 @@ public enum StartupSplashTheme
 /// <summary>Resolves the startup artwork before the main visual tree is displayed.</summary>
 public static class StartupSplashPresentation
 {
-    public const string DarkLogoAssetUri = "ms-appx:///Assets/Icon-Large-Dark-1024.png";
-    public const string LightLogoAssetUri = "ms-appx:///Assets/Icon-Large-Light-1024.png";
+    // Historical file names remain for package stability. Semantic names describe
+    // the target app theme: Dark uses the white source and Light the black source.
+    private const string WhiteLogoSourceUri = "ms-appx:///Assets/Icon-Large-Dark-1024.png";
+    private const string BlackLogoSourceUri = "ms-appx:///Assets/Icon-Large-Light-1024.png";
+    public const string LogoForDarkThemeAssetUri = WhiteLogoSourceUri;
+    public const string LogoForLightThemeAssetUri = BlackLogoSourceUri;
 
     public static StartupSplashTheme ResolveTheme(string? preference, bool systemUsesLightTheme) =>
         SettingsService.NormalizeTheme(preference) switch
@@ -21,7 +25,7 @@ public static class StartupSplashPresentation
         };
 
     public static string GetLogoAssetUri(StartupSplashTheme theme) =>
-        theme == StartupSplashTheme.Light ? LightLogoAssetUri : DarkLogoAssetUri;
+        theme == StartupSplashTheme.Light ? LogoForLightThemeAssetUri : LogoForDarkThemeAssetUri;
 
     // The light artwork has a square canvas. This size preserves the visible
     // bounds of the existing 200%-scale native splash artwork at 100% display scale.
