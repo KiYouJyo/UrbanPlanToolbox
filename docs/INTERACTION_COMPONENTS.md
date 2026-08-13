@@ -1,10 +1,9 @@
-# 通用交互组件
+# 通用交互组件合同
 
-v0.3.10 将窗口级交互收敛为小型、可测试的服务，而不替换已验收的项目业务规则。
+`AppDialogService` serializes `ContentDialog` presentation against the current `XamlRoot`. `AppNotificationService` presents host-window success, warning, and error notifications without user payload, tokens, certificates, or private keys. `AsyncOperationRunner` prevents duplicate work for a stable operation key and retains `Idle`, `Running`, `Succeeded`, `Failed`, and `Canceled` states. `UnsavedChangesGuard` requires a real save, discard, or cancel decision before leaving modified content.
 
-- `AppDialogService` 以当前 `XamlRoot` 串行显示 `ContentDialog`；不可用或已关闭的根安全返回，不允许多个对话框并发。
-- `AppNotificationService` 向主窗口通知宿主发布信息、成功、警告和错误；相同内容在短窗口内去重。错误通知默认保留，通知不得含项目正文、授权 token、证书或私钥。
-- `AsyncOperationRunner` 对单个稳定操作键拒绝重复执行，并保留 Idle、Running、Succeeded、Failed、Canceled 状态；不同键互不阻塞。
-- `UnsavedChangesGuard` 只在页面确有修改时请求“保存并继续、放弃、取消”，并且保存失败时不允许离开。
+Pages delegate generic confirmation, notification, and operation state to these services while retaining domain validation in their respective pages or services. New visible text must be present in all three RESW catalogs and interactive controls require accessible names.
 
-页面只把通用确认、通知和执行状态交给这些服务。项目字段、导入格式、删除名称校验及业务验证仍在各自页面或服务中。新增可见文字必须同步三套 RESW，并为交互控件提供可访问名称。
+## Tool Page state target
+
+`Idle`, `Loading`, `Success`, `Warning`, `Error`, `Empty`, and `Disabled` are the target design contract for tool-page state presentation. This is planned standardization, not a claim that every existing page already uses one implementation.

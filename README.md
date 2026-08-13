@@ -31,7 +31,7 @@
 
 ### 后续更新
 
-在应用中打开“关于”→“检查更新”。GitHub 版本会通过 Windows App Installer 下载并安装后续版本；Microsoft Store 版本继续由 Microsoft Store 管理。
+在应用中打开“关于”→“检查更新”。GitHub 版本可在应用内检查并下载正式更新；应用会验证下载包的完整性与签名，并在准备完成后由用户执行重启更新。Microsoft Store 版本继续使用 Store 更新渠道。
 
 ### 高级安装
 
@@ -57,6 +57,7 @@ Windows 10 17763 或更高版本，x64。
 
 - [路线图与版本政策](docs/ROADMAP.md)
 - [发布指南](docs/RELEASE.md)
+- [文档治理与当前状态](docs/DOCUMENTATION.md)
 - [数据存储](docs/DATA_STORAGE.md) · [数据备份](docs/DATA_BACKUP.md)
 - [更改日志](CHANGELOG.md)
 - [隐私政策](PRIVACY.md) · [第三方声明](THIRD-PARTY-NOTICES.md)

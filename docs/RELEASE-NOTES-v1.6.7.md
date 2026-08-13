@@ -10,7 +10,7 @@ UrbanPlanToolbox v1.6.7 主要修复应用图标和标题栏在浅色、深色�
 - 明确区分应用主题和 Windows Shell 主题，避免不同主题组合下出现错误图标。
 - 完善黑白图标在不同 DPI 和资源尺寸下的一致性。
 
-v1.6.7 同时通过 GitHub Releases 和 Microsoft Store 发布。
+v1.6.7 已通过 GitHub Releases 发布，并已提交 Microsoft Store 认证。Microsoft Store 是否公开以实际认证和商店可用状态为准。
 
 ## 日本語
 
@@ -24,7 +24,7 @@ UrbanPlanToolbox v1.6.7 では、ライト / ダークテーマにおけるア�
 - アプリテーマと Windows Shell テーマを明確に分離しました。
 - DPI とアイコンサイズごとの表示一貫性を改善しました。
 
-v1.6.7 は GitHub Releases と Microsoft Store の両方で公開します。
+v1.6.7 は GitHub Releases で公開され、Microsoft Store の認証に提出されています。Microsoft Store での公開は、実際の認証結果とストアでの利用可否を基準とします。
 
 ## English
 
@@ -38,4 +38,4 @@ UrbanPlanToolbox v1.6.7 improves icon and title-bar consistency across light and
 - Clearly separated app-theme behavior from Windows Shell theme behavior.
 - Improved icon consistency across DPI scales and resource sizes.
 
-v1.6.7 is released through both GitHub Releases and Microsoft Store.
+v1.6.7 is published through GitHub Releases and submitted for Microsoft Store certification. Microsoft Store publication is determined by the actual certification result and Store availability.

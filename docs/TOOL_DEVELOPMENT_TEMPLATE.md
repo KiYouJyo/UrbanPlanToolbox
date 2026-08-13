@@ -15,6 +15,12 @@ Each production tool must be implemented through this checklist; do not add an u
 11. Add contract tests for ID uniqueness, categories, page routing, all three resource sets, search, favorites, path safety, data round-trip, recovery, future-schema refusal, and backup contents.
 12. Validate Debug/Release x64, a signed non-development MSIX, and manual UI/data-loop acceptance before release.
 
+## Tool Page Design System target
+
+For new tools and migrations, target a consistent Header, Description / Notice, Input Card, Parameter Card, Action Bar, Result Card, Export Actions, and Status / Error area. This is a new-tool target and migration target, not a claim that every existing tool already implements it.
+
+Assess project-context readiness, responsive breakpoints, keyboard access, accessibility, DPI behavior, dependency impact, startup impact, and package-size impact. A heavy native dependency requires a documented purpose and benefit.
+
 `color-palette-recorder` is the first real implementation of this template. `workflow-review-checklist` is the second real sample and validates a pure structured-data tool with multiple placements. `architecture-planning-regulations-index` is the third sample and validates a read-only packaged catalog with development-time import and official-link boundaries. Both schemas are intentionally separate from `ProjectSchemaVersion`; the portable container remains `BackupFormatVersion = 1`.
 
 `design-concept-dictionary` is the fourth sample: it validates an offline editable dictionary with independent schema version 1, deep-copy editing/duplication, generic editable tag lists, and backup validation without attachments.

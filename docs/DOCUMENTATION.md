@@ -77,3 +77,32 @@ RELIABILITY 定义启动、异步操作、更新、日志、数据恢复和发�
 ## 7. 当前治理目标
 
 当前阶段不推进新的产品版本。文档治理的目标是先消除陈旧版本状态、旧 updater 描述、过时 Store 里程碑规则和版本绑定式专题说明，并为后续自动生成 Release Notes、网站版本历史及发布元数据建立清晰边界。
+
+## 8. Current documents
+
+### Product
+
+- [Roadmap](ROADMAP.md)
+- [README](../README.md)
+
+### Release
+
+- [Release contract](RELEASE.md)
+- [Microsoft Store publishing contract](STORE-PUBLISHING.md)
+- [Store updater E2E contract](StoreUpdateTesting.md)
+
+### Architecture
+
+- [Data storage](DATA_STORAGE.md)
+- [Data backup](DATA_BACKUP.md)
+- [Project workspace](PROJECT_WORKSPACE.md)
+- [Localization](LOCALIZATION.md)
+- [Reliability](RELIABILITY.md)
+- [Interaction components](INTERACTION_COMPONENTS.md)
+- [Tool development template](TOOL_DEVELOPMENT_TEMPLATE.md)
+
+### Historical
+
+- [Changelog](../CHANGELOG.md)
+- [Release notes](.)
+- [Historical release decisions](history/release-decisions-1.4-1.5.md)

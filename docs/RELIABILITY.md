@@ -1,7 +1,29 @@
-# 可靠性约定
+# Reliability contract
 
-启动优先创建并激活主窗口；数据目录、设置和项目读取失败必须转为可恢复状态或安全诊断，不能以吞掉异常伪造成功。导航继续使用稳定路由和项目 ID，页面离开时应取消页面范围的异步工作。
+## Startup
 
-异步业务操作必须防重复、在 `finally` 恢复 UI、把取消与失败区分，并且不得让失效页面更新控件。日志只能保存安全的阶段、异常类型和 HRESULT；不得保存项目正文、访问 token、私钥或完整导入内容。
+Prioritize creating and activating the main window. Settings, data, project, first-run, Mica/theme initialization, and window-state restoration must fail safely without blocking the shell or faking success. First-run work begins after the application can present its primary experience.
 
-本地发布前需从当前提交构建真实 Release x64 MSIX、使用既有证书签名、以非开发模式安装并从 AppsFolder 包身份启动。CI 仅执行构建和测试，不访问本机证书或安装包。
+## Async operations
+
+Operations use explicit `Idle`, `Running`, `Succeeded`, `Failed`, and `Canceled` outcomes. Prevent duplicate actions, restore UI in `finally`, distinguish cancellation from failure, and prevent disposed pages from updating controls.
+
+## Updates
+
+GitHub update states are `Checking`, `Downloading`, `Verifying`, `ReadyToInstall`, `Deploying`, `Restarting`, `Completed`, and `Failed`. Metadata must survive progress refreshes. An update is complete only after deployment and restart/new-version launch evidence, never merely after a completed download.
+
+## Data
+
+Use atomic save, last-valid recovery, future-schema refusal, migration rollback, and an import safety backup. Preserve valid data when validation, migration, or replacement fails.
+
+## Logging and privacy
+
+Log safe stages, result types, and HRESULTs only. Never log private keys, tokens, certificate material, complete user content, or sensitive local paths.
+
+## Localization and release reliability
+
+Maintain matching three-language resource key sets. Release validation covers Debug/Release x64, MSIX, installation, upgrade, language, theme, DPI, and channel identity as appropriate to the authorized release.
+
+## Future engineering budgets
+
+Establish measured baselines before enforcing cold-start, package-size, memory, tool-initialization, native-dependency inventory, and dependency-impact budgets. Do not invent values that have not been measured.

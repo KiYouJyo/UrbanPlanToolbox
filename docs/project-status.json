@@ -1,6 +1,10 @@
 {
   "schemaVersion": 1,
   "asOf": "2026-08-13",
+  "repository": {
+    "defaultBranch": "main",
+    "documentationGovernance": "docs/DOCUMENTATION.md"
+  },
   "product": {
     "name": "UrbanPlanToolbox",
     "version": "1.6.7",
@@ -70,6 +74,10 @@
       "Package.Store.appxmanifest"
     ],
     "runtimeUpdateManifest": "docs/update-manifest.json is runtime/update infrastructure and is not the documentation source of truth"
+  },
+  "dataContracts": {
+    "projectSchemaVersion": 3,
+    "backupFormatVersion": 1
   },
   "roadmap": {
     "stage": "stabilization-and-productization",

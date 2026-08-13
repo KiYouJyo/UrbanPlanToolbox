@@ -111,6 +111,10 @@ jobs:
         shell: pwsh
         run: ./scripts/Test-ReleaseDocumentationConsistency.ps1
 
+      - name: Validate documentation SSOT
+        shell: pwsh
+        run: ./packaging/Test-DocumentationConsistency.ps1
+
       - name: Validate CMD files
         shell: pwsh
         run: |

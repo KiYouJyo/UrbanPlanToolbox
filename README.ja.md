@@ -31,7 +31,7 @@
 
 ### その後の更新
 
-About を開き、「更新を確認」を選択してください。GitHub 版は Windows App Installer で更新し、Microsoft Store 版は Microsoft Store が管理します。
+About を開き、「更新を確認」を選択してください。GitHub 版はアプリ内で正式更新を確認してダウンロードできます。アプリはダウンロードしたパッケージの完全性と署名を検証し、準備完了後にユーザーが「再起動して更新」を実行します。Microsoft Store 版は引き続き Store の更新チャネルを使用します。
 
 ### 上級者向けインストール
 
@@ -57,6 +57,7 @@ Windows 10 17763 以降、x64。
 
 - [ロードマップとバージョン方針](docs/ROADMAP.md)
 - [リリースガイド](docs/RELEASE.md)
+- [ドキュメントガバナンスと現在の状態](docs/DOCUMENTATION.md)
 - [データ保存](docs/DATA_STORAGE.md) · [データバックアップ](docs/DATA_BACKUP.md)
 - [変更履歴](CHANGELOG.md)
 - [プライバシーポリシー](PRIVACY.md) · [第三者通知](THIRD-PARTY-NOTICES.md)
