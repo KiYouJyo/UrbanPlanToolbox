@@ -31,7 +31,7 @@ Download the lightweight one-click installer from the [latest GitHub Release](ht
 
 ### Later updates
 
-Open About and choose Check for updates. GitHub builds download and install later versions through Windows App Installer; Microsoft Store builds continue to be managed by Microsoft Store.
+Open About and choose Check for updates. GitHub builds can check for and download formal updates in the app; the app verifies the downloaded package's integrity and signature, then the user chooses restart and update once it is ready. Microsoft Store builds continue to use the Store update channel.
 
 ### Advanced installation
 
@@ -57,6 +57,7 @@ The interface supports Simplified Chinese, 日本語, and English, with immediat
 
 - [Roadmap and version policy](docs/ROADMAP.md)
 - [Release guide](docs/RELEASE.md)
+- [Documentation governance and current status](docs/DOCUMENTATION.md)
 - [Data storage](docs/DATA_STORAGE.md) · [Data backup](docs/DATA_BACKUP.md)
 - [Changelog](CHANGELOG.md)
 - [Privacy policy](PRIVACY.md) · [Third-party notices](THIRD-PARTY-NOTICES.md)

@@ -1,103 +1,41 @@
-# 发布指南
+# UrbanPlanToolbox Release Contract
 
-# v1.5.4 发布决策
+## Authority
 
-- GitHub：发布正式 `v1.5.4` Release、`v1.5.4` 标签和从最终 `main` 构建的 x64 framework-dependent 自签名旁加载包。
-- Microsoft Store：使用现有正式工作流构建 `1.5.4.0` Store 包，创建正式公开 submission 并提交认证；不使用 Package Flight，不把认证中状态描述为已公开。
-- Store updater 的真实 `v1.5.4 → v1.5.5` 更新验证留待下一版本目标包出现后执行。
+[project-status.json](project-status.json) is the repository authority for current product and channel status. [CHANGELOG.md](../CHANGELOG.md), versioned release notes, GitHub Releases, and Partner Center / Microsoft Store preserve historical and external facts. Historical release decisions are archived in [history/release-decisions-1.4-1.5.md](history/release-decisions-1.4-1.5.md).
 
-## v1.5.2 发布决策
+## Release principles
 
-- GitHub：发布正式 `v1.5.2` Release、`v1.5.2` 标签和从最终 `main` 构建的 x64 framework-dependent 自签名旁加载包。
-- Microsoft Store：使用现有 Store 工作流构建关联 `.msixupload`，创建唯一的 v1.5.2 submission 并提交认证；不把认证中状态描述为已公开。
-- 版本修复范围仅包括更新弹窗标题本地化和 Store 更新进度/状态反馈，不改变项目数据格式或现有工具功能。
+A tag, GitHub Release, GitHub package, Store package, Store submission, Store certification, and Store publication are separate steps. Success at one step never proves success at another. A build, test, upload, or 100% download is not publication or a completed update.
 
-## v1.5.1 发布决策
+## GitHub release contract
 
-- GitHub：发布正式 `v1.5.1` Release、`v1.5.1` 标签和从最终 `main` 构建的 x64 framework-dependent 自签名旁加载包。
-- Microsoft Store：本版本获得一次性例外授权，使用最终主线构建 Store `.msixupload` 并提交认证；提交后状态记录为认证中，不提前宣称已公开。
-- 后续 Microsoft Store 版本继续遵循 `x.0.0` 或 `x.5.0` 里程碑政策。
-- 新增坐标点批量格式转换器的功能、三语资源、离线处理声明和发布说明必须与本版本实现一致。
+- Build from the final approved `main` commit with matching product and package versions, x64 target, GitHub sideload identity, and publisher.
+- Produce the formal MSIXBundle, SHA-256 checksums, one-click bootstrap, and three-language release notes.
+- Validate identity, publisher, package version, checksums, signatures, installation, and the GitHub updater end-to-end path before declaring success.
 
-本文档是 UrbanPlanToolbox 的可复用发布边界与检查清单。
+## GitHub updater E2E gate
 
-## v1.5.8 release gate (mandatory)
+Prove this sequence from a previous formal GitHub installation: **Checking → Downloading → Verifying → ReadyToInstall → Restart and update → new package registration → new-version launch → user-data retention**.
 
-`v1.5.8` is LOCAL TEST ONLY until every item below has evidence. A passing unit test or build is not sufficient.
+Also prove network, checksum, signature, publisher-mismatch, deployment, and interrupted-restart failures are explicit and recoverable. Download completion alone is not update success.
 
-- Run `packaging/Test-GitHubUpdateDeploymentE2E.ps1` with a signed local bundle and verify package N -> N+1, exact GitHub identity, and unchanged `JoKiy.UrbanPlanToolbox`.
-- On a Windows test machine, install public v1.5.7, keep the app running for at least 60 seconds, invoke the in-app GitHub updater, and record Download, Verify, DeploymentQueued, Installing, Restarting, and Completed separately.
-- Record `ActivityId`, `ExtendedErrorCode`, and `ErrorText` from the deployment result. Download at 100% is not deployment success.
-- Verify automatic shutdown, registration of 1.5.8.0, automatic relaunch, and `AppVersionProvider = 1.5.8`.
-- Verify v1.5.8 one-click fresh install, one-click uninstall, not-installed uninstall, and Store package untouched.
-- Keep the GitHub and Store identities separate; no Store submission is implied by this gate.
+## Microsoft Store release contract
 
-If the in-process updater cannot complete the running-app E2E on the target Windows environment, leave the release blocked and investigate the recorded ActivityId through `Get-AppPackageLog -ActivityID <GUID>` or Event Viewer. Do not replace it with a timer or claim success from a direct package install.
+Store work requires explicit release authorization. Use the Store identity, `Package.Store.appxmanifest`, a valid package version, `msixupload`, Partner Center, and the required Store technical validation. Do not retain a fixed `x.0.0` / `x.5.0` rule. A Store submission is not a public release; only Partner Center and actual Store availability establish publication.
 
-## v1.5.0 发布决策
+## Pre-release consistency
 
-- GitHub：发布正式 `v1.5.0` Release、`v1.5.0` 标签和从最终 `main` 构建的 x64 旁加载包。
-- Microsoft Store：`NOT TOUCHED`。本版本不执行 Store CLI、Partner Center、草稿上传、认证、listing 修改或 Store 发布；下一 Store 里程碑为 `v2.0.0`。
-- 新增“图纸版本差异对比器”最终交付范围以 README、CHANGELOG 和正式 Release Notes 为准：相同像素尺寸图像的半透明叠加与擦除浏览。
+Before an authorized release, validate [project-status.json](project-status.json), `UrbanPlanToolbox.csproj`, both manifests, three-language release notes, website metadata, changelog, and channel metadata. Run the documentation consistency check as part of this review.
 
-## v1.4.2 发布决策
+## Post-release state updates
 
-- GitHub：发布正式 `v1.4.2` Release、`v1.4.2` 标签和 x64 framework-dependent 自签名旁加载包。
-- Microsoft Store：`SKIPPED BY RELEASE POLICY`。本版本不执行 Store CLI、Partner Center、草稿上传、认证或 listing 修改；下一 Store 里程碑为 `v1.5.0`。
-- 新增“调研照片整理器”，实际能力以 README、CHANGELOG 和正式 Release Notes 为准。
+After a confirmed GitHub publication, update the SSOT GitHub state to `published`. After a Store submission, use `certification-submitted`. Change Store state to `published` only with confirmation of actual public availability.
 
-## v1.4.1 发布决策
+## Prohibitions
 
-- GitHub：发布正式 `v1.4.1` Release、标签和 x64 framework-dependent 自签名旁加载包。
-- Microsoft Store：`SKIPPED BY RELEASE POLICY`。本版本不执行 Store CLI、Partner Center、草稿上传、认证或 listing 修改。
-- v1.4.1 新增中日英规划术语库，包含 140 条核心术语、三语检索、分类、关系辨析和来源信息。
-- 宽窗口左右栏底部的小幅不齐列为 deferred，不在本版本继续修改。
-
-## v1.4.0 发布决策（历史记录）
-
-- GitHub：发布正式 `v1.4.0` Release、标签和 x64 framework-dependent 自签名旁加载包。
-- Microsoft Store：`SKIPPED BY RELEASE POLICY`。本版本不执行 Store CLI、Partner Center、草稿上传、认证或 listing 修改；下一 Store 里程碑为 `v1.5.0`。
-
-## 发布节奏
-
-每个获准正式版本都可以发布到 GitHub，GitHub 可更频繁发布。Microsoft Store 默认只在 `x.0.0` 或 `x.5.0` 里程碑更新，因此 GitHub 最新版本和 Store 当前版本可以不同。文档必须明确写出渠道、产品版本、包版本和发布状态。
-
-## 通用准备
-
-从最终 `main` 重新构建并记录提交和 SHA-256。不要复用不同提交产生的候选包，不要将证书、私钥、PFX、MSIX 或本机验收文件提交仓库。标签、GitHub Release、Store 上传和 Store 认证是相互独立的授权步骤。
-
-## GitHub 旁加载渠道
-
-1. 使用 `Package.appxmanifest` 与 `CN=AppPublisher`。
-2. 仅在确实维护该渠道时发布 x64 framework-dependent 自签名包。
-3. 生成 MSIXBundle、安装 ZIP 和 SHA256SUMS；ZIP 内不包含私钥、PDB、源代码或本机数据。
-4. GitHub 更新检查只在用户主动操作时访问 Releases API。
-
-### GitHub 首次安装与 App Installer 架构
-
-GitHub 首次安装使用轻量 one-click Bootstrap。Bootstrap 仅携带公开证书、脚本、metadata 和 SHA256 清单，不携带 MSIXBundle 或 `.appinstaller`。安装时查询 GitHub Releases API，下载 MSIXBundle 与 SHA256 清单到临时目录，校验 SHA256 和 `CN=AppPublisher` 签名，然后通过本地 `Add-AppxPackage -Path` 完成部署。Pages AppInstaller 仅保留为 legacy compatibility infrastructure。
-
-正式分发关系保持唯一：
-
-```text
-one-click bootstrap → GitHub Releases API/assets → local SHA256/signature verification → local MSIXBundle deployment
-```
-
-GitHub Release 资产为 one-click ZIP、MSIXBundle 和 `SHA256SUMS.txt`；`.appinstaller` 只作为 Pages 基础设施保留在稳定地址 `https://kiyoujyo.github.io/UrbanPlanToolbox/UrbanPlanToolbox.appinstaller`，不作为 Release Asset。
-
-## Microsoft Store 渠道
-
-仅在版本符合 Store 里程碑政策且取得单独授权时执行：使用 `Package.Store.appxmanifest`、正式 Identity `JoKiy.UrbanPlanToolbox` 和 Publisher `CN=C4E4B33A-7B77-4121-897C-7D720A5471F8`，生成 `.msixupload`，在最终主线产物上运行 WACK，再由维护者手工上传 Partner Center。Store 包版本必须单调递增，发布后的更新由 Microsoft Store 管理。
-
-现有 Store 工作流的上传、认证和发布阶段保持独立；不要把 GitHub 旁加载包上传为 Store 包，也不要在跳过 Store 的版本中调用该工作流。
-
-## 构建与测试
-
-```powershell
-dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Debug -p:Platform=x64
-dotnet test tests/UrbanPlanToolbox.Tests/UrbanPlanToolbox.Tests.csproj -c Debug -p:Platform=x64
-dotnet build UrbanPlanToolbox.slnx -c Debug -p:Platform=x64 --no-restore
-dotnet build UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore
-```
-
-发布前还应完成三语资源键集检查、安装包渠道身份检查、Git 差异检查和人工验收。Store 渠道发布时另行完成 WACK。
+- Do not reuse a package from a different commit.
+- Do not treat a GitHub package as a Store package.
+- Do not describe certification submission as publication.
+- Do not replace content of a published same-version package or upload different binaries under the same version.
+- Do not commit test packages, local certificates, or credentials.
