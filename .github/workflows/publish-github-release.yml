@@ -101,7 +101,7 @@ jobs:
           if (-not $signtool) { throw 'x64 signtool.exe was not found.' }
           Write-Output "Windows Kits root: $kitsRoot"
           Write-Output "signtool path: $($signtool.FullName)"
-          & $signtool.FullName sign /fd SHA256 /sha1 $certificate.Thumbprint /tr http://timestamp.sectigo.com /td SHA256 $env:BUNDLE_PATH
+          & $signtool.FullName sign /fd SHA256 /sha1 $certificate.Thumbprint /tr http://timestamp.digicert.com /td SHA256 $env:BUNDLE_PATH
           if ($LASTEXITCODE -ne 0) { throw "signtool sign failed: $LASTEXITCODE" }
           & $signtool.FullName verify /pa /all /v $env:BUNDLE_PATH
           if ($LASTEXITCODE -ne 0) { throw "signtool verify failed: $LASTEXITCODE" }
