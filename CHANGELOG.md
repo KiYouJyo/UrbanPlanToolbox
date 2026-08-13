@@ -1,5 +1,19 @@
 # 更改日志
 
+## 1.6.3
+
+### Fixed
+
+- Stabilized update-management card fields and removed empty dash placeholders.
+- Replaced overlapping checking-state field indicators with one status progress indicator.
+- Fixed packaged, locale-matched Release Notes loading for zh-CN, ja-JP, and en-US, including LocalVersionNewer results.
+- Hardened the GitHub update state machine against late progress callbacks and added Downloading → Verifying → ReadyToInstall.
+
+### Release boundary
+
+- GitHub Releases only; Microsoft Store is not included.
+- The real restart-and-update end-to-end acceptance remains pending for the v1.6.3 → v1.6.4 upgrade path.
+
 ## 1.6.2
 
 ### Fixed

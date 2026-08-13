@@ -34,7 +34,13 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
             Progress = null;
             OnChanged(nameof(Progress));
             Info = Info with { State = AppUpdateState.Checking, Detail = null, ErrorCode = null };
-            Info = await _service.CheckForUpdatesAsync(cancellationToken);
+            var result = await _service.CheckForUpdatesAsync(cancellationToken);
+            Info = result with
+            {
+                // A re-check must not make an already populated card flash empty while
+                // the matching localized document is fetched again.
+                LocalizedReleaseNotes = result.LocalizedReleaseNotes ?? Info.LocalizedReleaseNotes
+            };
         }
         catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" }; }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
@@ -43,38 +49,71 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     public async Task DownloadAndInstallAsync(CancellationToken cancellationToken = default)
     {
         if (!CanInstall || Interlocked.Exchange(ref _busy, 1) != 0) return;
+        var progressGate = new object();
+        var acceptingProgress = true;
         try
         {
             RestartFailureReason = null;
             var progress = new Progress<AppUpdateProgress>(value =>
             {
-                var normalized = AppUpdateProgress.NormalizeValue(value.Value);
-                if (value.State == AppUpdateState.Downloading)
+                lock (progressGate)
                 {
-                    if (normalized is double) Progress = normalized;
-                }
-                else if (value.State is AppUpdateState.Installing or AppUpdateState.Completed or AppUpdateState.Failed or AppUpdateState.Cancelled)
-                {
-                    Progress = value.State == AppUpdateState.Completed ? 1d : null;
-                }
+                    if (!acceptingProgress || !CanApplyProgress(Info.State, value.State)) return;
 
-                Info = Info with { State = value.State, Detail = value.Detail };
-                OnChanged(nameof(Progress));
+                    var normalized = AppUpdateProgress.NormalizeValue(value.Value);
+                    if (value.State == AppUpdateState.Downloading)
+                    {
+                        if (normalized is double) Progress = normalized;
+                    }
+                    else if (value.State is AppUpdateState.Verifying or AppUpdateState.Installing or AppUpdateState.Completed or AppUpdateState.Failed or AppUpdateState.Cancelled)
+                    {
+                        Progress = value.State == AppUpdateState.Completed ? 1d : null;
+                    }
+
+                    Info = Info with { State = value.State, Detail = value.Detail };
+                    OnChanged(nameof(Progress));
+                }
             });
             var result = Info.IsReadyToInstall
                 ? await _service.InstallPendingAsync(progress, cancellationToken)
                 : await _service.DownloadAndInstallAsync(progress, cancellationToken);
             var finalState = result.State;
             // Store and App Installer own shutdown/restart. The app must not ask for a second confirmation.
-            Progress = null;
-            OnChanged(nameof(Progress));
-            Info = Info with { State = finalState, Detail = result.Detail, ErrorCode = result.ErrorCode };
+            // Closing this gate and applying the result under the same lock makes the awaited result authoritative.
+            lock (progressGate)
+            {
+                acceptingProgress = false;
+                Progress = null;
+                OnChanged(nameof(Progress));
+                Info = Info with { State = finalState, Detail = result.Detail, ErrorCode = result.ErrorCode };
+            }
         }
-        catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" }; }
+        catch (OperationCanceledException)
+        {
+            lock (progressGate)
+            {
+                acceptingProgress = false;
+                Progress = null;
+                OnChanged(nameof(Progress));
+                Info = Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" };
+            }
+        }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
     }
 
     public bool TryRestartAgain() => _restartService.TryRestart(out _);
+
+    // Progress callbacks can be posted after the awaited operation has completed.
+    // They report activity only; the returned AppUpdateResult is authoritative for terminal transitions.
+    private static bool CanApplyProgress(AppUpdateState current, AppUpdateState incoming) => incoming switch
+    {
+        AppUpdateState.Downloading => current is AppUpdateState.UpdateAvailable or AppUpdateState.Downloading,
+        AppUpdateState.Verifying => current is AppUpdateState.Downloading or AppUpdateState.Verifying,
+        AppUpdateState.Installing => current is AppUpdateState.ReadyToInstall or AppUpdateState.Installing,
+        AppUpdateState.Restarting => current is AppUpdateState.Installing or AppUpdateState.Restarting,
+        AppUpdateState.Completed or AppUpdateState.Failed or AppUpdateState.Cancelled => true,
+        _ => false
+    };
 
     private void OnChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new(name));
 

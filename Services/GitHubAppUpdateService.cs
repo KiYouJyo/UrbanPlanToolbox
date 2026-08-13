@@ -45,6 +45,7 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
             var bundlePath = await _updateService.DownloadAndVerifyBundleAsync(_pendingRelease, bundleName, progress, cancellationToken);
             if (bundlePath is null) return new(AppUpdateState.Failed, "BundleVerificationFailed");
 
+            progress?.Report(new(AppUpdateState.Verifying, Detail: "Bundle verification completed"));
             _pendingBundlePath = bundlePath;
             SavePendingState(_pendingRelease.TagName, bundlePath);
             progress?.Report(new(AppUpdateState.ReadyToInstall, Detail: "Verified; ready to install"));

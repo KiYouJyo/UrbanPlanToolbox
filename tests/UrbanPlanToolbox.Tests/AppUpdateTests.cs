@@ -231,25 +231,26 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public void AboutPageKeepsUpdateFieldsStableAndScopesProgressRingsToChecking()
+    public void AboutPageUsesOnlyTheStatusProgressRingAndNoDashPlaceholders()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
         var code = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
 
-        Assert.Contains("x:Name=\"UpdateTargetProgressRing\"", xaml, StringComparison.Ordinal);
-        Assert.Contains("x:Name=\"UpdateNotesProgressRing\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"UpdateStatusProgressRing\"", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("UpdateTargetProgressRing", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("UpdateNotesProgressRing", xaml, StringComparison.Ordinal);
         Assert.Contains("ProgressRing", xaml, StringComparison.Ordinal);
         Assert.Contains("var checking = info.State == AppUpdateState.Checking", code, StringComparison.Ordinal);
-        Assert.Contains("UpdateTargetProgressRing.IsActive = checking", code, StringComparison.Ordinal);
-        Assert.Contains("UpdateNotesProgressRing.IsActive = checking", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateStatusProgressRing.IsActive = checking", code, StringComparison.Ordinal);
         Assert.Contains("UpdateTargetLabel.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateTargetText.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesLabel.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesContainer.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesText.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
-        Assert.Contains("UpdateTargetProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
-        Assert.Contains("UpdateNotesProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateStatusProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
+        Assert.DoesNotContain("unavailableValue", code, StringComparison.Ordinal);
+        Assert.DoesNotContain("\\u2014", code, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -325,6 +326,115 @@ public sealed class AppUpdateTests
         Assert.True(viewModel.ShouldShowUpdateDialog);
     }
 
+    [Theory]
+    [InlineData("zh-CN", "中文更新说明")]
+    [InlineData("ja-JP", "日本語の更新内容")]
+    [InlineData("en-US", "English release notes")]
+    public async Task ReleaseNotesUseTheRequestedLanguage(string locale, string expectedItem)
+    {
+        var payload = "{\"schemaVersion\":1,\"version\":\"1.6.2\",\"notes\":{\"zh-CN\":{\"title\":\"中文\",\"items\":[\"中文更新说明\"]},\"ja-JP\":{\"title\":\"日本語\",\"items\":[\"日本語の更新内容\"]},\"en-US\":{\"title\":\"English\",\"items\":[\"English release notes\"]}}}";
+        var notes = await new LocalizedReleaseNotesService(new HttpClient(new ReleaseNotesHandler { Payload = payload })).GetAsync("1.6.2", locale);
+
+        Assert.NotNull(notes);
+        Assert.Contains(expectedItem, notes!.Notes[locale].Items);
+    }
+
+    [Theory]
+    [InlineData("zh-CN")]
+    [InlineData("ja-JP")]
+    public async Task MissingRequestedLanguageDoesNotReturnEnglishReleaseNotes(string locale)
+    {
+        var payload = "{\"schemaVersion\":1,\"version\":\"1.6.2\",\"notes\":{\"en-US\":{\"title\":\"English\",\"items\":[\"English release notes\"]}}}";
+        var notes = await new LocalizedReleaseNotesService(new HttpClient(new ReleaseNotesHandler { Payload = payload })).GetAsync("1.6.2", locale);
+
+        Assert.Null(notes);
+    }
+
+    [Theory]
+    [InlineData("1.6.2")]
+    [InlineData("v1.6.2")]
+    [InlineData("1.6.2.0")]
+    public async Task PackagedReleaseNotesNormalizeVersionStrings(string version)
+    {
+        var service = new LocalizedReleaseNotesService(new HttpClient(new ReleaseNotesHandler()), BundledNotes);
+        var notes = await service.GetAsync(version, "zh-Hans-CN");
+
+        Assert.NotNull(notes);
+        Assert.Contains("中文说明", notes!.Notes["zh-CN"].Items);
+    }
+
+    [Theory]
+    [InlineData("zh-CN", "中文说明")]
+    [InlineData("ja-JP", "日本語の説明")]
+    [InlineData("en-US", "English notes")]
+    public async Task LocalVersionNewerUsesPackagedNotesForTheCurrentLocale(string locale, string expected)
+    {
+        var notes = new LocalizedReleaseNotesService(new HttpClient(new ReleaseNotesHandler()), BundledNotes);
+        var viewModel = new UpdateViewModel(new FixedUpdateService(AppUpdateState.UpToDate, "1.6.2", "English release body"));
+        await viewModel.CheckAsync();
+        await viewModel.SetLocalizedNotesAsync(notes, locale);
+
+        var display = ReleaseNotesPresentation.Resolve(viewModel.Info, locale, "no notes");
+        Assert.Equal(ReleaseNotesDisplaySource.LocalizedPackage, display.Source);
+        Assert.Contains(expected, display.Text);
+        Assert.DoesNotContain("English release body", display.Text);
+    }
+
+    [Theory]
+    [InlineData("zh-CN", "暂无更新说明")]
+    [InlineData("ja-JP", "更新内容はありません")]
+    public void MissingNonEnglishNotesDoNotFallBackToEnglishReleaseBody(string locale, string fallback)
+    {
+        var display = ReleaseNotesPresentation.Resolve(new AppUpdateInfo(AppUpdateState.UpToDate, "1.6.2", ReleaseNotes: "English release body"), locale, fallback);
+        Assert.Equal(ReleaseNotesDisplaySource.LocalizedEmptyFallback, display.Source);
+        Assert.Equal(fallback, display.Text);
+    }
+
+    [Fact]
+    public void PackagedReleaseNotes162And163ContainAllLocales()
+    {
+        var root = FindRepositoryRoot();
+        foreach (var version in new[] { "1.6.2", "1.6.3" })
+        {
+            var document = System.Text.Json.JsonSerializer.Deserialize<LocalizedReleaseNotes>(File.ReadAllText(Path.Combine(root, "Assets", "Data", "ReleaseNotes", $"{version}.json")), new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            Assert.NotNull(document);
+            Assert.Equal(new[] { "en-US", "ja-JP", "zh-CN" }, document!.Notes.Keys.Order(StringComparer.Ordinal).ToArray());
+            Assert.All(document.Notes.Values, note => Assert.NotEmpty(note.Items));
+        }
+    }
+
+    [Theory]
+    [InlineData(AppUpdateState.ReadyToInstall)]
+    [InlineData(AppUpdateState.Failed)]
+    public async Task LateDownloadingProgressCannotOverwriteAnAuthoritativeFinalResult(AppUpdateState finalState)
+    {
+        var service = new LateDownloadingCallbackService(finalState);
+        var viewModel = new UpdateViewModel(service);
+        await viewModel.CheckAsync();
+        await viewModel.DownloadAndInstallAsync();
+
+        service.ReportLateDownloading();
+        await Task.Delay(50);
+
+        Assert.Equal(finalState, viewModel.Info.State);
+    }
+
+    [Theory]
+    [InlineData(AppUpdateState.ReadyToInstall)]
+    [InlineData(AppUpdateState.Installing)]
+    public async Task DownloadProgressCannotRegressReadyOrInstallingState(AppUpdateState finalState)
+    {
+        var service = new LateDownloadingCallbackService(finalState);
+        var viewModel = new UpdateViewModel(service);
+        await viewModel.CheckAsync();
+        await viewModel.DownloadAndInstallAsync();
+
+        service.ReportLateDownloading();
+        await Task.Delay(50);
+
+        Assert.Equal(finalState, viewModel.Info.State);
+    }
+
     [Fact]
     public void StoreProgressDiagnosticsContainVersionAndSourceFields()
     {
@@ -386,7 +496,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.6.2", viewModel.CurrentVersion);
+        Assert.Equal("v1.6.3", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -434,6 +544,10 @@ public sealed class AppUpdateTests
             });
     }
 
+    private static Task<string?> BundledNotes(string version, CancellationToken cancellationToken) => Task.FromResult<string?>(version == "1.6.2"
+        ? "{\"schemaVersion\":1,\"version\":\"1.6.2\",\"notes\":{\"zh-CN\":{\"title\":\"中文\",\"items\":[\"中文说明\"]},\"ja-JP\":{\"title\":\"日本語\",\"items\":[\"日本語の説明\"]},\"en-US\":{\"title\":\"English\",\"items\":[\"English notes\"]}}}"
+        : null);
+
 }
 
 internal sealed class ReadyToInstallUpdateService : IAppUpdateService
@@ -473,10 +587,10 @@ internal sealed class PendingProgressService : IAppUpdateService
     }
 }
 
-internal sealed class FixedUpdateService(AppUpdateState resultState, string availableVersion) : IAppUpdateService
+internal sealed class FixedUpdateService(AppUpdateState resultState, string availableVersion, string? releaseNotes = null) : IAppUpdateService
 {
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateInfo(resultState, AvailableVersion: availableVersion));
+        Task.FromResult(new AppUpdateInfo(resultState, AvailableVersion: availableVersion, ReleaseNotes: releaseNotes));
 
     public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(new AppUpdateResult(resultState));
@@ -516,6 +630,23 @@ internal sealed class InstallResultUpdateService(AppUpdateState resultState) : I
 
     public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default) =>
         Task.FromResult(new AppUpdateResult(resultState));
+}
+
+internal sealed class LateDownloadingCallbackService(AppUpdateState finalState) : IAppUpdateService
+{
+    private IProgress<AppUpdateProgress>? _progress;
+    public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, AvailableVersion: "1.6.3"));
+
+    public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        _progress = progress;
+        progress?.Report(new(AppUpdateState.Downloading, 1d));
+        return Task.FromResult(new AppUpdateResult(finalState));
+    }
+
+
+    public void ReportLateDownloading() => _progress?.Report(new(AppUpdateState.Downloading, 1d));
 }
 
 internal sealed class UpdateRestartStub(bool result) : IApplicationRestartService

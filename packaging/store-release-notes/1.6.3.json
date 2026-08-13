@@ -1,0 +1,8 @@
+{
+  "version": "1.6.3",
+  "notes": {
+    "zh-CN": ["修复 GitHub 更新状态机的延迟进度回调竞态，并新增更新验证状态。", "修复更新管理卡片占位符和多语言更新说明显示。", "此版本仅用于 GitHub 更新修复的人工验收，未提交 Microsoft Store。"],
+    "ja-JP": ["GitHub 更新の遅延した進捗コールバックの競合を修正し、更新の検証状態を追加しました。", "更新管理カードのプレースホルダーと多言語の更新内容表示を修正しました。", "このバージョンは GitHub 更新修正の手動検証用であり、Microsoft Store には提出していません。"],
+    "en-US": ["Fixed delayed progress-callback races in the GitHub update state machine and added a verifying state.", "Fixed update-card placeholders and localized release-note display.", "This build is for GitHub update-fix manual acceptance only and is not submitted to the Microsoft Store."]
+  }
+}

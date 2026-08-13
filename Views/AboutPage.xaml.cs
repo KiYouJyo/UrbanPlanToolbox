@@ -72,34 +72,29 @@ public sealed partial class AboutPage : Page
     {
         var info = _updates.Info;
         var checking = info.State == AppUpdateState.Checking;
-        var localizedNotes = info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage));
-        var localizedItems = localizedNotes?.Items.Where(item => !string.IsNullOrWhiteSpace(item)).ToArray() ?? [];
-        var releaseNotes = localizedItems.Length > 0
-            ? string.Join(Environment.NewLine, localizedItems.Select(item => $"- {item}"))
-            : info.ReleaseNotes;
-        var hasReleaseNotes = !string.IsNullOrWhiteSpace(releaseNotes);
-        const string unavailableValue = "\u2014";
+        var display = info.State is AppUpdateState.NotChecked or AppUpdateState.Checking && info.LocalizedReleaseNotes is null && string.IsNullOrWhiteSpace(info.ReleaseNotes)
+            ? new ReleaseNotesDisplay(string.Empty, ReleaseNotesDisplaySource.LocalizedEmptyFallback)
+            : ReleaseNotesPresentation.Resolve(info, _localization.CurrentLanguage, T("Update_ReleaseNotesUnavailable"));
+        AppLogger.Default.Info("ReleaseNotes", "RenderUpdateNotesSource", $"State={info.State}; AvailableVersion={info.AvailableVersion}; Locale={LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage)}; Source={display.Source}");
 
         UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
         UpdateTargetLabel.Visibility = Visibility.Visible;
         UpdateTargetText.Visibility = Visibility.Visible;
-        UpdateTargetProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;
-        UpdateTargetProgressRing.IsActive = checking;
-        UpdateTargetText.Text = string.IsNullOrWhiteSpace(info.AvailableVersion) ? unavailableValue : $"v{info.AvailableVersion}";
+        UpdateTargetText.Text = string.IsNullOrWhiteSpace(info.AvailableVersion) ? string.Empty : $"v{info.AvailableVersion}";
 
         UpdateNotesLabel.Visibility = Visibility.Visible;
         UpdateNotesContainer.Visibility = Visibility.Visible;
         UpdateNotesText.Visibility = Visibility.Visible;
-        UpdateNotesProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;
-        UpdateNotesProgressRing.IsActive = checking;
-        UpdateNotesText.Text = hasReleaseNotes ? releaseNotes : unavailableValue;
+        UpdateNotesText.Text = display.Text;
 
         CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
         CheckUpdateButton.Content = info.IsReadyToInstall ? T("Action_RestartAndUpdate") : info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
         UpdateStatusText.Text = T($"Update_State_{info.State}");
-        var progressVisible = info.State is AppUpdateState.Downloading or AppUpdateState.Installing or AppUpdateState.Restarting;
+        UpdateStatusProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;
+        UpdateStatusProgressRing.IsActive = checking;
+        var progressVisible = info.State is AppUpdateState.Downloading or AppUpdateState.Verifying or AppUpdateState.Installing or AppUpdateState.Restarting;
         UpdateProgressBar.Visibility = progressVisible ? Visibility.Visible : Visibility.Collapsed;
-        UpdateProgressBar.IsIndeterminate = info.State is AppUpdateState.Installing or AppUpdateState.Restarting || _updates.Progress is null;
+        UpdateProgressBar.IsIndeterminate = info.State is AppUpdateState.Verifying or AppUpdateState.Installing or AppUpdateState.Restarting || _updates.Progress is null;
         if (_updates.Progress is double progress) UpdateProgressBar.Value = progress * 100d;
         if (info.State == AppUpdateState.Failed) UpdateStatusText.Text = $"{T(AppUpdateErrorMapper.ToResourceKey(info.ErrorCode))}{(string.IsNullOrWhiteSpace(info.ErrorCode) ? string.Empty : $" ({info.ErrorCode})")}";
     }
