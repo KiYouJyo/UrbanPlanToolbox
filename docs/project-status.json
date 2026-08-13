@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "asOf": "2026-08-13",
+  "product": {
+    "name": "UrbanPlanToolbox",
+    "version": "1.6.7",
+    "lifecycle": "stable-1.x",
+    "platform": "Windows",
+    "supportedArchitecture": "x64",
+    "offlineFirst": true
+  },
+  "distribution": {
+    "github": {
+      "productVersion": "1.6.7",
+      "packageVersion": "1.6.7.0",
+      "releaseTag": "v1.6.7",
+      "state": "published",
+      "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
+    },
+    "microsoftStore": {
+      "submittedProductVersion": "1.6.7",
+      "submittedPackageVersion": "1.6.7.0",
+      "state": "certification-submitted",
+      "publicProductVersion": null,
+      "publicVersionAuthority": "Partner Center and the Microsoft Store client",
+      "storeId": "9MWDPJG1BHKW",
+      "updatePath": "Microsoft Store managed update path"
+    }
+  },
+  "releasePolicy": {
+    "github": "formal releases may be published more frequently after release approval and validation",
+    "microsoftStore": "stable versions are submitted only with explicit release approval; there is no longer a fixed x.0.0/x.5.0 milestone rule",
+    "channelIdentitiesAreIndependent": true,
+    "crossChannelUpgradeSupported": false,
+    "doNotEquateCertificationWithPublication": true
+  },
+  "updater": {
+    "github": {
+      "states": [
+        "Checking",
+        "Downloading",
+        "Verifying",
+        "ReadyToInstall",
+        "Deploying",
+        "Restarting",
+        "Completed",
+        "Failed"
+      ],
+      "integrityChecks": [
+        "SHA-256",
+        "WinVerifyTrust",
+        "AppxSignature.p7x signer extraction",
+        "signer Subject pinning",
+        "signer Thumbprint pinning"
+      ],
+      "policy": "freeze feature expansion; future updater changes require end-to-end regression evidence"
+    },
+    "microsoftStore": {
+      "policy": "use Microsoft Store APIs and service-managed package delivery; keep Store and GitHub update state presentation consistent without merging their identities"
+    }
+  },
+  "documentation": {
+    "currentStateAuthority": "docs/project-status.json",
+    "historicalChangeAuthority": "CHANGELOG.md and versioned release notes",
+    "githubPublicationAuthority": "GitHub Releases",
+    "storePublicationAuthority": "Partner Center and Microsoft Store availability",
+    "buildVersionMustMatch": [
+      "UrbanPlanToolbox.csproj",
+      "Package.appxmanifest",
+      "Package.Store.appxmanifest"
+    ],
+    "runtimeUpdateManifest": "docs/update-manifest.json is runtime/update infrastructure and is not the documentation source of truth"
+  },
+  "roadmap": {
+    "stage": "stabilization-and-productization",
+    "nextVersion": null,
+    "priorities": [
+      "complete documentation governance and keep current-state metadata single-sourced",
+      "freeze and harden the updater with repeatable GitHub and Store end-to-end acceptance",
+      "standardize tool-page layout, state presentation, responsive behavior, and accessibility",
+      "make Project the context center for tool workflows without turning the app into a file manager",
+      "formalize project and backup schema migration contracts",
+      "establish startup, package-size, dependency, and native-component budgets",
+      "then deepen GIS/data interoperability and planning-specific productivity workflows"
+    ]
+  }
+}
