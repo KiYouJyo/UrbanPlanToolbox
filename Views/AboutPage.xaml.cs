@@ -73,19 +73,23 @@ public sealed partial class AboutPage : Page
         var info = _updates.Info;
         var notChecked = info.State == AppUpdateState.NotChecked;
         var checking = info.State == AppUpdateState.Checking;
-        var unavailable = T("About_Unavailable");
-        var notCheckedText = T("Update_State_NotChecked");
+        var hasAvailableVersion = info.State == AppUpdateState.UpdateAvailable && !string.IsNullOrWhiteSpace(info.AvailableVersion);
+        var localizedNotes = info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage));
+        var hasReleaseNotes = info.State == AppUpdateState.UpdateAvailable && localizedNotes is not null && localizedNotes.Items.Count > 0;
 
         UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
-        UpdateTargetText.Visibility = checking ? Visibility.Collapsed : Visibility.Visible;
+        UpdateTargetLabel.Visibility = checking || !hasAvailableVersion ? Visibility.Collapsed : Visibility.Visible;
+        UpdateTargetText.Visibility = checking || !hasAvailableVersion ? Visibility.Collapsed : Visibility.Visible;
         UpdateTargetProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;
         UpdateTargetProgressRing.IsActive = checking;
-        UpdateTargetText.Text = notChecked ? notCheckedText : info.AvailableVersion is null ? unavailable : $"v{info.AvailableVersion}";
+        UpdateTargetText.Text = hasAvailableVersion ? $"v{info.AvailableVersion}" : string.Empty;
 
-        UpdateNotesText.Visibility = checking ? Visibility.Collapsed : Visibility.Visible;
+        UpdateNotesLabel.Visibility = checking || !hasReleaseNotes ? Visibility.Collapsed : Visibility.Visible;
+        UpdateNotesContainer.Visibility = checking || hasReleaseNotes ? Visibility.Visible : Visibility.Collapsed;
+        UpdateNotesText.Visibility = checking || !hasReleaseNotes ? Visibility.Collapsed : Visibility.Visible;
         UpdateNotesProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;
         UpdateNotesProgressRing.IsActive = checking;
-        UpdateNotesText.Text = notChecked ? notCheckedText : info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage)) is { } note ? string.Join(Environment.NewLine, note.Items.Select(item => $"• {item}")) : unavailable;
+        UpdateNotesText.Text = hasReleaseNotes ? string.Join(Environment.NewLine, localizedNotes!.Items.Select(item => $"• {item}")) : string.Empty;
 
         CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
         CheckUpdateButton.Content = info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");

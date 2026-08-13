@@ -15,6 +15,7 @@ public sealed partial class HomePage : Page
     public const string ResearchCategoryId = "research-projects";
     private static string _sessionKind = ProjectKindCodes.Design;
     private readonly ProjectStorageService _projects = ProjectStorageService.Default;
+    private readonly IProjectFolderAccessService _folders = WindowsProjectFolderAccessService.Default;
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private IReadOnlyList<ProjectRecord> _loadedProjects = [];
     private bool _configuring;
@@ -164,7 +165,22 @@ public sealed partial class HomePage : Page
         var text = _localization.GetString(key); button.Content = text; AutomationProperties.SetName(button, text); ToolTipService.SetToolTip(button, text);
     }
 
-    private void OnOpenProject(object sender, RoutedEventArgs e) { if ((sender as Button)?.Tag is ProjectRecord project) Frame.Navigate(typeof(ProjectWorkspacePage), project.Id); }
+    private void OnOpenProject(object sender, RoutedEventArgs e)
+    {
+        if (e.OriginalSource is Button source && !ReferenceEquals(source, sender)) return;
+        if ((sender as Button)?.Tag is ProjectRecord project) Frame.Navigate(typeof(ProjectWorkspacePage), project.Id);
+    }
+    private async void OnOpenWorkFolder(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not ProjectRecord { WorkFolder: { RequiresReselection: false } folder }) return;
+        var result = await _folders.OpenAsync(folder);
+        if (!result.Succeeded)
+        {
+            StatusBar.IsOpen = true;
+            StatusBar.Severity = InfoBarSeverity.Error;
+            StatusBar.Message = _localization.GetString(result.ErrorKey ?? "ProjectFolder_OpenFailed");
+        }
+    }
     private string LocalizeValidation(IReadOnlyList<string>? errors) => errors is null ? _localization.GetString("Project_Error_SaveFailed") : string.Join(Environment.NewLine, errors.Select(error => _localization.GetString($"ProjectValidation_{error}")));
 
     private static bool TryParseCoordinate(string text, out decimal? value)
@@ -177,7 +193,7 @@ public sealed partial class HomePage : Page
     private sealed record ProjectKindOption(string Id, string Kind, string DisplayName);
     private sealed record KindChoice(string Kind, string Name, string Description);
     private sealed record ProjectTypeOption(string Code, string Name);
-    private sealed record ProjectCard(ProjectRecord Project, string Name, string Kind, string PrimaryDetails, string SecondaryDetails, string FullDetails, string Statistics, string Updated)
+    private sealed record ProjectCard(ProjectRecord Project, string Name, string Kind, string PrimaryDetails, string SecondaryDetails, string FullDetails, string Statistics, string Updated, bool HasWorkFolder, string WorkFolderActionText)
     {
         public ProjectCard(ProjectRecord project, ILocalizationService localization) : this(
             project, project.Name, ProjectPresentation.GetKindName(project.Kind, localization),
@@ -187,6 +203,8 @@ public sealed partial class HomePage : Page
             project.Kind == ProjectKindCodes.Research ? ProjectPresentation.CreateResearchSubjectSummary(project.ResearchDetails?.ResearchSubject) : string.Empty,
             project.Kind == ProjectKindCodes.Research ? project.ResearchDetails?.ResearchSubject ?? string.Empty : string.Empty,
             localization.GetFormattedString("Project_Card_Milestones", project.Milestones.Count),
-            localization.GetFormattedString("Project_Card_Updated", project.UpdatedAtUtc.ToLocalTime().ToString("g"))) { }
+            localization.GetFormattedString("Project_Card_Updated", project.UpdatedAtUtc.ToLocalTime().ToString("g")),
+            project.WorkFolder is { RequiresReselection: false },
+            localization.GetString(project.WorkFolder is { RequiresReselection: false } ? "ProjectFolder_Action_OpenWorkFolder" : "ProjectFolder_Action_NotLinked")) { }
     }
 }
