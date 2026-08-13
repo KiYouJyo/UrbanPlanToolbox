@@ -332,7 +332,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.5.11", viewModel.CurrentVersion);
+        Assert.Equal("v1.6.0", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -346,6 +346,11 @@ public sealed class AppUpdateTests
         Assert.Contains("UpdateVersionText.Text = AppVersionProvider.DisplayVersion", source, StringComparison.Ordinal);
         Assert.DoesNotContain("UpdateVersionText.Text = info.AvailableVersion", source, StringComparison.Ordinal);
         Assert.DoesNotContain("UpdateVersionText.Text = info.Version", source, StringComparison.Ordinal);
+        Assert.Contains("info.State == AppUpdateState.UpdateAvailable && !string.IsNullOrWhiteSpace(info.AvailableVersion)", source, StringComparison.Ordinal);
+        Assert.Contains("UpdateTargetLabel.Visibility", source, StringComparison.Ordinal);
+        Assert.Contains("UpdateNotesLabel.Visibility", source, StringComparison.Ordinal);
+        Assert.Contains("UpdateNotesContainer.Visibility", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("info.AvailableVersion is null ? unavailable", source, StringComparison.Ordinal);
     }
 
     private static string FindRepositoryRoot()

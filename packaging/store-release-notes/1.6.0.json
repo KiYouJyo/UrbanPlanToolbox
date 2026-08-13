@@ -1,0 +1,8 @@
+{
+  "version": "1.6.0",
+  "locales": {
+    "zh-CN": ["优化项目主页卡片布局，并新增工作文件夹快捷入口。"],
+    "ja-JP": ["プロジェクトホームのカードレイアウトを改善し、作業フォルダーへのショートカットを追加しました。"],
+    "en-US": ["Improved project home card layout and added a work-folder shortcut."]
+  }
+}

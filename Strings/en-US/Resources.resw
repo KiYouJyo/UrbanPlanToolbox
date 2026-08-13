@@ -982,6 +982,8 @@ Latest version: {1}</value>
     <value>Updated {0}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
+  <data name="ProjectFolder_Action_OpenWorkFolder" xml:space="preserve"><value>Open work folder</value></data>
+  <data name="ProjectFolder_Action_NotLinked" xml:space="preserve"><value>Work folder not linked</value></data>
   <data name="ProjectArchive_ArchivedAt" xml:space="preserve">
     <value>Archived {0}</value>
     <comment>v0.3.9 project workspace resource.</comment>

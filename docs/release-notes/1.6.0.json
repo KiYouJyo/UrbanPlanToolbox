@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.0",
+  "notes": {
+    "zh-CN": {
+      "title": "更新内容",
+      "items": [
+        "项目主页的项目卡片新增工作文件夹快捷入口。",
+        "优化项目卡片布局，并修复 Microsoft Store 最新状态下显示无意义占位内容的问题。"
+      ]
+    },
+    "ja-JP": {
+      "title": "更新内容",
+      "items": [
+        "プロジェクトホームのカードに作業フォルダーのショートカットを追加しました。",
+        "カードレイアウトを改善し、Microsoft Store で最新の場合に不要なプレースホルダーが表示される問題を修正しました。"
+      ]
+    },
+    "en-US": {
+      "title": "What's new",
+      "items": [
+        "Added a work-folder shortcut to project cards on the project home page.",
+        "Improved card layout and fixed meaningless placeholders when Microsoft Store reports the app is up to date."
+      ]
+    }
+  }
+}

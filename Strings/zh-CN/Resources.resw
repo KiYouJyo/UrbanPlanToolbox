@@ -985,6 +985,8 @@ dwyblchhq</value>
     <value>更新于 {0}</value>
     <comment>v0.3.9 project workspace resource.</comment>
   </data>
+  <data name="ProjectFolder_Action_OpenWorkFolder" xml:space="preserve"><value>打开工作文件夹</value></data>
+  <data name="ProjectFolder_Action_NotLinked" xml:space="preserve"><value>工作文件夹未绑定</value></data>
   <data name="ProjectArchive_ArchivedAt" xml:space="preserve">
     <value>归档于 {0}</value>
     <comment>v0.3.9 project workspace resource.</comment>
