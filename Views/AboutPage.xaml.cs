@@ -71,27 +71,28 @@ public sealed partial class AboutPage : Page
     private void RenderUpdate()
     {
         var info = _updates.Info;
-        var notChecked = info.State == AppUpdateState.NotChecked;
         var checking = info.State == AppUpdateState.Checking;
-        var hasAvailableVersion = info.State == AppUpdateState.UpdateAvailable && !string.IsNullOrWhiteSpace(info.AvailableVersion);
-        var hasPendingVersion = (info.State is AppUpdateState.Downloading or AppUpdateState.ReadyToInstall or AppUpdateState.Installing or AppUpdateState.Restarting) && !string.IsNullOrWhiteSpace(info.AvailableVersion);
-        hasAvailableVersion |= hasPendingVersion;
         var localizedNotes = info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage));
-        var hasReleaseNotes = info.State == AppUpdateState.UpdateAvailable && localizedNotes is not null && localizedNotes.Items.Count > 0;
+        var localizedItems = localizedNotes?.Items.Where(item => !string.IsNullOrWhiteSpace(item)).ToArray() ?? [];
+        var releaseNotes = localizedItems.Length > 0
+            ? string.Join(Environment.NewLine, localizedItems.Select(item => $"- {item}"))
+            : info.ReleaseNotes;
+        var hasReleaseNotes = !string.IsNullOrWhiteSpace(releaseNotes);
+        const string unavailableValue = "\u2014";
 
         UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
-        UpdateTargetLabel.Visibility = checking || !hasAvailableVersion ? Visibility.Collapsed : Visibility.Visible;
-        UpdateTargetText.Visibility = checking || !hasAvailableVersion ? Visibility.Collapsed : Visibility.Visible;
+        UpdateTargetLabel.Visibility = Visibility.Visible;
+        UpdateTargetText.Visibility = Visibility.Visible;
         UpdateTargetProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;
         UpdateTargetProgressRing.IsActive = checking;
-        UpdateTargetText.Text = hasAvailableVersion ? $"v{info.AvailableVersion}" : string.Empty;
+        UpdateTargetText.Text = string.IsNullOrWhiteSpace(info.AvailableVersion) ? unavailableValue : $"v{info.AvailableVersion}";
 
-        UpdateNotesLabel.Visibility = checking || !hasReleaseNotes ? Visibility.Collapsed : Visibility.Visible;
-        UpdateNotesContainer.Visibility = checking || hasReleaseNotes ? Visibility.Visible : Visibility.Collapsed;
-        UpdateNotesText.Visibility = checking || !hasReleaseNotes ? Visibility.Collapsed : Visibility.Visible;
+        UpdateNotesLabel.Visibility = Visibility.Visible;
+        UpdateNotesContainer.Visibility = Visibility.Visible;
+        UpdateNotesText.Visibility = Visibility.Visible;
         UpdateNotesProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;
         UpdateNotesProgressRing.IsActive = checking;
-        UpdateNotesText.Text = hasReleaseNotes ? string.Join(Environment.NewLine, localizedNotes!.Items.Select(item => $"• {item}")) : string.Empty;
+        UpdateNotesText.Text = hasReleaseNotes ? releaseNotes : unavailableValue;
 
         CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
         CheckUpdateButton.Content = info.IsReadyToInstall ? T("Action_RestartAndUpdate") : info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");

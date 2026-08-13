@@ -29,8 +29,14 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     public async Task CheckAsync(CancellationToken cancellationToken = default)
     {
         if (Interlocked.Exchange(ref _busy, 1) != 0) return;
-        try { Progress = null; OnChanged(nameof(Progress)); Info = new(AppUpdateState.Checking); Info = await _service.CheckForUpdatesAsync(cancellationToken); }
-        catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = new(AppUpdateState.Cancelled); }
+        try
+        {
+            Progress = null;
+            OnChanged(nameof(Progress));
+            Info = Info with { State = AppUpdateState.Checking, Detail = null, ErrorCode = null };
+            Info = await _service.CheckForUpdatesAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" }; }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
     }
 
@@ -64,7 +70,7 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
             OnChanged(nameof(Progress));
             Info = Info with { State = finalState, Detail = result.Detail, ErrorCode = result.ErrorCode };
         }
-        catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = new(AppUpdateState.Cancelled); }
+        catch (OperationCanceledException) { Progress = null; OnChanged(nameof(Progress)); Info = Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" }; }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
     }
 

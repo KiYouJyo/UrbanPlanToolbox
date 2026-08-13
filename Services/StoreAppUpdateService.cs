@@ -22,9 +22,9 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
         {
             var context = CreateContext();
             _updates = await context.GetAppAndOptionalStorePackageUpdatesAsync().AsTask(cancellationToken);
-            if (_updates.Count == 0) return new(AppUpdateState.UpToDate, Source: UpdateInstallSource.Unknown);
+            if (_updates.Count == 0) return new(AppUpdateState.UpToDate, AvailableVersion: AppVersionProvider.Version, Source: UpdateInstallSource.Store);
             var versionText = await _manifestService.GetVersionAsync(DistributionChannel.Store, cancellationToken);
-            return new(AppUpdateState.UpdateAvailable, versionText, Source: UpdateInstallSource.Unknown);
+            return new(AppUpdateState.UpdateAvailable, versionText, Source: UpdateInstallSource.Store);
         }
         catch (OperationCanceledException) { return new(AppUpdateState.Cancelled); }
         catch (InvalidOperationException exception) when (exception.Message == "StoreWindowUnavailable") { return new(AppUpdateState.Failed, exception.Message); }
