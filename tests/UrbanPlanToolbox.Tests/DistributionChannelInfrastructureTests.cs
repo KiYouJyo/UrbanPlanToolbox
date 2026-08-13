@@ -32,17 +32,23 @@ public sealed class DistributionChannelInfrastructureTests
     }
 
     [Fact]
-    public void GitHubUpdaterUsesOfficialAppInstaller()
+    public void GitHubUpdaterDeploysVerifiedLocalBundleWithoutBrowserFallback()
     {
         var root = FindRepositoryRoot();
         var updater = File.ReadAllText(Path.Combine(root, "Services", "GitHubAppUpdateService.cs"));
         var releaseService = File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs"));
 
         Assert.Contains("DownloadAndVerifyBundleAsync", releaseService, StringComparison.Ordinal);
-        Assert.Contains("RepositoryLinks.AppInstaller", updater, StringComparison.Ordinal);
-        Assert.Contains("ExternalLinkService.OpenAsync", updater, StringComparison.Ordinal);
-        Assert.DoesNotContain("AddPackageAsync", updater, StringComparison.Ordinal);
-        Assert.DoesNotContain("PackageManager", updater, StringComparison.Ordinal);
+        Assert.Contains("_updateService.DownloadAndVerifyBundleAsync", updater, StringComparison.Ordinal);
+        Assert.Contains("PackageManager", updater, StringComparison.Ordinal);
+        Assert.Contains("AddPackageAsync", updater, StringComparison.Ordinal);
+        Assert.Contains("ForceApplicationShutdown", updater, StringComparison.Ordinal);
+        Assert.Contains("ApplicationRestartRegistration.Register", updater, StringComparison.Ordinal);
+        Assert.Contains("PackageDeploymentCompleted", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("RepositoryLinks.AppInstaller", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("ExternalLinkService.OpenAsync", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("Launcher.LaunchFileAsync", updater, StringComparison.Ordinal);
+        Assert.DoesNotContain("ms-appinstaller:", updater, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("UpdateInstallSource.GitHub", updater, StringComparison.Ordinal);
     }
 

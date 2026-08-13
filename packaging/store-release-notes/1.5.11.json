@@ -1,0 +1,8 @@
+{
+  "version": "1.5.11",
+  "locales": {
+    "zh-CN": ["修复 GitHub 侧载更新跳转浏览器，并改为应用内下载校验 MSIXBundle。"],
+    "ja-JP": ["GitHub 更新のブラウザー遷移を修正し、アプリ内で MSIXBundle をダウンロードして検証するようにしました。"],
+    "en-US": ["Fixed GitHub updates opening the browser and added in-app MSIXBundle download and verification."]
+  }
+}

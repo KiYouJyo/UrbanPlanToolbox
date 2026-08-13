@@ -209,6 +209,23 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
+    public void AboutPageUsesNativeProgressRingsOnlyWhileChecking()
+    {
+        var root = FindRepositoryRoot();
+        var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
+        var code = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
+
+        Assert.Contains("x:Name=\"UpdateTargetProgressRing\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"UpdateNotesProgressRing\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("ProgressRing", xaml, StringComparison.Ordinal);
+        Assert.Contains("var checking = info.State == AppUpdateState.Checking", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateTargetProgressRing.IsActive = checking", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateNotesProgressRing.IsActive = checking", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateTargetProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateNotesProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task ReleaseNotesRequestUsesAbsoluteGitHubPagesUriAndRejectsVersionMismatch()
     {
         var handler = new ReleaseNotesHandler();
@@ -315,7 +332,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.5.10", viewModel.CurrentVersion);
+        Assert.Equal("v1.5.11", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -357,6 +374,7 @@ public sealed class AppUpdateTests
                 Content = new StringContent($"{{\"tag_name\":\"v{version}\",\"name\":\"UrbanPlanToolbox v{version}\",\"body\":\"notes\",\"html_url\":\"https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v{version}\",\"assets\":[]}}", System.Text.Encoding.UTF8, "application/json")
             });
     }
+
 }
 
 internal sealed class PendingProgressService : IAppUpdateService
