@@ -1,10 +1,8 @@
-# UrbanPlanToolbox v1.5.4
-
 ## 简体中文
 
 UrbanPlanToolbox v1.5.4 正式发布。
 
-### 修复与改进
+**修复与改进**
 
 - 修复发现新版本时更新确认弹窗标题可能显示本地化资源键的问题。
 - 重构 Microsoft Store 应用内更新的进度回调链路，提高真实下载进度获取的可靠性。
@@ -19,7 +17,7 @@ UrbanPlanToolbox v1.5.4 正式发布。
 
 UrbanPlanToolbox v1.5.4 を正式公開します。
 
-### 修正と改善
+**修正と改善**
 
 - 更新確認ダイアログのタイトルにローカライズ用リソースキーが表示される問題を修正しました。
 - Microsoft Store アプリ内更新の進捗コールバック処理を見直し、実際のダウンロード進捗取得の信頼性を向上しました。
@@ -34,7 +32,7 @@ UrbanPlanToolbox v1.5.4 を正式公開します。
 
 UrbanPlanToolbox v1.5.4 is now available.
 
-### Fixes and improvements
+**Fixes and improvements**
 
 - Fixed an issue where the update confirmation dialog could display a localization resource key instead of its title.
 - Revised the Microsoft Store in-app update progress callback pipeline for more reliable real download progress reporting.

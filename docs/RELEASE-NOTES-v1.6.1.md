@@ -1,5 +1,3 @@
-# UrbanPlanToolbox v1.6.1
-
 ## 简体中文
 
 UrbanPlanToolbox v1.6.1 改进 GitHub 侧载渠道的更新流程。

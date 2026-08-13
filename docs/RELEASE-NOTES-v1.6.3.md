@@ -1,5 +1,3 @@
-# UrbanPlanToolbox v1.6.3
-
 ## 简体中文
 
 UrbanPlanToolbox v1.6.3 主要改进 GitHub 更新系统稳定性。

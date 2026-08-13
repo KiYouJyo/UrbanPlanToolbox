@@ -1,5 +1,3 @@
-# UrbanPlanToolbox v1.6.4
-
 ## 简体中文
 
 UrbanPlanToolbox v1.6.4 主要改进响应式导航界面的视觉一致性。

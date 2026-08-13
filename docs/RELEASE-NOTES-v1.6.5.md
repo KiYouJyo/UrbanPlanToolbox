@@ -1,5 +1,3 @@
-# UrbanPlanToolbox v1.6.5
-
 ## 简体中文
 
 UrbanPlanToolbox v1.6.5 主要修复 GitHub 侧载更新安装包的签名验证流程。

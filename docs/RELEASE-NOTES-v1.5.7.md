@@ -1,10 +1,8 @@
-# UrbanPlanToolbox v1.5.7
-
 ## 简体中文
 
 UrbanPlanToolbox v1.5.7 正式发布。
 
-### 更新体验
+**更新体验**
 
 - 统一 GitHub 与 Microsoft Store 的更新检查体验。
 - 发现新版本时显示与应用主题一致的本地化确认弹窗。
@@ -13,7 +11,7 @@ UrbanPlanToolbox v1.5.7 正式发布。
 - 修复更新管理中当前版本可能显示远端版本的问题。
 - 修复 About 页面版权符号编码错误。
 
-### 分发与兼容性
+**分发与兼容性**
 
 - GitHub 与 Microsoft Store 继续使用独立的下载和安装机制。
 - GitHub 安装继续从 GitHub Releases 获取并验证 MSIXBundle 后进行本地部署。
@@ -27,7 +25,7 @@ UrbanPlanToolbox v1.5.7 正式发布。
 
 UrbanPlanToolbox v1.5.7 を正式に公開しました。
 
-### 更新体験
+**更新体験**
 
 - GitHub 版と Microsoft Store 版の更新確認 UI を統一しました。
 - 新しいバージョンがある場合、現在のアプリ言語によるテーマ対応の確認ダイアログを表示します。
@@ -36,7 +34,7 @@ UrbanPlanToolbox v1.5.7 を正式に公開しました。
 - 更新管理画面で現在のバージョンがリモート版として表示される問題を修正しました。
 - About ページの著作権記号の文字化けを修正しました。
 
-### 配布と互換性
+**配布と互換性**
 
 - GitHub と Microsoft Store は独立したダウンロード・インストール経路を引き続き使用します。
 - GitHub 版は GitHub Releases から MSIXBundle を取得・検証してローカルに展開します。
@@ -50,7 +48,7 @@ UrbanPlanToolbox v1.5.7 を正式に公開しました。
 
 UrbanPlanToolbox v1.5.7 is now available.
 
-### Update experience
+**Update experience**
 
 - Unified the update-check experience for GitHub and Microsoft Store installations.
 - Added a themed, localized confirmation dialog when an update is available.
@@ -59,7 +57,7 @@ UrbanPlanToolbox v1.5.7 is now available.
 - Fixed the Update section showing a remote version instead of the currently installed version.
 - Fixed the copyright-symbol encoding issue on the About page.
 
-### Distribution and compatibility
+**Distribution and compatibility**
 
 - GitHub and Microsoft Store continue to use independent download and installation pipelines.
 - GitHub installations continue to obtain and verify the official MSIXBundle from GitHub Releases before local deployment.

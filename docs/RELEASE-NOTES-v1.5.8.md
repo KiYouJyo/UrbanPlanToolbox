@@ -1,5 +1,3 @@
-# UrbanPlanToolbox v1.5.8
-
 ## 简体中文
 
 UrbanPlanToolbox v1.5.8 正式发布。

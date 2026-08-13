@@ -1,5 +1,3 @@
-# UrbanPlanToolbox v1.5.10
-
 ## 简体中文
 
 UrbanPlanToolbox v1.5.10 是一次更新管理界面修复版本。
