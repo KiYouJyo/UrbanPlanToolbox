@@ -16,4 +16,7 @@ if ($text -notmatch '(?ms)Sign bundle and export public certificate.*?env:\s*\r?
 if ($text -notmatch '(?ms)gh release upload.*?LASTEXITCODE') { throw 'Release asset upload must check LASTEXITCODE.' }
 if ($text -match 'gh release delete|gh api -X DELETE') { throw 'Workflow must never delete Releases or assets.' }
 if ($text -match '-f body=') { throw 'Release notes must be passed through --notes-file, not an inline API body.' }
+if ($text -match '&\$normalize') { throw 'Normalizer ScriptBlock calls must use the spaced invocation form.' }
+if ($text -notmatch '\(\&\s+\$normalize\s+\$release\.body\)\s+-ne\s+\(\&\s+\$normalize') { throw 'Release Notes comparison must parenthesize both normalizer calls.' }
+if ($text -notmatch '\(\&\s+\$normalize\s+\$localSha\)\s+-ne\s+\(\&\s+\$normalize') { throw 'SHA256 manifest comparison must parenthesize both normalizer calls.' }
 Write-Output 'GitHub release workflow contract validation passed.'

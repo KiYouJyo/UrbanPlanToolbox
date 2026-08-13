@@ -223,7 +223,7 @@ jobs:
           $release = $releaseJson | ConvertFrom-Json
           if ($release.tag_name -ne $tag -or $release.draft -or $release.prerelease) { throw "Published Release metadata mismatch." }
           $normalize = { param($value) (($value -replace "`r`n", "`n") -replace "`r", "`n").TrimEnd() }
-          if (&$normalize $release.body -ne (&$normalize (Get-Content $notesPath -Raw))) { throw 'Published Release Notes do not match the notes file.' }
+          if ((& $normalize $release.body) -ne (& $normalize (Get-Content $notesPath -Raw))) { throw 'Published Release Notes do not match the notes file.' }
           if ($release.body -match '`n|\\n') { throw 'Published Release Notes contain literal newline escapes.' }
           $expected = @("UrbanPlanToolbox_${version}.0_x64.msixbundle", "UrbanPlanToolbox-v$version-x64-one-click.zip", 'SHA256SUMS.txt')
           $remote = gh api "repos/${{ github.repository }}/releases/$($release.id)/assets" 2>&1
@@ -253,7 +253,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Published SHA256SUMS.txt download failed.' }
           $localSha = Get-Content (Join-Path $assets 'SHA256SUMS.txt') -Raw
           $remoteSha = Get-Content (Join-Path $publishedSha 'SHA256SUMS.txt') -Raw
-          if (&$normalize $localSha -ne (&$normalize $remoteSha)) { throw 'Published SHA256SUMS.txt does not match the local manifest.' }
+          if ((& $normalize $localSha) -ne (& $normalize $remoteSha)) { throw 'Published SHA256SUMS.txt does not match the local manifest.' }
 
       - name: Upload release asset artifact
         uses: actions/upload-artifact@v7
