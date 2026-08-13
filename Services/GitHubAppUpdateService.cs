@@ -20,7 +20,7 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
         return result.Status switch
         {
             UpdateCheckStatus.UpdateAvailable => await SetPendingAsync(result, cancellationToken),
-            UpdateCheckStatus.UpToDate or UpdateCheckStatus.LocalVersionNewer => SetPending(result, new(AppUpdateState.UpToDate, Source: UpdateInstallSource.AppInstaller)),
+            UpdateCheckStatus.UpToDate or UpdateCheckStatus.LocalVersionNewer => SetPending(result, new(AppUpdateState.UpToDate, AvailableVersion: GetRemoteVersion(result), Source: UpdateInstallSource.AppInstaller)),
             UpdateCheckStatus.NoRelease => Fail("ReleaseNotFound"),
             UpdateCheckStatus.InvalidRemoteVersion or UpdateCheckStatus.InvalidResponse => Fail("InvalidReleaseResponse"),
             UpdateCheckStatus.RateLimited => Fail("GitHubRateLimited"),
@@ -57,7 +57,7 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
     {
         _pendingRelease = result.Release;
         _updateAvailable = result.Status == UpdateCheckStatus.UpdateAvailable;
-        var displayVersion = await _manifestService.GetVersionAsync(DistributionChannel.GitHub, cancellationToken);
+        var displayVersion = GetRemoteVersion(result) ?? await _manifestService.GetVersionAsync(DistributionChannel.GitHub, cancellationToken);
         return new(AppUpdateState.UpdateAvailable, displayVersion, Source: UpdateInstallSource.AppInstaller);
     }
 
@@ -69,4 +69,8 @@ public sealed class GitHubAppUpdateService(GitHubUpdateService updateService, Up
         _updateAvailable = result.Status == UpdateCheckStatus.UpdateAvailable;
         return info;
     }
+
+    private static string? GetRemoteVersion(UpdateCheckResult result) => result.RemoteVersion is { } version
+        ? $"{version.Major}.{version.Minor}.{version.Build}"
+        : null;
 }

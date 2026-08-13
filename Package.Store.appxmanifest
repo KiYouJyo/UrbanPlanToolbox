@@ -11,7 +11,7 @@
   <Identity
     Name="JoKiy.UrbanPlanToolbox"
     Publisher="CN=C4E4B33A-7B77-4121-897C-7D720A5471F8"
-    Version="1.5.9.0" />
+    Version="1.5.10.0" />
 
   <Properties>
     <DisplayName>ms-resource:AppDisplayName</DisplayName>

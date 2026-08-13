@@ -55,7 +55,7 @@ public sealed partial class AboutPage : Page
             return;
         }
         await _updates.CheckAsync(_pageLifetime.Token);
-        if (_updates.Info.IsUpdateAvailable)
+        if (!string.IsNullOrWhiteSpace(_updates.Info.AvailableVersion))
             await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
     }
     private void OnCopyDiagnostics(object sender, RoutedEventArgs e)
@@ -70,7 +70,7 @@ public sealed partial class AboutPage : Page
     }
     private void RenderUpdate()
     {
-        var info = _updates.Info; UpdateVersionText.Text = AppVersionProvider.DisplayVersion; UpdateTargetText.Text = info.AvailableVersion is null ? T("About_Unavailable") : $"v{info.AvailableVersion}"; UpdateNotesText.Text = info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage)) is { } note ? string.Join(Environment.NewLine, note.Items.Select(item => $"• {item}")) : T("About_Unavailable"); CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
+        var info = _updates.Info; var notChecked = info.State == AppUpdateState.NotChecked; var unavailable = T("About_Unavailable"); var notCheckedText = T("Update_State_NotChecked"); UpdateVersionText.Text = AppVersionProvider.DisplayVersion; UpdateTargetText.Text = notChecked ? notCheckedText : info.AvailableVersion is null ? unavailable : $"v{info.AvailableVersion}"; UpdateNotesText.Text = notChecked ? notCheckedText : info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage)) is { } note ? string.Join(Environment.NewLine, note.Items.Select(item => $"• {item}")) : unavailable; CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
         CheckUpdateButton.Content = info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
         UpdateStatusText.Text = T($"Update_State_{info.State}");
         var progressVisible = info.State is AppUpdateState.Downloading or AppUpdateState.Installing or AppUpdateState.Restarting;

@@ -1,0 +1,8 @@
+{
+  "version": "1.5.10",
+  "locales": {
+    "zh-CN": ["修复最新版本显示、Release Notes 显示和更新检查前状态显示问题。"],
+    "ja-JP": ["最新バージョン表示、Release Notes 表示、更新確認前の状態表示を修正しました。"],
+    "en-US": ["Fixed latest-version display, Release Notes display, and the pre-check update state."]
+  }
+}

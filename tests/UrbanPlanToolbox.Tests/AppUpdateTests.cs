@@ -222,6 +222,49 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
+    public async Task GitHubUpToDateRetainsValidatedRemoteVersion()
+    {
+        var localVersion = AppVersionProvider.GetCurrentVersion();
+        var expectedVersion = $"{localVersion.Major}.{localVersion.Minor}.{localVersion.Build}";
+        var service = new GitHubAppUpdateService(new GitHubUpdateService(new HttpClient(new GitHubReleaseHandler(expectedVersion))));
+
+        var info = await service.CheckForUpdatesAsync();
+
+        Assert.Equal(AppUpdateState.UpToDate, info.State);
+        Assert.Equal(expectedVersion, info.AvailableVersion);
+        Assert.False(info.IsUpdateAvailable);
+    }
+
+    [Fact]
+    public async Task UpToDateVersionLoadsLocalizedReleaseNotesWithoutEnablingInstall()
+    {
+        var viewModel = new UpdateViewModel(new FixedUpdateService(AppUpdateState.UpToDate, "1.5.9"));
+        var notes = new LocalizedReleaseNotesService(new HttpClient(new ReleaseNotesHandler()));
+
+        await viewModel.CheckAsync();
+        await viewModel.SetLocalizedNotesAsync(notes, "en-US");
+
+        Assert.NotNull(viewModel.Info.LocalizedReleaseNotes);
+        Assert.False(viewModel.CanInstall);
+        Assert.False(viewModel.ShouldShowUpdateDialog);
+    }
+
+    [Fact]
+    public async Task UpdateAvailableStillLoadsLocalizedReleaseNotesAndEnablesInstall()
+    {
+        var viewModel = new UpdateViewModel(new FixedUpdateService(AppUpdateState.UpdateAvailable, "1.5.9"));
+        var notes = new LocalizedReleaseNotesService(new HttpClient(new ReleaseNotesHandler()));
+
+        await viewModel.CheckAsync();
+        await viewModel.SetLocalizedNotesAsync(notes, "en-US");
+
+        Assert.Equal("1.5.9", viewModel.Info.AvailableVersion);
+        Assert.NotNull(viewModel.Info.LocalizedReleaseNotes);
+        Assert.True(viewModel.CanInstall);
+        Assert.True(viewModel.ShouldShowUpdateDialog);
+    }
+
+    [Fact]
     public void StoreProgressDiagnosticsContainVersionAndSourceFields()
     {
         var root = FindRepositoryRoot();
@@ -272,7 +315,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.5.9", viewModel.CurrentVersion);
+        Assert.Equal("v1.5.10", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -304,6 +347,15 @@ public sealed class AppUpdateTests
             RequestUri = request.RequestUri;
             return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(Payload, System.Text.Encoding.UTF8, "application/json") });
         }
+    }
+
+    private sealed class GitHubReleaseHandler(string version) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new StringContent($"{{\"tag_name\":\"v{version}\",\"name\":\"UrbanPlanToolbox v{version}\",\"body\":\"notes\",\"html_url\":\"https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v{version}\",\"assets\":[]}}", System.Text.Encoding.UTF8, "application/json")
+            });
     }
 }
 
