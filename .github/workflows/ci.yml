@@ -24,13 +24,116 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Determine CI change scope
+        id: change-scope
+        shell: pwsh
+        env:
+          CI_EVENT_NAME: ${{ github.event_name }}
+          CI_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          CI_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_PUSH_BEFORE_SHA: ${{ github.event.before }}
+          CI_HEAD_SHA: ${{ github.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $changedFiles = @()
+          $classificationError = $null
+          $comparisonAvailable = $false
+
+          try {
+            switch ($env:CI_EVENT_NAME) {
+              'pull_request' {
+                $base = $env:CI_PR_BASE_SHA
+                $head = $env:CI_PR_HEAD_SHA
+              }
+              'push' {
+                $base = $env:CI_PUSH_BEFORE_SHA
+                $head = $env:CI_HEAD_SHA
+                if ($base -match '^0{40}$') {
+                  throw 'Push before SHA is the all-zero initial-push sentinel.'
+                }
+              }
+              default {
+                throw "No reliable changed-files comparison is defined for event '$env:CI_EVENT_NAME'."
+              }
+            }
+
+            if ([string]::IsNullOrWhiteSpace($base) -or [string]::IsNullOrWhiteSpace($head)) {
+              throw 'Base or head SHA is missing.'
+            }
+
+            foreach ($sha in @($base, $head)) {
+              git cat-file -e "$sha^{commit}"
+              if ($LASTEXITCODE -ne 0) {
+                throw "Commit is unavailable locally: $sha"
+              }
+            }
+
+            $changedFiles = @(git -c core.quotepath=false diff --name-only --no-renames $base $head)
+            if ($LASTEXITCODE -ne 0) {
+              throw "git diff failed with exit code $LASTEXITCODE."
+            }
+            $comparisonAvailable = $true
+          }
+          catch {
+            $classificationError = $_.Exception.Message
+          }
+
+          if ($classificationError) {
+            $classification = [pscustomobject]@{
+              Scope = 'full'
+              Reason = "full CI required because changed files could not be reliably determined: $classificationError"
+              Files = @()
+            }
+          }
+          else {
+            $classification = & .github/scripts/Get-CiChangeScope.ps1 -ChangedPath $changedFiles
+          }
+
+          Write-Host "CI change scope: $($classification.Scope.ToUpperInvariant())"
+          Write-Host 'Changed files:'
+          if ($changedFiles.Count -eq 0) { Write-Host '  <none>' }
+          else { $changedFiles | ForEach-Object { Write-Host "  $_" } }
+          Write-Host "Reason: $($classification.Reason)"
+          if ($classification.Scope -eq 'full' -and $classification.Files.Count -gt 0) {
+            Write-Host 'Full CI required because:'
+            $classification.Files | ForEach-Object { Write-Host "  $_" }
+          }
+
+          "scope=$($classification.Scope)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "has-comparison=$comparisonAvailable" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          if ($comparisonAvailable) {
+            "diff-base=$base" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            "diff-head=$head" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          }
+
+      - name: Check diff whitespace
+        if: steps.change-scope.outputs.has-comparison == 'true'
+        shell: pwsh
+        run: git diff --check '${{ steps.change-scope.outputs.diff-base }}' '${{ steps.change-scope.outputs.diff-head }}'
+
+      - name: Validate CI change classifier
+        shell: pwsh
+        run: ./\.github/scripts/Test-CiChangeScope.ps1
+
+      - name: Validate release documentation
+        shell: pwsh
+        run: ./scripts/Test-ReleaseDocumentationConsistency.ps1
+
+      - name: Validate documentation SSOT
+        shell: pwsh
+        run: ./packaging/Test-DocumentationConsistency.ps1
 
       - name: Setup .NET
+        if: steps.change-scope.outputs.scope == 'full'
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
       - name: Show environment
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: |
           dotnet --info
@@ -41,6 +144,7 @@ jobs:
           Write-Host "Ref: $env:GITHUB_REF"
 
       - name: Restore Release dependencies
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: |
           dotnet restore UrbanPlanToolbox.slnx `
@@ -48,18 +152,22 @@ jobs:
             -p:Platform=x64
 
       - name: Run unit tests
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: dotnet test UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore --verbosity normal
 
       - name: Build Debug x64
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: dotnet build UrbanPlanToolbox.slnx -c Debug -p:Platform=x64 --no-restore
 
       - name: Build Release x64
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: dotnet build UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore
 
       - name: Verify x64 output
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: |
           $targetFramework = 'net10.0-windows10.0.26100.0'
@@ -85,6 +193,7 @@ jobs:
           }
 
       - name: Validate PowerShell scripts
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: |
           $scriptFiles = Get-ChildItem -Path packaging -Filter '*.ps1' -File -Recurse
@@ -107,15 +216,8 @@ jobs:
             }
           }
 
-      - name: Validate release documentation
-        shell: pwsh
-        run: ./scripts/Test-ReleaseDocumentationConsistency.ps1
-
-      - name: Validate documentation SSOT
-        shell: pwsh
-        run: ./packaging/Test-DocumentationConsistency.ps1
-
       - name: Validate CMD files
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: |
           $cmdFiles = @(
@@ -149,6 +251,7 @@ jobs:
           }
 
       - name: Validate repository contents
+        if: steps.change-scope.outputs.scope == 'full'
         shell: pwsh
         run: |
           $trackedFiles = git ls-files
