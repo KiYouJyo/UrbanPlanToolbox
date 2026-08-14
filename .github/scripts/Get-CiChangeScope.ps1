@@ -19,6 +19,11 @@ $safeRootMarkdown = @(
     'THIRD-PARTY-NOTICES.md'
 )
 
+$safeExactDocumentation = @(
+    'docs/project-status.json',
+    'docs/update-manifest.json'
+)
+
 function New-Classification {
     param(
         [ValidateSet('full', 'lightweight')]
@@ -50,8 +55,8 @@ foreach ($path in $paths) {
         continue
     }
 
-    $isSafeDocumentation = $path -eq 'docs/project-status.json' -or
-        $path -match '^docs/.+\.md$' -or
+    $isSafeDocumentation = $safeExactDocumentation -contains $path -or
+        $path -match '^docs/.+\.(md|html)$' -or
         $safeRootMarkdown -contains $path
 
     if (-not $isSafeDocumentation) {
@@ -60,7 +65,7 @@ foreach ($path in $paths) {
 }
 
 if ($unsafePaths.Count -gt 0) {
-    return New-Classification -Scope full -Reason 'full CI required because one or more changed files are outside the documentation/status allowlist' -Files $unsafePaths.ToArray()
+    return New-Classification -Scope full -Reason 'full CI required because one or more changed files are outside the documentation/static-site/status allowlist' -Files $unsafePaths.ToArray()
 }
 
-return New-Classification -Scope lightweight -Reason 'all changed files are documentation/status only' -Files $paths
+return New-Classification -Scope lightweight -Reason 'all changed files are documentation/static-site/status metadata only' -Files $paths
