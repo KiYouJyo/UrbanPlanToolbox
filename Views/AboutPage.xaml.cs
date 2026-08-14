@@ -15,10 +15,9 @@ public sealed partial class AboutPage : Page
 {
     private const string PublisherDisplayName = "Jo Kiyō";
     private readonly CancellationTokenSource _pageLifetime = new();
-    private readonly CancellationTokenSource _updateLifetime = new();
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private readonly DistributionChannelContext _channel = new AppDistributionChannelService().GetContext();
-    private readonly UpdateViewModel _updates = new(AppUpdateServiceFactory.CreateDefault(), new ApplicationRestartService());
+    private readonly UpdateViewModel _updates = UpdateViewModel.GetOrCreateDefault(() => new(AppUpdateServiceFactory.CreateDefault(), new ApplicationRestartService()));
     private readonly IReleaseNotesProvider _releaseNotes = LocalizedReleaseNotesService.Default;
 
     public AboutPage()
@@ -29,13 +28,29 @@ public sealed partial class AboutPage : Page
         RepositoryButton.Content = T("Action_GitHubRepository"); ReleasesButton.Content = T("Action_Releases"); IssuesButton.Content = T("Action_SubmitIssue"); LicenseButton.Content = T("Action_ViewMitLicense");
         CheckUpdateButton.Content = T("Action_CheckForUpdates");
         CopyDiagnosticsButton.Content = T("Action_CopyDiagnostics"); OpenLogsButton.Content = T("Action_OpenLogsFolder");
-        _updates.PropertyChanged += (_, _) => DispatcherQueue.TryEnqueue(RenderUpdate);
         Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
         ActualThemeChanged += OnActualThemeChanged;
-        RenderUpdate(); Unloaded += (_, _) => _pageLifetime.Cancel();
+        RenderUpdate();
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e) => UpdateProductLogo();
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        _updates.PropertyChanged -= OnUpdateStateChanged;
+        _updates.PropertyChanged += OnUpdateStateChanged;
+        UpdateProductLogo();
+        RenderUpdate();
+        if (!string.IsNullOrWhiteSpace(_updates.Info.AvailableVersion))
+            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage);
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        _updates.PropertyChanged -= OnUpdateStateChanged;
+        _pageLifetime.Cancel();
+    }
+
+    private void OnUpdateStateChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => DispatcherQueue.TryEnqueue(RenderUpdate);
 
     private void OnActualThemeChanged(FrameworkElement sender, object e) => UpdateProductLogo();
 
@@ -63,19 +78,19 @@ public sealed partial class AboutPage : Page
     {
         if (_updates.Info.NeedsFinalRestart)
         {
-            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
-            await _updates.RestartAndUpdateAsync(_updateLifetime.Token);
+            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage);
+            await _updates.RestartAndUpdateAsync();
             return;
         }
         if (_updates.Info.IsUpdateAvailable)
         {
-            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
-            await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
+            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage);
+            await _updates.DownloadAndInstallAsync();
             return;
         }
-        await _updates.CheckAsync(_pageLifetime.Token);
+        await _updates.CheckAsync();
         if (!string.IsNullOrWhiteSpace(_updates.Info.AvailableVersion))
-            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
+            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage);
     }
     private void OnCopyDiagnostics(object sender, RoutedEventArgs e)
     {

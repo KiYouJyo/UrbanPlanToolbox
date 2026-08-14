@@ -51,7 +51,7 @@ UrbanPlanToolbox/
 }
 ```
 
-`schemaVersion` 是从 1 开始的整数，仅表示该业务文件的数据格式；它与应用版本 0.4.3、MSIX 版本 0.4.3.0 无关。当前项目格式为 `ProjectSchemaVersion = 3`，备份容器另用 `BackupFormatVersion = 1`。`savedAtUtc` 必须是 UTC。字段命名和 UTF-8 JSON 选项由 `DataStorageJson` 集中管理。
+`schemaVersion` 是从 1 开始的整数，仅表示该业务文件的数据格式；它与应用版本 0.4.3、MSIX 版本 0.4.3.0 无关。当前项目格式为 `ProjectSchemaVersion = 3`，备份容器另用 `BackupFormatVersion = 2`。`savedAtUtc` 必须是 UTC。字段命名和 UTF-8 JSON 选项由 `DataStorageJson` 集中管理。
 
 ## 写入、备份与并发
 

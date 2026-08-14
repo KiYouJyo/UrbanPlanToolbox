@@ -11,6 +11,47 @@ namespace UrbanPlanToolbox.Tests;
 
 public sealed class ProjectStorageTests
 {
+    [Theory]
+    [InlineData("v1", "11111111-1111-1111-1111-111111111111", "Legacy canal study")]
+    [InlineData("v2", "22222222-2222-2222-2222-222222222222", "Milestone-era design")]
+    public async Task HistoricalFixtureMigratesToCurrentWithoutLosingProjectIdentityOrWorkFolder(string schema, string projectId, string name)
+    {
+        using var scope = new ProjectScope();
+        var id = Guid.Parse(projectId);
+        await CopyHistoricalFixtureAsync(schema, scope.Provider.GetProjectDataFilePath(id));
+
+        var read = await scope.Service.ReadAsync(id);
+
+        Assert.Equal(DataStorageStatus.Success, read.Status);
+        Assert.Equal(ProjectStorageService.ProjectSchemaVersion, read.SchemaVersion);
+        Assert.Equal(id, read.Value!.Id);
+        Assert.Equal(name, read.Value.Name);
+        Assert.Equal(ProjectKindCodes.Design, read.Value.Kind);
+        Assert.Equal("C:\\Urban\\Canal", read.Value.WorkFolder!.DisplayPath);
+        Assert.Equal("historic-folder-token", read.Value.WorkFolder.AccessToken);
+        Assert.Contains("\"schemaVersion\": 3", await File.ReadAllTextAsync(scope.Provider.GetProjectDataFilePath(id)));
+    }
+
+    [Fact]
+    public async Task CurrentHistoricalFixtureLoadsWithoutMigrationAndPreservesDetails()
+    {
+        using var scope = new ProjectScope();
+        var id = Guid.Parse("33333333-3333-3333-3333-333333333333");
+        var path = scope.Provider.GetProjectDataFilePath(id);
+        await CopyHistoricalFixtureAsync("v3", path);
+        var before = await File.ReadAllBytesAsync(path);
+
+        var read = await scope.Service.ReadAsync(id);
+
+        Assert.Equal(DataStorageStatus.Success, read.Status);
+        Assert.Equal(ProjectStorageService.ProjectSchemaVersion, read.SchemaVersion);
+        Assert.Equal("Current project fixture", read.Value!.Name);
+        Assert.Equal("Suzhou", read.Value.DesignDetails!.AdministrativeRegion);
+        Assert.Equal("Retain current details", read.Value.DesignDetails.Description);
+        Assert.False(Assert.Single(read.Value.Milestones).ReminderEnabled);
+        Assert.Equal(before, await File.ReadAllBytesAsync(path));
+    }
+
     [Fact]
     public async Task CreateReadAndEditKeepStableIdAndIdBasedDirectory()
     {
@@ -557,6 +598,13 @@ public sealed class ProjectStorageTests
     {
         var now = DateTimeOffset.UtcNow;
         return new() { Id = id, Name = name, Type = ProjectTypeCodes.Research, DesignDetails = new(), CreatedAtUtc = now, UpdatedAtUtc = now };
+    }
+
+    private static Task CopyHistoricalFixtureAsync(string schema, string destination)
+    {
+        var fixture = Path.Combine(AppContext.BaseDirectory, "Fixtures", "ProjectSchema", schema, "minimal-valid.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+        return File.WriteAllTextAsync(destination, File.ReadAllText(fixture), new UTF8Encoding(false));
     }
 
     private sealed class ProjectScope : IDisposable

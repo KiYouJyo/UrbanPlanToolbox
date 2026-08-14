@@ -1,5 +1,16 @@
 # 更改日志
 
+## 1.7.0
+
+### Platform foundation and updater freeze preparation
+
+- Fixes update state and progress disappearing after navigation during a check or download; update work now persists for the whole application session.
+- Establishes a unified release-metadata source to reduce drift among versions, notes, the CHANGELOG, GitHub, and Microsoft Store publication data.
+- Strengthens project data-format versioning, migration, and backward-compatibility rules for long-term readability of older projects.
+- Establishes deterministic governance baselines for package size and dependencies.
+- Completes stability closeout and freeze preparation for the GitHub and Microsoft Store update flows.
+- Refines the dual-channel policy: GitHub delivers frequent stable releases while Microsoft Store primarily carries stable milestone versions.
+
 ## 1.6.8
 
 ### Maintenance closeout

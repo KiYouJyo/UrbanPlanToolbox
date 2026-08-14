@@ -3,6 +3,9 @@
 [Oo]bj/
 [Dd]ebug/
 [Rr]elease/
+!release/
+!release/release.json
+!release/release.schema.json
 .vs/
 *.user
 *.suo

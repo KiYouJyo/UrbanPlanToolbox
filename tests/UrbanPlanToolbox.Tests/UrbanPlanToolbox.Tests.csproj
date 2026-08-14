@@ -24,6 +24,7 @@
   <Compile Include="../../Services/IAppDataPathProvider.cs" Link="Services/IAppDataPathProvider.cs" />
   <Compile Include="../../Services/AppDataPathProvider.cs" Link="Services/AppDataPathProvider.cs" />
   <Compile Include="../../Services/DataStorageJson.cs" Link="Services/DataStorageJson.cs" />
+  <Compile Include="../../Services/DataContractVersions.cs" Link="Services/DataContractVersions.cs" />
   <Compile Include="../../Services/IDataMigration.cs" Link="Services/IDataMigration.cs" />
   <Compile Include="../../Services/ProjectV1ToV2Migration.cs" Link="Services/ProjectV1ToV2Migration.cs" />
   <Compile Include="../../Services/ProjectV2ToV3Migration.cs" Link="Services/ProjectV2ToV3Migration.cs" />
@@ -134,6 +135,7 @@
   <Compile Include="../../Services/CoordinateBatchConversionService.cs" Link="Services/CoordinateBatchConversionService.cs" />
  </ItemGroup>
  <ItemGroup>
+  <Content Include="../Fixtures/ProjectSchema/**/*" Link="Fixtures/ProjectSchema/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   <None Include="../../Strings/**/*.resw" Link="Strings/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   <None Include="../../Package.appxmanifest" Link="Package.appxmanifest" CopyToOutputDirectory="PreserveNewest" />
   <None Include="../../UrbanPlanToolbox.csproj" Link="UrbanPlanToolbox.csproj" CopyToOutputDirectory="PreserveNewest" />

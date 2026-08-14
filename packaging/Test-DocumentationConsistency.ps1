@@ -28,51 +28,42 @@ function Get-RequiredFile {
 }
 
 $statusPath = Get-RequiredFile 'docs/project-status.json'
+$releasePath = Get-RequiredFile 'release/release.json'
 $documentationPath = Get-RequiredFile 'docs/DOCUMENTATION.md'
 if ($failures.Count -eq 0) {
     try {
         $status = Get-Content -LiteralPath $statusPath -Raw -Encoding utf8 | ConvertFrom-Json
         Test-Requirement ($status.schemaVersion -eq 2) 'project-status.json uses supported schemaVersion 2'
+        $release = Get-Content -LiteralPath $releasePath -Raw -Encoding utf8 | ConvertFrom-Json
+        Test-Requirement ($release.schemaVersion -eq 1) 'release/release.json uses supported schemaVersion 1'
     }
     catch {
         $failures.Add("project-status.json is not valid JSON: $($_.Exception.Message)")
     }
 }
 
-if ($status) {
+if ($status -and $release) {
     $projectFile = [xml](Get-Content -LiteralPath (Join-Path $repositoryRoot 'UrbanPlanToolbox.csproj') -Raw)
     $projectVersionNode = $projectFile.SelectSingleNode('/*[local-name()="Project"]/*[local-name()="PropertyGroup"]/*[local-name()="Version"]')
     $projectVersion = if ($projectVersionNode) { $projectVersionNode.InnerText } else { $null }
-    Test-Requirement ($status.product.version -eq $projectVersion) 'SSOT product version matches UrbanPlanToolbox.csproj'
+    Test-Requirement ($release.product.version -eq $projectVersion) 'Candidate Release Metadata matches UrbanPlanToolbox.csproj'
+    Test-Requirement ($release.product.packageVersion -eq "$projectVersion.0") 'Candidate Release Metadata package version matches product version'
+    Test-Requirement ($release.channels.github.publish -is [bool]) 'Candidate Release Metadata declares GitHub publish policy'
+    Test-Requirement ($release.channels.microsoftStore.submit -is [bool]) 'Candidate Release Metadata declares Microsoft Store submit policy'
 
     $github = $status.distribution.github
-    Test-Requirement ($github.candidateProductVersion -eq $status.product.version) 'SSOT GitHub candidate version matches product version'
-    Test-Requirement ($github.candidatePackageVersion -eq "$($status.product.version).0") 'SSOT GitHub candidate package version matches product version'
     Test-Requirement ($github.latestPublishedProductVersion -ne $null) 'SSOT records the latest confirmed GitHub publication separately'
-    $githubLifecycleIsTruthful =
-        ($github.candidateState -eq 'prepared' -and $github.latestPublishedProductVersion -ne $github.candidateProductVersion) -or
-        ($github.candidateState -eq 'published' -and
-            $github.latestPublishedProductVersion -eq $github.candidateProductVersion -and
-            $github.latestPublishedPackageVersion -eq $github.candidatePackageVersion -and
-            $github.latestPublishedReleaseTag -eq "v$($github.candidateProductVersion)")
-    Test-Requirement $githubLifecycleIsTruthful 'SSOT GitHub candidate lifecycle is truthful'
+    Test-Requirement ($github.latestPublishedPackageVersion -eq "$($github.latestPublishedProductVersion).0") 'Confirmed GitHub package version matches published product version'
+    Test-Requirement ($github.latestPublishedReleaseTag -eq "v$($github.latestPublishedProductVersion)") 'Confirmed GitHub tag matches published product version'
 
-    Test-Requirement ($status.distribution.microsoftStore.candidateProductVersion -eq $status.product.version) 'SSOT Store candidate version matches product version'
     $store = $status.distribution.microsoftStore
-    $storeLifecycleIsTruthful =
-        ($store.candidateState -eq 'prepared-for-validation' -and
-            $store.submittedProductVersion -ne $store.candidateProductVersion -and
-            $store.submittedPackageVersion -ne $store.candidatePackageVersion) -or
-        ($store.candidateState -eq 'certification-submitted' -and
-            $store.state -eq 'certification-submitted' -and
-            $store.submittedProductVersion -eq $store.candidateProductVersion -and
-            $store.submittedPackageVersion -eq $store.candidatePackageVersion)
-    Test-Requirement $storeLifecycleIsTruthful 'SSOT Store candidate lifecycle is truthful'
+    Test-Requirement ($store.submittedPackageVersion -eq "$($store.submittedProductVersion).0") 'Confirmed Store submitted package version matches product version'
+    Test-Requirement (-not ($store.state -eq 'certification-submitted' -and [string]::IsNullOrWhiteSpace($store.submittedProductVersion))) 'Store certification state has a submitted version'
 
     foreach ($manifestName in @('Package.appxmanifest', 'Package.Store.appxmanifest')) {
         [xml]$manifest = Get-Content -LiteralPath (Join-Path $repositoryRoot $manifestName) -Raw
         $identity = $manifest.SelectSingleNode('/*[local-name()="Package"]/*[local-name()="Identity"]')
-        Test-Requirement ($identity.Version -eq $github.candidatePackageVersion) "$manifestName matches SSOT candidate package version"
+        Test-Requirement ($identity.Version -eq $release.product.packageVersion) "$manifestName matches Candidate Release Metadata package version"
     }
 
     if ($status.distribution.microsoftStore.state -eq 'certification-submitted') {

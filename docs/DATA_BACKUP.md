@@ -4,7 +4,7 @@
 
 ## `.uptbackup` 格式
 
-`.uptbackup` 使用 ZIP 容器，`BackupFormatVersion = 1`。包包含：
+`.uptbackup` 使用 ZIP 容器，`BackupFormatVersion = 2`。包包含：
 
 ```text
 backup-manifest.json
@@ -16,7 +16,7 @@ attachments/projects/...
 
 清单记录 UTC 创建时间、导出应用版本、项目/活跃/归档数量，以及每个内容文件的相对路径、大小和 SHA-256。导出先在隔离临时目录生成，完成后重新验证整个包，再移动到用户通过 `FileSavePicker` 选择的位置。
 
-导出包括 `ProjectSchemaVersion = 3`、`ProjectKind`、互斥的 `DesignDetails`/`ResearchDetails`、重要时间节点、兼容保留字段、归档状态、设置、语言、主题、精度、自动计算、收藏工具 ID 和应用内项目附件。不包括 cache、logs、临时文件、last-valid 备份、损坏诊断副本、证书/签名材料、FutureAccessList token、外部工作文件夹内容、运行时或安装包。容器和 manifest 结构保持兼容，因此 `BackupFormatVersion` 继续为 1。
+导出包括 `ProjectSchemaVersion = 3`、`ProjectKind`、互斥的 `DesignDetails`/`ResearchDetails`、重要时间节点、兼容保留字段、归档状态、设置、语言、主题、精度、自动计算、收藏工具 ID 和应用内项目附件。不包括 cache、logs、临时文件、last-valid 备份、损坏诊断副本、证书/签名材料、FutureAccessList token、外部工作文件夹内容、运行时或安装包。容器和 manifest 结构保持兼容，因此 `BackupFormatVersion` 继续为 2。
 
 ## 完整替换导入
 

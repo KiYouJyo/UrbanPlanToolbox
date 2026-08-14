@@ -46,12 +46,15 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $release = Get-Content -LiteralPath release/release.json -Raw | ConvertFrom-Json
+          if (-not $release.channels.microsoftStore.submit) { throw 'release/release.json disables Microsoft Store submission.' }
           [xml]$project = Get-Content -LiteralPath UrbanPlanToolbox.csproj -Raw
           [xml]$githubManifest = Get-Content -LiteralPath Package.appxmanifest -Raw
           [xml]$storeManifest = Get-Content -LiteralPath Package.Store.appxmanifest -Raw
           $projectVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
           if ($projectVersion -notmatch '^\d+\.\d+\.\d+$') { throw "UrbanPlanToolbox.csproj Version must use major.minor.patch format; got '$projectVersion'." }
-          $expectedPackageVersion = "$projectVersion.0"
+          $expectedPackageVersion = [string]$release.product.packageVersion
+          if ($projectVersion -ne [string]$release.product.version) { throw "Project version does not match release metadata. Project=$projectVersion Metadata=$($release.product.version)" }
           $githubPackageVersion = [string]$githubManifest.Package.Identity.Version
           $storePackageVersion = [string]$storeManifest.Package.Identity.Version
           if ($githubPackageVersion -ne $expectedPackageVersion -or $storePackageVersion -ne $expectedPackageVersion) { throw "Version mismatch. Project=$projectVersion ExpectedPackage=$expectedPackageVersion GitHubManifest=$githubPackageVersion StoreManifest=$storePackageVersion" }

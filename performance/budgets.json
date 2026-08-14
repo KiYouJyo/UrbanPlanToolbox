@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "productVersion": "1.7.0",
+  "msixBundle": { "baselineBytes": 120722414, "maximumBytes": 132794655, "headroomPercent": 10 }
+}
