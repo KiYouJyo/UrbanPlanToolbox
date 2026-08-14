@@ -142,7 +142,9 @@ public sealed partial class HomePage : Page
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = scrollViewer, MaxWidth = dialogMaxWidth, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
+        // ContentDialog's modal host owns its placement. Setting alignment here overrides
+        // that host and anchors this dialog to the page's layout slot instead of the window.
+        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = scrollViewer, MaxWidth = dialogMaxWidth, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
         dialog.PrimaryButtonClick += async (_, args) =>
         {
             args.Cancel = true; var deferral = args.GetDeferral();

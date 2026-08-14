@@ -98,8 +98,8 @@ public sealed class VisualPolishPackagingTests
         Assert.Contains("const double dialogMaxWidth = 760;", source);
         Assert.DoesNotContain("Width = dialogWidth", source);
         Assert.Contains("MaxWidth = dialogMaxWidth", source);
-        Assert.Contains("HorizontalAlignment = HorizontalAlignment.Center", source);
-        Assert.Contains("VerticalAlignment = VerticalAlignment.Center", source);
+        Assert.DoesNotContain("HorizontalAlignment = HorizontalAlignment.Center", source);
+        Assert.DoesNotContain("VerticalAlignment = VerticalAlignment.Center", source);
         Assert.Contains("const double scrollBarGutter = 20;", source);
         Assert.Contains("Padding = new Thickness(0, 0, scrollBarGutter, 0)", source);
         Assert.Contains("XamlRoot.Size.Height - 240", source);
