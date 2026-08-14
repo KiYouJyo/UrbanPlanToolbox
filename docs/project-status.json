@@ -15,24 +15,24 @@
   },
   "distribution": {
     "github": {
-      "latestPublishedProductVersion": "1.7.4",
-      "latestPublishedPackageVersion": "1.7.4.0",
-      "latestPublishedReleaseTag": "v1.7.4",
+      "latestPublishedProductVersion": "1.7.5",
+      "latestPublishedPackageVersion": "1.7.5.0",
+      "latestPublishedReleaseTag": "v1.7.5",
       "candidateProductVersion": "1.7.5",
       "candidatePackageVersion": "1.7.5.0",
-      "candidateState": "prepared-for-validation",
+      "candidateState": "published-and-validated",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
     "microsoftStore": {
-      "submittedProductVersion": "1.7.4",
-      "submittedPackageVersion": "1.7.4.0",
+      "submittedProductVersion": "1.7.5",
+      "submittedPackageVersion": "1.7.5.0",
       "state": "published",
-      "publicProductVersion": "1.7.4",
+      "publicProductVersion": "1.7.5",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
       "candidateProductVersion": "1.7.5",
       "candidatePackageVersion": "1.7.5.0",
-      "candidateState": "prepared-for-validation",
+      "candidateState": "published-and-validated",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
@@ -68,8 +68,8 @@
       "policy": "validated / frozen; future updater changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
-      "validation": "final-e2e-pending",
-      "policy": "v1.7.4 implementation is behavior-frozen; v1.7.5 is the final real Store 1.7.4 to 1.7.5 E2E target. One user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
+      "validation": "validated",
+      "policy": "validated / fully frozen after the successful real Microsoft Store 1.7.4 to 1.7.5 E2E acceptance on 2026-08-14; future updater changes require a proven bug, security issue, or Windows / Microsoft Store platform/API compatibility requirement plus end-to-end regression evidence on the affected channel. One user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
     }
   },
   "documentation": {
@@ -93,7 +93,7 @@
     "nextVersion": null,
     "priorities": [
       "complete documentation governance and keep current-state metadata single-sourced",
-      "freeze and harden the updater with repeatable GitHub and Store end-to-end acceptance",
+      "preserve the frozen updater and reopen it only for a proven bug, security issue, or Windows platform/API compatibility requirement with end-to-end regression evidence",
       "standardize tool-page layout, state presentation, responsive behavior, and accessibility",
       "make Project the context center for tool workflows without turning the app into a file manager",
       "formalize project and backup schema migration contracts",
