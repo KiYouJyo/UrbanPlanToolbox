@@ -1,0 +1,111 @@
+name: Orchestrate approved dual-channel release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'release/release.json'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: approved-release-orchestration
+  cancel-in-progress: false
+
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Resolve approved release transition
+        id: release
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, subprocess
+          from pathlib import Path
+
+          current = json.loads(Path('release/release.json').read_text(encoding='utf-8'))
+          try:
+              previous_text = subprocess.check_output(
+                  ['git', 'show', 'HEAD^:release/release.json'], text=True, encoding='utf-8'
+              )
+              previous = json.loads(previous_text)
+          except Exception:
+              previous = {'channels': {'github': {'publish': False}, 'microsoftStore': {'submit': False}}}
+
+          version = current['product']['version']
+          package_version = current['product']['packageVersion']
+          expected_package = f'{version}.0'
+          if package_version != expected_package:
+              raise SystemExit(f'Package version mismatch: {package_version} != {expected_package}')
+
+          if current.get('classification', {}).get('stability') != 'release-approved':
+              print('requested=false')
+              print(f'version={version}')
+              raise SystemExit(0)
+
+          gh_now = bool(current.get('channels', {}).get('github', {}).get('publish'))
+          store_now = bool(current.get('channels', {}).get('microsoftStore', {}).get('submit'))
+          gh_before = bool(previous.get('channels', {}).get('github', {}).get('publish'))
+          store_before = bool(previous.get('channels', {}).get('microsoftStore', {}).get('submit'))
+          requested = gh_now and store_now and (not gh_before or not store_before)
+          print(f'requested={str(requested).lower()}')
+          print(f'version={version}')
+          PY
+
+      - name: Create immutable release tag
+        if: steps.release.outputs.requested == 'true'
+        shell: bash
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+          git fetch origin --tags --force
+          if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+            tag_commit="$(git rev-list -n 1 "refs/tags/${tag}")"
+            head_commit="$(git rev-parse HEAD)"
+            if [ "$tag_commit" != "$head_commit" ]; then
+              echo "Existing tag ${tag} points to ${tag_commit}, expected ${head_commit}." >&2
+              exit 1
+            fi
+            echo "Tag ${tag} already exists at the approved release commit."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$tag" -m "UrbanPlanToolbox ${tag}"
+            git push origin "$tag"
+          fi
+
+      - name: Dispatch GitHub release workflow
+        if: steps.release.outputs.requested == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          gh workflow run publish-github-release.yml --ref main \
+            -f version="$VERSION" \
+            -f dry_run=false
+
+      - name: Dispatch Microsoft Store workflow
+        if: steps.release.outputs.requested == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          gh workflow run publish-microsoft-store.yml --ref main \
+            -f source_ref="v$VERSION" \
+            -f publication_confirmation="PUBLISH $VERSION"
+
+      - name: No release transition
+        if: steps.release.outputs.requested != 'true'
+        run: echo "No new dual-channel release approval transition was detected."
