@@ -2,34 +2,24 @@
 
 # Microsoft Store 应用内更新 E2E 合同
 
-Any change to Store update behavior requires end-to-end evidence; unit tests, a build, package creation, publication, or a download indicator alone are insufficient.
+任何 Store 更新行为的修改都必须提供真实端到端证据；单元测试、构建、打包、提交认证、公开发布或下载进度本身都不能替代真实设备上的应用内更新验收。
 
-## Test boundary
+## 已完成的最终验收
 
-Use a formal Store installation at source product version **N** and the Microsoft Store-published target product version **1.7.4**. A Package Flight may be used as an auxiliary delivery mechanism, but neither a historical version nor a flight replaces the current release-status authority.
+- 来源：Microsoft Store 正式版 **1.7.4**
+- 目标：Microsoft Store 正式版 **1.7.5**
+- 验收日期：**2026-08-14**
+- Store 发布状态：**PUBLISHED**
+- Updater E2E 状态：**PASSED / FULLY FROZEN**
 
-## Required path
+真实 Store 1.7.4 → 1.7.5 更新验收已经完成，因此此前的 `FINAL-E2E-PENDING / FREEZE-READY` 状态正式关闭。本次真实 E2E 是将 Microsoft Store updater 标记为 fully frozen 的最终依据，而不是仅以商店发布成功作为替代证据。
 
-Prove: **existing Store installation → check for updates → available version → user selects “下载并安装更新” → Windows restart recovery registration → native Store download authorization → native Store installation authorization → deployment → automatic application relaunch → target version → user-data retention**. Store deployment ownership is not relaunch ownership: a terminated process is relaunched by the registration; a surviving process must remove that registration before its `AppInstance.Restart` fallback.
+## 冻结后的固定路径
 
-## Required scenarios
+Microsoft Store 更新路径固定为：**现有 Store 安装 → 检查更新 → 显示可用版本与本地化更新说明 → 用户执行一次“下载并安装更新” → 在 Store 操作前注册 Windows restart recovery → Windows 原生下载与安装授权 → Store deployment → 自动启动新版本 → 保留用户数据**。
 
-- up to date;
-- network failure;
-- Store unavailable;
-- download failure;
-- installation failure;
-- user cancellation; and
-- retry after failure.
+Store deployment 可能终止旧进程；若发生终止，由预先注册的 Windows restart recovery 负责重新启动。若 Store 操作返回时旧进程仍存活，则应用必须先注销 recovery registration，再仅执行一次 `AppInstance.Restart` 作为后备。包级 `Completed` 回调不是应用级终态，只有 await 的 Store operation `OverallState` 才是权威结果。取消或失败后必须恢复为可重试状态，并且页面离开后返回不得启动第二个 Store 操作。
 
-Capture the displayed state, package identity/version, deployment result, restart behavior, and retained user data. GitHub sideload packages and Store packages have independent identities and publishers, cannot upgrade over one another, and must be tested independently.
+## 重新打开条件
 
-## v1.7.4 final Store E2E target
-
-- Source: actual Microsoft Store baseline `N`
-- Target: published Microsoft Store version `1.7.4`
-- Publication status: **PUBLISHED**
-- Updater E2E status: **PENDING**
-- Prove: check → localized 1.7.4 notes → one Download and install update action → restart registration before the combined Store operation → native download/install authorization → deployment → automatic 1.7.4 launch → retained user data. Also prove cancellation returns to `UpdateAvailable`, a surviving process uses exactly one fallback restart, and package-level `Completed` callbacks do not advance the UI to a terminal state.
-
-Microsoft Store publication confirms delivery status only; it does not by itself prove the real-device in-app updater or automatic relaunch path.
+冻结后不再为功能扩展、交互微调或内部重构修改 Store updater。只有确认存在 updater 缺陷、安全问题，或 Windows / Microsoft Store 平台与 API 兼容性要求时才允许修改；一旦修改，必须重新执行受影响渠道的真实 E2E，并在证据通过后才能再次标记为 frozen。
