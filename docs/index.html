@@ -64,7 +64,49 @@
 
     <section id="version-history" aria-labelledby="history-heading">
       <article class="card">
-        <h2>1.6.7</h2><p class="meta">当前发布版本 / 現在のリリースバージョン / Current release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.7">GitHub Release</a> · Microsoft Store certification submitted / Microsoft Store 認証審査提出済み / Microsoft Store 已提交认证</p>
+        <h2>1.7.3</h2><p class="meta">当前发布版本 / 現在のリリースバージョン / Current release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.3">GitHub Release</a> · Microsoft Store 已提交认证 / Microsoft Store 認証審査提出済み / Microsoft Store certification submitted</p>
+        <div class="language"><strong>简体中文</strong><ul><li>修复 Microsoft Store 更新安装后应用关闭但不会自动重新启动的问题，并完善失败、取消与重试恢复。</li></ul></div>
+        <div class="language" lang="ja"><strong>日本語</strong><ul><li>Microsoft Store 更新のインストール後にアプリが終了したまま再起動しない問題を修正し、失敗・キャンセル・再試行時の復旧処理を改善しました。</li></ul></div>
+        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed the Microsoft Store update relaunch path after package deployment and improved recovery for cancellation, failure, and retry.</li></ul></div>
+      </article>
+
+      <article class="card">
+        <h2>1.7.2</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.2">GitHub Release</a></p>
+        <div class="language"><strong>简体中文</strong><ul><li>引入默认单实例运行；重复启动会唤起已有窗口，并恢复最小化窗口。</li></ul></div>
+        <div class="language" lang="ja"><strong>日本語</strong><ul><li>既定で単一インスタンス動作となり、再起動時は既存ウィンドウを前面に出し、最小化状態から復元します。</li></ul></div>
+        <div class="language" lang="en"><strong>English</strong><ul><li>Added default single-instance behavior; relaunching activates the existing window and restores it when minimized.</li></ul></div>
+      </article>
+
+      <article class="card">
+        <h2>1.7.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.1">GitHub Release</a> · Microsoft Store 当前公开版本 / Microsoft Store 現在の公開バージョン / Current Microsoft Store public version</p>
+        <div class="language"><strong>简体中文</strong><ul><li>将 Microsoft Store 更新修正为真正的“先下载、后安装”两阶段流程，下载完成前不再提前显示“重启并更新”。</li></ul></div>
+        <div class="language" lang="ja"><strong>日本語</strong><ul><li>Microsoft Store 更新を「ダウンロード後に明示的にインストール」する二段階フローへ修正し、完了前に再起動ボタンが表示されないようにしました。</li></ul></div>
+        <div class="language" lang="en"><strong>English</strong><ul><li>Implemented a true download-then-explicit-install Microsoft Store flow so Restart and update no longer appears before download completion.</li></ul></div>
+      </article>
+
+      <article class="card">
+        <h2>1.7.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.0">GitHub Release</a></p>
+        <div class="language"><strong>简体中文</strong><ul><li>更新任务改为应用会话级持续保留，并建立统一发布元数据、数据迁移与包体/依赖治理基线。</li></ul></div>
+        <div class="language" lang="ja"><strong>日本語</strong><ul><li>更新状態をアプリ セッション全体で保持し、リリースメタデータ、データ移行、パッケージ/依存関係管理の基盤を統一しました。</li></ul></div>
+        <div class="language" lang="en"><strong>English</strong><ul><li>Made update state persist across the app session and established unified release metadata, migration, package-size, and dependency baselines.</li></ul></div>
+      </article>
+
+      <article class="card">
+        <h2>1.6.9</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.9">GitHub Release</a></p>
+        <div class="language"><strong>简体中文</strong><ul><li>统一 GitHub 与 Microsoft Store 更新后的重启交互，补齐旧版本读取目标版本三语更新说明及数据一致性检查。</li></ul></div>
+        <div class="language" lang="ja"><strong>日本語</strong><ul><li>GitHub と Microsoft Store の更新後再起動フローを統一し、旧版からの多言語リリースノート取得とデータ整合性検証を改善しました。</li></ul></div>
+        <div class="language" lang="en"><strong>English</strong><ul><li>Unified post-update restart behavior across GitHub and Microsoft Store and improved multilingual target-version notes and consistency checks.</li></ul></div>
+      </article>
+
+      <article class="card">
+        <h2>1.6.8</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.8">GitHub Release</a></p>
+        <div class="language"><strong>简体中文</strong><ul><li>完成维护收口：冻结已验收的 GitHub updater，统一当前状态文档，并修复首次启动、主题浮层及 Light/Dark/DPI 回归问题。</li></ul></div>
+        <div class="language" lang="ja"><strong>日本語</strong><ul><li>保守フェーズを収束し、検証済み GitHub updater を凍結、状態文書を統一し、初回起動・テーマ Surface・Light/Dark/DPI 回帰を修正しました。</li></ul></div>
+        <div class="language" lang="en"><strong>English</strong><ul><li>Closed the maintenance cycle by freezing the validated GitHub updater, unifying current-state documentation, and fixing first-run, themed-surface, and Light/Dark/DPI regressions.</li></ul></div>
+      </article>
+
+      <article class="card">
+        <h2>1.6.7</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.7">GitHub Release</a> · Microsoft Store certification submitted / Microsoft Store 認証審査提出済み / Microsoft Store 已提交认证</p>
         <div class="language"><strong>简体中文</strong><ul><li>修复浅色和深色主题下标题栏应用图标的对比度。</li><li>修复任务栏与开始菜单图标的反向配色。</li><li>统一标题栏、任务栏和开始菜单的主题资源规则。</li></ul></div>
         <div class="language" lang="ja"><strong>日本語</strong><ul><li>ライト / ダークテーマでタイトルバーアイコンの視認性を修正しました。</li><li>タスクバーとスタートメニューのアイコン配色を修正しました。</li><li>タイトルバー、タスクバー、スタートメニューのテーマ別アイコン規則を統一しました。</li></ul></div>
         <div class="language" lang="en"><strong>English</strong><ul><li>Fixed title-bar icon contrast across light and dark themes.</li><li>Fixed reversed taskbar and Start-menu icon colors.</li><li>Unified theme-aware resources for the title bar, taskbar, and Start menu.</li></ul></div>
