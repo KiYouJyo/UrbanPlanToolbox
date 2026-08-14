@@ -15,9 +15,21 @@ Current Store status is defined in [project-status.json](project-status.json). T
 
 Use the Store manifest and Store package only for the Store channel. GitHub sideload identity, publisher, signing chain, package, and updater are independent and cannot provide cross-channel upgrades.
 
+## WinGet / Microsoft Store source
+
+Windows Package Manager 的默认 `msstore` 源直接使用 Microsoft Store 目录。UrbanPlanToolbox 的 Store 产品 ID 为 `9MWDPJG1BHKW`，因此 Store 版可通过以下命令安装：
+
+```powershell
+winget install --id 9MWDPJG1BHKW --source msstore -e
+```
+
+这不是第三套发行包，也不需要独立的 WinGet 发布工作流。通过 `msstore` 安装的仍是 Microsoft Store 身份，后续更新继续由 Store 管理，其可用性取决于实际 Store 上架状态。
+
+不要把当前 GitHub 旁加载 `.msixbundle` 直接提交到 WinGet Community Repository：GitHub 包使用项目自签名证书，并依赖首次安装 bootstrap 配置信任；WinGet Community 不会替应用完成这一步，且脚本型 bootstrap 不能作为 Community installer。只有在未来提供可由干净系统直接信任和静默安装的独立安装器后，才评估额外的 `winget` Community source 包。
+
 ## Authorized workflow
 
-The workflow entry point is `.github/workflows/publish-microsoft-store.yml` and must be manually authorized for each Store submission. It verifies the approved source commit, version alignment, release notes, package identity, publisher, resources, and package evidence before interacting with Partner Center.
+The workflow entry point is `.github/workflows/publish-microsoft-store.yml` and must be explicitly authorized for each Store submission. It verifies the approved source commit, version alignment, release notes, package identity, publisher, resources, and package evidence before interacting with Partner Center.
 
 ## Submission lifecycle
 
@@ -33,4 +45,4 @@ Run WACK / Store technical validation for the final authorized package when requ
 
 ## Version and channel rules
 
-The product version and both manifest package versions must align with the release metadata before an authorized release. Store package versions must be valid and monotonic relative to Partner Center. Store submissions can be less frequent than GitHub releases and are never implied by a GitHub release.
+The product version and both manifest package versions must align with the release metadata before an authorized release. Store package versions must be valid and monotonic relative to Partner Center. Store submissions can be less frequent than GitHub releases and are never implied by a GitHub release. WinGet `msstore` availability follows the Store catalog and does not create a separate release-state authority.

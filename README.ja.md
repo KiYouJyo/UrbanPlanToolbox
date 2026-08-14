@@ -10,8 +10,13 @@
 
 - [GitHub 最新正式 Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest)：より頻繁に更新される x64 サイドロード版です。
 - [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW)：Microsoft Store からインストール・更新したいユーザー向けです。
+- **WinGet（Microsoft Store ソース）**：ターミナルから Store 版を直接インストールできます。
 
-2 つのチャネルは ID と更新経路が独立しており、相互に上書き更新できません。バージョンの詳細は [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) と [CHANGELOG.md](CHANGELOG.md) を参照してください。
+```powershell
+winget install --id 9MWDPJG1BHKW --source msstore -e
+```
+
+GitHub サイドロード版と Microsoft Store 版は、パッケージ ID と更新経路が独立しており、相互に上書き更新できません。WinGet の `msstore` エントリは Microsoft Store 版への別のインストール入口であり、第三のパッケージ ID ではありません。WinGet からインストールした後も更新は Microsoft Store が管理します。バージョンの詳細は [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) と [CHANGELOG.md](CHANGELOG.md) を参照してください。
 
 ## 主な機能
 
@@ -31,7 +36,7 @@
 
 ### その後の更新
 
-About を開き、「更新を確認」を選択してください。GitHub 版はアプリ内で正式更新を確認してダウンロードできます。アプリはダウンロードしたパッケージの完全性と署名を検証し、準備完了後にユーザーが「再起動して更新」を実行します。Microsoft Store 版は引き続き Store の更新チャネルを使用します。
+About を開き、「更新を確認」を選択してください。GitHub 版はアプリ内で正式更新を確認してダウンロードできます。アプリはダウンロードしたパッケージの完全性と署名を検証し、準備完了後にユーザーが「再起動して更新」を実行します。Microsoft Store 版および WinGet の `msstore` ソースからインストールした版は、引き続き Store の更新チャネルを使用します。
 
 ### 上級者向けインストール
 
