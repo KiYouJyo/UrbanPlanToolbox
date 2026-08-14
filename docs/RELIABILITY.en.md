@@ -4,6 +4,6 @@ English | [简体中文](RELIABILITY.md) | [日本語](RELIABILITY.ja.md)
 
 Current UrbanPlanToolbox facts are governed by [project-status.json](project-status.json).
 
-Startup prioritizes creation and activation of the shell and fails safely. Native Store `Deploying` maps to `Installing`; Store `Completed` means package deployment completed and maps to `RestartRequired`, not application-level `Completed`. `Completed` is reserved for an update with no remaining user action. GitHub uses `ReadyToInstall` before deployment and Store uses `RestartRequired` after deployment, while both expose Check → Download and install → Restart and update. Final Store v1.6.8 → v1.6.9 E2E is pending real Store delivery.
+Startup prioritizes creation and activation of the shell and fails safely. Microsoft Store uses Check → download only → `ReadyToInstall` → explicit user install action → deployment → new-version launch. A completed download is not a completed update, and a per-package progress callback is not an application-level terminal state; only the awaited Store operation's `OverallState` is authoritative. Native Store `Deploying` maps to `Installing` only after explicit installation. GitHub keeps its independent verified deployment and restart flow. Final Store baseline → v1.7.1 E2E is pending real Store delivery.
 
 Logs record safe stages, result types, and HRESULTs only—never tokens, keys, user data, or unnecessary absolute paths.

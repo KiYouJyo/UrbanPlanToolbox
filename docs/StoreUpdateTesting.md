@@ -10,7 +10,7 @@ Use a formal Store installation at source product version **N** and a higher Sto
 
 ## Required path
 
-Prove: **existing Store installation → check for updates → available version → download state → Store deployment → application close/restart behavior → target version → user-data retention**.
+Prove: **existing Store installation → check for updates → available version → download only → ReadyToInstall without deployment → explicit user “Restart and update” action → Store deployment → application close/restart behavior → target version → user-data retention**.
 
 ## Required scenarios
 
@@ -24,9 +24,9 @@ Prove: **existing Store installation → check for updates → available version
 
 Capture the displayed state, package identity/version, deployment result, restart behavior, and retained user data. GitHub sideload packages and Store packages have independent identities and publishers, cannot upgrade over one another, and must be tested independently.
 
-## v1.6.9 final Store E2E target
+## v1.7.1 final Store E2E target
 
-- Source: actual Microsoft Store `1.6.8`
-- Target: `1.6.9`
+- Source: actual Microsoft Store baseline `N`
+- Target: `1.7.1`
 - Status: **PENDING**
-- Prove: check → localized 1.6.9 notes → download → installing → Store `Completed` → `RestartRequired` → Restart and update → v1.6.9 launch → retained user data.
+- Prove: check → localized 1.7.1 notes → download only → `ReadyToInstall` → no deployment, restart, or process shutdown before the second action → explicit Restart and update → installing/deployment → 1.7.1 launch → retained user data. Per-package `Completed` callbacks must not advance the UI to a terminal state.

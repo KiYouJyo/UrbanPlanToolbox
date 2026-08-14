@@ -161,9 +161,27 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     {
         try
         {
+            Info = Info with { State = AppUpdateState.Installing, Detail = null, ErrorCode = null };
+            Progress = null;
+            OnChanged(nameof(Progress));
+            var progress = new Progress<AppUpdateProgress>(value =>
+            {
+                if (value.State is AppUpdateState.Downloading or AppUpdateState.Installing)
+                {
+                    Progress = value.State == AppUpdateState.Downloading ? AppUpdateProgress.NormalizeValue(value.Value) : null;
+                    Info = Info with { State = value.State, Detail = value.Detail };
+                    OnChanged(nameof(Progress));
+                }
+            });
             using var linked = CancellationTokenSource.CreateLinkedTokenSource(_sessionLifetime.Token, cancellationToken);
-            var result = await _service.InstallPendingAsync(cancellationToken: linked.Token);
+            var result = await _service.InstallPendingAsync(progress, linked.Token);
             Info = Info with { State = result.State, Detail = result.Detail, ErrorCode = result.ErrorCode };
+
+            // GitHub retains its independent deployment-and-restart path. Store returns
+            // Completed after its user-authorized deployment and never reaches here as a
+            // restart request.
+            if (result.State == AppUpdateState.RestartRequired)
+                await RestartAndUpdateAsync(linked.Token);
         }
         catch (OperationCanceledException) { Info = Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" }; }
         finally

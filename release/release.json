@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.7.0", "packageVersion": "1.7.0.0" },
-  "classification": { "kind": "platform-foundation", "stability": "stable", "storeMilestone": true },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.7.1", "packageVersion": "1.7.1.0" },
+  "classification": { "kind": "updater-reliability", "stability": "stable", "storeMilestone": true },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.7.0 平台底座与更新会话冻结",
-    "ja-JP": "UrbanPlanToolbox v1.7.0 プラットフォーム基盤と更新セッションの凍結",
-    "en-US": "UrbanPlanToolbox v1.7.0 platform foundation and update-session freeze"
+    "zh-CN": "UrbanPlanToolbox v1.7.1 Store 更新流程修复",
+    "ja-JP": "UrbanPlanToolbox v1.7.1 Store 更新フローの修正",
+    "en-US": "UrbanPlanToolbox v1.7.1 Store update flow fix"
   },
   "languageLabels": {
     "zh-CN": "简体中文",
@@ -15,11 +15,9 @@
     "en-US": "English"
   },
   "items": [
-    { "id": "update-session", "zh-CN": "修复检查或下载更新时切换页面后状态和进度消失的问题；更新任务现在在整个应用会话内持续保留。", "ja-JP": "更新の確認またはダウンロード中にページを切り替えると状態と進行状況が消える問題を修正し、更新タスクをアプリケーション セッション全体で維持します。", "en-US": "Fixes update state and progress disappearing after navigation during a check or download; update work now persists for the whole application session." },
-    { "id": "metadata-governance", "zh-CN": "建立统一发布元数据源，减少版本、更新说明、CHANGELOG、GitHub 与 Microsoft Store 发布信息之间的不一致。", "ja-JP": "統一されたリリース メタデータ元を確立し、バージョン、更新内容、CHANGELOG、GitHub、Microsoft Store の公開情報の不整合を減らします。", "en-US": "Establishes a unified release-metadata source to reduce drift among versions, notes, the CHANGELOG, GitHub, and Microsoft Store publication data." },
-    { "id": "schema-governance", "zh-CN": "强化项目数据格式版本、迁移和向后兼容规则，提高旧项目长期可读取性。", "ja-JP": "プロジェクト データ形式のバージョン、移行、後方互換性の規則を強化し、旧プロジェクトの長期的な読み取り可能性を高めます。", "en-US": "Strengthens project data-format versioning, migration, and backward-compatibility rules for long-term readability of older projects." },
-    { "id": "performance-governance", "zh-CN": "建立包体积和依赖治理的确定性基线。", "ja-JP": "パッケージ サイズと依存関係管理の決定的な baseline を確立します。", "en-US": "Establishes deterministic governance baselines for package size and dependencies." },
-    { "id": "updater-freeze-ready", "zh-CN": "完成 GitHub 与 Microsoft Store 更新流程的稳定性收口和冻结准备。", "ja-JP": "GitHub と Microsoft Store の更新フローを安定化し、凍結の準備を完了します。", "en-US": "Completes stability closeout and freeze preparation for the GitHub and Microsoft Store update flows." },
-    { "id": "channel-policy", "zh-CN": "完善双渠道发布策略，GitHub 作为高频稳定发布渠道，Microsoft Store 主要承载稳定里程碑版本。", "ja-JP": "二つの配布チャネルの方針を整備し、GitHub を高頻度の安定リリース、Microsoft Store を主に安定したマイルストーン版に位置付けます。", "en-US": "Refines the dual-channel policy: GitHub delivers frequent stable releases while Microsoft Store primarily carries stable milestone versions." }
+    { "id": "store-download-first", "zh-CN": "修复 Microsoft Store 更新下载完成前错误出现“重启并更新”按钮的问题，并改为真正的先下载、后安装两阶段流程。", "ja-JP": "Microsoft Store 更新でダウンロード完了前に「再起動して更新」が表示される問題を修正し、ダウンロード後にインストールする二段階フローへ変更しました。", "en-US": "Fixes Microsoft Store updates showing Restart and update before download completion and implements a true download-then-install flow." },
+    { "id": "store-explicit-install", "zh-CN": "在用户点击“重启并更新”前，不再进入 Store 包部署流程。", "ja-JP": "ユーザーが「再起動して更新」を選ぶまで、Store パッケージの展開を開始しません。", "en-US": "Store package deployment no longer begins until the user chooses Restart and update." },
+    { "id": "store-progress-terminal", "zh-CN": "修复将 Store package progress 的 Completed 错误视为整个更新流程完成的问题，并完善多包和异步回调的状态机回归测试。", "ja-JP": "Store package progress の Completed を更新全体の完了として扱う問題を修正し、複数パッケージと非同期コールバックの状態機械テストを強化しました。", "en-US": "Fixes treating Store package-progress Completed as the whole update transaction and strengthens multi-package and asynchronous-callback state-machine coverage." },
+    { "id": "github-unchanged", "zh-CN": "保持 GitHub 更新流程及应用级更新会话行为不变。", "ja-JP": "GitHub 更新フローとアプリケーション全体の更新セッション動作を維持します。", "en-US": "Keeps the GitHub update flow and application-scoped update-session behavior unchanged." }
   ]
 }
