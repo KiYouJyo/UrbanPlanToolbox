@@ -8,7 +8,7 @@
   "product": {
     "name": "UrbanPlanToolbox",
     "version": "1.7.3",
-    "lifecycle": "prepared-for-validation",
+    "lifecycle": "release-approved",
     "platform": "Windows",
     "supportedArchitecture": "x64",
     "offlineFirst": true
@@ -20,7 +20,7 @@
       "latestPublishedReleaseTag": "v1.7.2",
       "candidateProductVersion": "1.7.3",
       "candidatePackageVersion": "1.7.3.0",
-      "candidateState": "prepared-for-validation",
+      "candidateState": "release-approved",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -32,7 +32,7 @@
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
       "candidateProductVersion": "1.7.3",
       "candidatePackageVersion": "1.7.3.0",
-      "candidateState": "prepared-for-validation",
+      "candidateState": "release-approved",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
@@ -68,8 +68,8 @@
       "policy": "validated / frozen; future updater changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
-      "validation": "prepared-for-validation",
-      "policy": "prepared-for-validation / download-only then explicit-install; register Windows restart recovery before Store deployment, use app restart only when the process survives, and keep Store and GitHub identities separate"
+      "validation": "release-approved",
+      "policy": "release-approved / download-only then explicit-install; register Windows restart recovery before Store deployment, use app restart only when the process survives, and keep Store and GitHub identities separate"
     }
   },
   "documentation": {
