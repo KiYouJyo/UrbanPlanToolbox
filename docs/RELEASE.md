@@ -10,9 +10,17 @@
 
 A tag, GitHub Release, GitHub package, Store package, Store submission, Store certification, and Store publication are separate steps. Success at one step never proves success at another. A build, test, upload, or 100% download is not publication or a completed update.
 
+## 发布授权与单 PR 规则
+
+当维护者已经明确要求某个版本“直接发布”或“执行到双端发布完成”时，**开发 PR 本身就是唯一的发布审批点**。该 PR 应在 `release/release.json` 中直接设置目标版本，并将 `channels.github.publish` 与 `channels.microsoftStore.submit` 设置为 `true`。开发 PR 合并到 `main` 后，release orchestrator 直接创建不可变 tag，并启动 GitHub Release 与 Microsoft Store 工作流。
+
+**禁止再为同一版本创建只把 `release-candidate` 改成 `release-approved`、或只把 publish/submit 从 `false` 改成 `true` 的纯批准 PR。** `classification.stability == release-approved` 不再是发布编排器的强制门槛；历史记录中可以继续保留该状态，但未来发布不依赖它。
+
+如果任务明确要求“只开发、暂不发布”，则开发 PR 保持两个 channel flag 为 `false`。之后需要发布现有 candidate 时，使用 release orchestrator 的手动 `workflow_dispatch`，提交当前版本号并输入精确确认文本 `PUBLISH X.Y.Z`；不再通过额外 approval-only PR 获得授权。
+
 ## GitHub release contract
 
-- Build from the final approved `main` commit with matching product and package versions, x64 target, GitHub sideload identity, and publisher.
+- Build from the final authorized `main` commit with matching product and package versions, x64 target, GitHub sideload identity, and publisher.
 - Produce the formal MSIXBundle, SHA-256 checksums, one-click bootstrap, and three-language release notes.
 - Validate identity, publisher, package version, checksums, signatures, installation, and the GitHub updater end-to-end path before declaring success.
 
