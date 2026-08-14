@@ -1,6 +1,7 @@
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
 using UrbanPlanToolbox.ViewModels;
+using System.ComponentModel;
 using Xunit;
 
 namespace UrbanPlanToolbox.Tests;
@@ -623,13 +624,15 @@ public sealed class AppUpdateTests
 
         var operation = session.DownloadAndInstallAsync();
         await service.DownloadStarted;
+        var progress25 = WaitForProgressAsync(session, 0.25);
         service.ReportDownload(0.25);
-        await Task.Delay(25);
+        await progress25;
         Assert.Equal(0.25, session.Progress);
 
         // Simulated detach/reattach only observes the same session state.
+        var progress55 = WaitForProgressAsync(session, 0.55);
         service.ReportDownload(0.55);
-        await Task.Delay(25);
+        await progress55;
         Assert.Equal(0.55, session.Progress);
         await session.DownloadAndInstallAsync();
         Assert.Equal(1, service.DownloadCalls);
@@ -638,6 +641,30 @@ public sealed class AppUpdateTests
         await operation;
         Assert.Equal(AppUpdateState.ReadyToInstall, session.Info.State);
         Assert.Equal("1.7.0", session.Info.AvailableVersion);
+    }
+
+    private static async Task WaitForProgressAsync(UpdateViewModel session, double expected)
+    {
+        if (session.Progress == expected) return;
+
+        var observed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        PropertyChangedEventHandler? handler = null;
+        handler = (_, args) =>
+        {
+            if (args.PropertyName == nameof(UpdateViewModel.Progress) && session.Progress == expected)
+                observed.TrySetResult();
+        };
+
+        session.PropertyChanged += handler;
+        try
+        {
+            if (session.Progress == expected) return;
+            await observed.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        }
+        finally
+        {
+            session.PropertyChanged -= handler;
+        }
     }
 
     private static string FindRepositoryRoot()

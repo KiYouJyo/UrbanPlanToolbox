@@ -36,6 +36,10 @@ The release gate also requires all three Markdown sibling files, valid sibling l
 
 After a confirmed GitHub publication, update the SSOT GitHub state to `published`. After a Store submission, use `certification-submitted`. Change Store state to `published` only with confirmation of actual public availability.
 
+## 发布流程完结条件
+
+必须先推送发布后的状态提交，并且该提交对应的必需 `main` CI 已 `completed` 且为 `success`，才能宣布发布流程完全收尾。queued、in-progress 或 waiting 的 CI 都属于中间状态；CI 失败时必须进行发布后 CI 修复。
+
 ## Prohibitions
 
 - Do not reuse a package from a different commit.
