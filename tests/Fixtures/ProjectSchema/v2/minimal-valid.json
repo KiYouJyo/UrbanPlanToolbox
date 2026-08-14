@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 2,
+  "savedAtUtc": "2026-08-02T00:00:00+00:00",
+  "payload": {
+    "id": "22222222-2222-2222-2222-222222222222",
+    "name": "Milestone-era design",
+    "type": "competition",
+    "administrativeArea": "Nanjing",
+    "description": "Historic v2 detail",
+    "planningRequirements": "Keep waterfront access",
+    "milestones": [{ "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "title": "Review", "date": "2026-08-10", "notes": "Historical milestone", "createdAtUtc": "2026-08-02T00:00:00+00:00", "updatedAtUtc": "2026-08-02T00:00:00+00:00", "displayOrder": 0 }],
+    "todos": [],
+    "planningSnapshots": [],
+    "workFolder": { "accessToken": "historic-folder-token", "displayName": "Canal", "displayPath": "C:\\Urban\\Canal", "requiresReselection": false },
+    "isArchived": false,
+    "createdAtUtc": "2026-08-02T00:00:00+00:00",
+    "updatedAtUtc": "2026-08-02T00:00:00+00:00"
+  }
+}

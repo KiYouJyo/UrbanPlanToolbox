@@ -246,8 +246,9 @@ public sealed class AppUpdateTests
     {
         var root = FindRepositoryRoot();
         var source = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
-        Assert.Contains("_updates.DownloadAndInstallAsync(_updateLifetime.Token)", source, StringComparison.Ordinal);
+        Assert.Contains("_updates.DownloadAndInstallAsync()", source, StringComparison.Ordinal);
         Assert.DoesNotContain("_updates.DownloadAndInstallAsync(_pageLifetime.Token)", source, StringComparison.Ordinal);
+        Assert.DoesNotContain("_updateLifetime", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -570,7 +571,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.6.9", viewModel.CurrentVersion);
+        Assert.Equal("v1.7.0", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -589,6 +590,54 @@ public sealed class AppUpdateTests
         Assert.Contains("UpdateNotesLabel.Visibility", source, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesContainer.Visibility", source, StringComparison.Ordinal);
         Assert.DoesNotContain("info.AvailableVersion is null ? unavailable", source, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CheckContinuesWhenAboutPageDetaches()
+    {
+        var service = new DeferredUpdateService(AppUpdateState.UpdateAvailable);
+        var session = new UpdateViewModel(service);
+
+        var operation = session.CheckAsync();
+        await service.CheckStarted;
+        Assert.Equal(AppUpdateState.Checking, session.Info.State);
+        // A presenter detach does not supply a cancellation token to the application session.
+        Assert.False(service.OperationCancellationRequested);
+
+        service.CompleteCheck();
+        await operation;
+
+        Assert.Equal(AppUpdateState.UpdateAvailable, session.Info.State);
+        Assert.Equal("1.7.0", session.Info.AvailableVersion);
+    }
+
+    [Fact]
+    public async Task DownloadProgressSurvivesNavigationAndDoesNotDuplicateTheOperation()
+    {
+        var service = new DeferredUpdateService(AppUpdateState.ReadyToInstall);
+        var session = new UpdateViewModel(service);
+        var check = session.CheckAsync();
+        await service.CheckStarted;
+        service.CompleteCheck();
+        await check;
+
+        var operation = session.DownloadAndInstallAsync();
+        await service.DownloadStarted;
+        service.ReportDownload(0.25);
+        await Task.Delay(25);
+        Assert.Equal(0.25, session.Progress);
+
+        // Simulated detach/reattach only observes the same session state.
+        service.ReportDownload(0.55);
+        await Task.Delay(25);
+        Assert.Equal(0.55, session.Progress);
+        await session.DownloadAndInstallAsync();
+        Assert.Equal(1, service.DownloadCalls);
+
+        service.CompleteDownload();
+        await operation;
+        Assert.Equal(AppUpdateState.ReadyToInstall, session.Info.State);
+        Assert.Equal("1.7.0", session.Info.AvailableVersion);
     }
 
     private static string FindRepositoryRoot()
@@ -728,4 +777,36 @@ internal sealed class UpdateRestartStub(bool result) : IApplicationRestartServic
     public int CallCount { get; private set; }
     public bool TryRestart() => TryRestart(out _);
     public bool TryRestart(out string? failureReason) { CallCount++; failureReason = result ? null : "StubFailure"; return result; }
+}
+
+internal sealed class DeferredUpdateService(AppUpdateState downloadResult) : IAppUpdateService
+{
+    private readonly TaskCompletionSource _checkStarted = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource _downloadStarted = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource _checkCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource _downloadCompletion = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private IProgress<AppUpdateProgress>? _progress;
+    private CancellationToken _operationToken;
+    public int DownloadCalls { get; private set; }
+    public bool OperationCancellationRequested => _operationToken.IsCancellationRequested;
+    public Task CheckStarted => _checkStarted.Task;
+    public Task DownloadStarted => _downloadStarted.Task;
+
+    public async Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default)
+    {
+        _operationToken = cancellationToken; _checkStarted.TrySetResult();
+        await _checkCompletion.Task.WaitAsync(cancellationToken);
+        return new(AppUpdateState.UpdateAvailable, "1.7.0", "notes", Source: UpdateInstallSource.GitHub);
+    }
+
+    public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        DownloadCalls++; _operationToken = cancellationToken; _progress = progress; _downloadStarted.TrySetResult();
+        await _downloadCompletion.Task.WaitAsync(cancellationToken);
+        return new(downloadResult);
+    }
+
+    public void CompleteCheck() => _checkCompletion.TrySetResult();
+    public void ReportDownload(double value) => _progress?.Report(new(AppUpdateState.Downloading, value));
+    public void CompleteDownload() => _downloadCompletion.TrySetResult();
 }

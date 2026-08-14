@@ -1,0 +1,29 @@
+{
+    "version":  "1.7.0",
+    "locales":  {
+                    "zh-CN":  [
+                                  "修复检查或下载更新时切换页面后状态和进度消失的问题；更新任务现在在整个应用会话内持续保留。",
+                                  "建立统一发布元数据源，减少版本、更新说明、CHANGELOG、GitHub 与 Microsoft Store 发布信息之间的不一致。",
+                                  "强化项目数据格式版本、迁移和向后兼容规则，提高旧项目长期可读取性。",
+                                  "建立包体积和依赖治理的确定性基线。",
+                                  "完成 GitHub 与 Microsoft Store 更新流程的稳定性收口和冻结准备。",
+                                  "完善双渠道发布策略，GitHub 作为高频稳定发布渠道，Microsoft Store 主要承载稳定里程碑版本。"
+                              ],
+                    "ja-JP":  [
+                                  "更新の確認またはダウンロード中にページを切り替えると状態と進行状況が消える問題を修正し、更新タスクをアプリケーション セッション全体で維持します。",
+                                  "統一されたリリース メタデータ元を確立し、バージョン、更新内容、CHANGELOG、GitHub、Microsoft Store の公開情報の不整合を減らします。",
+                                  "プロジェクト データ形式のバージョン、移行、後方互換性の規則を強化し、旧プロジェクトの長期的な読み取り可能性を高めます。",
+                                  "パッケージ サイズと依存関係管理の決定的な baseline を確立します。",
+                                  "GitHub と Microsoft Store の更新フローを安定化し、凍結の準備を完了します。",
+                                  "二つの配布チャネルの方針を整備し、GitHub を高頻度の安定リリース、Microsoft Store を主に安定したマイルストーン版に位置付けます。"
+                              ],
+                    "en-US":  [
+                                  "Fixes update state and progress disappearing after navigation during a check or download; update work now persists for the whole application session.",
+                                  "Establishes a unified release-metadata source to reduce drift among versions, notes, the CHANGELOG, GitHub, and Microsoft Store publication data.",
+                                  "Strengthens project data-format versioning, migration, and backward-compatibility rules for long-term readability of older projects.",
+                                  "Establishes deterministic governance baselines for package size and dependencies.",
+                                  "Completes stability closeout and freeze preparation for the GitHub and Microsoft Store update flows.",
+                                  "Refines the dual-channel policy: GitHub delivers frequent stable releases while Microsoft Store primarily carries stable milestone versions."
+                              ]
+                }
+}

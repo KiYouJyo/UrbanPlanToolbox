@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "nativeAllowlist": ["OpenCvSharp4.runtime.win"],
+  "dependencies": [
+    { "name": "Microsoft.Windows.SDK.BuildTools", "version": "10.0.28000.2526", "kind": "tooling", "purpose": "MSIX build support", "featureOwner": "packaging", "startupRequired": false, "lazyLoadEligible": false },
+    { "name": "Microsoft.WindowsAppSDK", "version": "2.3.1", "kind": "managed", "purpose": "WinUI runtime", "featureOwner": "application-shell", "startupRequired": true, "lazyLoadEligible": false },
+    { "name": "Microsoft.Windows.SDK.BuildTools.WinApp", "version": "0.5.0", "kind": "tooling", "purpose": "packaged development launch tooling", "featureOwner": "packaging", "startupRequired": false, "lazyLoadEligible": false },
+    { "name": "System.Security.Cryptography.Pkcs", "version": "10.0.0", "kind": "managed", "purpose": "MSIX signature verification", "featureOwner": "updater", "startupRequired": false, "lazyLoadEligible": true },
+    { "name": "NetTopologySuite", "version": "2.6.0", "kind": "managed", "purpose": "geospatial model operations", "featureOwner": "GIS tools", "startupRequired": false, "lazyLoadEligible": true },
+    { "name": "NetTopologySuite.IO.Esri.Shapefile", "version": "1.2.0", "kind": "managed", "purpose": "Shapefile import and export", "featureOwner": "GIS tools", "startupRequired": false, "lazyLoadEligible": true },
+    { "name": "MetadataExtractor", "version": "2.9.0", "kind": "managed", "purpose": "photo metadata extraction", "featureOwner": "survey photo organizer", "startupRequired": false, "lazyLoadEligible": true },
+    { "name": "OpenCvSharp4", "version": "4.11.0.20250506", "kind": "managed", "purpose": "drawing comparison APIs", "featureOwner": "drawing difference comparator", "startupRequired": false, "lazyLoadEligible": true },
+    { "name": "OpenCvSharp4.runtime.win", "version": "4.11.0.20250506", "kind": "native", "purpose": "OpenCV native runtime", "featureOwner": "drawing difference comparator", "startupRequired": false, "lazyLoadEligible": true }
+  ]
+}

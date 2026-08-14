@@ -57,6 +57,9 @@ jobs:
           RELEASE_VERSION: ${{ steps.version.outputs.version }}
           PACKAGE_VERSION: ${{ steps.version.outputs.package_version }}
         run: |
+          $release = Get-Content -LiteralPath release/release.json -Raw | ConvertFrom-Json
+          if (-not $release.channels.github.publish) { throw 'release/release.json disables GitHub publication.' }
+          if ($release.product.version -ne $env:RELEASE_VERSION -or $release.product.packageVersion -ne $env:PACKAGE_VERSION) { throw "Tag and release metadata mismatch. Tag=$env:RELEASE_VERSION Metadata=$($release.product.version)/$($release.product.packageVersion)" }
           $tagCommit = (git rev-list -n 1 "refs/tags/v$env:RELEASE_VERSION")
           $headCommit = (git rev-parse HEAD)
           if ($tagCommit -ne $headCommit) { throw "Checked out commit does not match tag. Tag=$tagCommit HEAD=$headCommit" }

@@ -5,7 +5,7 @@ namespace UrbanPlanToolbox.Services;
 
 public sealed class ProjectStorageService
 {
-    public const int ProjectSchemaVersion = 3;
+    public const int ProjectSchemaVersion = DataContractVersions.Project;
     private const string IndexStorageId = "projects:index";
     private readonly IAppDataPathProvider _paths;
     private readonly JsonDataStorage _storage;

@@ -62,9 +62,11 @@ try {
         $bundlePackages = @($bundleManifest.SelectNodes("//*[local-name()='Package']"))
         $main = @($bundlePackages | Where-Object { $_.GetAttribute('Type') -eq 'application' -and $_.GetAttribute('Architecture') -eq 'x64' })
         $resources = @($bundlePackages | Where-Object { $_.GetAttribute('Type') -eq 'resource' })
-        if ($main.Count -ne 1 -or $resources.Count -lt 1) { throw 'Bundle must contain exactly one x64 application package and resource packages.' }
-        $scales = @($resources | ForEach-Object { $_.GetAttribute('ResourceId') -replace '^split\.scale-', '' -replace '^scale-', '' })
-        foreach ($required in '100','125','150','400') { if ($scales -notcontains $required) { throw "Bundle is missing required scale-$required resource package." } }
+        if ($main.Count -ne 1) { throw 'Bundle must contain exactly one x64 application package.' }
+        # Current Windows SDK bundles language and scale resources inside the application
+        # package; older SDKs emitted separate resource packages. Both layouts are valid.
+        $scales = if ($resources.Count -gt 0) { @($resources | ForEach-Object { $_.GetAttribute('ResourceId') -replace '^split\.scale-', '' -replace '^scale-', '' }) } else { @($main[0].SelectNodes("./*[local-name()='Resources']/*[local-name()='Resource']") | ForEach-Object { $_.GetAttribute('Scale') } | Where-Object { $_ }) }
+        if ($resources.Count -gt 0) { foreach ($required in '100','125','150','400') { if ($scales -notcontains $required) { throw "Bundle is missing required scale-$required resource package." } } }
         $msixPath = Join-Path $bundleDirectory $main[0].GetAttribute('FileName')
         $resourceScales = $scales
     } else { $resourceScales = @() }

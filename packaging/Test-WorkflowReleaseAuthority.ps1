@@ -1,0 +1,6 @@
+[CmdletBinding()] param()
+Set-StrictMode -Version Latest; $ErrorActionPreference='Stop'; $root=Split-Path -Parent $PSScriptRoot; $fail=[Collections.Generic.List[string]]::new();$pass=[Collections.Generic.List[string]]::new();function Check([bool]$ok,[string]$m){if($ok){$pass.Add($m)}else{$fail.Add($m)}}
+foreach($workflow in @('publish-github-release.yml','publish-microsoft-store.yml')){$content=Get-Content (Join-Path $root ".github/workflows/$workflow") -Raw;Check ($content -match 'release/release\.json') "$workflow reads release metadata";Check ($content -notmatch 'project-status\.json') "$workflow does not use project status as candidate authority"}
+$github=Get-Content (Join-Path $root '.github/workflows/publish-github-release.yml') -Raw; Check ($github -match 'channels\.github\.publish') 'GitHub workflow honors publish flag'; Check ($github -match 'product\.packageVersion') 'GitHub workflow reads package version metadata'
+$store=Get-Content (Join-Path $root '.github/workflows/publish-microsoft-store.yml') -Raw; Check ($store -match 'channels\.microsoftStore\.submit') 'Store workflow honors submit flag'; Check ($store -match 'product\.packageVersion') 'Store workflow reads package version metadata'
+foreach($x in $pass){Write-Host "PASS: $x"};foreach($x in $fail){Write-Host "FAIL: $x" -ForegroundColor Red};if($fail.Count){exit 1}

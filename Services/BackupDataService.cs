@@ -10,7 +10,7 @@ namespace UrbanPlanToolbox.Services;
 
 public sealed class BackupDataService
 {
-    public const int BackupFormatVersion = 2;
+    public const int BackupFormatVersion = DataContractVersions.Backup;
     public const int MaximumFileCount = 10_000;
     public const long MaximumSingleFileBytes = 256L * 1024 * 1024;
     public const long MaximumPackageBytes = 2L * 1024 * 1024 * 1024;

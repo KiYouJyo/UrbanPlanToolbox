@@ -212,7 +212,10 @@ public sealed class StorePackagingInfrastructureTests
         Assert.Contains("Publisher=\"CN=C4E4B33A-7B77-4121-897C-7D720A5471F8\"", storeManifest);
         Assert.Contains($"Version=\"{expectedPackageVersion}\"", storeManifest);
 
-        Assert.Contains("$expectedPackageVersion = \"$projectVersion.0\"", workflow);
+        Assert.Contains("release/release.json", workflow);
+        Assert.Contains("channels.microsoftStore.submit", workflow);
+        Assert.Contains("$expectedPackageVersion = [string]$release.product.packageVersion", workflow);
+        Assert.Contains("$projectVersion -ne [string]$release.product.version", workflow);
         Assert.Contains("$notesPath = \"packaging/store-release-notes/$projectVersion.json\"", workflow);
         Assert.DoesNotContain("EXPECTED_PRODUCT_VERSION", workflow);
 
@@ -224,8 +227,8 @@ public sealed class StorePackagingInfrastructureTests
 
         var releaseNotesPath = Path.Combine(root, "packaging", "store-release-notes", $"{productVersion}.json");
         Assert.True(File.Exists(releaseNotesPath), $"Missing Store release notes for {productVersion}.");
-        var releaseNotes = File.ReadAllText(releaseNotesPath);
-        Assert.Contains($"\"version\": \"{productVersion}\"", releaseNotes);
+        using var releaseNotes = System.Text.Json.JsonDocument.Parse(File.ReadAllText(releaseNotesPath));
+        Assert.Equal(productVersion, releaseNotes.RootElement.GetProperty("version").GetString());
     }
 
     private static string FindRepositoryRoot()

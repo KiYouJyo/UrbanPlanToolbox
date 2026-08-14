@@ -7,11 +7,20 @@ namespace UrbanPlanToolbox.ViewModels;
 
 public sealed class UpdateViewModel(IAppUpdateService service, IApplicationRestartService? restartService = null) : INotifyPropertyChanged
 {
+    private static UpdateViewModel? _defaultSession;
     private readonly IAppUpdateService _service = service;
     private readonly IApplicationRestartService _restartService = restartService ?? new NoOpApplicationRestartService();
+    private readonly CancellationTokenSource _sessionLifetime = new();
+    private readonly Dictionary<(string Version, string Locale), LocalizedReleaseNotes> _localizedNotes = new();
     private int _busy;
     private AppUpdateInfo _info = new(AppUpdateState.NotChecked);
     public event PropertyChangedEventHandler? PropertyChanged;
+    /// <summary>One update-operation owner for the application process. Pages only attach to this session.</summary>
+    public static UpdateViewModel GetOrCreateDefault(Func<UpdateViewModel> factory)
+    {
+        ArgumentNullException.ThrowIfNull(factory);
+        return LazyInitializer.EnsureInitialized(ref _defaultSession, factory)!;
+    }
     public AppUpdateInfo Info { get => _info; private set { _info = value; OnChanged(); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); } }
     public double? Progress { get; private set; }
     public string? RestartFailureReason { get; private set; }
@@ -19,10 +28,20 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     public bool CanInstall => CanCheck && (Info.IsUpdateAvailable || Info.NeedsFinalRestart);
     public string CurrentVersion => AppVersionProvider.DisplayVersion;
     public bool ShouldShowUpdateDialog => Info.IsUpdateAvailable;
+    public bool HasChecked { get; private set; }
     public async Task SetLocalizedNotesAsync(IReleaseNotesProvider provider, string locale, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(Info.AvailableVersion)) return;
-        var notes = await provider.GetAsync(Info.AvailableVersion, locale, cancellationToken);
+        var version = Info.AvailableVersion;
+        var normalizedLocale = LocalizedReleaseNotesService.NormalizeLocale(locale);
+        if (_localizedNotes.TryGetValue((version, normalizedLocale), out var cached))
+        {
+            Info = Info with { LocalizedReleaseNotes = cached, ReleaseNotes = null };
+            return;
+        }
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(_sessionLifetime.Token, cancellationToken);
+        var notes = await provider.GetAsync(version, normalizedLocale, linked.Token);
+        if (notes is not null) _localizedNotes[(version, normalizedLocale)] = notes;
         if (notes is not null) Info = Info with { LocalizedReleaseNotes = notes, ReleaseNotes = null };
     }
 
@@ -31,10 +50,13 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
         if (Interlocked.Exchange(ref _busy, 1) != 0) return;
         try
         {
+            HasChecked = true;
+            OnChanged(nameof(HasChecked));
             Progress = null;
             OnChanged(nameof(Progress));
             Info = Info with { State = AppUpdateState.Checking, Detail = null, ErrorCode = null };
-            var result = await _service.CheckForUpdatesAsync(cancellationToken);
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(_sessionLifetime.Token, cancellationToken);
+            var result = await _service.CheckForUpdatesAsync(linked.Token);
             Info = result with
             {
                 // A re-check must not make an already populated card flash empty while
@@ -79,9 +101,10 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
                     OnChanged(nameof(Progress));
                 }
             });
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(_sessionLifetime.Token, cancellationToken);
             var result = Info.IsReadyToInstall
-                ? await _service.InstallPendingAsync(progress, cancellationToken)
-                : await _service.DownloadAndInstallAsync(progress, cancellationToken);
+                ? await _service.InstallPendingAsync(progress, linked.Token)
+                : await _service.DownloadAndInstallAsync(progress, linked.Token);
             var finalState = result.State;
             // The awaited service result is authoritative; deployment completion may still require a user-initiated restart.
             lock (progressGate)
@@ -138,7 +161,8 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     {
         try
         {
-            var result = await _service.InstallPendingAsync(cancellationToken: cancellationToken);
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(_sessionLifetime.Token, cancellationToken);
+            var result = await _service.InstallPendingAsync(cancellationToken: linked.Token);
             Info = Info with { State = result.State, Detail = result.Detail, ErrorCode = result.ErrorCode };
         }
         catch (OperationCanceledException) { Info = Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" }; }
