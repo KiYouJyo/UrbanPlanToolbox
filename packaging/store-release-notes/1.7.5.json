@@ -1,0 +1,20 @@
+{
+  "version": "1.7.5",
+  "locales": {
+    "zh-CN": [
+      "优化新建设计项目与研究项目窗口的宽度和表单布局。",
+      "修复长表单滚动条覆盖输入框的问题。",
+      "继续使用已经稳定的 Microsoft Store / GitHub 更新机制，本版本不改变更新行为。"
+    ],
+    "ja-JP": [
+      "新しい設計プロジェクトと研究プロジェクトの画面幅およびフォーム レイアウトを改善しました。",
+      "長いフォームでスクロールバーが入力欄に重なる問題を修正しました。",
+      "安定している Microsoft Store / GitHub の更新機構を引き続き使用し、このバージョンでは更新動作を変更しません。"
+    ],
+    "en-US": [
+      "Improves the width and form layout of the new design and research project dialogs.",
+      "Fixes scrollbars overlapping input controls in long forms.",
+      "Continues to use the established Microsoft Store and GitHub update mechanisms; this version does not change update behavior."
+    ]
+  }
+}

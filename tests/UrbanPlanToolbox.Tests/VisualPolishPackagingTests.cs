@@ -51,11 +51,11 @@ public sealed class VisualPolishPackagingTests
     }
 
     [Fact]
-    public void VersionAndUserAgentAre168()
+    public void VersionAndUserAgentAre175()
     {
         var root = FindRepositoryRoot();
-        Assert.Contains("Version=\"1.7.4.0\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
-        Assert.Contains("<Version>1.7.4</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
+        Assert.Contains("Version=\"1.7.5.0\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
+        Assert.Contains("<Version>1.7.5</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
         Assert.Contains("UrbanPlanToolbox/", File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs")));
     }
 
@@ -78,7 +78,7 @@ public sealed class VisualPolishPackagingTests
         var manifest = File.ReadAllText(Path.Combine(root, "Package.Store.appxmanifest"));
         Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", manifest);
         Assert.Contains("Publisher=\"CN=C4E4B33A-7B77-4121-897C-7D720A5471F8\"", manifest);
-        Assert.Contains("Version=\"1.7.4.0\"", manifest);
+        Assert.Contains("Version=\"1.7.5.0\"", manifest);
         Assert.Contains("<PublisherDisplayName>Jo Kiyō</PublisherDisplayName>", manifest);
         Assert.DoesNotContain("556F80C5-C4D4-452B-93B4-00DE3FA7AC29", manifest, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("PhoneIdentity", manifest, StringComparison.Ordinal);
@@ -86,6 +86,29 @@ public sealed class VisualPolishPackagingTests
         var project = File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj"));
         Assert.Contains("'$(DistributionChannel)' == 'Store'", project);
         Assert.Contains("Package.Store.appxmanifest", project);
+    }
+
+    [Fact]
+    public void CreateProjectDialogUsesAdaptiveWideSharedFormLayout()
+    {
+        var root = FindRepositoryRoot();
+        var source = File.ReadAllText(Path.Combine(root, "Views", "HomePage.xaml.cs"));
+
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(source, "private async Task ShowCreateDialogAsync\\(string kind\\)").Cast<System.Text.RegularExpressions.Match>());
+        Assert.DoesNotContain("const double dialogMaxWidth = 760;", source);
+        Assert.DoesNotContain("Width = dialogWidth", source);
+        Assert.DoesNotContain("MaxWidth = dialogMaxWidth", source);
+        Assert.DoesNotContain("HorizontalAlignment = HorizontalAlignment.Center", source);
+        Assert.DoesNotContain("VerticalAlignment = VerticalAlignment.Center", source);
+        Assert.Contains("const double scrollBarGutter = 20;", source);
+        Assert.Contains("Padding = new Thickness(0, 0, scrollBarGutter, 0)", source);
+        Assert.Contains("XamlRoot.Size.Height - 240", source);
+        Assert.Contains("VerticalScrollBarVisibility = ScrollBarVisibility.Auto", source);
+        Assert.Contains("HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled", source);
+        Assert.Contains("HorizontalContentAlignment = HorizontalAlignment.Stretch", source);
+        Assert.Contains("HorizontalAlignment = HorizontalAlignment.Stretch", source);
+        Assert.Contains("CreateResearchAsync(name.Text, selected.Code, customType.Text, field!.Text, subject!.Text, methods!.Text)", source);
+        Assert.Contains("CreateAsync(name.Text, selected.Code, customType.Text, area!.Text, lat, lon, description!.Text, requirements!.Text)", source);
     }
 
     [Fact]

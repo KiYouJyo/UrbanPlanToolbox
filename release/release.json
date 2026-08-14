@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.7.4", "packageVersion": "1.7.4.0" },
-  "classification": { "kind": "store-native-update-flow", "stability": "release-approved", "storeMilestone": false },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.7.5", "packageVersion": "1.7.5.0" },
+  "classification": { "kind": "store-native-update-flow", "stability": "prepared-for-validation", "storeMilestone": false },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.7.4 Microsoft Store 更新流程优化",
-    "ja-JP": "UrbanPlanToolbox v1.7.4 Microsoft Store 更新フローの改善",
-    "en-US": "UrbanPlanToolbox v1.7.4 Microsoft Store update flow improvements"
+    "zh-CN": "UrbanPlanToolbox v1.7.5 新建项目窗口优化",
+    "ja-JP": "UrbanPlanToolbox v1.7.5 新規プロジェクト画面の改善",
+    "en-US": "UrbanPlanToolbox v1.7.5 new project dialog improvements"
   },
   "languageLabels": {
     "zh-CN": "简体中文",
@@ -15,8 +15,8 @@
     "en-US": "English"
   },
   "items": [
-    { "id": "native-combined-flow", "zh-CN": "Microsoft Store 更新恢复为 Windows 官方的一体式下载与安装流程，避免两阶段更新导致系统授权窗口出现在语义错误的时间。", "ja-JP": "Microsoft Store の更新を Windows 公式の一体型ダウンロード・インストール フローに戻し、2 段階更新でシステム承認画面が不自然なタイミングに表示される問題を回避します。", "en-US": "Restores Microsoft Store updates to the official Windows combined download-and-install flow, avoiding system authorization at the wrong point in a two-stage update." },
-    { "id": "restart-recovery", "zh-CN": "点击“下载并安装更新”后，由 Windows / Microsoft Store 依次处理下载和安装授权；在更新开始前注册 Windows 应用重启恢复，确保应用关闭后自动重新启动新版。", "ja-JP": "「アップデートをダウンロードしてインストール」を選ぶと、Windows / Microsoft Store がダウンロードとインストールの承認を順に処理します。開始前に Windows のアプリ再起動回復を登録し、アプリ終了後に新しいバージョンを自動起動します。", "en-US": "After choosing Download and install update, Windows / Microsoft Store handles download and installation authorization in sequence. Windows restart recovery is registered first so the new version relaunches automatically after the app closes." },
-    { "id": "surviving-process-fallback", "zh-CN": "若 Store 更新完成后旧进程仍然存活，则继续使用应用级重启作为兜底；GitHub 更新、单实例机制以及其他功能保持不变。", "ja-JP": "Store 更新後も古いプロセスが残る場合はアプリ側の再起動をフォールバックとして使用します。GitHub 更新、単一インスタンス機構、その他の機能は変更されません。", "en-US": "If the old process survives a completed Store update, the app-level restart remains the fallback. GitHub updates, single-instance behavior, and other features are unchanged." }
+    { "id": "wide-project-dialog", "zh-CN": "优化新建设计项目与研究项目窗口的宽度和表单布局。", "ja-JP": "新しい設計プロジェクトと研究プロジェクトの画面幅およびフォーム レイアウトを改善しました。", "en-US": "Improves the width and form layout of the new design and research project dialogs." },
+    { "id": "scrollbar-gutter", "zh-CN": "修复长表单滚动条覆盖输入框的问题。", "ja-JP": "長いフォームでスクロールバーが入力欄に重なる問題を修正しました。", "en-US": "Fixes scrollbars overlapping input controls in long forms." },
+    { "id": "updater-freeze", "zh-CN": "继续使用已经稳定的 Microsoft Store / GitHub 更新机制，本版本不改变更新行为。", "ja-JP": "安定している Microsoft Store / GitHub の更新機構を引き続き使用し、このバージョンでは更新動作を変更しません。", "en-US": "Continues to use the established Microsoft Store and GitHub update mechanisms; this version does not change update behavior." }
   ]
 }

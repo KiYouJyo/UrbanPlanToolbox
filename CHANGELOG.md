@@ -1,5 +1,13 @@
 # 更改日志
 
+## 1.7.5
+
+### Platform foundation and updater freeze preparation
+
+- Improves the width and form layout of the new design and research project dialogs.
+- Fixes scrollbars overlapping input controls in long forms.
+- Continues to use the established Microsoft Store and GitHub update mechanisms; this version does not change update behavior.
+
 ## 1.7.4
 
 ### Platform foundation and updater freeze preparation
