@@ -7,7 +7,7 @@
   },
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.6.9",
+    "version": "1.7.0",
     "lifecycle": "stable-1.x",
     "platform": "Windows",
     "supportedArchitecture": "x64",
@@ -15,23 +15,23 @@
   },
   "distribution": {
     "github": {
-      "latestPublishedProductVersion": "1.6.9",
-      "latestPublishedPackageVersion": "1.6.9.0",
-      "latestPublishedReleaseTag": "v1.6.9",
-      "candidateProductVersion": "1.6.9",
-      "candidatePackageVersion": "1.6.9.0",
+      "latestPublishedProductVersion": "1.7.0",
+      "latestPublishedPackageVersion": "1.7.0.0",
+      "latestPublishedReleaseTag": "v1.7.0",
+      "candidateProductVersion": "1.7.0",
+      "candidatePackageVersion": "1.7.0.0",
       "candidateState": "published",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
     "microsoftStore": {
-      "submittedProductVersion": "1.6.9",
-      "submittedPackageVersion": "1.6.9.0",
+      "submittedProductVersion": "1.7.0",
+      "submittedPackageVersion": "1.7.0.0",
       "state": "certification-submitted",
       "publicProductVersion": "1.6.7",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
-      "candidateProductVersion": "1.6.9",
-      "candidatePackageVersion": "1.6.9.0",
+      "candidateProductVersion": "1.7.0",
+      "candidatePackageVersion": "1.7.0.0",
       "candidateState": "certification-submitted",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
@@ -65,11 +65,11 @@
         "signer Thumbprint pinning"
       ],
       "validation": "validated",
-      "policy": "frozen; future updater changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
+      "policy": "validated / frozen; future updater changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
       "validation": "final-e2e-pending",
-      "policy": "use Microsoft Store APIs and service-managed package delivery; keep Store and GitHub update state presentation consistent without merging their identities"
+      "policy": "final-e2e-pending / freeze-ready; use Microsoft Store APIs and service-managed package delivery; keep Store and GitHub update state presentation consistent without merging their identities"
     }
   },
   "documentation": {
@@ -86,7 +86,7 @@
   },
   "dataContracts": {
     "projectSchemaVersion": 3,
-    "backupFormatVersion": 1
+    "backupFormatVersion": 2
   },
   "roadmap": {
     "stage": "stabilization-and-productization",
