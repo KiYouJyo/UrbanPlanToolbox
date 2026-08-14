@@ -38,23 +38,47 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
         if (_updates.Count == 0) return new(AppUpdateState.Failed, "NoPendingUpdate");
         try
         {
-            _lastDownloadProgress = null;
-            _lastLoggedState = null;
-            _lastLoggedProgressBucket = -1;
-            var operation = CreateContext().RequestDownloadAndInstallStorePackageUpdatesAsync(_updates);
-            var storeProgress = new Progress<StorePackageUpdateStatus>(status =>
-            {
-                HandleStoreProgress(status, progress);
-            });
+            ResetProgressTracking();
+            // This is intentionally download-only. A Store package must not be deployed
+            // until the user explicitly chooses the second, restart-and-update action.
+            var operation = CreateContext().RequestDownloadStorePackageUpdatesAsync(_updates);
+            var storeProgress = new Progress<StorePackageUpdateStatus>(status => HandleStoreProgress(status, progress, isInstallOperation: false));
             var result = await operation.AsTask(cancellationToken, storeProgress);
             var state = result.OverallState.ToString();
             if (state.Equals("Canceled", StringComparison.OrdinalIgnoreCase) || state.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Cancelled);
             if (state.Equals("Completed", StringComparison.OrdinalIgnoreCase))
             {
-                AppLogger.Default.Info("StoreUpdate", "StoreDeploymentCompleted", "StoreState=Completed;MappedAppState=RestartRequired");
-                return new(AppUpdateState.RestartRequired);
+                AppLogger.Default.Info("StoreUpdate", "StoreDownloadCompleted", "StoreOverallState=Completed;MappedAppState=ReadyToInstall");
+                return new(AppUpdateState.ReadyToInstall);
             }
-            return new(AppUpdateState.Failed, state);
+            return new(AppUpdateState.Failed, $"StoreDownload{state}");
+        }
+        catch (OperationCanceledException) { return new(AppUpdateState.Cancelled); }
+        catch (InvalidOperationException exception) when (exception.Message == "StoreWindowUnavailable") { return new(AppUpdateState.Failed, exception.Message); }
+        catch (COMException exception) { return new(AppUpdateState.Failed, $"0x{exception.HResult:X8}"); }
+        catch (Exception) { return new(AppUpdateState.Failed, "StoreDownloadFailed"); }
+    }
+
+    public async Task<AppUpdateResult> InstallPendingAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        if (_channelService.GetCurrentChannel() != DistributionChannel.Store) return new(AppUpdateState.UnsupportedChannel);
+        if (_updates.Count == 0) return new(AppUpdateState.Failed, "NoPendingUpdate");
+        try
+        {
+            ResetProgressTracking();
+            var operation = CreateContext().RequestDownloadAndInstallStorePackageUpdatesAsync(_updates);
+            var storeProgress = new Progress<StorePackageUpdateStatus>(status => HandleStoreProgress(status, progress, isInstallOperation: true));
+            var result = await operation.AsTask(cancellationToken, storeProgress);
+            var state = result.OverallState.ToString();
+            if (state.Equals("Canceled", StringComparison.OrdinalIgnoreCase) || state.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Cancelled);
+            if (state.Equals("Completed", StringComparison.OrdinalIgnoreCase))
+            {
+                // Store owns deployment and process replacement. Do not request a second
+                // AppInstance restart after the user has authorized Store installation.
+                AppLogger.Default.Info("StoreUpdate", "StoreInstallCompleted", "StoreOverallState=Completed;MappedAppState=Completed");
+                return new(AppUpdateState.Completed);
+            }
+            return new(AppUpdateState.Failed, $"StoreInstall{state}");
         }
         catch (OperationCanceledException) { return new(AppUpdateState.Cancelled); }
         catch (InvalidOperationException exception) when (exception.Message == "StoreWindowUnavailable") { return new(AppUpdateState.Failed, exception.Message); }
@@ -62,7 +86,14 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
         catch (Exception) { return new(AppUpdateState.Failed, "StoreInstallFailed"); }
     }
 
-    private void HandleStoreProgress(StorePackageUpdateStatus status, IProgress<AppUpdateProgress>? progress)
+    private void ResetProgressTracking()
+    {
+        _lastDownloadProgress = null;
+        _lastLoggedState = null;
+        _lastLoggedProgressBucket = -1;
+    }
+
+    private void HandleStoreProgress(StorePackageUpdateStatus status, IProgress<AppUpdateProgress>? progress, bool isInstallOperation)
     {
         var updateState = status.PackageUpdateState;
         var resolution = StoreUpdateProgressResolver.ResolveDownloadProgress(
@@ -80,23 +111,24 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
                 LogProgress(status, AppUpdateState.Downloading, _lastDownloadProgress, resolution.Source);
                 break;
             case StorePackageUpdateState.Deploying:
-                progress?.Report(new(AppUpdateState.Installing));
+                // A deployment callback is only meaningful after the user chose install.
+                // It is activity, not a transaction terminal state.
+                if (isInstallOperation) progress?.Report(new(AppUpdateState.Installing));
                 LogProgress(status, AppUpdateState.Installing, null, "None");
                 break;
             case StorePackageUpdateState.Completed:
-                progress?.Report(new(AppUpdateState.RestartRequired));
-                LogProgress(status, AppUpdateState.RestartRequired, null, "None");
+                // Per-package completion must never advance the application state. The
+                // awaited StorePackageUpdateResult.OverallState is authoritative.
+                LogProgress(status, isInstallOperation ? AppUpdateState.Installing : AppUpdateState.Downloading, _lastDownloadProgress, "PackageCompleted");
                 break;
             case StorePackageUpdateState.Canceled:
-                progress?.Report(new(AppUpdateState.Cancelled));
-                LogProgress(status, AppUpdateState.Cancelled, null, "None");
+                LogProgress(status, isInstallOperation ? AppUpdateState.Installing : AppUpdateState.Downloading, _lastDownloadProgress, "PackageCancelled");
                 break;
             case StorePackageUpdateState.OtherError:
             case StorePackageUpdateState.ErrorLowBattery:
             case StorePackageUpdateState.ErrorWiFiRecommended:
             case StorePackageUpdateState.ErrorWiFiRequired:
-                progress?.Report(new(AppUpdateState.Failed, Detail: updateState.ToString()));
-                LogProgress(status, AppUpdateState.Failed, null, "None");
+                LogProgress(status, isInstallOperation ? AppUpdateState.Installing : AppUpdateState.Downloading, _lastDownloadProgress, $"Package{updateState}");
                 break;
             default:
                 progress?.Report(new(AppUpdateState.Downloading, _lastDownloadProgress));

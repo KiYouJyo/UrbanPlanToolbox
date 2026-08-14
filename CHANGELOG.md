@@ -1,5 +1,14 @@
 # 更改日志
 
+## 1.7.1
+
+### Platform foundation and updater freeze preparation
+
+- Fixes Microsoft Store updates showing Restart and update before download completion and implements a true download-then-install flow.
+- Store package deployment no longer begins until the user chooses Restart and update.
+- Fixes treating Store package-progress Completed as the whole update transaction and strengthens multi-package and asynchronous-callback state-machine coverage.
+- Keeps the GitHub update flow and application-scoped update-session behavior unchanged.
+
 ## 1.7.0
 
 ### Platform foundation and updater freeze preparation

@@ -12,7 +12,7 @@ Operations use explicit `Idle`, `Running`, `Succeeded`, `Failed`, and `Canceled`
 
 ## Updates
 
-The application update states include `ReadyToInstall` and `RestartRequired`. Store native `Deploying` maps to `Installing`; Store `Completed` means package deployment completed and maps to `RestartRequired`, never application-level `Completed`. `Completed` means no user action remains. The user-facing GitHub and Store flow is identical: Check → Update available → Download and install → Restart and update. Internally GitHub uses `ReadyToInstall` before deployment, while Store uses `RestartRequired` after deployment; both present the same final action. Store final E2E remains pending the real v1.6.8 → v1.6.9 Store path.
+The application update states include `ReadyToInstall` and `RestartRequired`. Microsoft Store follows Check → download only → `ReadyToInstall` → explicit user install action → deployment → new-version launch. A completed download is not a completed update, and a per-package progress callback is never an application-level terminal state; only the awaited Store operation's `OverallState` is authoritative. Store native `Deploying` maps to `Installing` only after the explicit install action. GitHub retains its independently verified download, deployment, and restart path. Store final E2E remains pending a real Store baseline-to-v1.7.1 delivery.
 
 ## Data
 

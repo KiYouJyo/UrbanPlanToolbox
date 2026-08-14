@@ -144,16 +144,19 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public void StoreCompletionUsesRestartRequiredAndGitHubLogicRemainsSeparate()
+    public void StoreUsesDownloadThenExplicitInstallAndGitHubLogicRemainsSeparate()
     {
         var root = FindRepositoryRoot();
         var store = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
         var github = File.ReadAllText(Path.Combine(root, "Services", "GitHubAppUpdateService.cs"));
         var about = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
 
-        Assert.Contains("StoreDeploymentCompleted", store);
-        Assert.Contains("new(AppUpdateState.RestartRequired)", store);
-        Assert.DoesNotContain("if (state.Equals(\"Completed\", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Completed)", store);
+        Assert.Contains("RequestDownloadStorePackageUpdatesAsync", store);
+        Assert.Contains("RequestDownloadAndInstallStorePackageUpdatesAsync", store);
+        Assert.Contains("StoreDownloadCompleted", store);
+        Assert.Contains("new(AppUpdateState.ReadyToInstall)", store);
+        Assert.Contains("StoreInstallCompleted", store);
+        Assert.Contains("new(AppUpdateState.Completed)", store);
         Assert.Contains("AppUpdateState.ReadyToInstall", github);
         Assert.Contains("info.NeedsFinalRestart ? T(\"Action_RestartAndUpdate\")", about);
     }
@@ -239,7 +242,7 @@ public sealed class AppUpdateTests
         var source = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
         Assert.DoesNotContain("operation.Progress", source, StringComparison.Ordinal);
         Assert.Contains("AsTask(cancellationToken, storeProgress)", source, StringComparison.Ordinal);
-        Assert.Contains("HandleStoreProgress(status, progress)", source, StringComparison.Ordinal);
+        Assert.Contains("HandleStoreProgress(status, progress, isInstallOperation", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -572,7 +575,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.7.0", viewModel.CurrentVersion);
+        Assert.Equal("v1.7.1", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -609,7 +612,7 @@ public sealed class AppUpdateTests
         await operation;
 
         Assert.Equal(AppUpdateState.UpdateAvailable, session.Info.State);
-        Assert.Equal("1.7.0", session.Info.AvailableVersion);
+        Assert.Equal("1.7.1", session.Info.AvailableVersion);
     }
 
     [Fact]
@@ -640,7 +643,7 @@ public sealed class AppUpdateTests
         service.CompleteDownload();
         await operation;
         Assert.Equal(AppUpdateState.ReadyToInstall, session.Info.State);
-        Assert.Equal("1.7.0", session.Info.AvailableVersion);
+        Assert.Equal("1.7.1", session.Info.AvailableVersion);
     }
 
     private static async Task WaitForProgressAsync(UpdateViewModel session, double expected)
@@ -823,7 +826,7 @@ internal sealed class DeferredUpdateService(AppUpdateState downloadResult) : IAp
     {
         _operationToken = cancellationToken; _checkStarted.TrySetResult();
         await _checkCompletion.Task.WaitAsync(cancellationToken);
-        return new(AppUpdateState.UpdateAvailable, "1.7.0", "notes", Source: UpdateInstallSource.GitHub);
+        return new(AppUpdateState.UpdateAvailable, "1.7.1", "notes", Source: UpdateInstallSource.GitHub);
     }
 
     public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
