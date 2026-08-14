@@ -9,5 +9,3 @@
 - 建立启动、包体和依赖基线，完成 Light/Dark/DPI 维护性回归。
 - 修复卸载重装或 Windows 重置后保留业务数据会错误跳过首次使用向导的问题。
 - 统一应用内弹窗、下拉选择器及其他浮层界面的主题 Surface，使其与应用 Light、Dark 和系统主题视觉保持一致。
-
-本候选版本尚未公开发布、未创建 tag、未创建 GitHub Release、未创建 Store submission。

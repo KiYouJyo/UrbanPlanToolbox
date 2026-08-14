@@ -30,6 +30,8 @@ Store work requires explicit release authorization. Use the Store identity, `Pac
 
 Before an authorized release, validate [project-status.json](project-status.json), `UrbanPlanToolbox.csproj`, both manifests, three-language release notes, website metadata, changelog, and channel metadata. Run the documentation consistency check as part of this review.
 
+The release gate also requires all three Markdown sibling files, valid sibling links, complete structured `notes` for `zh-CN` / `ja-JP` / `en-US`, semantic equality between `Assets/Data/ReleaseNotes/X.Y.Z.json` and its GitHub Pages mirror, production-model deserialization, and a generated GitHub Release body. The generated body must use tag-pinned language URLs and contain no candidate-only publication status. Run `packaging/Sync-ReleaseNotes.ps1 -Version X.Y.Z -Check` and `packaging/New-GitHubReleaseBody.ps1 -Version X.Y.Z -OutputPath <path>` before tagging.
+
 ## Post-release state updates
 
 After a confirmed GitHub publication, update the SSOT GitHub state to `published`. After a Store submission, use `certification-submitted`. Change Store state to `published` only with confirmation of actual public availability.
