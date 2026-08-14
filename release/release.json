@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "product": { "name": "UrbanPlanToolbox", "version": "1.7.2", "packageVersion": "1.7.2.0" },
-  "classification": { "kind": "desktop-lifecycle", "stability": "release-approved", "storeMilestone": false },
+  "classification": { "kind": "desktop-lifecycle", "stability": "stable", "storeMilestone": false },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
