@@ -1,5 +1,7 @@
 # Updater freeze contract
 
-After v1.7.0 validation, runtime updater behavior is frozen. `UpdateViewModel` owns the application-scoped update session; `AboutPage` attaches on `Loaded`, detaches on `Unloaded`, and owns no update cancellation token.
+The runtime updater is behavior-frozen for the validated GitHub path. `UpdateViewModel` owns the application-scoped update session; `AboutPage` attaches on `Loaded`, detaches on `Unloaded`, and owns no update cancellation token.
 
-GitHub retains its verified discovery, checksum, signature, deployment, and restart path. Store `Completed` always maps to `RestartRequired`. Store is freeze-ready, not fully frozen, until a real Store N to v1.7.0 update succeeds.
+GitHub retains its verified discovery, SHA-256, signature, deployment, and restart path. Microsoft Store uses one user action and `RequestDownloadAndInstallStorePackageUpdatesAsync`; Windows restart recovery is registered before that call. Per-package `Completed` is not a transaction terminal state. Navigation preserves checking, download progress, localized notes, target version, source, and retryable failure without starting a second Store operation.
+
+The GitHub updater is validated and frozen. The v1.7.4 Store updater is published and freeze-ready, but it is not fully frozen until a real Microsoft Store baseline N → v1.7.4 update proves native authorization, deployment, automatic relaunch, retry behavior, navigation continuity, and retained user data. Publication alone is not that E2E evidence.

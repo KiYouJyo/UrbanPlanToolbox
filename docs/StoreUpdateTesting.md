@@ -2,11 +2,11 @@
 
 # Microsoft Store 应用内更新 E2E 合同
 
-Any change to Store update behavior requires end-to-end evidence; unit tests, a build, package creation, or a download indicator alone are insufficient.
+Any change to Store update behavior requires end-to-end evidence; unit tests, a build, package creation, publication, or a download indicator alone are insufficient.
 
 ## Test boundary
 
-Use a formal Store installation at source product version **N** and a higher Store-delivered target product version **N+1**. A Package Flight may be used as the delivery mechanism, but neither a historical version nor a flight is the current release status authority.
+Use a formal Store installation at source product version **N** and the Microsoft Store-published target product version **1.7.4**. A Package Flight may be used as an auxiliary delivery mechanism, but neither a historical version nor a flight replaces the current release-status authority.
 
 ## Required path
 
@@ -27,6 +27,9 @@ Capture the displayed state, package identity/version, deployment result, restar
 ## v1.7.4 final Store E2E target
 
 - Source: actual Microsoft Store baseline `N`
-- Target: `1.7.4`
-- Status: **PENDING**
+- Target: published Microsoft Store version `1.7.4`
+- Publication status: **PUBLISHED**
+- Updater E2E status: **PENDING**
 - Prove: check → localized 1.7.4 notes → one Download and install update action → restart registration before the combined Store operation → native download/install authorization → deployment → automatic 1.7.4 launch → retained user data. Also prove cancellation returns to `UpdateAvailable`, a surviving process uses exactly one fallback restart, and package-level `Completed` callbacks do not advance the UI to a terminal state.
+
+Microsoft Store publication confirms delivery status only; it does not by itself prove the real-device in-app updater or automatic relaunch path.
