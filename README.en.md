@@ -10,8 +10,13 @@ An offline-first Windows toolbox for urban planning, architectural design, and s
 
 - [Latest formal GitHub Release](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest): more frequent x64 sideloaded releases.
 - [Microsoft Store](https://apps.microsoft.com/detail/9MWDPJG1BHKW): for users who prefer Microsoft Store installation and updates.
+- **WinGet (Microsoft Store source)**: install the Store edition directly from a terminal:
 
-The two channels have independent identities and update paths and cannot upgrade over each other. See [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) and [CHANGELOG.md](CHANGELOG.md) for version details.
+```powershell
+winget install --id 9MWDPJG1BHKW --source msstore -e
+```
+
+The GitHub sideload edition and Microsoft Store edition have independent package identities and update paths and cannot upgrade over each other. The WinGet `msstore` entry is another installation entry point for the Microsoft Store edition, not a third package identity; later updates remain Store-managed. See [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) and [CHANGELOG.md](CHANGELOG.md) for version details.
 
 ## Core features
 
@@ -31,7 +36,7 @@ Download the lightweight one-click installer from the [latest GitHub Release](ht
 
 ### Later updates
 
-Open About and choose Check for updates. GitHub builds can check for and download formal updates in the app; the app verifies the downloaded package's integrity and signature, then the user chooses restart and update once it is ready. Microsoft Store builds continue to use the Store update channel.
+Open About and choose Check for updates. GitHub builds can check for and download formal updates in the app; the app verifies the downloaded package's integrity and signature, then the user chooses restart and update once it is ready. Microsoft Store builds, including installations performed through WinGet's `msstore` source, continue to use the Store update channel.
 
 ### Advanced installation
 
