@@ -17,6 +17,8 @@ public sealed class SingleInstanceActivationTests
         Assert.Contains("if (!mainInstance.IsCurrent)", program);
         Assert.Contains("return;", program);
         Assert.Contains("mainInstance.Activated", program);
+        Assert.Contains("DispatcherQueueSynchronizationContext", program);
+        Assert.True(program.IndexOf("SynchronizationContext.SetSynchronizationContext", StringComparison.Ordinal) < program.IndexOf("new App()", StringComparison.Ordinal));
     }
 
     [Fact]

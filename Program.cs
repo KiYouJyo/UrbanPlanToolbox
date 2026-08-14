@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Dispatching;
 using Microsoft.Windows.AppLifecycle;
 using UrbanPlanToolbox.Services;
 using WinRT;
@@ -23,6 +24,11 @@ public static class Program
         }
 
         mainInstance.Activated += (_, activationArguments) => App.OnRedirectedActivation(activationArguments);
-        Application.Start(_ => new App());
+        Application.Start(callbackParameters =>
+        {
+            var synchronizationContext = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
+            SynchronizationContext.SetSynchronizationContext(synchronizationContext);
+            _ = new App();
+        });
     }
 }
