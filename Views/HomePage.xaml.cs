@@ -127,10 +127,7 @@ public sealed partial class HomePage : Page
         var error = new TextBlock { Foreground = (Brush)Application.Current.Resources["SystemFillColorCriticalBrush"], TextWrapping = TextWrapping.Wrap };
         panel.Children.Add(error);
         const double dialogMaxWidth = 760;
-        const double dialogOuterMargin = 48;
         const double scrollBarGutter = 20;
-        var availableDialogWidth = Math.Max(0, XamlRoot.Size.Width - dialogOuterMargin);
-        var dialogWidth = Math.Min(dialogMaxWidth, availableDialogWidth);
         var formLayout = new Border
         {
             Padding = new Thickness(0, 0, scrollBarGutter, 0),
@@ -145,7 +142,7 @@ public sealed partial class HomePage : Page
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = scrollViewer, Width = dialogWidth, MaxWidth = dialogMaxWidth, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
+        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = scrollViewer, MaxWidth = dialogMaxWidth, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
         dialog.PrimaryButtonClick += async (_, args) =>
         {
             args.Cancel = true; var deferral = args.GetDeferral();
