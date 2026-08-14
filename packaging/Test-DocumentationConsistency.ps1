@@ -48,10 +48,24 @@ if ($status) {
     $github = $status.distribution.github
     Test-Requirement ($github.candidateProductVersion -eq $status.product.version) 'SSOT GitHub candidate version matches product version'
     Test-Requirement ($github.candidatePackageVersion -eq "$($status.product.version).0") 'SSOT GitHub candidate package version matches product version'
-    Test-Requirement ($github.candidateState -eq 'prepared') 'SSOT GitHub candidate is prepared, not published'
     Test-Requirement ($github.latestPublishedProductVersion -ne $null) 'SSOT records the latest confirmed GitHub publication separately'
+    $githubLifecycleIsTruthful =
+        ($github.candidateState -eq 'prepared' -and $github.latestPublishedProductVersion -ne $github.candidateProductVersion) -or
+        ($github.candidateState -eq 'published' -and
+            $github.latestPublishedProductVersion -eq $github.candidateProductVersion -and
+            $github.latestPublishedPackageVersion -eq $github.candidatePackageVersion -and
+            $github.latestPublishedReleaseTag -eq "v$($github.candidateProductVersion)")
+    Test-Requirement $githubLifecycleIsTruthful 'SSOT GitHub candidate lifecycle is truthful'
+
     Test-Requirement ($status.distribution.microsoftStore.candidateProductVersion -eq $status.product.version) 'SSOT Store candidate version matches product version'
-    Test-Requirement ($status.distribution.microsoftStore.candidateState -eq 'prepared-for-validation') 'SSOT Store candidate remains pending validation'
+    $store = $status.distribution.microsoftStore
+    $storeLifecycleIsTruthful =
+        ($store.candidateState -eq 'prepared-for-validation' -and $store.state -ne 'certification-submitted') -or
+        ($store.candidateState -eq 'certification-submitted' -and
+            $store.state -eq 'certification-submitted' -and
+            $store.submittedProductVersion -eq $store.candidateProductVersion -and
+            $store.submittedPackageVersion -eq $store.candidatePackageVersion)
+    Test-Requirement $storeLifecycleIsTruthful 'SSOT Store candidate lifecycle is truthful'
 
     foreach ($manifestName in @('Package.appxmanifest', 'Package.Store.appxmanifest')) {
         [xml]$manifest = Get-Content -LiteralPath (Join-Path $repositoryRoot $manifestName) -Raw

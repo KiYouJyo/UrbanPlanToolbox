@@ -15,24 +15,24 @@
   },
   "distribution": {
     "github": {
-      "latestPublishedProductVersion": "1.6.7",
-      "latestPublishedPackageVersion": "1.6.7.0",
-      "latestPublishedReleaseTag": "v1.6.7",
+      "latestPublishedProductVersion": "1.6.8",
+      "latestPublishedPackageVersion": "1.6.8.0",
+      "latestPublishedReleaseTag": "v1.6.8",
       "candidateProductVersion": "1.6.8",
       "candidatePackageVersion": "1.6.8.0",
-      "candidateState": "prepared",
+      "candidateState": "published",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
     "microsoftStore": {
-      "submittedProductVersion": "1.6.7",
-      "submittedPackageVersion": "1.6.7.0",
+      "submittedProductVersion": "1.6.8",
+      "submittedPackageVersion": "1.6.8.0",
       "state": "certification-submitted",
-      "publicProductVersion": null,
+      "publicProductVersion": "1.6.7",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
       "candidateProductVersion": "1.6.8",
       "candidatePackageVersion": "1.6.8.0",
-      "candidateState": "prepared-for-validation",
+      "candidateState": "certification-submitted",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
