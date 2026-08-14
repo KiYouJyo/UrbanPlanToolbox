@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 1,
-  "asOf": "2026-08-13",
+  "schemaVersion": 2,
+  "asOf": "2026-08-14",
   "repository": {
     "defaultBranch": "main",
     "documentationGovernance": "docs/DOCUMENTATION.md"
   },
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.6.7",
+    "version": "1.6.8",
     "lifecycle": "stable-1.x",
     "platform": "Windows",
     "supportedArchitecture": "x64",
@@ -15,9 +15,12 @@
   },
   "distribution": {
     "github": {
-      "productVersion": "1.6.7",
-      "packageVersion": "1.6.7.0",
-      "releaseTag": "v1.6.7",
+      "latestPublishedProductVersion": "1.6.7",
+      "latestPublishedPackageVersion": "1.6.7.0",
+      "latestPublishedReleaseTag": "v1.6.7",
+      "candidateProductVersion": "1.6.8",
+      "candidatePackageVersion": "1.6.8.0",
+      "candidateState": "prepared",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -27,6 +30,9 @@
       "state": "certification-submitted",
       "publicProductVersion": null,
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
+      "candidateProductVersion": "1.6.8",
+      "candidatePackageVersion": "1.6.8.0",
+      "candidateState": "prepared-for-validation",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
@@ -45,7 +51,7 @@
         "Downloading",
         "Verifying",
         "ReadyToInstall",
-        "Deploying",
+        "Installing",
         "Restarting",
         "Completed",
         "Failed"
@@ -57,9 +63,11 @@
         "signer Subject pinning",
         "signer Thumbprint pinning"
       ],
-      "policy": "freeze feature expansion; future updater changes require end-to-end regression evidence"
+      "validation": "validated",
+      "policy": "frozen; future updater changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
+      "validation": "final-e2e-pending",
       "policy": "use Microsoft Store APIs and service-managed package delivery; keep Store and GitHub update state presentation consistent without merging their identities"
     }
   },

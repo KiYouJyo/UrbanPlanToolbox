@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
+using UrbanPlanToolbox.Controls;
 using UrbanPlanToolbox.Models.Projects;
 using UrbanPlanToolbox.Services;
 
@@ -94,6 +95,7 @@ public sealed partial class HomePage : Page
         var isResearch = kind == ProjectKindCodes.Research;
         var name = CreateTextBox("Project_Field_Name", ProjectValidation.MaxNameLength);
         var type = new ComboBox { Header = _localization.GetString(isResearch ? "ResearchProject_Field_Type" : "Project_Field_Type"), DisplayMemberPath = "Name", HorizontalAlignment = HorizontalAlignment.Stretch };
+        TransientComboBoxTheme.ApplyTo(type);
         var codes = isResearch ? ResearchProjectTypeCodes.All : ProjectTypeCodes.All;
         type.ItemsSource = codes.Select(code => new ProjectTypeOption(code, isResearch ? ProjectPresentation.GetResearchTypeName(code, _localization) : ProjectPresentation.GetDesignTypeName(code, _localization))).ToArray();
         type.SelectedIndex = 0;

@@ -1,4 +1,6 @@
-# Theme-aware asset naming
+简体中文 | [日本語](ASSET-CONVENTIONS.ja.md) | [English](ASSET-CONVENTIONS.en.md)
+
+# 主题感知资源命名
 
 Theme names describe the target environment where an asset is used, never the asset's own foreground color.
 

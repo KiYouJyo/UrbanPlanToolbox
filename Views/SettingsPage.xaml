@@ -1,6 +1,7 @@
 <Page x:Class="UrbanPlanToolbox.Views.SettingsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="using:UrbanPlanToolbox.Controls">
   <ScrollViewer HorizontalScrollMode="Disabled"
                 HorizontalScrollBarVisibility="Disabled"
                 HorizontalContentAlignment="Stretch">
@@ -49,7 +50,7 @@
                 <TextBlock x:Name="ThemeLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
                 <TextBlock x:Name="ThemeDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
               </StackPanel>
-              <ComboBox x:Name="ThemeBox"
+              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ThemeBox"
                         Grid.Row="1"
                         Grid.Column="0"
                         MinWidth="240"
@@ -69,7 +70,7 @@
                 <TextBlock x:Name="LanguageLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
                 <TextBlock x:Name="LanguageDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
               </StackPanel>
-              <ComboBox x:Name="LanguageBox"
+              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="LanguageBox"
                         Grid.Row="1"
                         Grid.Column="0"
                         MinWidth="240"
@@ -101,7 +102,7 @@
               <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
               <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
               <TextBlock x:Name="MilestoneNotificationsRepeatLabel" Grid.Row="0" Grid.Column="0" Style="{StaticResource SettingsRowLabelStyle}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-              <ComboBox x:Name="MilestoneNotificationsRepeatBox"
+              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="MilestoneNotificationsRepeatBox"
                         Grid.Row="1"
                         Grid.Column="0"
                         MinWidth="240"

@@ -22,9 +22,9 @@
               <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
               <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
               <TextBox x:Name="SearchBox" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" TextChanged="OnSearchChanged"/>
-              <ComboBox x:Name="ProjectTypeFilter" Grid.Row="1" Grid.Column="0" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
-              <ComboBox x:Name="TagFilter" Grid.Row="1" Grid.Column="1" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
-              <ComboBox x:Name="SortBox" Grid.Row="1" Grid.Column="2" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
+              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ProjectTypeFilter" Grid.Row="1" Grid.Column="0" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
+              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="TagFilter" Grid.Row="1" Grid.Column="1" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
+              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="SortBox" Grid.Row="1" Grid.Column="2" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
             </Grid>
             <TextBlock x:Name="CountText" TextWrapping="Wrap"/>
             <TextBlock x:Name="ListStatus" TextWrapping="Wrap"/>

@@ -1,3 +1,5 @@
+简体中文 | [日本語](PROJECT_WORKSPACE.ja.md) | [English](PROJECT_WORKSPACE.en.md)
+
 # 当前项目工作台合同
 
 项目工作台以项目、搜索、设计工具、科研工具和项目归档为主要入口；关于与设置固定在底部。搜索继续使用既有稳定 ID 和独立一级入口；工具收藏保留，但不增加“常用功能”或 Favorites 一级入口。

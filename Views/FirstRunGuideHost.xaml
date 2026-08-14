@@ -6,7 +6,7 @@
   IsTabStop="True" KeyDown="OnKeyDown" GettingFocus="OnGettingFocus" SizeChanged="OnSizeChanged">
   <!-- This is an opaque, hit-testable window-level surface. It must remain a
        sibling of RootFrame, never a child of a page or its ScrollViewer. -->
-  <Grid x:Name="OverlayRoot" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
+  <Grid x:Name="OverlayRoot" Background="{ThemeResource ShellNavigationPaneBackgroundBrush}"
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="24">
     <Border x:Name="GuideCard" Style="{StaticResource SettingsSectionCardStyle}"
             HorizontalAlignment="Center" VerticalAlignment="Center" Padding="32">

@@ -1,4 +1,6 @@
-# New tool development template
+简体中文 | [日本語](TOOL_DEVELOPMENT_TEMPLATE.ja.md) | [English](TOOL_DEVELOPMENT_TEMPLATE.en.md)
+
+# 新工具开发模板
 
 Each production tool must be implemented through this checklist; do not add an unreferenced sample tool to the build.
 

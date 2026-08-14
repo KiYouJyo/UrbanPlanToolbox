@@ -1,5 +1,19 @@
 # 更改日志
 
+## 1.6.8
+
+### Maintenance closeout
+
+- GitHub updater is validated and frozen; Store updater final real E2E remains pending.
+- Added the candidate-versus-published documentation lifecycle in `project-status.json`.
+- Added trilingual canonical-document checks and corrected first-run guide Light/Dark backgrounds.
+- Fixed first-run lifecycle false completion: retained external business data no longer suppresses onboarding after reinstall or Windows Reset; schema v1 synthetic legacy completion migrates to pending.
+- Established startup, package, and dependency measurement-baseline documentation.
+
+### Release boundary
+
+- Candidate only: no v1.6.8 tag, GitHub Release, or Microsoft Store submission has been created.
+
 ## 1.6.7
 
 ### Fixed

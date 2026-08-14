@@ -1,4 +1,6 @@
-# Microsoft Store publishing contract
+简体中文 | [日本語](STORE-PUBLISHING.ja.md) | [English](STORE-PUBLISHING.en.md)
+
+# Microsoft Store 发布合同
 
 Current Store status is defined in [project-status.json](project-status.json). The final authorities for public availability are Partner Center and the Microsoft Store client or product page; do not infer publication from `update-manifest.json`, a GitHub Release body, or a successful submission command.
 

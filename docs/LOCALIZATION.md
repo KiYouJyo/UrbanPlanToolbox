@@ -1,3 +1,5 @@
+简体中文 | [日本語](LOCALIZATION.ja.md) | [English](LOCALIZATION.en.md)
+
 # 本地化与三语资源规范
 
 ## 支持语言

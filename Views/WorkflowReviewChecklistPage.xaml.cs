@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using UrbanPlanToolbox.Controls;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Models.Tools;
 using UrbanPlanToolbox.Models.Interaction;
@@ -90,6 +91,7 @@ public sealed partial class WorkflowReviewChecklistPage : Page
         var title = new TextBlock { Text = (item.IsCritical ? "★ " : "") + item.Title, TextWrapping = TextWrapping.Wrap };
         var row = new Grid(); row.ColumnDefinitions.Add(new ColumnDefinition()); row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         var status = new ComboBox { ItemsSource = Enum.GetValues<WorkflowChecklistItemStatus>().Select(value => new StatusChoice(value, StatusName(value))).ToArray(), DisplayMemberPath = nameof(StatusChoice.Display), Tag = item, HorizontalAlignment = HorizontalAlignment.Stretch };
+        TransientComboBoxTheme.ApplyTo(status);
         status.SelectedItem = status.Items.OfType<StatusChoice>().First(value => value.Value == item.Status); status.SelectionChanged += OnItemStatusChanged;
         var remove = new Button { Content = "×", Tag = (section, item) }; remove.Click += OnRemoveItemClick; Grid.SetColumn(remove, 1); row.Children.Add(status); row.Children.Add(remove);
         panel.Children.Add(title); if (!string.IsNullOrWhiteSpace(item.Description)) panel.Children.Add(new TextBlock { Text = item.Description, TextWrapping = TextWrapping.Wrap }); panel.Children.Add(row);

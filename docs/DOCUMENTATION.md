@@ -1,3 +1,5 @@
+简体中文 | [日本語](DOCUMENTATION.ja.md) | [English](DOCUMENTATION.en.md)
+
 # 文档治理与 Single Source of Truth
 
 UrbanPlanToolbox 的文档采用“当前事实单一来源 + 历史事实不可覆盖”的维护模型。目标是避免 README、ROADMAP、发布指南、网站和 Store 文档分别维护版本号与发布状态，从而产生互相矛盾的“当前版本”。
@@ -79,6 +81,10 @@ RELIABILITY 定义启动、异步操作、更新、日志、数据恢复和发�
 当前阶段不推进新的产品版本。文档治理的目标是先消除陈旧版本状态、旧 updater 描述、过时 Store 里程碑规则和版本绑定式专题说明，并为后续自动生成 Release Notes、网站版本历史及发布元数据建立清晰边界。
 
 ## 8. Current documents
+
+## 9. 文档语言政策
+
+UrbanPlanToolbox 正式支持 `zh-CN`、`ja-JP` 和 `en-US` 三种文档语言。当前 canonical documents 使用同名 sibling files：默认简体中文 `FILE.md`、日语 `FILE.ja.md`、英文 `FILE.en.md`；每份文件开头必须链接到另外两种语言。`project-status.json` 等机器可读 SSOT 的键不翻译，面向人的说明文档必须三语一致。历史证据、第三方许可证和法律原文不要求追溯翻译。
 
 ### Product
 

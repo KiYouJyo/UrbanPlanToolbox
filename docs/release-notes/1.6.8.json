@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.8",
+  "status": "candidate-not-published",
+  "locales": {
+    "zh-CN": ["维护收口：GitHub 更新器冻结，Store 最终 E2E 待真实交付。", "三语文档合同、首次启动主题背景与测量基线。"],
+    "ja-JP": ["保守収束：GitHub updater は凍結、Store 最終 E2E は実配信待ちです。", "三言語文書契約、初回起動テーマ背景、測定基準。"],
+    "en-US": ["Maintenance closeout: GitHub updater frozen; final Store E2E awaits real delivery.", "Trilingual documentation contract, first-run theme background, and measurement baselines."]
+  }
+}

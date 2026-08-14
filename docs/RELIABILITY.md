@@ -1,4 +1,6 @@
-# Reliability contract
+简体中文 | [日本語](RELIABILITY.ja.md) | [English](RELIABILITY.en.md)
+
+# 可靠性合同
 
 ## Startup
 
@@ -10,7 +12,7 @@ Operations use explicit `Idle`, `Running`, `Succeeded`, `Failed`, and `Canceled`
 
 ## Updates
 
-GitHub update states are `Checking`, `Downloading`, `Verifying`, `ReadyToInstall`, `Deploying`, `Restarting`, `Completed`, and `Failed`. Metadata must survive progress refreshes. An update is complete only after deployment and restart/new-version launch evidence, never merely after a completed download.
+The application update states are `NotChecked`, `Checking`, `UpToDate`, `UpdateAvailable`, `Downloading`, `Verifying`, `ReadyToInstall`, `Installing`, `Restarting`, `Completed`, `UnsupportedChannel`, `Cancelled`, and `Failed`. Store native `Deploying` is mapped to the application-level `Installing` state. Metadata must survive progress refreshes. An update is complete only after deployment and restart/new-version launch evidence, never merely after a completed download.
 
 ## Data
 

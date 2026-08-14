@@ -1,11 +1,11 @@
-<Page x:Class="UrbanPlanToolbox.Views.CoordinateSystemConverterPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Page x:Class="UrbanPlanToolbox.Views.CoordinateSystemConverterPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:UrbanPlanToolbox.Controls">
   <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
     <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" Margin="24,16,24,8"/>
     <Pivot x:Name="ModePivot" Grid.Row="1" Margin="24,0,24,16">
       <PivotItem x:Name="SinglePointPivot"><ScrollViewer><StackPanel x:Name="SinglePointContent" Spacing="12">
         <TextBlock x:Name="SingleSettingsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
         <Grid ColumnSpacing="12" RowSpacing="12"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-          <ComboBox x:Name="SourceSystemBox" Grid.Row="0" Grid.Column="0"/><ComboBox x:Name="TargetSystemBox" Grid.Row="0" Grid.Column="1"/><Button x:Name="SwapButton" Grid.Row="0" Grid.Column="2" Click="OnSwap"/>
+          <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="SourceSystemBox" Grid.Row="0" Grid.Column="0"/><ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="TargetSystemBox" Grid.Row="0" Grid.Column="1"/><Button x:Name="SwapButton" Grid.Row="0" Grid.Column="2" Click="OnSwap"/>
           <TextBox x:Name="LongitudeBox" Grid.Row="1" Grid.Column="0" InputScope="Number"/><TextBox x:Name="LatitudeBox" Grid.Row="1" Grid.Column="1" InputScope="Number"/>
         </Grid>
         <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Name="ConvertButton" Click="OnConvert"/><Button x:Name="ClearButton" Click="OnClear"/><Button x:Name="SampleButton" Click="OnSample"/></StackPanel>
@@ -15,7 +15,7 @@
         <TextBlock x:Name="ShapefileDescriptionText" TextWrapping="Wrap"/><TextBlock x:Name="ShapefilePrivacyText" TextWrapping="Wrap"/>
         <StackPanel Spacing="4"><Button x:Name="SelectShapefileButton" Click="OnSelectShapefile" HorizontalAlignment="Left"/><TextBlock x:Name="ShapefileSelectionHelpText" Style="{ThemeResource BodyTextBlockStyle}" Opacity="0.72" TextWrapping="Wrap"/></StackPanel>
         <TextBlock x:Name="SelectedShapefileText" TextWrapping="Wrap"/><TextBlock x:Name="CompanionStatusText" TextWrapping="Wrap"/>
-        <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions><ComboBox x:Name="ShapefileSourceBox" Grid.Column="0"/><ComboBox x:Name="ShapefileTargetBox" Grid.Column="1"/></Grid>
+        <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions><ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ShapefileSourceBox" Grid.Column="0"/><ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ShapefileTargetBox" Grid.Column="1"/></Grid>
         <Button x:Name="SelectOutputFolderButton" Click="OnSelectOutputFolder"/><TextBox x:Name="OutputNameBox"/><TextBlock x:Name="OutputNameHelpText" TextWrapping="Wrap"/><TextBlock x:Name="OutputFolderText" TextWrapping="Wrap"/>
         <StackPanel Orientation="Horizontal" Spacing="8"><Button x:Name="ConvertShapefileButton" Click="OnConvertShapefile"/><Button x:Name="CancelShapefileButton" Click="OnCancelShapefile" IsEnabled="False"/></StackPanel><ProgressBar x:Name="ShapefileProgress" IsIndeterminate="True" Visibility="Collapsed"/><TextBlock x:Name="ShapefileProgressText" TextWrapping="Wrap"/><Button x:Name="OpenOutputFolderButton" Click="OnOpenOutputFolder" IsEnabled="False"/>
       </StackPanel></ScrollViewer></PivotItem>

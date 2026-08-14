@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
 using UrbanPlanToolbox.ViewModels;
@@ -29,7 +30,19 @@ public sealed partial class AboutPage : Page
         CheckUpdateButton.Content = T("Action_CheckForUpdates");
         CopyDiagnosticsButton.Content = T("Action_CopyDiagnostics"); OpenLogsButton.Content = T("Action_OpenLogsFolder");
         _updates.PropertyChanged += (_, _) => DispatcherQueue.TryEnqueue(RenderUpdate);
+        Loaded += OnLoaded;
+        ActualThemeChanged += OnActualThemeChanged;
         RenderUpdate(); Unloaded += (_, _) => _pageLifetime.Cancel();
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e) => UpdateProductLogo();
+
+    private void OnActualThemeChanged(FrameworkElement sender, object e) => UpdateProductLogo();
+
+    private void UpdateProductLogo()
+    {
+        var theme = ActualTheme == ElementTheme.Dark ? AppTheme.Dark : AppTheme.Light;
+        ProductLogo.Source = new BitmapImage(new Uri(WindowIconTheme.GetLogoUri(theme)));
     }
 
     private void PopulateApplicationInfo()

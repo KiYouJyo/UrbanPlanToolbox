@@ -213,4 +213,5 @@ public sealed partial class SettingsPage : Page
     }
     private void SetDataBusy(bool busy) { ExportButton.IsEnabled = ImportButton.IsEnabled = ClearDataButton.IsEnabled = !busy; }
     private static string FormatBytes(long bytes) => bytes >= 1024 * 1024 ? $"{bytes / (1024d * 1024d):0.##} MB" : $"{bytes / 1024d:0.##} KB";
+
 }
