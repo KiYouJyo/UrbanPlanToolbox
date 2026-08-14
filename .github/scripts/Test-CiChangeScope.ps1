@@ -21,14 +21,20 @@ function Assert-Scope {
 }
 
 Assert-Scope -Name 'project status only' -ChangedPath @('docs/project-status.json') -ExpectedScope lightweight
+Assert-Scope -Name 'update manifest only' -ChangedPath @('docs/update-manifest.json') -ExpectedScope lightweight
 Assert-Scope -Name 'docs Markdown only' -ChangedPath @('docs/RELIABILITY.md') -ExpectedScope lightweight
+Assert-Scope -Name 'docs HTML only' -ChangedPath @('docs/index.html') -ExpectedScope lightweight
+Assert-Scope -Name 'nested docs HTML only' -ChangedPath @('docs/privacy/index.html') -ExpectedScope lightweight
 Assert-Scope -Name 'status plus README' -ChangedPath @('docs/project-status.json', 'README.md') -ExpectedScope lightweight
+Assert-Scope -Name 'status plus site HTML plus manifest' -ChangedPath @('docs/project-status.json', 'docs/index.html', 'docs/update-manifest.json') -ExpectedScope lightweight
 Assert-Scope -Name 'status plus service' -ChangedPath @('docs/project-status.json', 'Services/AppUpdateService.cs') -ExpectedScope full
+Assert-Scope -Name 'site HTML plus service' -ChangedPath @('docs/index.html', 'Services/AppUpdateService.cs') -ExpectedScope full
 Assert-Scope -Name 'view model code' -ChangedPath @('ViewModels/UpdateViewModel.cs') -ExpectedScope full
 Assert-Scope -Name 'status plus arbitrary code' -ChangedPath @('docs/project-status.json', 'Models/Project.cs') -ExpectedScope full
 Assert-Scope -Name 'test code' -ChangedPath @('tests/UrbanPlanToolbox.Tests/AppUpdateTests.cs') -ExpectedScope full
 Assert-Scope -Name 'workflow' -ChangedPath @('.github/workflows/ci.yml') -ExpectedScope full
 Assert-Scope -Name 'runtime release notes JSON' -ChangedPath @('docs/release-notes/1.7.0.json') -ExpectedScope full
+Assert-Scope -Name 'arbitrary docs JSON' -ChangedPath @('docs/other-data.json') -ExpectedScope full
 Assert-Scope -Name 'unknown file' -ChangedPath @('new-file.unknown') -ExpectedScope full
 Assert-Scope -Name 'empty diff' -ChangedPath @() -ExpectedScope full
 
