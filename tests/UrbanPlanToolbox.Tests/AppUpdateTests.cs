@@ -90,18 +90,54 @@ public sealed class AppUpdateTests
         Assert.Equal(AppUpdateState.Completed, viewModel.Info.State); Assert.Null(viewModel.Progress);
     }
 
-    [Theory]
-    [InlineData(AppUpdateState.Completed, true)]
-    [InlineData(AppUpdateState.Restarting, true)]
-    [InlineData(AppUpdateState.Failed, false)]
-    [InlineData(AppUpdateState.Cancelled, false)]
-    [InlineData(AppUpdateState.UpToDate, false)]
-    public async Task UpdateCompletionDoesNotRequestAnAppOwnedRestart(AppUpdateState resultState, bool _)
+    [Fact]
+    public async Task StoreRelaunchRegistersBeforeInstallAndUsesFallbackOnlyAfterCompletedInstall()
     {
-        var restart = new UpdateRestartStub(true);
-        var viewModel = new UpdateViewModel(new InstallResultUpdateService(resultState), restart);
+        var calls = new List<string>();
+        var service = new StoreRelaunchUpdateService(AppUpdateState.Completed, calls);
+        var restart = new UpdateRestartStub(true, calls);
+        var registration = new RestartRegistrationStub(true, calls);
+        var viewModel = new UpdateViewModel(service, restart, registration);
         await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync();
+        Assert.Equal(AppUpdateState.ReadyToInstall, viewModel.Info.State);
+        Assert.Equal(1, service.DownloadCalls);
+        Assert.Equal(0, service.InstallCalls);
+        await viewModel.RestartAndUpdateAsync();
+        Assert.Equal(new[] { "register", "install", "unregister", "restart" }, calls);
+        Assert.Equal(1, restart.CallCount);
+        Assert.False(registration.Active);
+    }
+
+    [Fact]
+    public async Task StoreRelaunchRegistrationFailureKeepsPendingUpdateAndDoesNotInstall()
+    {
+        var calls = new List<string>();
+        var service = new StoreRelaunchUpdateService(AppUpdateState.Completed, calls);
+        var viewModel = new UpdateViewModel(service, new UpdateRestartStub(true), new RestartRegistrationStub(false, calls));
+        await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync(); await viewModel.RestartAndUpdateAsync();
+        Assert.Equal(new[] { "register" }, calls);
+        Assert.Equal(0, service.InstallCalls);
+        Assert.Equal(AppUpdateState.ReadyToInstall, viewModel.Info.State);
+        Assert.Equal("StoreRestartRegistrationFailed", viewModel.Info.ErrorCode);
+        Assert.True(viewModel.CanInstall);
+    }
+
+    [Theory]
+    [InlineData(AppUpdateState.Cancelled, AppUpdateState.ReadyToInstall)]
+    [InlineData(AppUpdateState.Failed, AppUpdateState.Failed)]
+    public async Task StoreRelaunchCancellationAndFailureRemoveRegistration(AppUpdateState installResult, AppUpdateState expectedState)
+    {
+        var calls = new List<string>();
+        var service = new StoreRelaunchUpdateService(installResult, calls);
+        var restart = new UpdateRestartStub(true);
+        var registration = new RestartRegistrationStub(true, calls);
+        var viewModel = new UpdateViewModel(service, restart, registration);
+        await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync(); await viewModel.RestartAndUpdateAsync();
+        Assert.Equal(new[] { "register", "install", "unregister" }, calls);
+        Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(0, restart.CallCount);
+        Assert.False(registration.Active);
+        Assert.Equal(installResult == AppUpdateState.Cancelled, viewModel.CanInstall);
     }
 
     [Theory]
@@ -575,7 +611,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.7.2", viewModel.CurrentVersion);
+        Assert.Equal("v1.7.3", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -612,7 +648,7 @@ public sealed class AppUpdateTests
         await operation;
 
         Assert.Equal(AppUpdateState.UpdateAvailable, session.Info.State);
-        Assert.Equal("1.7.2", session.Info.AvailableVersion);
+        Assert.Equal("1.7.3", session.Info.AvailableVersion);
     }
 
     [Fact]
@@ -643,7 +679,7 @@ public sealed class AppUpdateTests
         service.CompleteDownload();
         await operation;
         Assert.Equal(AppUpdateState.ReadyToInstall, session.Info.State);
-        Assert.Equal("1.7.2", session.Info.AvailableVersion);
+        Assert.Equal("1.7.3", session.Info.AvailableVersion);
     }
 
     private static async Task WaitForProgressAsync(UpdateViewModel session, double expected)
@@ -802,11 +838,39 @@ internal sealed class LateDownloadingCallbackService(AppUpdateState finalState) 
     public void ReportLateDownloading() => _progress?.Report(new(AppUpdateState.Downloading, 1d));
 }
 
-internal sealed class UpdateRestartStub(bool result) : IApplicationRestartService
+internal sealed class UpdateRestartStub(bool result, List<string>? calls = null) : IApplicationRestartService
 {
     public int CallCount { get; private set; }
     public bool TryRestart() => TryRestart(out _);
-    public bool TryRestart(out string? failureReason) { CallCount++; failureReason = result ? null : "StubFailure"; return result; }
+    public bool TryRestart(out string? failureReason) { CallCount++; calls?.Add("restart"); failureReason = result ? null : "StubFailure"; return result; }
+}
+
+internal sealed class RestartRegistrationStub(bool registrationResult, List<string> calls) : IApplicationRestartRegistrationService
+{
+    public bool Active { get; private set; }
+    public bool TryRegister(out string? failureReason)
+    {
+        calls.Add("register"); Active = registrationResult;
+        failureReason = registrationResult ? null : "RegistrationFailure";
+        return registrationResult;
+    }
+    public void Unregister() { calls.Add("unregister"); Active = false; }
+}
+
+internal sealed class StoreRelaunchUpdateService(AppUpdateState installResult, List<string> calls) : IAppUpdateService
+{
+    public int DownloadCalls { get; private set; }
+    public int InstallCalls { get; private set; }
+    public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.7.3", Source: UpdateInstallSource.Store));
+    public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        DownloadCalls++; return Task.FromResult(new AppUpdateResult(AppUpdateState.ReadyToInstall));
+    }
+    public Task<AppUpdateResult> InstallPendingAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        InstallCalls++; calls.Add("install"); return Task.FromResult(new AppUpdateResult(installResult));
+    }
 }
 
 internal sealed class DeferredUpdateService(AppUpdateState downloadResult) : IAppUpdateService
@@ -826,7 +890,7 @@ internal sealed class DeferredUpdateService(AppUpdateState downloadResult) : IAp
     {
         _operationToken = cancellationToken; _checkStarted.TrySetResult();
         await _checkCompletion.Task.WaitAsync(cancellationToken);
-        return new(AppUpdateState.UpdateAvailable, "1.7.2", "notes", Source: UpdateInstallSource.GitHub);
+        return new(AppUpdateState.UpdateAvailable, "1.7.3", "notes", Source: UpdateInstallSource.GitHub);
     }
 
     public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)

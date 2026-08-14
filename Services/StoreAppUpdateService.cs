@@ -73,8 +73,8 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
             if (state.Equals("Canceled", StringComparison.OrdinalIgnoreCase) || state.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Cancelled);
             if (state.Equals("Completed", StringComparison.OrdinalIgnoreCase))
             {
-                // Store owns deployment and process replacement. Do not request a second
-                // AppInstance restart after the user has authorized Store installation.
+                // Store owns package deployment and may terminate the running process.
+                // The coordinator has already arranged relaunch before deployment begins.
                 AppLogger.Default.Info("StoreUpdate", "StoreInstallCompleted", "StoreOverallState=Completed;MappedAppState=Completed");
                 return new(AppUpdateState.Completed);
             }
