@@ -10,7 +10,7 @@ Use a formal Store installation at source product version **N** and a higher Sto
 
 ## Required path
 
-Prove: **existing Store installation → check for updates → available version → download only → ReadyToInstall without deployment → explicit user “Restart and update” action → Windows restart recovery registration → Store deployment → application close/restart behavior → target version → user-data retention**. Store deployment ownership is not relaunch ownership: a terminated process is relaunched by the registration; a surviving process must remove that registration before its `AppInstance.Restart` fallback.
+Prove: **existing Store installation → check for updates → available version → user selects “下载并安装更新” → Windows restart recovery registration → native Store download authorization → native Store installation authorization → deployment → automatic application relaunch → target version → user-data retention**. Store deployment ownership is not relaunch ownership: a terminated process is relaunched by the registration; a surviving process must remove that registration before its `AppInstance.Restart` fallback.
 
 ## Required scenarios
 
@@ -24,9 +24,9 @@ Prove: **existing Store installation → check for updates → available version
 
 Capture the displayed state, package identity/version, deployment result, restart behavior, and retained user data. GitHub sideload packages and Store packages have independent identities and publishers, cannot upgrade over one another, and must be tested independently.
 
-## v1.7.3 final Store E2E target
+## v1.7.4 final Store E2E target
 
 - Source: actual Microsoft Store baseline `N`
-- Target: `1.7.3`
+- Target: `1.7.4`
 - Status: **PENDING**
-- Prove: check → localized 1.7.3 notes → download only → `ReadyToInstall` → no deployment, restart, or process shutdown before the second action → explicit Restart and update → restart registration → installing/deployment → 1.7.3 launch → retained user data. Also prove cancellation returns to `ReadyToInstall` and a surviving process uses exactly one fallback restart. Per-package `Completed` callbacks must not advance the UI to a terminal state.
+- Prove: check → localized 1.7.4 notes → one Download and install update action → restart registration before the combined Store operation → native download/install authorization → deployment → automatic 1.7.4 launch → retained user data. Also prove cancellation returns to `UpdateAvailable`, a surviving process uses exactly one fallback restart, and package-level `Completed` callbacks do not advance the UI to a terminal state.
