@@ -126,7 +126,27 @@ public sealed partial class HomePage : Page
         }
         var error = new TextBlock { Foreground = (Brush)Application.Current.Resources["SystemFillColorCriticalBrush"], TextWrapping = TextWrapping.Wrap };
         panel.Children.Add(error);
-        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = new ScrollViewer { Content = panel, MaxHeight = 580 }, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
+        const double dialogMaxWidth = 760;
+        const double dialogMinWidth = 320;
+        const double dialogOuterMargin = 48;
+        const double scrollBarGutter = 20;
+        var availableDialogWidth = Math.Max(0, XamlRoot.Size.Width - dialogOuterMargin);
+        var dialogWidth = Math.Min(dialogMaxWidth, availableDialogWidth);
+        var effectiveDialogMinWidth = Math.Min(dialogMinWidth, dialogWidth);
+        var formLayout = new Grid { Width = dialogWidth, HorizontalAlignment = HorizontalAlignment.Stretch };
+        formLayout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        formLayout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(scrollBarGutter) });
+        Grid.SetColumn(panel, 0);
+        formLayout.Children.Add(panel);
+        var scrollViewer = new ScrollViewer
+        {
+            Content = formLayout,
+            MaxHeight = 580,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch
+        };
+        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = scrollViewer, Width = dialogWidth, MinWidth = effectiveDialogMinWidth, MaxWidth = dialogMaxWidth, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
         dialog.PrimaryButtonClick += async (_, args) =>
         {
             args.Cancel = true; var deferral = args.GetDeferral();

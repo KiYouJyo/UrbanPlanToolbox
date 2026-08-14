@@ -632,7 +632,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.7.4", viewModel.CurrentVersion);
+        Assert.Equal("v1.7.5", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -669,7 +669,7 @@ public sealed class AppUpdateTests
         await operation;
 
         Assert.Equal(AppUpdateState.UpdateAvailable, session.Info.State);
-        Assert.Equal("1.7.4", session.Info.AvailableVersion);
+        Assert.Equal("1.7.5", session.Info.AvailableVersion);
     }
 
     [Fact]
@@ -700,7 +700,7 @@ public sealed class AppUpdateTests
         service.CompleteDownload();
         await operation;
         Assert.Equal(AppUpdateState.ReadyToInstall, session.Info.State);
-        Assert.Equal("1.7.4", session.Info.AvailableVersion);
+        Assert.Equal("1.7.5", session.Info.AvailableVersion);
     }
 
     private static async Task WaitForProgressAsync(UpdateViewModel session, double expected)
@@ -883,7 +883,7 @@ internal sealed class StoreRelaunchUpdateService(AppUpdateState installResult, L
     public int DownloadCalls { get; private set; }
     public int InstallCalls { get; private set; }
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.7.4", Source: UpdateInstallSource.Store));
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.7.5", Source: UpdateInstallSource.Store));
     public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
     {
         DownloadCalls++; calls.Add("download-install"); return Task.FromResult(new AppUpdateResult(installResult));
@@ -911,7 +911,7 @@ internal sealed class DeferredUpdateService(AppUpdateState downloadResult) : IAp
     {
         _operationToken = cancellationToken; _checkStarted.TrySetResult();
         await _checkCompletion.Task.WaitAsync(cancellationToken);
-        return new(AppUpdateState.UpdateAvailable, "1.7.4", "notes", Source: UpdateInstallSource.GitHub);
+        return new(AppUpdateState.UpdateAvailable, "1.7.5", "notes", Source: UpdateInstallSource.GitHub);
     }
 
     public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
