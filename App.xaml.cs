@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using UrbanPlanToolbox.Services;
 using Microsoft.Windows.Globalization;
+using Microsoft.Windows.AppLifecycle;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -23,7 +24,9 @@ namespace UrbanPlanToolbox;
 /// </summary>
 public partial class App : Application
 {
+    private static readonly object ActivationGate = new();
     private Window? _window;
+    private static bool _redirectedActivationPending;
     public static MainWindow? MainWindow { get; private set; }
     
     /// <summary>
@@ -40,6 +43,36 @@ public partial class App : Application
 
     private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e) =>
         AppLogger.Default.Error("App", "UnhandledException", e.Exception, "Unhandled application exception.");
+
+    /// <summary>Receives an activation redirected from a secondary process without creating another window.</summary>
+    internal static void OnRedirectedActivation(AppActivationArguments activationArguments)
+    {
+        MainWindow? existingWindow;
+        lock (ActivationGate)
+        {
+            existingWindow = MainWindow;
+            if (existingWindow is null)
+            {
+                _redirectedActivationPending = true;
+                return;
+            }
+        }
+
+        existingWindow.DispatcherQueue.TryEnqueue(existingWindow.RestoreAndActivate);
+    }
+
+    private static void ActivatePendingRedirectedWindow()
+    {
+        MainWindow? existingWindow;
+        lock (ActivationGate)
+        {
+            if (!_redirectedActivationPending || MainWindow is null) return;
+            _redirectedActivationPending = false;
+            existingWindow = MainWindow;
+        }
+
+        existingWindow.DispatcherQueue.TryEnqueue(existingWindow.RestoreAndActivate);
+    }
 
     /// <summary>
     /// Invoked when the application is launched.
@@ -61,6 +94,7 @@ public partial class App : Application
             .GetColorValue(Windows.UI.ViewManagement.UIColorType.Background);
         var systemUsesLightTheme = (0.2126 * systemBackground.R) + (0.7152 * systemBackground.G) + (0.0722 * systemBackground.B) >= 128;
         _window = MainWindow = new MainWindow(settings.Theme, systemUsesLightTheme);
+        ActivatePendingRedirectedWindow();
         StartupTiming.Default.Mark("Startup.WindowCreated");
         StartupTiming.Default.Mark("T4 Root content ready");
         MainWindow.ApplyTheme(settings.Theme);

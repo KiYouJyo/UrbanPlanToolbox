@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -116,6 +117,20 @@ public sealed partial class MainWindow : Window
         try { _windowPlacement.Save(_lastNormalWindowSize, _wasWindowMaximized); }
         catch (Exception exception) { AppLogger.Default.Error("WindowPlacement", "SaveFailed", exception, "Could not save window placement."); }
     }
+
+    /// <summary>Restores and foregrounds this already-created main window for redirected activation.</summary>
+    public void RestoreAndActivate()
+    {
+        if (AppWindow.Presenter is OverlappedPresenter presenter && presenter.State == OverlappedPresenterState.Minimized)
+            presenter.Restore();
+
+        Activate();
+        SetForegroundWindow(WinRT.Interop.WindowNative.GetWindowHandle(this));
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetForegroundWindow(nint hWnd);
 
     /// <summary>Applies the app theme and synchronizes only runtime window chrome.</summary>
     public void ApplyTheme(string? preference)
