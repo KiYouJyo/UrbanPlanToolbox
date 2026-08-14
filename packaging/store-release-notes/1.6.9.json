@@ -1,0 +1,8 @@
+{
+  "version": "1.6.9",
+  "locales": {
+    "zh-CN": ["统一 GitHub 与 Microsoft Store 更新流程的最终重启交互。", "Store 更新安装完成后会提示重启并更新；v1.6.9 仍是最终 Store E2E 验收目标。"],
+    "ja-JP": ["GitHub と Microsoft Store の更新フローで最終再起動の操作を統一しました。", "Store 更新のインストール後に再起動して更新を表示します。v1.6.9 は最終 Store E2E の検証対象です。"],
+    "en-US": ["Unified the final restart interaction for GitHub and Microsoft Store updates.", "Store updates now prompt for Restart and update after installation; v1.6.9 remains the final Store E2E target."]
+  }
+}

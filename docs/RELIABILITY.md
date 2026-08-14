@@ -12,7 +12,7 @@ Operations use explicit `Idle`, `Running`, `Succeeded`, `Failed`, and `Canceled`
 
 ## Updates
 
-The application update states are `NotChecked`, `Checking`, `UpToDate`, `UpdateAvailable`, `Downloading`, `Verifying`, `ReadyToInstall`, `Installing`, `Restarting`, `Completed`, `UnsupportedChannel`, `Cancelled`, and `Failed`. Store native `Deploying` is mapped to the application-level `Installing` state. Metadata must survive progress refreshes. An update is complete only after deployment and restart/new-version launch evidence, never merely after a completed download.
+The application update states include `ReadyToInstall` and `RestartRequired`. Store native `Deploying` maps to `Installing`; Store `Completed` means package deployment completed and maps to `RestartRequired`, never application-level `Completed`. `Completed` means no user action remains. The user-facing GitHub and Store flow is identical: Check → Update available → Download and install → Restart and update. Internally GitHub uses `ReadyToInstall` before deployment, while Store uses `RestartRequired` after deployment; both present the same final action. Store final E2E remains pending the real v1.6.8 → v1.6.9 Store path.
 
 ## Data
 

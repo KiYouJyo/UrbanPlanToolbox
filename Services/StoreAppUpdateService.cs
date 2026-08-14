@@ -49,7 +49,11 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
             var result = await operation.AsTask(cancellationToken, storeProgress);
             var state = result.OverallState.ToString();
             if (state.Equals("Canceled", StringComparison.OrdinalIgnoreCase) || state.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Cancelled);
-            if (state.Equals("Completed", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Completed);
+            if (state.Equals("Completed", StringComparison.OrdinalIgnoreCase))
+            {
+                AppLogger.Default.Info("StoreUpdate", "StoreDeploymentCompleted", "StoreState=Completed;MappedAppState=RestartRequired");
+                return new(AppUpdateState.RestartRequired);
+            }
             return new(AppUpdateState.Failed, state);
         }
         catch (OperationCanceledException) { return new(AppUpdateState.Cancelled); }
@@ -80,8 +84,8 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
                 LogProgress(status, AppUpdateState.Installing, null, "None");
                 break;
             case StorePackageUpdateState.Completed:
-                progress?.Report(new(AppUpdateState.Completed, 1d));
-                LogProgress(status, AppUpdateState.Completed, 1d, "Total");
+                progress?.Report(new(AppUpdateState.RestartRequired));
+                LogProgress(status, AppUpdateState.RestartRequired, null, "None");
                 break;
             case StorePackageUpdateState.Canceled:
                 progress?.Report(new(AppUpdateState.Cancelled));
