@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "product": { "name": "UrbanPlanToolbox", "version": "1.7.4", "packageVersion": "1.7.4.0" },
-  "classification": { "kind": "store-native-update-flow", "stability": "release-candidate", "storeMilestone": false },
-  "channels": { "github": { "publish": false }, "microsoftStore": { "submit": false } },
+  "classification": { "kind": "store-native-update-flow", "stability": "release-approved", "storeMilestone": false },
+  "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
     "zh-CN": "UrbanPlanToolbox v1.7.4 Microsoft Store 更新流程优化",
