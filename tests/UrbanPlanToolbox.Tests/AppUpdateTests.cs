@@ -575,7 +575,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.7.1", viewModel.CurrentVersion);
+        Assert.Equal("v1.7.2", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -612,7 +612,7 @@ public sealed class AppUpdateTests
         await operation;
 
         Assert.Equal(AppUpdateState.UpdateAvailable, session.Info.State);
-        Assert.Equal("1.7.1", session.Info.AvailableVersion);
+        Assert.Equal("1.7.2", session.Info.AvailableVersion);
     }
 
     [Fact]
@@ -643,7 +643,7 @@ public sealed class AppUpdateTests
         service.CompleteDownload();
         await operation;
         Assert.Equal(AppUpdateState.ReadyToInstall, session.Info.State);
-        Assert.Equal("1.7.1", session.Info.AvailableVersion);
+        Assert.Equal("1.7.2", session.Info.AvailableVersion);
     }
 
     private static async Task WaitForProgressAsync(UpdateViewModel session, double expected)
@@ -826,7 +826,7 @@ internal sealed class DeferredUpdateService(AppUpdateState downloadResult) : IAp
     {
         _operationToken = cancellationToken; _checkStarted.TrySetResult();
         await _checkCompletion.Task.WaitAsync(cancellationToken);
-        return new(AppUpdateState.UpdateAvailable, "1.7.1", "notes", Source: UpdateInstallSource.GitHub);
+        return new(AppUpdateState.UpdateAvailable, "1.7.2", "notes", Source: UpdateInstallSource.GitHub);
     }
 
     public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)

@@ -1,0 +1,23 @@
+{
+  "version": "1.7.2",
+  "locales": {
+    "zh-CN": [
+      "UrbanPlanToolbox 现默认以单实例模式运行。",
+      "应用已经打开时，再次启动会直接唤起已有窗口，不再创建第二个工具箱窗口。",
+      "最小化的主窗口会在再次启动应用时自动恢复并激活。",
+      "完善 Windows App SDK 应用生命周期与激活重定向逻辑，同时保持 Microsoft Store 与 GitHub 更新重启流程兼容。"
+    ],
+    "ja-JP": [
+      "UrbanPlanToolbox は既定で単一インスタンスとして動作するようになりました。",
+      "アプリが既に開いている場合、再起動すると既存のウィンドウを前面に表示し、2 つ目のツールボックスウィンドウは作成されません。",
+      "最小化されたメインウィンドウは、アプリを再度起動すると自動的に復元され、アクティブになります。",
+      "Windows App SDK のアプリライフサイクルとアクティブ化のリダイレクトを強化し、Microsoft Store と GitHub の更新後再起動フローとの互換性を維持しました。"
+    ],
+    "en-US": [
+      "UrbanPlanToolbox now runs as a single main application instance by default.",
+      "Launching again while the app is open brings the existing window forward instead of creating another toolbox window.",
+      "A minimized main window is restored and activated when the app is launched again.",
+      "Improves Windows App SDK lifecycle and activation redirection while preserving Microsoft Store and GitHub update restart compatibility."
+    ]
+  }
+}

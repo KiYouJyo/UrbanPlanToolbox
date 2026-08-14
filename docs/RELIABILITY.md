@@ -4,7 +4,7 @@
 
 ## Startup
 
-Prioritize creating and activating the main window. Settings, data, project, first-run, Mica/theme initialization, and window-state restoration must fail safely without blocking the shell or faking success. First-run work begins after the application can present its primary experience.
+Prioritize creating and activating the main window. UrbanPlanToolbox uses one main application instance per user session; secondary launch activations are redirected to the existing instance, whose minimized window is restored before activation. Settings, data, project, first-run, Mica/theme initialization, and window-state restoration must fail safely without blocking the shell or faking success. First-run work begins after the application can present its primary experience.
 
 ## Async operations
 

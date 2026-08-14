@@ -7,8 +7,8 @@
   },
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.7.1",
-    "lifecycle": "stable-1.x",
+    "version": "1.7.2",
+    "lifecycle": "development",
     "platform": "Windows",
     "supportedArchitecture": "x64",
     "offlineFirst": true
@@ -18,9 +18,9 @@
       "latestPublishedProductVersion": "1.7.0",
       "latestPublishedPackageVersion": "1.7.0.0",
       "latestPublishedReleaseTag": "v1.7.0",
-      "candidateProductVersion": "1.7.1",
-      "candidatePackageVersion": "1.7.1.0",
-      "candidateState": "release-candidate",
+      "candidateProductVersion": "1.7.2",
+      "candidatePackageVersion": "1.7.2.0",
+      "candidateState": "prepared-for-validation",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -30,9 +30,9 @@
       "state": "certification-submitted",
       "publicProductVersion": "1.6.7",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
-      "candidateProductVersion": "1.7.1",
-      "candidatePackageVersion": "1.7.1.0",
-      "candidateState": "release-candidate",
+      "candidateProductVersion": "1.7.2",
+      "candidatePackageVersion": "1.7.2.0",
+      "candidateState": "prepared-for-validation",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }

@@ -1,5 +1,14 @@
 # 更改日志
 
+## 1.7.2
+
+### Platform foundation and updater freeze preparation
+
+- UrbanPlanToolbox now runs as a single main application instance by default.
+- Launching again while the app is open brings the existing window forward instead of creating another toolbox window.
+- A minimized main window is restored and activated when the app is launched again.
+- Improves Windows App SDK lifecycle and activation redirection while preserving Microsoft Store and GitHub update restart compatibility.
+
 ## 1.7.1
 
 ### Platform foundation and updater freeze preparation
