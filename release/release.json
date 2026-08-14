@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.7.3", "packageVersion": "1.7.3.0" },
-  "classification": { "kind": "store-updater-relaunch-hotfix", "stability": "release-approved", "storeMilestone": false },
-  "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.7.4", "packageVersion": "1.7.4.0" },
+  "classification": { "kind": "store-native-update-flow", "stability": "release-candidate", "storeMilestone": false },
+  "channels": { "github": { "publish": false }, "microsoftStore": { "submit": false } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.7.3 Microsoft Store 更新后重新启动修复",
-    "ja-JP": "UrbanPlanToolbox v1.7.3 Microsoft Store 更新後の再起動修正",
-    "en-US": "UrbanPlanToolbox v1.7.3 Microsoft Store update relaunch fix"
+    "zh-CN": "UrbanPlanToolbox v1.7.4 Microsoft Store 更新流程优化",
+    "ja-JP": "UrbanPlanToolbox v1.7.4 Microsoft Store 更新フローの改善",
+    "en-US": "UrbanPlanToolbox v1.7.4 Microsoft Store update flow improvements"
   },
   "languageLabels": {
     "zh-CN": "简体中文",
@@ -15,8 +15,8 @@
     "en-US": "English"
   },
   "items": [
-    { "id": "store-relaunch", "zh-CN": "修复 Microsoft Store 更新安装后应用关闭但不会自动重新启动的问题。", "ja-JP": "Microsoft Store の更新インストール後にアプリが閉じても自動的に再起動しない問題を修正しました。", "en-US": "Fixes the app not automatically relaunching after a Microsoft Store update closes it." },
-    { "id": "restart-recovery", "zh-CN": "在 Store 部署前注册 Windows 应用重启恢复，并为进程未关闭的路径保留应用级重启兜底。", "ja-JP": "Store 展開前に Windows のアプリ再起動回復を登録し、プロセスが終了しない場合はアプリ側の再起動をフォールバックとして使用します。", "en-US": "Registers Windows restart recovery before Store deployment and retains an app-owned fallback when the process survives." },
-    { "id": "two-stage-preserved", "zh-CN": "保持 Microsoft Store 先下载、后明确安装的两阶段更新流程，以及 GitHub 更新和单实例行为不变。", "ja-JP": "Microsoft Store のダウンロード後に明示的にインストールする 2 段階更新、GitHub 更新、単一インスタンスの動作を維持します。", "en-US": "Preserves the Store download-then-explicit-install flow, GitHub updates, and single-instance behavior." }
+    { "id": "native-combined-flow", "zh-CN": "Microsoft Store 更新恢复为 Windows 官方的一体式下载与安装流程，避免两阶段更新导致系统授权窗口出现在语义错误的时间。", "ja-JP": "Microsoft Store の更新を Windows 公式の一体型ダウンロード・インストール フローに戻し、2 段階更新でシステム承認画面が不自然なタイミングに表示される問題を回避します。", "en-US": "Restores Microsoft Store updates to the official Windows combined download-and-install flow, avoiding system authorization at the wrong point in a two-stage update." },
+    { "id": "restart-recovery", "zh-CN": "点击“下载并安装更新”后，由 Windows / Microsoft Store 依次处理下载和安装授权；在更新开始前注册 Windows 应用重启恢复，确保应用关闭后自动重新启动新版。", "ja-JP": "「アップデートをダウンロードしてインストール」を選ぶと、Windows / Microsoft Store がダウンロードとインストールの承認を順に処理します。開始前に Windows のアプリ再起動回復を登録し、アプリ終了後に新しいバージョンを自動起動します。", "en-US": "After choosing Download and install update, Windows / Microsoft Store handles download and installation authorization in sequence. Windows restart recovery is registered first so the new version relaunches automatically after the app closes." },
+    { "id": "surviving-process-fallback", "zh-CN": "若 Store 更新完成后旧进程仍然存活，则继续使用应用级重启作为兜底；GitHub 更新、单实例机制以及其他功能保持不变。", "ja-JP": "Store 更新後も古いプロセスが残る場合はアプリ側の再起動をフォールバックとして使用します。GitHub 更新、単一インスタンス機構、その他の機能は変更されません。", "en-US": "If the old process survives a completed Store update, the app-level restart remains the fallback. GitHub updates, single-instance behavior, and other features are unchanged." }
   ]
 }

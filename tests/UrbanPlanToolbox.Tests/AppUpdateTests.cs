@@ -91,7 +91,7 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public async Task StoreRelaunchRegistersBeforeInstallAndUsesFallbackOnlyAfterCompletedInstall()
+    public async Task StoreCombinedUpdateRegistersBeforeOperationAndUsesFallbackOnlyAfterCompletion()
     {
         var calls = new List<string>();
         var service = new StoreRelaunchUpdateService(AppUpdateState.Completed, calls);
@@ -99,41 +99,39 @@ public sealed class AppUpdateTests
         var registration = new RestartRegistrationStub(true, calls);
         var viewModel = new UpdateViewModel(service, restart, registration);
         await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync();
-        Assert.Equal(AppUpdateState.ReadyToInstall, viewModel.Info.State);
+        Assert.Equal(new[] { "register", "download-install", "unregister", "restart" }, calls);
         Assert.Equal(1, service.DownloadCalls);
         Assert.Equal(0, service.InstallCalls);
-        await viewModel.RestartAndUpdateAsync();
-        Assert.Equal(new[] { "register", "install", "unregister", "restart" }, calls);
         Assert.Equal(1, restart.CallCount);
         Assert.False(registration.Active);
     }
 
     [Fact]
-    public async Task StoreRelaunchRegistrationFailureKeepsPendingUpdateAndDoesNotInstall()
+    public async Task StoreCombinedRegistrationFailureKeepsUpdateAvailableAndDoesNotStartOperation()
     {
         var calls = new List<string>();
         var service = new StoreRelaunchUpdateService(AppUpdateState.Completed, calls);
         var viewModel = new UpdateViewModel(service, new UpdateRestartStub(true), new RestartRegistrationStub(false, calls));
-        await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync(); await viewModel.RestartAndUpdateAsync();
+        await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync();
         Assert.Equal(new[] { "register" }, calls);
-        Assert.Equal(0, service.InstallCalls);
-        Assert.Equal(AppUpdateState.ReadyToInstall, viewModel.Info.State);
+        Assert.Equal(0, service.DownloadCalls);
+        Assert.Equal(AppUpdateState.UpdateAvailable, viewModel.Info.State);
         Assert.Equal("StoreRestartRegistrationFailed", viewModel.Info.ErrorCode);
         Assert.True(viewModel.CanInstall);
     }
 
     [Theory]
-    [InlineData(AppUpdateState.Cancelled, AppUpdateState.ReadyToInstall)]
+    [InlineData(AppUpdateState.Cancelled, AppUpdateState.UpdateAvailable)]
     [InlineData(AppUpdateState.Failed, AppUpdateState.Failed)]
-    public async Task StoreRelaunchCancellationAndFailureRemoveRegistration(AppUpdateState installResult, AppUpdateState expectedState)
+    public async Task StoreCombinedCancellationAndFailureRemoveRegistration(AppUpdateState installResult, AppUpdateState expectedState)
     {
         var calls = new List<string>();
         var service = new StoreRelaunchUpdateService(installResult, calls);
         var restart = new UpdateRestartStub(true);
         var registration = new RestartRegistrationStub(true, calls);
         var viewModel = new UpdateViewModel(service, restart, registration);
-        await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync(); await viewModel.RestartAndUpdateAsync();
-        Assert.Equal(new[] { "register", "install", "unregister" }, calls);
+        await viewModel.CheckAsync(); await viewModel.DownloadAndInstallAsync();
+        Assert.Equal(new[] { "register", "download-install", "unregister" }, calls);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(0, restart.CallCount);
         Assert.False(registration.Active);
@@ -180,21 +178,44 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public void StoreUsesDownloadThenExplicitInstallAndGitHubLogicRemainsSeparate()
+    public void StoreUsesOneNativeDownloadInstallOperationAndGitHubLogicRemainsSeparate()
     {
         var root = FindRepositoryRoot();
         var store = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
         var github = File.ReadAllText(Path.Combine(root, "Services", "GitHubAppUpdateService.cs"));
         var about = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
 
-        Assert.Contains("RequestDownloadStorePackageUpdatesAsync", store);
         Assert.Contains("RequestDownloadAndInstallStorePackageUpdatesAsync", store);
-        Assert.Contains("StoreDownloadCompleted", store);
-        Assert.Contains("new(AppUpdateState.ReadyToInstall)", store);
-        Assert.Contains("StoreInstallCompleted", store);
+        Assert.DoesNotContain("RequestDownloadStorePackageUpdatesAsync", store);
+        Assert.DoesNotContain("new(AppUpdateState.ReadyToInstall)", store);
+        Assert.Contains("StoreUpdateCompleted", store);
         Assert.Contains("new(AppUpdateState.Completed)", store);
         Assert.Contains("AppUpdateState.ReadyToInstall", github);
         Assert.Contains("info.NeedsFinalRestart ? T(\"Action_RestartAndUpdate\")", about);
+    }
+
+    [Fact]
+    public void StoreCombinedFlowKeepsRestartRegistrationAheadOfTheNativeOperation()
+    {
+        var root = FindRepositoryRoot();
+        var viewModel = File.ReadAllText(Path.Combine(root, "ViewModels", "UpdateViewModel.cs"));
+        var coordinator = viewModel.IndexOf("private async Task DownloadInstallAndRestartStoreAsync", StringComparison.Ordinal);
+        var registration = viewModel.IndexOf("_restartRegistrationService.TryRegister", coordinator, StringComparison.Ordinal);
+        var operation = viewModel.IndexOf("_service.DownloadAndInstallAsync(progress, linked.Token)", coordinator, StringComparison.Ordinal);
+        Assert.True(registration >= 0 && operation > registration);
+        Assert.Contains("State = AppUpdateState.UpdateAvailable", viewModel, StringComparison.Ordinal);
+        Assert.Contains("StoreRestartRegistrationFailed", viewModel, StringComparison.Ordinal);
+        Assert.Contains("FallbackRestartRequested", viewModel, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StoreProgressMapsDeployingToInstallingWithoutTreatingPackageCompletionAsTerminal()
+    {
+        var root = FindRepositoryRoot();
+        var store = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
+        Assert.Contains("case StorePackageUpdateState.Deploying", store, StringComparison.Ordinal);
+        Assert.Contains("progress?.Report(new(AppUpdateState.Installing))", store, StringComparison.Ordinal);
+        Assert.Contains("awaited StorePackageUpdateResult.OverallState is authoritative", store, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -223,7 +244,7 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public async Task ViewModelKeepsReleaseMetadataAndRequiresSecondActionAfterDownload()
+    public async Task GitHubViewModelKeepsReleaseMetadataAndRequiresSecondActionAfterDownload()
     {
         var service = new ReadyToInstallUpdateService();
         var viewModel = new UpdateViewModel(service);
@@ -278,7 +299,7 @@ public sealed class AppUpdateTests
         var source = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
         Assert.DoesNotContain("operation.Progress", source, StringComparison.Ordinal);
         Assert.Contains("AsTask(cancellationToken, storeProgress)", source, StringComparison.Ordinal);
-        Assert.Contains("HandleStoreProgress(status, progress, isInstallOperation", source, StringComparison.Ordinal);
+        Assert.Contains("HandleStoreProgress(status, progress)", source, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -611,7 +632,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.7.3", viewModel.CurrentVersion);
+        Assert.Equal("v1.7.4", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
@@ -648,7 +669,7 @@ public sealed class AppUpdateTests
         await operation;
 
         Assert.Equal(AppUpdateState.UpdateAvailable, session.Info.State);
-        Assert.Equal("1.7.3", session.Info.AvailableVersion);
+        Assert.Equal("1.7.4", session.Info.AvailableVersion);
     }
 
     [Fact]
@@ -679,7 +700,7 @@ public sealed class AppUpdateTests
         service.CompleteDownload();
         await operation;
         Assert.Equal(AppUpdateState.ReadyToInstall, session.Info.State);
-        Assert.Equal("1.7.3", session.Info.AvailableVersion);
+        Assert.Equal("1.7.4", session.Info.AvailableVersion);
     }
 
     private static async Task WaitForProgressAsync(UpdateViewModel session, double expected)
@@ -862,10 +883,10 @@ internal sealed class StoreRelaunchUpdateService(AppUpdateState installResult, L
     public int DownloadCalls { get; private set; }
     public int InstallCalls { get; private set; }
     public Task<AppUpdateInfo> CheckForUpdatesAsync(CancellationToken cancellationToken = default) =>
-        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.7.3", Source: UpdateInstallSource.Store));
+        Task.FromResult(new AppUpdateInfo(AppUpdateState.UpdateAvailable, "1.7.4", Source: UpdateInstallSource.Store));
     public Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
     {
-        DownloadCalls++; return Task.FromResult(new AppUpdateResult(AppUpdateState.ReadyToInstall));
+        DownloadCalls++; calls.Add("download-install"); return Task.FromResult(new AppUpdateResult(installResult));
     }
     public Task<AppUpdateResult> InstallPendingAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)
     {
@@ -890,7 +911,7 @@ internal sealed class DeferredUpdateService(AppUpdateState downloadResult) : IAp
     {
         _operationToken = cancellationToken; _checkStarted.TrySetResult();
         await _checkCompletion.Task.WaitAsync(cancellationToken);
-        return new(AppUpdateState.UpdateAvailable, "1.7.3", "notes", Source: UpdateInstallSource.GitHub);
+        return new(AppUpdateState.UpdateAvailable, "1.7.4", "notes", Source: UpdateInstallSource.GitHub);
     }
 
     public async Task<AppUpdateResult> DownloadAndInstallAsync(IProgress<AppUpdateProgress>? progress = null, CancellationToken cancellationToken = default)

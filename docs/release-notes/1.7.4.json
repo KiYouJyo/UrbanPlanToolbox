@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "version": "1.7.4",
+  "notes": {
+    "zh-CN": {
+      "title": "UrbanPlanToolbox v1.7.4 Microsoft Store 更新流程优化",
+      "items": [
+        "Microsoft Store 更新恢复为 Windows 官方的一体式下载与安装流程，避免两阶段更新导致系统授权窗口出现在语义错误的时间。",
+        "点击“下载并安装更新”后，由 Windows / Microsoft Store 依次处理下载和安装授权；在更新开始前注册 Windows 应用重启恢复，确保应用关闭后自动重新启动新版。",
+        "若 Store 更新完成后旧进程仍然存活，则继续使用应用级重启作为兜底；GitHub 更新、单实例机制以及其他功能保持不变。"
+      ]
+    },
+    "ja-JP": {
+      "title": "UrbanPlanToolbox v1.7.4 Microsoft Store 更新フローの改善",
+      "items": [
+        "Microsoft Store の更新を Windows 公式の一体型ダウンロード・インストール フローに戻し、2 段階更新でシステム承認画面が不自然なタイミングに表示される問題を回避します。",
+        "「アップデートをダウンロードしてインストール」を選ぶと、Windows / Microsoft Store がダウンロードとインストールの承認を順に処理します。開始前に Windows のアプリ再起動回復を登録し、アプリ終了後に新しいバージョンを自動起動します。",
+        "Store 更新後も古いプロセスが残る場合はアプリ側の再起動をフォールバックとして使用します。GitHub 更新、単一インスタンス機構、その他の機能は変更されません。"
+      ]
+    },
+    "en-US": {
+      "title": "UrbanPlanToolbox v1.7.4 Microsoft Store update flow improvements",
+      "items": [
+        "Restores Microsoft Store updates to the official Windows combined download-and-install flow, avoiding system authorization at the wrong point in a two-stage update.",
+        "After choosing Download and install update, Windows / Microsoft Store handles download and installation authorization in sequence. Windows restart recovery is registered first so the new version relaunches automatically after the app closes.",
+        "If the old process survives a completed Store update, the app-level restart remains the fallback. GitHub updates, single-instance behavior, and other features are unchanged."
+      ]
+    }
+  }
+}

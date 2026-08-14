@@ -1,5 +1,13 @@
 # 更改日志
 
+## 1.7.4
+
+### Platform foundation and updater freeze preparation
+
+- Restores Microsoft Store updates to the official Windows combined download-and-install flow, avoiding system authorization at the wrong point in a two-stage update.
+- After choosing Download and install update, Windows / Microsoft Store handles download and installation authorization in sequence. Windows restart recovery is registered first so the new version relaunches automatically after the app closes.
+- If the old process survives a completed Store update, the app-level restart remains the fallback. GitHub updates, single-instance behavior, and other features are unchanged.
+
 ## 1.7.3
 
 ### Microsoft Store updater relaunch hotfix

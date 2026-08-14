@@ -77,6 +77,11 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
             return;
         }
         if (!CanInstall || Interlocked.Exchange(ref _busy, 1) != 0) return;
+        if (Info.Source == UpdateInstallSource.Store)
+        {
+            await DownloadInstallAndRestartStoreAsync(cancellationToken);
+            return;
+        }
         var progressGate = new object();
         var acceptingProgress = true;
         try
@@ -127,6 +132,82 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
             }
         }
         finally { Interlocked.Exchange(ref _busy, 0); OnChanged(nameof(CanCheck)); OnChanged(nameof(CanInstall)); }
+    }
+
+    private async Task DownloadInstallAndRestartStoreAsync(CancellationToken cancellationToken)
+    {
+        var restartRegistered = false;
+        try
+        {
+            AppLogger.Default.Info("StoreUpdate", "StoreRestartRegistrationRequested", "BeforeStoreDownloadAndInstall=true");
+            if (!_restartRegistrationService.TryRegister(out var registrationFailure))
+            {
+                AppLogger.Default.Info("StoreUpdate", "StoreRestartRegistrationFailed", registrationFailure ?? "Unknown");
+                Info = Info with { State = AppUpdateState.UpdateAvailable, Detail = registrationFailure, ErrorCode = "StoreRestartRegistrationFailed" };
+                return;
+            }
+
+            restartRegistered = true;
+            AppLogger.Default.Info("StoreUpdate", "StoreRestartRegistrationSucceeded", "BeforeStoreDownloadAndInstall=true");
+            var progress = new Progress<AppUpdateProgress>(value =>
+            {
+                if (value.State is not (AppUpdateState.Downloading or AppUpdateState.Installing)) return;
+                Progress = value.State == AppUpdateState.Downloading ? AppUpdateProgress.NormalizeValue(value.Value) : null;
+                Info = Info with { State = value.State, Detail = value.Detail, ErrorCode = null };
+                OnChanged(nameof(Progress));
+            });
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(_sessionLifetime.Token, cancellationToken);
+            var result = await _service.DownloadAndInstallAsync(progress, linked.Token);
+            AppLogger.Default.Info("StoreUpdate", "StoreUpdateReturned", $"State={result.State}");
+
+            if (result.State == AppUpdateState.Cancelled)
+            {
+                _restartRegistrationService.Unregister();
+                restartRegistered = false;
+                AppLogger.Default.Info("StoreUpdate", "StoreUpdateCancelled", "RestartRegistrationRemoved=true");
+                Info = Info with { State = AppUpdateState.UpdateAvailable, Detail = null, ErrorCode = null };
+                return;
+            }
+            if (result.State != AppUpdateState.Completed)
+            {
+                _restartRegistrationService.Unregister();
+                restartRegistered = false;
+                AppLogger.Default.Info("StoreUpdate", "StoreUpdateFailed", $"State={result.State};RestartRegistrationRemoved=true");
+                Info = Info with { State = result.State, Detail = result.Detail, ErrorCode = result.ErrorCode };
+                return;
+            }
+
+            // If Store deployment terminated us, this continuation never executes and Windows
+            // relaunches through the registration above. A surviving process uses this fallback.
+            _restartRegistrationService.Unregister();
+            restartRegistered = false;
+            AppLogger.Default.Info("StoreUpdate", "FallbackRestartRequested", "Store update completed while process remained alive.");
+            if (!_restartService.TryRestart(out var failureReason))
+            {
+                RestartFailureReason = string.IsNullOrWhiteSpace(failureReason) ? "FallbackRestartFailed" : failureReason;
+                AppLogger.Default.Info("StoreUpdate", "FallbackRestartFailed", RestartFailureReason);
+                Info = Info with { State = AppUpdateState.Failed, Detail = RestartFailureReason, ErrorCode = "FallbackRestartFailed" };
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            if (restartRegistered) _restartRegistrationService.Unregister();
+            AppLogger.Default.Info("StoreUpdate", "StoreUpdateCancelled", "OperationCanceledException");
+            Info = Info with { State = AppUpdateState.UpdateAvailable, Detail = null, ErrorCode = null };
+        }
+        catch
+        {
+            if (restartRegistered) _restartRegistrationService.Unregister();
+            throw;
+        }
+        finally
+        {
+            Progress = null;
+            OnChanged(nameof(Progress));
+            Interlocked.Exchange(ref _busy, 0);
+            OnChanged(nameof(CanCheck));
+            OnChanged(nameof(CanInstall));
+        }
     }
 
     public Task RestartAndUpdateAsync(CancellationToken cancellationToken = default)
@@ -258,7 +339,7 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     {
         AppUpdateState.Downloading => current is AppUpdateState.UpdateAvailable or AppUpdateState.Downloading,
         AppUpdateState.Verifying => current is AppUpdateState.Downloading or AppUpdateState.Verifying,
-        AppUpdateState.Installing => current is AppUpdateState.ReadyToInstall or AppUpdateState.Installing,
+        AppUpdateState.Installing => current is AppUpdateState.UpdateAvailable or AppUpdateState.ReadyToInstall or AppUpdateState.Installing,
         AppUpdateState.RestartRequired => current is AppUpdateState.Installing or AppUpdateState.RestartRequired,
         AppUpdateState.Restarting => current is AppUpdateState.Installing or AppUpdateState.Restarting,
         AppUpdateState.Completed or AppUpdateState.Failed or AppUpdateState.Cancelled => true,

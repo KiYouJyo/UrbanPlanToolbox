@@ -7,7 +7,7 @@
   },
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.7.3",
+    "version": "1.7.4",
     "lifecycle": "stable-1.x",
     "platform": "Windows",
     "supportedArchitecture": "x64",
@@ -18,9 +18,9 @@
       "latestPublishedProductVersion": "1.7.3",
       "latestPublishedPackageVersion": "1.7.3.0",
       "latestPublishedReleaseTag": "v1.7.3",
-      "candidateProductVersion": "1.7.3",
-      "candidatePackageVersion": "1.7.3.0",
-      "candidateState": "published",
+      "candidateProductVersion": "1.7.4",
+      "candidatePackageVersion": "1.7.4.0",
+      "candidateState": "release-candidate",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -30,9 +30,9 @@
       "state": "certification-submitted",
       "publicProductVersion": "1.7.1",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
-      "candidateProductVersion": "1.7.3",
-      "candidatePackageVersion": "1.7.3.0",
-      "candidateState": "certification-submitted",
+      "candidateProductVersion": "1.7.4",
+      "candidatePackageVersion": "1.7.4.0",
+      "candidateState": "release-candidate",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
@@ -69,7 +69,7 @@
     },
     "microsoftStore": {
       "validation": "release-approved",
-      "policy": "release-approved / download-only then explicit-install; register Windows restart recovery before Store deployment, use app restart only when the process survives, and keep Store and GitHub identities separate"
+      "policy": "release-candidate / one user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
     }
   },
   "documentation": {
