@@ -15,24 +15,24 @@
   },
   "distribution": {
     "github": {
-      "latestPublishedProductVersion": "1.7.3",
-      "latestPublishedPackageVersion": "1.7.3.0",
-      "latestPublishedReleaseTag": "v1.7.3",
+      "latestPublishedProductVersion": "1.7.4",
+      "latestPublishedPackageVersion": "1.7.4.0",
+      "latestPublishedReleaseTag": "v1.7.4",
       "candidateProductVersion": "1.7.4",
       "candidatePackageVersion": "1.7.4.0",
-      "candidateState": "release-candidate",
+      "candidateState": "published",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
     "microsoftStore": {
-      "submittedProductVersion": "1.7.3",
-      "submittedPackageVersion": "1.7.3.0",
-      "state": "certification-submitted",
-      "publicProductVersion": "1.7.1",
+      "submittedProductVersion": "1.7.4",
+      "submittedPackageVersion": "1.7.4.0",
+      "state": "published",
+      "publicProductVersion": "1.7.4",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
       "candidateProductVersion": "1.7.4",
       "candidatePackageVersion": "1.7.4.0",
-      "candidateState": "release-candidate",
+      "candidateState": "published",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
@@ -68,8 +68,8 @@
       "policy": "validated / frozen; future updater changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
-      "validation": "release-approved",
-      "policy": "release-candidate / one user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
+      "validation": "real-e2e-pending",
+      "policy": "one user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
     }
   },
   "documentation": {
