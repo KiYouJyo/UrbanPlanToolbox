@@ -1,5 +1,14 @@
 # 更改日志
 
+## 1.7.3
+
+### Microsoft Store updater relaunch hotfix
+
+- Registers Windows application restart recovery before Microsoft Store package deployment.
+- Uses the existing application restart service only as the surviving-process fallback, after removing recovery registration.
+- Restores a retryable pending update after cancellation and removes recovery registration after failures.
+- Preserves the Store download-then-explicit-install flow, GitHub update path, and single-instance behavior.
+
 ## 1.7.2
 
 ### Platform foundation and updater freeze preparation

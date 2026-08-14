@@ -5,11 +5,12 @@ using UrbanPlanToolbox.Services;
 
 namespace UrbanPlanToolbox.ViewModels;
 
-public sealed class UpdateViewModel(IAppUpdateService service, IApplicationRestartService? restartService = null) : INotifyPropertyChanged
+public sealed class UpdateViewModel(IAppUpdateService service, IApplicationRestartService? restartService = null, IApplicationRestartRegistrationService? restartRegistrationService = null) : INotifyPropertyChanged
 {
     private static UpdateViewModel? _defaultSession;
     private readonly IAppUpdateService _service = service;
     private readonly IApplicationRestartService _restartService = restartService ?? new NoOpApplicationRestartService();
+    private readonly IApplicationRestartRegistrationService _restartRegistrationService = restartRegistrationService ?? new NoOpApplicationRestartRegistrationService();
     private readonly CancellationTokenSource _sessionLifetime = new();
     private readonly Dictionary<(string Version, string Locale), LocalizedReleaseNotes> _localizedNotes = new();
     private int _busy;
@@ -159,8 +160,25 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
 
     private async Task InstallPendingAndRestartAsync(CancellationToken cancellationToken)
     {
+        var storeRelaunchRegistered = false;
         try
         {
+            if (Info.Source == UpdateInstallSource.Store)
+            {
+                if (!_restartRegistrationService.TryRegister(out var registrationFailure))
+                {
+                    Info = Info with
+                    {
+                        State = AppUpdateState.ReadyToInstall,
+                        Detail = registrationFailure,
+                        ErrorCode = "StoreRestartRegistrationFailed"
+                    };
+                    return;
+                }
+
+                storeRelaunchRegistered = true;
+            }
+
             Info = Info with { State = AppUpdateState.Installing, Detail = null, ErrorCode = null };
             Progress = null;
             OnChanged(nameof(Progress));
@@ -174,16 +192,58 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
                 }
             });
             using var linked = CancellationTokenSource.CreateLinkedTokenSource(_sessionLifetime.Token, cancellationToken);
+            AppLogger.Default.Info("StoreUpdate", "StoreInstallRequested", "RelaunchRegistrationActive=" + storeRelaunchRegistered);
             var result = await _service.InstallPendingAsync(progress, linked.Token);
+            AppLogger.Default.Info("StoreUpdate", "StoreInstallReturned", $"State={result.State}");
+
+            if (storeRelaunchRegistered && result.State == AppUpdateState.Cancelled)
+            {
+                _restartRegistrationService.Unregister();
+                storeRelaunchRegistered = false;
+                Info = Info with { State = AppUpdateState.ReadyToInstall, Detail = null, ErrorCode = null };
+                return;
+            }
+
+            if (storeRelaunchRegistered && result.State != AppUpdateState.Completed)
+            {
+                _restartRegistrationService.Unregister();
+                storeRelaunchRegistered = false;
+            }
+
             Info = Info with { State = result.State, Detail = result.Detail, ErrorCode = result.ErrorCode };
 
-            // GitHub retains its independent deployment-and-restart path. Store returns
-            // Completed after its user-authorized deployment and never reaches here as a
-            // restart request.
+            // Store may terminate the app before its await continuation runs. When it does,
+            // Windows owns relaunch through the registration made before deployment. If this
+            // process survives a completed Store operation, it must take the fallback path.
+            if (storeRelaunchRegistered && result.State == AppUpdateState.Completed)
+            {
+                _restartRegistrationService.Unregister();
+                storeRelaunchRegistered = false;
+                AppLogger.Default.Info("StoreUpdate", "FallbackRestartRequested", "Store install returned while process is alive.");
+                if (!_restartService.TryRestart(out var failureReason))
+                {
+                    RestartFailureReason = string.IsNullOrWhiteSpace(failureReason) ? "FallbackRestartFailed" : failureReason;
+                    AppLogger.Default.Info("StoreUpdate", "FallbackRestartFailed", "Restart service returned to the surviving process.");
+                    Info = Info with { State = AppUpdateState.Failed, Detail = RestartFailureReason, ErrorCode = "FallbackRestartFailed" };
+                }
+            }
+
+            // GitHub retains its independent deployment-and-restart path.
             if (result.State == AppUpdateState.RestartRequired)
                 await RestartAndUpdateAsync(linked.Token);
         }
-        catch (OperationCanceledException) { Info = Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" }; }
+        catch (OperationCanceledException)
+        {
+            if (storeRelaunchRegistered) _restartRegistrationService.Unregister();
+            Info = Info.Source == UpdateInstallSource.Store
+                ? Info with { State = AppUpdateState.ReadyToInstall, Detail = null, ErrorCode = null }
+                : Info with { State = AppUpdateState.Cancelled, Detail = "Cancelled" };
+        }
+        catch
+        {
+            if (storeRelaunchRegistered) _restartRegistrationService.Unregister();
+            throw;
+        }
         finally
         {
             Interlocked.Exchange(ref _busy, 0);
@@ -211,5 +271,11 @@ public sealed class UpdateViewModel(IAppUpdateService service, IApplicationResta
     {
         public bool TryRestart() => false;
         public bool TryRestart(out string? failureReason) { failureReason = "RestartServiceUnavailable"; return false; }
+    }
+
+    private sealed class NoOpApplicationRestartRegistrationService : IApplicationRestartRegistrationService
+    {
+        public bool TryRegister(out string? failureReason) { failureReason = "RestartRegistrationServiceUnavailable"; return false; }
+        public void Unregister() { }
     }
 }

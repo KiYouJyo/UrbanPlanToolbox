@@ -8,6 +8,8 @@ public static class AppUpdateErrorMapper
         "StoreUnavailable" or "StoreCheckFailed" => "Update_ErrorStoreUnavailable",
         "DownloadFailed" or "BundleDownloadFailed" => "Update_ErrorDownload",
         "InstallFailed" or "StoreInstallFailed" or "PackageDeploymentFailed" => "Update_ErrorInstall",
+        "StoreRestartRegistrationFailed" => "Update_ErrorRestartRegistration",
+        "FallbackRestartFailed" => "Update_ErrorFallbackRestart",
         "UnableToContactGitHub" => "Update_ErrorGitHubNetwork",
         "ReleaseNotFound" => "Update_ErrorReleaseNotFound",
         "BundleAssetNotFound" => "Update_ErrorBundleAssetNotFound",

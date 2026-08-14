@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.7.3",
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.7.3 Microsoft Store 更新后重新启动修复", "items": ["修复 Microsoft Store 更新安装后应用关闭但不会自动重新启动的问题。", "在 Store 包部署开始前注册 Windows 应用重启恢复；若安装返回且进程仍存活，则使用应用级重启兜底。", "完善取消、失败和重启失败时的恢复与重试逻辑。", "保持先下载、后安装的 Store 两阶段更新、GitHub 更新和单实例行为不变。"] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.7.3 Microsoft Store 更新後の再起動修正", "items": ["Microsoft Store の更新インストール後にアプリが閉じても自動的に再起動しない問題を修正しました。", "Store 展開前に Windows の再起動回復を登録し、処理が戻ってプロセスが残る場合はアプリ側で再起動します。", "キャンセル、インストール失敗、再起動失敗時の復帰と再試行を改善しました。", "ダウンロード後に明示的にインストールする Store 更新、GitHub 更新、単一インスタンスの動作は変更していません。"] },
+    "en-US": { "title": "UrbanPlanToolbox v1.7.3 Microsoft Store update relaunch fix", "items": ["Fixes the app not automatically relaunching after a Microsoft Store update closes it.", "Registers Windows restart recovery before Store deployment, with an app-owned restart fallback if the process remains alive.", "Improves recovery and retry behavior for cancellation, installation failures, and restart failures.", "Preserves the Store download-then-explicit-install flow, GitHub updates, and single-instance behavior."] }
+  }
+}

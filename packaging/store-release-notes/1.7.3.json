@@ -1,0 +1,8 @@
+{
+  "version": "1.7.3",
+  "notes": {
+    "zh-CN": ["修复 Microsoft Store 更新安装后应用关闭但不会自动重新启动的问题。", "在 Store 部署前注册 Windows 应用重启恢复，并保留应用级重启兜底。", "保持先下载、后安装的两阶段更新流程不变。"],
+    "ja-JP": ["Microsoft Store の更新インストール後にアプリが自動再起動しない問題を修正しました。", "Store 展開前に Windows の再起動回復を登録し、アプリ側の再起動フォールバックも保持します。", "ダウンロード後に明示的にインストールする 2 段階更新を維持します。"],
+    "en-US": ["Fixes the app not automatically relaunching after a Microsoft Store update closes it.", "Registers Windows restart recovery before Store deployment and retains an app-owned restart fallback.", "Preserves the download-then-explicit-install update flow."]
+  }
+}

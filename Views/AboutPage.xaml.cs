@@ -17,7 +17,7 @@ public sealed partial class AboutPage : Page
     private readonly CancellationTokenSource _pageLifetime = new();
     private readonly ILocalizationService _localization = LocalizationService.Default;
     private readonly DistributionChannelContext _channel = new AppDistributionChannelService().GetContext();
-    private readonly UpdateViewModel _updates = UpdateViewModel.GetOrCreateDefault(() => new(AppUpdateServiceFactory.CreateDefault(), new ApplicationRestartService()));
+    private readonly UpdateViewModel _updates = UpdateViewModel.GetOrCreateDefault(() => new(AppUpdateServiceFactory.CreateDefault(), new ApplicationRestartService(), new ApplicationRestartRegistrationService()));
     private readonly IReleaseNotesProvider _releaseNotes = LocalizedReleaseNotesService.Default;
 
     public AboutPage()
