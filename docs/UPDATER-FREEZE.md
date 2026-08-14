@@ -1,7 +1,11 @@
-# Updater freeze contract
+简体中文 | [日本語](UPDATER-FREEZE.ja.md) | [English](UPDATER-FREEZE.en.md)
 
-The runtime updater is behavior-frozen for the validated GitHub path. `UpdateViewModel` is the application-scoped update session; `AboutPage` attaches on `Loaded`, detaches on `Unloaded`, and never owns an update cancellation token.
+# 更新模块冻结合同
 
-GitHub keeps its verified discovery, SHA-256, signature, deployment, and restart path. Microsoft Store uses one user action and `RequestDownloadAndInstallStorePackageUpdatesAsync`; Windows restart recovery is registered before that call. Per-package `Completed` is not a transaction terminal state. Navigation preserves checking, download progress, localized notes, target version, source, and retryable failure without starting a second Store operation.
+GitHub 与 Microsoft Store 两条运行时更新路径现均已完成真实环境验证并冻结。`UpdateViewModel` 继续作为应用级更新会话；`AboutPage` 在 `Loaded` 时连接、在 `Unloaded` 时解除连接，页面本身不拥有更新取消令牌。
 
-The GitHub updater is validated and frozen. The v1.7.4 Store updater implementation is published and behavior-frozen. v1.7.5 is the final real Microsoft Store E2E validation target: it is freeze-ready / final-e2e-pending, not fully frozen, until a real Store 1.7.4 → Store 1.7.5 update proves native authorization, deployment, automatic relaunch, retry behavior, navigation continuity, and retained user data. Publication alone is not that E2E evidence.
+GitHub 保留已经验证的版本发现、SHA-256、签名校验、部署与重启路径。Microsoft Store 保留一次用户操作触发 `RequestDownloadAndInstallStorePackageUpdatesAsync` 的 Windows 原生下载与安装流程，并在调用前注册 Windows 重启恢复。单个包的 `Completed` 不是整次更新事务的终态。页面导航必须保持检查状态、下载进度、本地化更新说明、目标版本、更新来源与可重试失败状态，且不得启动第二个 Store 更新操作。
+
+2026-08-14 已完成真实 Microsoft Store **1.7.4 → 1.7.5** 端到端验收。至此 GitHub updater 与 Store updater 均为 **validated / fully frozen**，此前的 `final-e2e-pending` 状态正式结束。
+
+冻结后不再以功能优化、交互微调或重构为理由修改 updater。只有确认存在 updater 缺陷、安全问题，或 Windows / Microsoft Store 平台与 API 兼容性要求时才允许重新打开该模块；任何此类修改都必须重新提供受影响渠道的完整端到端回归证据后才能再次冻结。
