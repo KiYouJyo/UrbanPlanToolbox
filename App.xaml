@@ -9,6 +9,27 @@
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="ShellNavigationPaneBackgroundBrush" Color="#E5F9F9" />
+                    <SolidColorBrush x:Key="AppTransientSurfaceBrush" Color="#E5F9F9" />
+                    <StaticResource x:Key="AppTransientSurfaceBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+                    <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="AppTransientSurfaceBrush" />
+                    <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="ShellNavigationPaneBackgroundBrush" Color="#1A2323" />
+                    <SolidColorBrush x:Key="AppTransientSurfaceBrush" Color="#1A2323" />
+                    <StaticResource x:Key="AppTransientSurfaceBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+                    <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="AppTransientSurfaceBrush" />
+                    <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush x:Key="ShellNavigationPaneBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+                    <StaticResource x:Key="AppTransientSurfaceBrush" ResourceKey="SystemColorWindowBrush" />
+                    <StaticResource x:Key="AppTransientSurfaceBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
             <Thickness x:Key="PageContentPadding">32</Thickness>
             <Thickness x:Key="CardContentPadding">16</Thickness>
             <x:Double x:Key="PageSectionSpacing">16</x:Double>

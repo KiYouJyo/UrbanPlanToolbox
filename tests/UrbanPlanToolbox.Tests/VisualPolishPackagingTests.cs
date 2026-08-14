@@ -5,11 +5,57 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class VisualPolishPackagingTests
 {
     [Fact]
-    public void VersionAndUserAgentAre167()
+    public void AppOwnedTransientSurfacesUseSharedResourcesAndCentralDialogPresentation()
     {
         var root = FindRepositoryRoot();
-        Assert.Contains("Version=\"1.6.7.0\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
-        Assert.Contains("<Version>1.6.7</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
+        var app = File.ReadAllText(Path.Combine(root, "App.xaml"));
+        var dialogs = File.ReadAllText(Path.Combine(root, "Services", "AppDialogService.cs"));
+        var comboBoxTheme = File.ReadAllText(Path.Combine(root, "Controls", "TransientComboBoxTheme.cs"));
+        Assert.Contains("AppTransientSurfaceBrush", app);
+        Assert.Contains("AppTransientSurfaceBorderBrush", app);
+        Assert.Contains("ComboBoxDropDownBackground", app);
+        Assert.Contains("ComboBoxDropDownBorderBrush", app);
+        Assert.Matches("<StaticResource\\s+x:Key=\\\"ComboBoxDropDownBackground\\\"\\s+ResourceKey=\\\"AppTransientSurfaceBrush\\\"\\s*/>", app);
+        Assert.Matches("<StaticResource\\s+x:Key=\\\"ComboBoxDropDownBorderBrush\\\"\\s+ResourceKey=\\\"CardStrokeColorDefaultBrush\\\"\\s*/>", app);
+        Assert.Contains("dialog.Background =", dialogs);
+        Assert.Contains("dialog.BorderBrush =", dialogs);
+        Assert.Contains("Resources[\"ComboBoxDropDownBackground\"]", comboBoxTheme);
+        Assert.Contains("Resources[\"ComboBoxDropDownBorderBrush\"]", comboBoxTheme);
+        Assert.Contains("ActualThemeChanged", comboBoxTheme);
+        Assert.DoesNotContain("ControlTemplate", comboBoxTheme);
+        Assert.DoesNotContain("OverlayCornerRadius", comboBoxTheme);
+        Assert.DoesNotContain("TargetType=\"ContentDialog\"", app);
+        Assert.DoesNotContain("ControlTemplate TargetType=\"ContentDialog\"", app);
+        Assert.DoesNotContain("ControlTemplate TargetType=\"Button\"", app);
+        Assert.DoesNotContain("ControlTemplate TargetType=\"ComboBox\"", app);
+        Assert.DoesNotContain("ControlCornerRadius", app);
+        Assert.DoesNotContain("ButtonCornerRadius", app);
+        Assert.DoesNotContain("ContentDialogCornerRadius", app);
+        Assert.DoesNotContain("OverlayCornerRadius", app);
+        Assert.DoesNotContain("ComboBoxItemBackground", app);
+        foreach (var source in Directory.EnumerateFiles(Path.Combine(root, "Views"), "*.xaml", SearchOption.AllDirectories))
+        {
+            var xaml = File.ReadAllText(source);
+            Assert.Equal(
+                System.Text.RegularExpressions.Regex.Matches(xaml, "<ComboBox(?:\\s|>)").Count,
+                System.Text.RegularExpressions.Regex.Matches(xaml, "<ComboBox\\s+controls:TransientComboBoxTheme.Apply=\\\"True\\\"").Count);
+        }
+        foreach (var source in Directory.EnumerateFiles(Path.Combine(root, "Views"), "*.cs", SearchOption.AllDirectories))
+        {
+            var code = File.ReadAllText(source);
+            Assert.DoesNotContain(".ShowAsync()", code);
+            Assert.Equal(
+                System.Text.RegularExpressions.Regex.Matches(code, "new ComboBox").Count,
+                System.Text.RegularExpressions.Regex.Matches(code, "TransientComboBoxTheme.ApplyTo").Count);
+        }
+    }
+
+    [Fact]
+    public void VersionAndUserAgentAre168()
+    {
+        var root = FindRepositoryRoot();
+        Assert.Contains("Version=\"1.6.8.0\"", File.ReadAllText(Path.Combine(root, "Package.appxmanifest")));
+        Assert.Contains("<Version>1.6.8</Version>", File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj")));
         Assert.Contains("UrbanPlanToolbox/", File.ReadAllText(Path.Combine(root, "Services", "GitHubUpdateService.cs")));
     }
 
@@ -32,7 +78,7 @@ public sealed class VisualPolishPackagingTests
         var manifest = File.ReadAllText(Path.Combine(root, "Package.Store.appxmanifest"));
         Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", manifest);
         Assert.Contains("Publisher=\"CN=C4E4B33A-7B77-4121-897C-7D720A5471F8\"", manifest);
-        Assert.Contains("Version=\"1.6.7.0\"", manifest);
+        Assert.Contains("Version=\"1.6.8.0\"", manifest);
         Assert.Contains("<PublisherDisplayName>Jo Kiyō</PublisherDisplayName>", manifest);
         Assert.DoesNotContain("556F80C5-C4D4-452B-93B4-00DE3FA7AC29", manifest, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("PhoneIdentity", manifest, StringComparison.Ordinal);
@@ -84,6 +130,10 @@ public sealed class VisualPolishPackagingTests
         Assert.DoesNotContain("Thread.Sleep", windowCode);
         var about = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
         var aboutCode = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
+        Assert.Contains("x:Name=\"ProductLogo\"", about);
+        Assert.DoesNotContain("Square44x44Logo.scale-200.png", about);
+        Assert.Contains("ActualThemeChanged += OnActualThemeChanged", aboutCode);
+        Assert.Contains("WindowIconTheme.GetLogoUri(theme)", aboutCode);
         Assert.DoesNotContain("PackageIdentityText", about);
         Assert.DoesNotContain("About_PackageIdentityLabel", about);
         Assert.DoesNotContain("Package.Current.Id.FullName", aboutCode);
@@ -147,16 +197,16 @@ public sealed class VisualPolishPackagingTests
     }
 
     [Fact]
-    public void OverlayPaneUsesTheActualThemeColorOnTheNavigationSplitView()
+    public void NavigationPaneUsesTheSharedShellSurface()
     {
         var root = FindRepositoryRoot();
         var page = File.ReadAllText(Path.Combine(root, "MainPage.xaml"));
-        var pageCode = File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs"));
-        Assert.Contains("FindDescendant<SplitView>(Navigation)", pageCode);
-        Assert.Contains("Navigation.ActualTheme == ElementTheme.Light", pageCode);
-        Assert.Contains("Windows.UI.Color.FromArgb(0xFF, 0xE5, 0xF9, 0xF9)", pageCode);
-        Assert.Contains("Windows.UI.Color.FromArgb(0xFF, 0x1A, 0x23, 0x23)", pageCode);
-        Assert.Contains("Navigation.PaneOpening", pageCode);
+        var app = File.ReadAllText(Path.Combine(root, "App.xaml"));
+        Assert.Contains("ShellNavigationPaneBackgroundBrush", page + File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
+        Assert.Contains("Navigation.ActualTheme == ElementTheme.Dark", File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
+        Assert.DoesNotContain("Windows.UI.Color.FromArgb", File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
+        Assert.Contains("x:Key=\"ShellNavigationPaneBackgroundBrush\"", app);
+        Assert.DoesNotContain("FirstRunGuideBackgroundBrush", app);
         Assert.DoesNotContain("PaneDisplayMode=\"Left\"", page);
     }
 

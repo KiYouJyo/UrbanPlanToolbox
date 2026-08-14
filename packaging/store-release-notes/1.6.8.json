@@ -1,0 +1,8 @@
+{
+  "version": "1.6.8",
+  "locales": {
+    "zh-CN": ["GitHub 更新器已验证并冻结；v1.6.8 是 Store 更新器最终真实 E2E 验收目标（待完成）。", "完善中日英正式文档合同和自动检查，修复首次启动向导的浅色/深色青色背景。"],
+    "ja-JP": ["GitHub updater は検証済みで凍結され、v1.6.8 は Store updater の最終実 E2E 検証対象です（保留）。", "中日英の文書契約と自動検査を整備し、初回起動ガイドのテーマ背景を修正しました。"],
+    "en-US": ["The GitHub updater is validated and frozen; v1.6.8 is the final real Store updater E2E target (pending).", "Completed the trilingual documentation contract and automated checks, and corrected first-run guide theme backgrounds."]
+  }
+}

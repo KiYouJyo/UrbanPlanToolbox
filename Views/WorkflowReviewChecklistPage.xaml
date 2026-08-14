@@ -1,4 +1,4 @@
-<Page x:Class="UrbanPlanToolbox.Views.WorkflowReviewChecklistPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Page x:Class="UrbanPlanToolbox.Views.WorkflowReviewChecklistPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:UrbanPlanToolbox.Controls">
   <Grid Padding="24" ColumnSpacing="20">
     <Grid.ColumnDefinitions><ColumnDefinition Width="280"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
     <StackPanel Spacing="12">
@@ -12,7 +12,7 @@
       <StackPanel Spacing="12">
         <TextBox x:Name="NameBox" TextChanged="OnDraftChanged"/>
         <TextBox x:Name="DescriptionBox" TextWrapping="Wrap" AcceptsReturn="True" TextChanged="OnDraftChanged"/>
-        <ComboBox x:Name="UsageBox" DisplayMemberPath="Display" SelectionChanged="OnUsageChanged"/>
+        <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="UsageBox" DisplayMemberPath="Display" SelectionChanged="OnUsageChanged"/>
         <TextBlock x:Name="StatisticsText" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/>
         <StackPanel x:Name="SectionsPanel" Spacing="12"/>
         <StackPanel Orientation="Horizontal" Spacing="8">

@@ -1,11 +1,12 @@
 <Page x:Class="UrbanPlanToolbox.Views.DrawingComparisonPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="using:UrbanPlanToolbox.Controls">
   <Grid Padding="24" RowSpacing="12">
     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
     <StackPanel Spacing="4"><TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}"/><TextBlock x:Name="DescriptionText" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/></StackPanel>
     <Grid Grid.Row="1" ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Grid.Column="0" Spacing="4"><TextBlock x:Name="AFileLabel"/><Button x:Name="PickAButton" Click="OnPickA"/><TextBlock x:Name="AFileText" TextWrapping="Wrap" Opacity="0.7"/></StackPanel><StackPanel Grid.Column="1" Spacing="4"><TextBlock x:Name="BFileLabel"/><Button x:Name="PickBButton" Click="OnPickB"/><TextBlock x:Name="BFileText" TextWrapping="Wrap" Opacity="0.7"/></StackPanel><StackPanel Grid.Column="2" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Right"><Button x:Name="CompareButton" Click="OnCompare"/><Button x:Name="FitButton" Click="OnFit"/></StackPanel></Grid>
-    <StackPanel Grid.Row="2" Spacing="8"><StackPanel Orientation="Horizontal" Spacing="8"><ComboBox x:Name="ModeBox" Width="190" SelectionChanged="OnModeChanged"/><Button x:Name="CancelButton" Click="OnCancel" IsEnabled="False"/></StackPanel><InfoBar x:Name="StatusBar" IsOpen="True" IsClosable="False"/>
+    <StackPanel Grid.Row="2" Spacing="8"><StackPanel Orientation="Horizontal" Spacing="8"><ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ModeBox" Width="190" SelectionChanged="OnModeChanged"/><Button x:Name="CancelButton" Click="OnCancel" IsEnabled="False"/></StackPanel><InfoBar x:Name="StatusBar" IsOpen="True" IsClosable="False"/>
       <StackPanel x:Name="OverlayControls" Orientation="Horizontal" Spacing="8" Visibility="Collapsed"><TextBlock x:Name="OpacityLabel" VerticalAlignment="Center"/><Slider x:Name="OpacitySlider" Minimum="0" Maximum="100" Width="240" ValueChanged="OnOverlayChanged"/><TextBlock x:Name="OpacityValue" VerticalAlignment="Center"/></StackPanel>
       <StackPanel x:Name="WipeControls" Orientation="Horizontal" Spacing="8" Visibility="Collapsed"><TextBlock x:Name="WipeLabel" VerticalAlignment="Center"/><Slider x:Name="WipeSlider" Minimum="0" Maximum="100" Width="240" ValueChanged="OnWipeChanged"/></StackPanel>
     </StackPanel>

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.8",
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.6.8", "items": ["GitHub 更新器已完成真实验收并进入冻结状态。", "v1.6.8 是 Microsoft Store 更新器最终真实 E2E 验收目标，尚未验证通过。", "补齐当前正式文档的中日英语言合同并加入自动一致性检查。", "首次启动向导在浅色主题使用淡青色、深色主题使用深青色背景。", "建立启动、包体和依赖测量基线，并完成主题与 DPI 回归收口。"] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.6.8", "items": ["GitHub updater の実運用検証を完了し、凍結しました。", "v1.6.8 は Microsoft Store updater の最終実 E2E 検証対象であり、まだ未完了です。", "現在の正式文書について中日英の言語契約と自動整合性検査を整備しました。", "初回起動ガイドはライトテーマで淡い青緑、ダークテーマで濃い青緑の背景を使用します。", "起動、パッケージ、依存関係の測定基準とテーマ・DPI 回帰を整備しました。"] },
+    "en-US": { "title": "UrbanPlanToolbox v1.6.8", "items": ["The GitHub updater has completed real acceptance and is frozen.", "v1.6.8 is the final real E2E validation target for the Microsoft Store updater; it has not yet passed.", "Completed the Chinese, Japanese, and English contract for current canonical documentation and added automated consistency checks.", "The first-run guide now uses a light cyan background in Light theme and a deep cyan background in Dark theme.", "Established startup, package, and dependency measurement baselines and closed theme/DPI regression work."] }
+  }
+}

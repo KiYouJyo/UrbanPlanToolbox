@@ -4,57 +4,31 @@ using Windows.Storage;
 
 namespace UrbanPlanToolbox.Services;
 
-/// <summary>
-/// Owns first-run lifecycle state separately from user preferences and backup data.
-/// </summary>
+/// <summary>Owns package-scoped onboarding lifecycle state; user business data is never completion evidence.</summary>
 public sealed class FirstRunExperienceService : IFirstRunExperienceService
 {
     public const int CurrentVersion = 1;
+    private const int CurrentSchemaVersion = 2;
     public static FirstRunExperienceService Default { get; } = new();
     private readonly string _statePath;
-    private readonly Func<bool> _legacyInstallationExists;
     private readonly object _gate = new();
     private FirstRunGuideState? _state;
 
-    public FirstRunExperienceService(string? statePath = null, Func<bool>? legacyInstallationExists = null)
-    {
-        _statePath = statePath ?? ResolvePackagedStatePath();
-        _legacyInstallationExists = legacyInstallationExists ?? DetectLegacyInstallation;
-    }
+    public FirstRunExperienceService(string? statePath = null) => _statePath = statePath ?? ResolvePackagedStatePath();
 
     public int CurrentFirstRunGuideVersion => CurrentVersion;
-
-    /// <summary>
-    /// Captures the new-installation/legacy-user decision before any startup
-    /// service can create default files in the legacy data root.
-    /// </summary>
-    public void PrepareForLaunch()
-    {
-        lock (_gate) _ = LoadOrMigrate();
-    }
-
-    public FirstRunGuideInstallationState InstallationState
-    {
-        get
-        {
-            lock (_gate) return LoadOrMigrate().InstallationState;
-        }
-    }
-
-    public bool IsCompleted
-    {
-        get
-        {
-            lock (_gate) return LoadOrMigrate().CompletedFirstRunGuideVersion >= CurrentVersion;
-        }
-    }
+    public void PrepareForLaunch() { lock (_gate) _ = LoadOrMigrate(); }
+    public FirstRunGuideInstallationState InstallationState { get { lock (_gate) return LoadOrMigrate().InstallationState; } }
+    public bool IsCompleted { get { lock (_gate) return LoadOrMigrate().CompletedFirstRunGuideVersion >= CurrentVersion; } }
 
     public bool ShouldShowAutomatically()
     {
         lock (_gate)
         {
             var state = LoadOrMigrate();
-            return state.CompletedFirstRunGuideVersion < CurrentVersion;
+            var shouldShow = state.CompletedFirstRunGuideVersion < CurrentVersion;
+            Log("AutomaticDecision", state, $"ShouldShow={shouldShow}");
+            return shouldShow;
         }
     }
 
@@ -65,49 +39,64 @@ public sealed class FirstRunExperienceService : IFirstRunExperienceService
             var state = LoadOrMigrate();
             state.CompletedFirstRunGuideVersion = CurrentVersion;
             state.InstallationState = FirstRunGuideInstallationState.Completed;
-            return TrySave(state, out error);
+            var saved = TrySave(state, out error);
+            if (saved) Log("Completed", state);
+            return saved;
         }
     }
 
     private FirstRunGuideState LoadOrMigrate()
     {
         if (_state is not null) return _state;
-
-        var state = ReadState();
-        if (!state.LegacyInstallationMigrationEvaluated)
+        var result = ReadState();
+        var state = result.State;
+        if (result.IsFutureSchema) return SetState(FailSafePending(), "StateLoaded", "FutureSchema=true;Preserved=true");
+        if (result.IsMissing || result.IsInvalid)
         {
-            state.LegacyInstallationMigrationEvaluated = true;
-            state.InstallationState = _legacyInstallationExists()
-                ? FirstRunGuideInstallationState.ExistingUserMigrated
-                : FirstRunGuideInstallationState.NewInstallation;
-            if (state.InstallationState == FirstRunGuideInstallationState.ExistingUserMigrated)
-                state.CompletedFirstRunGuideVersion = CurrentVersion;
-            // A failed write is deliberately non-fatal. The next launch retries this one-time decision.
-            TrySave(state, out _);
+            state = NewPendingState();
+            if (!TrySave(state, out _)) Log("StateSaveFailed", state);
+            return SetState(state, result.IsMissing ? "StateMissing" : "StateLoaded", result.IsInvalid ? "Invalid=true" : null);
         }
+        if (state.StateSchemaVersion == 1)
+        {
+            var synthetic = state.InstallationState == FirstRunGuideInstallationState.ExistingUserMigrated;
+            state.StateSchemaVersion = CurrentSchemaVersion;
+            state.CompletedFirstRunGuideVersion = synthetic ? 0 : Math.Min(state.CompletedFirstRunGuideVersion, CurrentVersion);
+            state.InstallationState = state.CompletedFirstRunGuideVersion >= CurrentVersion
+                ? FirstRunGuideInstallationState.Completed : FirstRunGuideInstallationState.Pending;
+            if (synthetic) Log("LegacySyntheticCompletionInvalidated", state);
+            if (!TrySave(state, out _)) Log("StateSaveFailed", state);
+            return SetState(state, "StateMigratedV1ToV2", $"SyntheticInvalidated={synthetic}");
+        }
+        state.CompletedFirstRunGuideVersion = Math.Min(state.CompletedFirstRunGuideVersion, CurrentVersion);
+        state.InstallationState = state.CompletedFirstRunGuideVersion >= CurrentVersion ? FirstRunGuideInstallationState.Completed : FirstRunGuideInstallationState.Pending;
+        return SetState(state, "StateLoaded");
+    }
 
-        if (state.CompletedFirstRunGuideVersion >= CurrentVersion)
-            state.InstallationState = FirstRunGuideInstallationState.Completed;
-        else if (state.InstallationState == FirstRunGuideInstallationState.Unknown)
-            state.InstallationState = FirstRunGuideInstallationState.Pending;
-
+    private FirstRunGuideState SetState(FirstRunGuideState state, string eventName, string? extra = null)
+    {
         _state = state;
+        Log(eventName, state, extra);
         return state;
     }
 
-    private FirstRunGuideState ReadState()
+    private static FirstRunGuideState NewPendingState() => new() { StateSchemaVersion = CurrentSchemaVersion, InstallationState = FirstRunGuideInstallationState.NewInstallation, CompletedFirstRunGuideVersion = 0 };
+    private static FirstRunGuideState FailSafePending() => new() { StateSchemaVersion = CurrentSchemaVersion, InstallationState = FirstRunGuideInstallationState.Pending, CompletedFirstRunGuideVersion = 0 };
+
+    private (FirstRunGuideState State, bool IsMissing, bool IsInvalid, bool IsFutureSchema) ReadState()
     {
         try
         {
-            if (!File.Exists(_statePath)) return new FirstRunGuideState();
-            var state = JsonSerializer.Deserialize<FirstRunGuideState>(File.ReadAllText(_statePath)) ?? new FirstRunGuideState();
-            if (state.StateSchemaVersion != 1 || state.CompletedFirstRunGuideVersion < 0 || !Enum.IsDefined(state.InstallationState)) return new FirstRunGuideState();
-            state.CompletedFirstRunGuideVersion = Math.Min(state.CompletedFirstRunGuideVersion, CurrentVersion);
-            return state;
+            if (!File.Exists(_statePath)) return (NewPendingState(), true, false, false);
+            var state = JsonSerializer.Deserialize<FirstRunGuideState>(File.ReadAllText(_statePath));
+            if (state is null || state.CompletedFirstRunGuideVersion < 0 || !Enum.IsDefined(state.InstallationState)) return (FailSafePending(), false, true, false);
+            if (state.StateSchemaVersion > CurrentSchemaVersion) return (FailSafePending(), false, false, true);
+            if (state.StateSchemaVersion is not 1 and not 2) return (FailSafePending(), false, true, false);
+            return (state, false, false, false);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
         {
-            return new FirstRunGuideState();
+            return (FailSafePending(), false, true, false);
         }
     }
 
@@ -120,45 +109,25 @@ public sealed class FirstRunExperienceService : IFirstRunExperienceService
             if (string.IsNullOrWhiteSpace(directory)) throw new IOException("The first-run state directory is unavailable.");
             Directory.CreateDirectory(directory);
             var temporary = $"{_statePath}.{Guid.NewGuid():N}.tmp";
-            try
-            {
-                File.WriteAllText(temporary, JsonSerializer.Serialize(state));
-                File.Move(temporary, _statePath, overwrite: true);
-            }
-            finally
-            {
-                if (File.Exists(temporary)) File.Delete(temporary);
-            }
-
+            try { File.WriteAllText(temporary, JsonSerializer.Serialize(state)); File.Move(temporary, _statePath, true); }
+            finally { if (File.Exists(temporary)) File.Delete(temporary); }
             _state = state;
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             error = ex.Message;
+            Log("StateSaveFailed", state);
             return false;
         }
     }
 
-    private bool DetectLegacyInstallation()
-    {
-        var paths = AppDataPathProvider.Default.Paths;
-        return File.Exists(paths.SettingsFilePath) || ContainsFiles(paths.DataDirectory) || ContainsFiles(paths.AttachmentsDirectory);
-    }
-
-    private static bool ContainsFiles(string directory) => Directory.Exists(directory) && Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Any();
+    private static void Log(string eventName, FirstRunGuideState state, string? extra = null) =>
+        AppLogger.Default.Info("FirstRun", eventName, $"Schema={state.StateSchemaVersion};CompletedVersion={state.CompletedFirstRunGuideVersion};CurrentVersion={CurrentVersion};State={state.InstallationState}{(string.IsNullOrWhiteSpace(extra) ? string.Empty : ";" + extra)}");
 
     private static string ResolvePackagedStatePath()
     {
-        try
-        {
-            // Package-scoped LocalState is cleared by a normal uninstall.
-            return Path.Combine(ApplicationData.Current.LocalFolder.Path, "first-run-guide.json");
-        }
-        catch (Exception ex) when (ex is InvalidOperationException or UnauthorizedAccessException)
-        {
-            // Unpackaged development and tests use the existing application-data root.
-            return Path.Combine(AppDataPathProvider.Default.Paths.RootDirectory, "first-run-guide.json");
-        }
+        try { return Path.Combine(ApplicationData.Current.LocalFolder.Path, "first-run-guide.json"); }
+        catch (Exception ex) when (ex is InvalidOperationException or UnauthorizedAccessException) { return Path.Combine(AppDataPathProvider.Default.Paths.RootDirectory, "first-run-guide.json"); }
     }
 }

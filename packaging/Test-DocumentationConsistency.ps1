@@ -32,7 +32,7 @@ $documentationPath = Get-RequiredFile 'docs/DOCUMENTATION.md'
 if ($failures.Count -eq 0) {
     try {
         $status = Get-Content -LiteralPath $statusPath -Raw -Encoding utf8 | ConvertFrom-Json
-        Test-Requirement ($status.schemaVersion -eq 1) 'project-status.json uses supported schemaVersion 1'
+        Test-Requirement ($status.schemaVersion -eq 2) 'project-status.json uses supported schemaVersion 2'
     }
     catch {
         $failures.Add("project-status.json is not valid JSON: $($_.Exception.Message)")
@@ -46,13 +46,17 @@ if ($status) {
     Test-Requirement ($status.product.version -eq $projectVersion) 'SSOT product version matches UrbanPlanToolbox.csproj'
 
     $github = $status.distribution.github
-    Test-Requirement ($github.productVersion -eq $status.product.version) 'SSOT GitHub product version matches product version'
-    Test-Requirement ($github.packageVersion -eq "$($status.product.version).0") 'SSOT GitHub package version matches product version'
+    Test-Requirement ($github.candidateProductVersion -eq $status.product.version) 'SSOT GitHub candidate version matches product version'
+    Test-Requirement ($github.candidatePackageVersion -eq "$($status.product.version).0") 'SSOT GitHub candidate package version matches product version'
+    Test-Requirement ($github.candidateState -eq 'prepared') 'SSOT GitHub candidate is prepared, not published'
+    Test-Requirement ($github.latestPublishedProductVersion -ne $null) 'SSOT records the latest confirmed GitHub publication separately'
+    Test-Requirement ($status.distribution.microsoftStore.candidateProductVersion -eq $status.product.version) 'SSOT Store candidate version matches product version'
+    Test-Requirement ($status.distribution.microsoftStore.candidateState -eq 'prepared-for-validation') 'SSOT Store candidate remains pending validation'
 
     foreach ($manifestName in @('Package.appxmanifest', 'Package.Store.appxmanifest')) {
         [xml]$manifest = Get-Content -LiteralPath (Join-Path $repositoryRoot $manifestName) -Raw
         $identity = $manifest.SelectSingleNode('/*[local-name()="Package"]/*[local-name()="Identity"]')
-        Test-Requirement ($identity.Version -eq $github.packageVersion) "$manifestName matches SSOT package version"
+        Test-Requirement ($identity.Version -eq $github.candidatePackageVersion) "$manifestName matches SSOT candidate package version"
     }
 
     if ($status.distribution.microsoftStore.state -eq 'certification-submitted') {
@@ -71,6 +75,27 @@ $readmes = @('README.md', 'README.en.md', 'README.ja.md')
 foreach ($relativePath in $readmes) {
     $content = Get-Content -LiteralPath (Join-Path $repositoryRoot $relativePath) -Raw -Encoding utf8
     Test-Requirement (-not ($content -match 'GitHub builds download and install later versions through Windows App Installer')) "$relativePath does not use the retired App Installer updater description"
+}
+
+$canonicalDocuments = @(
+    'docs/DOCUMENTATION.md', 'docs/ROADMAP.md', 'docs/RELEASE.md', 'docs/RELIABILITY.md',
+    'docs/STORE-PUBLISHING.md', 'docs/StoreUpdateTesting.md', 'docs/PROJECT_WORKSPACE.md',
+    'docs/DATA_STORAGE.md', 'docs/DATA_BACKUP.md', 'docs/LOCALIZATION.md',
+    'docs/INTERACTION_COMPONENTS.md', 'docs/TOOL_DEVELOPMENT_TEMPLATE.md', 'docs/FirstRunGuide.md',
+    'docs/MILESTONE_REMINDERS.md', 'docs/SHAPEFILE-COMPATIBILITY.md', 'docs/ASSET-CONVENTIONS.md'
+)
+foreach ($relativePath in $canonicalDocuments) {
+    $directory = Split-Path $relativePath -Parent
+    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($relativePath)
+    $siblings = @($relativePath, (Join-Path $directory "$baseName.ja.md"), (Join-Path $directory "$baseName.en.md"))
+    foreach ($sibling in $siblings) { Get-RequiredFile $sibling | Out-Null }
+    if ($siblings | Where-Object { -not (Test-Path -LiteralPath (Join-Path $repositoryRoot $_) -PathType Leaf) }) { continue }
+    $zh = Get-Content -LiteralPath (Join-Path $repositoryRoot $siblings[0]) -Raw -Encoding utf8
+    $ja = Get-Content -LiteralPath (Join-Path $repositoryRoot $siblings[1]) -Raw -Encoding utf8
+    $en = Get-Content -LiteralPath (Join-Path $repositoryRoot $siblings[2]) -Raw -Encoding utf8
+    Test-Requirement ($zh -match "\($baseName\.ja\.md\).+\($baseName\.en\.md\)") "$relativePath has Chinese language switcher"
+    Test-Requirement ($ja -match "\($baseName\.md\).+\($baseName\.en\.md\)") "$relativePath has Japanese language switcher"
+    Test-Requirement ($en -match "\($baseName\.md\).+\($baseName\.ja\.md\)") "$relativePath has English language switcher"
 }
 
 $roadmap = Get-Content -LiteralPath (Join-Path $repositoryRoot 'docs/ROADMAP.md') -Raw -Encoding utf8

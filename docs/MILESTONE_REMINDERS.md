@@ -1,4 +1,6 @@
-# Project milestone reminders
+简体中文 | [日本語](MILESTONE_REMINDERS.ja.md) | [English](MILESTONE_REMINDERS.en.md)
+
+# 项目里程碑提醒
 
 UrbanPlanToolbox schedules future milestones from active projects as local Windows notifications when the application-level reminder setting is enabled. It does not use a cloud service, WNS, Azure, external attachments, or external paths.
 

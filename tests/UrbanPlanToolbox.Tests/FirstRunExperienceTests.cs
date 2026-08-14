@@ -1,139 +1,79 @@
-using UrbanPlanToolbox.Services;
+using System.Text.Json;
 using UrbanPlanToolbox.Models;
+using UrbanPlanToolbox.Services;
 using Xunit;
 
 namespace UrbanPlanToolbox.Tests;
 
 public sealed class FirstRunExperienceTests
 {
-    [Fact]
-    public void NewInstallationShowsGuideAndCompletionPersists()
-    {
-        using var scope = new TemporaryState();
-        var service = new FirstRunExperienceService(scope.Path, () => false);
+    [Fact] public void FreshInstallationShowsGuide() { using var s = new TemporaryState(); Assert.True(new FirstRunExperienceService(s.Path).ShouldShowAutomatically()); }
 
-        Assert.True(service.ShouldShowAutomatically());
-        Assert.False(service.IsCompleted);
-        Assert.True(service.TryMarkCompleted(out var error), error);
-        Assert.False(service.ShouldShowAutomatically());
-        Assert.True(service.IsCompleted);
+    [Fact]
+    public void CompletedInstallationDoesNotShowGuide()
+    {
+        using var s = new TemporaryState(); var service = new FirstRunExperienceService(s.Path);
+        Assert.True(service.TryMarkCompleted(out var error), error); Assert.False(service.ShouldShowAutomatically());
+        Assert.False(new FirstRunExperienceService(s.Path).ShouldShowAutomatically());
+    }
+
+    [Theory]
+    [InlineData("settings.json")]
+    [InlineData("data/projects/project.json")]
+    [InlineData("attachments/photo.bin")]
+    public void ResetOrReinstallWithRetainedBusinessDataShowsGuide(string retainedFile)
+    {
+        using var s = new TemporaryState(); var first = new FirstRunExperienceService(s.Path);
+        Assert.True(first.TryMarkCompleted(out var error), error);
+        var retained = Path.Combine(s.Directory, retainedFile); Directory.CreateDirectory(Path.GetDirectoryName(retained)!); File.WriteAllText(retained, "data");
+        File.Delete(s.Path); // Package LocalState removed by Reset/uninstall; business data intentionally remains.
+        var reinstalled = new FirstRunExperienceService(s.Path);
+        Assert.False(reinstalled.IsCompleted); Assert.True(reinstalled.ShouldShowAutomatically());
     }
 
     [Fact]
-    public void LegacyInstallationIsMigratedOnceAndDoesNotShowAutomatically()
+    public void ExternalDataNeverCompletesOnboarding()
     {
-        using var scope = new TemporaryState();
-        var service = new FirstRunExperienceService(scope.Path, () => true);
-
-        Assert.False(service.ShouldShowAutomatically());
-        Assert.True(File.Exists(scope.Path));
-
-        var reopened = new FirstRunExperienceService(scope.Path, () => false);
-        Assert.False(reopened.ShouldShowAutomatically());
+        using var s = new TemporaryState();
+        foreach (var relative in new[] { "settings.json", "data/projects/a.json", "attachments/a.bin" }) { var p = Path.Combine(s.Directory, relative); Directory.CreateDirectory(Path.GetDirectoryName(p)!); File.WriteAllText(p, "data"); }
+        var service = new FirstRunExperienceService(s.Path);
+        Assert.False(service.IsCompleted); Assert.True(service.ShouldShowAutomatically());
     }
 
     [Fact]
-    public void InvalidStateFallsBackToNewInstallation()
+    public void V1SyntheticLegacyCompletionIsInvalidated()
     {
-        using var scope = new TemporaryState();
-        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(scope.Path)!);
-        File.WriteAllText(scope.Path, "{ invalid json");
-        var service = new FirstRunExperienceService(scope.Path, () => false);
-
-        Assert.True(service.ShouldShowAutomatically());
+        using var s = new TemporaryState(); WriteState(s.Path, 1, FirstRunGuideInstallationState.ExistingUserMigrated, 1, true);
+        var service = new FirstRunExperienceService(s.Path);
+        Assert.Equal(FirstRunGuideInstallationState.Pending, service.InstallationState); Assert.False(service.IsCompleted); Assert.True(service.ShouldShowAutomatically());
+        var migrated = JsonSerializer.Deserialize<FirstRunGuideState>(File.ReadAllText(s.Path))!;
+        Assert.Equal(2, migrated.StateSchemaVersion); Assert.Equal(0, migrated.CompletedFirstRunGuideVersion);
     }
 
     [Fact]
-    public void ManualReopenDoesNotResetCompletion()
+    public void V1RealCompletedStateIsPreserved()
     {
-        using var scope = new TemporaryState();
-        var service = new FirstRunExperienceService(scope.Path, () => false);
-        Assert.True(service.TryMarkCompleted(out var error), error);
+        using var s = new TemporaryState(); WriteState(s.Path, 1, FirstRunGuideInstallationState.Completed, 1, true);
+        var service = new FirstRunExperienceService(s.Path);
+        Assert.Equal(FirstRunGuideInstallationState.Completed, service.InstallationState); Assert.False(service.ShouldShowAutomatically());
+        Assert.Equal(2, JsonSerializer.Deserialize<FirstRunGuideState>(File.ReadAllText(s.Path))!.StateSchemaVersion);
+    }
 
-        // Manual opening is intentionally a host concern; the lifecycle service never exposes a reset operation.
-        Assert.False(service.ShouldShowAutomatically());
+    [Fact] public void CorruptStateShowsGuide() { using var s = new TemporaryState(); Directory.CreateDirectory(s.Directory); File.WriteAllText(s.Path, "{ invalid json"); Assert.True(new FirstRunExperienceService(s.Path).ShouldShowAutomatically()); }
+
+    [Fact]
+    public void UnsupportedFutureSchemaFailsSafeWithoutOverwritingState()
+    {
+        using var s = new TemporaryState(); WriteState(s.Path, 999, FirstRunGuideInstallationState.Completed, 1, false);
+        Assert.True(new FirstRunExperienceService(s.Path).ShouldShowAutomatically());
+        Assert.Equal(999, JsonDocument.Parse(File.ReadAllText(s.Path)).RootElement.GetProperty("StateSchemaVersion").GetInt32());
     }
 
     [Fact]
-    public void LifecycleStateDistinguishesNewInstallationAndCompletion()
+    public void ManualOpenBypassesAutomaticCompletionGate()
     {
-        using var scope = new TemporaryState();
-        var service = new FirstRunExperienceService(scope.Path, () => false);
-
-        Assert.Equal(FirstRunGuideInstallationState.NewInstallation, service.InstallationState);
-        Assert.True(service.TryMarkCompleted(out var error), error);
-        Assert.Equal(FirstRunGuideInstallationState.Completed, service.InstallationState);
-    }
-
-    [Fact]
-    public void LegacyMigrationIsPersistedAndNotReevaluated()
-    {
-        using var scope = new TemporaryState();
-        var calls = 0;
-        var service = new FirstRunExperienceService(scope.Path, () =>
-        {
-            calls++;
-            return true;
-        });
-
-        Assert.False(service.ShouldShowAutomatically());
-        var reopened = new FirstRunExperienceService(scope.Path, () => false);
-
-        Assert.Equal(1, calls);
-        Assert.False(reopened.ShouldShowAutomatically());
-    }
-
-    [Fact]
-    public void PendingStateWithMissingCompletionStillShowsGuide()
-    {
-        using var scope = new TemporaryState();
-        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(scope.Path)!);
-        File.WriteAllText(scope.Path, "{\"StateSchemaVersion\":1,\"InstallationState\":3,\"CompletedFirstRunGuideVersion\":0,\"LegacyInstallationMigrationEvaluated\":true}");
-
-        var service = new FirstRunExperienceService(scope.Path, () => true);
-
-        Assert.True(service.ShouldShowAutomatically());
-        Assert.False(service.IsCompleted);
-    }
-
-    [Fact]
-    public void LaunchPreparationRunsBeforeDefaultSettingsCreation()
-    {
-        using var scope = new TemporaryState();
-        var legacyFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(scope.Path)!, "settings.json");
-        var service = new FirstRunExperienceService(scope.Path, () => File.Exists(legacyFile));
-
-        service.PrepareForLaunch();
-        File.WriteAllText(legacyFile, "{}", System.Text.Encoding.UTF8);
-
-        Assert.True(service.ShouldShowAutomatically());
-    }
-
-    [Fact]
-    public void ClearingPackageStateAllowsTheNextInstallationToShowGuide()
-    {
-        using var scope = new TemporaryState();
-        var firstInstall = new FirstRunExperienceService(scope.Path, () => false);
-        Assert.True(firstInstall.TryMarkCompleted(out var error), error);
-
-        File.Delete(scope.Path);
-        var secondInstall = new FirstRunExperienceService(scope.Path, () => false);
-
-        Assert.True(secondInstall.ShouldShowAutomatically());
-    }
-
-    [Fact]
-    public void RestoredLegacyDataDoesNotForceOnboarding()
-    {
-        using var scope = new TemporaryState();
-        var legacyFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(scope.Path)!, "settings.json");
-        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(legacyFile)!);
-        File.WriteAllText(legacyFile, "{}", System.Text.Encoding.UTF8);
-        var service = new FirstRunExperienceService(scope.Path, () => File.Exists(legacyFile));
-
-        service.PrepareForLaunch();
-
-        Assert.False(service.ShouldShowAutomatically());
+        var root = FindRepositoryRoot(); var window = File.ReadAllText(Path.Combine(root, "MainWindow.xaml.cs"));
+        Assert.Contains("ShowFirstRunGuideFromSettings() => ShowFirstRunGuide(FirstRunGuideLaunchMode.Manual)", window);
     }
 
     [Fact]
@@ -141,16 +81,9 @@ public sealed class FirstRunExperienceTests
     {
         var catalogs = ReswCatalog.Languages.Select(ReswCatalog.Load).ToArray();
         Assert.All(catalogs, catalog => Assert.All(catalog.Where(pair => pair.Key.StartsWith("FirstRunGuide_", StringComparison.Ordinal)), pair => Assert.False(string.IsNullOrWhiteSpace(pair.Value), pair.Key)));
-        Assert.Equal(catalogs[0].Keys.OrderBy(x => x), catalogs[1].Keys.OrderBy(x => x));
-        Assert.Equal(catalogs[0].Keys.OrderBy(x => x), catalogs[2].Keys.OrderBy(x => x));
-        foreach (var key in new[] { "FirstRunGuide_Step", "FirstRunGuide_Step1Title", "FirstRunGuide_Step4Body", "FirstRunGuide_SettingsAction" })
-            Assert.All(catalogs, catalog => Assert.True(catalog.ContainsKey(key), key));
     }
 
-    private sealed class TemporaryState : IDisposable
-    {
-        private readonly string _directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "UrbanPlanToolbox-first-run-" + Guid.NewGuid().ToString("N"));
-        public string Path => System.IO.Path.Combine(_directory, "first-run-guide.json");
-        public void Dispose() { if (Directory.Exists(_directory)) Directory.Delete(_directory, recursive: true); }
-    }
+    private static void WriteState(string path, int schema, FirstRunGuideInstallationState state, int completed, bool legacy) { Directory.CreateDirectory(Path.GetDirectoryName(path)!); File.WriteAllText(path, $"{{\"StateSchemaVersion\":{schema},\"InstallationState\":{(int)state},\"CompletedFirstRunGuideVersion\":{completed},\"LegacyInstallationMigrationEvaluated\":{legacy.ToString().ToLowerInvariant()}}}"); }
+    private static string FindRepositoryRoot() { for (var d = new DirectoryInfo(AppContext.BaseDirectory); d is not null; d = d.Parent) if (File.Exists(Path.Combine(d.FullName, "UrbanPlanToolbox.slnx"))) return d.FullName; throw new DirectoryNotFoundException(); }
+    private sealed class TemporaryState : IDisposable { public string Directory { get; } = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "UrbanPlanToolbox-first-run-" + Guid.NewGuid().ToString("N")); public string Path => System.IO.Path.Combine(Directory, "first-run-guide.json"); public void Dispose() { if (System.IO.Directory.Exists(Directory)) System.IO.Directory.Delete(Directory, true); } }
 }

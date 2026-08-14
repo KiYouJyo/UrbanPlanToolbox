@@ -1,4 +1,6 @@
-# Shapefile compatibility (v1.1.0)
+简体中文 | [日本語](SHAPEFILE-COMPATIBILITY.ja.md) | [English](SHAPEFILE-COMPATIBILITY.en.md)
+
+# Shapefile 兼容性
 
 UrbanPlanToolbox 1.1.0 uses `NetTopologySuite` 2.6.0 and `NetTopologySuite.IO.Esri.Shapefile` 1.2.0 for fully local processing. No coordinate or file is uploaded.
 

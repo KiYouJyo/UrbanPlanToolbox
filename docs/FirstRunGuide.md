@@ -1,4 +1,14 @@
-# First-run guide architecture
+简体中文 | [日本語](FirstRunGuide.ja.md) | [English](FirstRunGuide.en.md)
+
+# 首次启动向导架构
+
+`project-status.json` 是 UrbanPlanToolbox 当前产品状态的 SSOT。首次使用向导生命周期状态位于 package-scoped LocalState 的 `first-run-guide.json`，而不是外置业务数据目录。卸载重装或 Windows Reset 清除该 package state 后，向导会在下次启动时再次显示；保留的项目、设置、附件、备份、缓存和日志不会被视为已经完成向导的证据，也不会被删除。
+
+状态 schema 2 只以有效的 `FirstRunGuideState` 判断自动显示。真实完成的 schema 1 `Completed` 记录迁移并保留；旧 `ExistingUserMigrated` synthetic completion 会迁移为 `Pending`，因此显示一次向导。损坏或不受支持的状态 fail safe 为显示向导，且未来 schema 不会被覆盖。Escape 关闭不完成；Skip 与最后一步 Start 保存完成；设置页手动打开始终可用且不重置完成状态。
+
+### 视觉 Surface 合同
+
+首次使用向导不维护独立的 Light/Dark 背景颜色。外层背景复用主应用导航边栏的主题 Surface；中央 GuideCard 复用应用普通卡片的主题 Surface。因此 Light、Dark、System 与 High Contrast 均由应用现有主题资源统一控制。First Run 不得复制或硬编码另一套导航背景或卡片颜色。
 
 The first-run guide is a reusable in-window host, not a second window or a native splash-screen replacement. `MainWindow` creates one `FirstRunGuideHost` over the existing shell. Closing the host leaves the existing page, navigation selection, title bar, backdrop, and activation flow intact.
 

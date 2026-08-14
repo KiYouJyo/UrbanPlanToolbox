@@ -32,6 +32,12 @@ public sealed class AppDialogService : IAppDialogService
             if (dialog.XamlRoot.Content is FrameworkElement root)
             {
                 dialog.RequestedTheme = root.ActualTheme;
+                var themeKey = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast
+                    ? "HighContrast"
+                    : root.ActualTheme == ElementTheme.Dark ? "Dark" : "Light";
+                var themeResources = Application.Current.Resources.ThemeDictionaries[themeKey] as ResourceDictionary;
+                dialog.Background = themeResources?["AppTransientSurfaceBrush"] as Microsoft.UI.Xaml.Media.Brush;
+                dialog.BorderBrush = themeResources?["AppTransientSurfaceBorderBrush"] as Microsoft.UI.Xaml.Media.Brush;
             }
             return await dialog.ShowAsync();
         }

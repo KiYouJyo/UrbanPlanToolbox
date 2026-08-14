@@ -23,7 +23,7 @@ foreach ($readme in $readmes) {
 
 Assert-Contains (Join-Path $RepositoryRoot 'CHANGELOG.md') '## 1.3.0'
 Assert-Contains (Join-Path $RepositoryRoot 'docs/index.html') '<h2>1.3.0</h2>'
-Assert-Contains (Join-Path $RepositoryRoot 'docs/project-status.json') '"schemaVersion": 1'
+Assert-Contains (Join-Path $RepositoryRoot 'docs/project-status.json') '"schemaVersion": 2'
 Assert-Contains (Join-Path $RepositoryRoot 'docs/ROADMAP.md') 'does not assign unapproved work a release number or date'
 
 $staleCurrentText = @('The preview version is **v1.3.0**')

@@ -1,6 +1,7 @@
 <Page x:Class="UrbanPlanToolbox.Views.PlanningTerminologyPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="using:UrbanPlanToolbox.Controls">
   <Grid x:Name="Root" Padding="{StaticResource PageContentPadding}" MaxWidth="1500" HorizontalAlignment="Stretch">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
@@ -21,8 +22,8 @@
       <Grid x:Name="FilterGrid" Grid.Row="2" ColumnSpacing="8" HorizontalAlignment="Stretch" Margin="0,6,0,0">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="0"/></Grid.RowDefinitions>
         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-        <ComboBox x:Name="JurisdictionBox" Grid.Row="0" Grid.Column="0" SelectionChanged="OnFilterChanged" DisplayMemberPath="Display" SelectedValuePath="Value"/>
-        <ComboBox x:Name="CategoryBox" Grid.Row="0" Grid.Column="1" SelectionChanged="OnFilterChanged" DisplayMemberPath="Display" SelectedValuePath="Value"/>
+        <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="JurisdictionBox" Grid.Row="0" Grid.Column="0" SelectionChanged="OnFilterChanged" DisplayMemberPath="Display" SelectedValuePath="Value"/>
+        <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="CategoryBox" Grid.Row="0" Grid.Column="1" SelectionChanged="OnFilterChanged" DisplayMemberPath="Display" SelectedValuePath="Value"/>
       </Grid>
       <InfoBar Grid.Row="3" x:Name="ErrorBar" IsOpen="False" Severity="Error" IsClosable="False" Margin="0,6,0,0"/>
       <Grid Grid.Row="4" x:Name="ContentGrid" ColumnSpacing="16" Margin="0,6,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MinHeight="0">
@@ -56,7 +57,7 @@
             <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock x:Name="JurisdictionText"/><TextBlock x:Name="EquivalenceText" TextWrapping="Wrap"/></StackPanel>
             <Button x:Name="CopyButton" Click="OnCopyClick" HorizontalAlignment="Left"/>
             <TextBlock x:Name="DefinitionHeader" Style="{StaticResource SubtitleTextBlockStyle}"/>
-            <ComboBox x:Name="DefinitionLanguageBox" SelectionChanged="OnDefinitionLanguageChanged" DisplayMemberPath="Display" SelectedValuePath="Value"/>
+            <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="DefinitionLanguageBox" SelectionChanged="OnDefinitionLanguageChanged" DisplayMemberPath="Display" SelectedValuePath="Value"/>
             <TextBlock x:Name="DefinitionText" TextWrapping="WrapWholeWords" FontSize="15"/>
             <InfoBar x:Name="ReviewBar" IsOpen="False" Severity="Warning" IsClosable="False"/>
             <TextBlock x:Name="RelatedHeader" Style="{StaticResource SubtitleTextBlockStyle}"/>

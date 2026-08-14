@@ -1,4 +1,6 @@
-# UrbanPlanToolbox Release Contract
+简体中文 | [日本語](RELEASE.ja.md) | [English](RELEASE.en.md)
+
+# UrbanPlanToolbox 发布合同
 
 ## Authority
 

@@ -29,13 +29,13 @@ public sealed partial class MainPage : Page
     {
         _initialState = initialState;
         InitializeComponent();
+        HookNavigationPaneBackground();
         ApplyLocalizedNavigation();
         NavigateTo(typeof(Views.HomePage));
     }
 
     private void OnNavigationLoaded(object sender, RoutedEventArgs e)
     {
-        HookNavigationPaneBackground();
 
         if (Navigation.SettingsItem is NavigationViewItem settingsItem)
         {
@@ -92,41 +92,34 @@ public sealed partial class MainPage : Page
             Navigation.PaneOpening += (_, _) => QueueNavigationPaneBackgroundUpdate();
             ActualThemeChanged += (_, _) => QueueNavigationPaneBackgroundUpdate();
         }
-
         QueueNavigationPaneBackgroundUpdate();
     }
 
-    private void QueueNavigationPaneBackgroundUpdate()
-    {
-        DispatcherQueue.TryEnqueue(ApplyExpandedNavigationPaneBackground);
-    }
+    private void QueueNavigationPaneBackgroundUpdate() => DispatcherQueue.TryEnqueue(ApplySharedNavigationPaneBackground);
 
-    private void ApplyExpandedNavigationPaneBackground()
+    private void ApplySharedNavigationPaneBackground()
     {
         _navigationSplitView ??= FindDescendant<SplitView>(Navigation);
-        if (_navigationSplitView is not null)
-        {
-            _navigationSplitView.PaneBackground = new SolidColorBrush(
-                Navigation.ActualTheme == ElementTheme.Light
-                    ? Windows.UI.Color.FromArgb(0xFF, 0xE5, 0xF9, 0xF9)
-                    : Windows.UI.Color.FromArgb(0xFF, 0x1A, 0x23, 0x23));
-        }
+        var themeKey = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast
+            ? "HighContrast"
+            : Navigation.ActualTheme == ElementTheme.Dark ? "Dark" : "Light";
+        var themeResources = Application.Current.Resources.ThemeDictionaries[themeKey] as ResourceDictionary;
+        if (_navigationSplitView is not null && themeResources?["ShellNavigationPaneBackgroundBrush"] is Brush brush)
+            _navigationSplitView.PaneBackground = brush;
     }
 
-    private static T? FindDescendant<T>(DependencyObject parent)
-        where T : DependencyObject
+    private static T? FindDescendant<T>(DependencyObject parent) where T : DependencyObject
     {
         for (var index = 0; index < VisualTreeHelper.GetChildrenCount(parent); index++)
         {
             var child = VisualTreeHelper.GetChild(parent, index);
             if (child is T match) return match;
-
             var descendant = FindDescendant<T>(child);
             if (descendant is not null) return descendant;
         }
-
         return null;
     }
+
 
     private void ApplyLocalizedNavigation()
     {

@@ -9,7 +9,7 @@
         <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="16">
             <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*" MinWidth="0"/></Grid.ColumnDefinitions>
-              <Image Source="/Assets/Square44x44Logo.scale-200.png" Width="48" Height="48" VerticalAlignment="Top" automation:AutomationProperties.AccessibilityView="Raw" />
+              <Image x:Name="ProductLogo" Width="48" Height="48" VerticalAlignment="Top" automation:AutomationProperties.AccessibilityView="Raw" />
               <StackPanel Grid.Column="1" MinWidth="0" Spacing="2"><TextBlock Text="UrbanPlanToolbox" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Uid="About_ProductName" Style="{StaticResource BodyStrongTextBlockStyle}"/><TextBlock x:Uid="About_Tagline" TextWrapping="Wrap"/></StackPanel>
             </Grid>
             <TextBlock x:Uid="About_AppInformation" Style="{StaticResource SubtitleTextBlockStyle}" />
