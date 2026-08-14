@@ -126,7 +126,6 @@ public sealed partial class HomePage : Page
         }
         var error = new TextBlock { Foreground = (Brush)Application.Current.Resources["SystemFillColorCriticalBrush"], TextWrapping = TextWrapping.Wrap };
         panel.Children.Add(error);
-        const double dialogMaxWidth = 760;
         const double scrollBarGutter = 20;
         var formLayout = new Border
         {
@@ -142,9 +141,9 @@ public sealed partial class HomePage : Page
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             HorizontalContentAlignment = HorizontalAlignment.Stretch
         };
-        // ContentDialog's modal host owns its placement. Setting alignment here overrides
-        // that host and anchors this dialog to the page's layout slot instead of the window.
-        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = scrollViewer, MaxWidth = dialogMaxWidth, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
+        // Keep the dialog at its content width. MaxWidth creates a wider outer layout slot
+        // that is left-anchored by this WinUI host even when the visible form is narrow.
+        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = scrollViewer, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
         dialog.PrimaryButtonClick += async (_, args) =>
         {
             args.Cancel = true; var deferral = args.GetDeferral();

@@ -95,9 +95,9 @@ public sealed class VisualPolishPackagingTests
         var source = File.ReadAllText(Path.Combine(root, "Views", "HomePage.xaml.cs"));
 
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(source, "private async Task ShowCreateDialogAsync\\(string kind\\)").Cast<System.Text.RegularExpressions.Match>());
-        Assert.Contains("const double dialogMaxWidth = 760;", source);
+        Assert.DoesNotContain("const double dialogMaxWidth = 760;", source);
         Assert.DoesNotContain("Width = dialogWidth", source);
-        Assert.Contains("MaxWidth = dialogMaxWidth", source);
+        Assert.DoesNotContain("MaxWidth = dialogMaxWidth", source);
         Assert.DoesNotContain("HorizontalAlignment = HorizontalAlignment.Center", source);
         Assert.DoesNotContain("VerticalAlignment = VerticalAlignment.Center", source);
         Assert.Contains("const double scrollBarGutter = 20;", source);
