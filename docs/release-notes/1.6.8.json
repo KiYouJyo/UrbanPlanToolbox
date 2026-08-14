@@ -1,10 +1,9 @@
 {
   "schemaVersion": 1,
   "version": "1.6.8",
-  "status": "candidate-not-published",
-  "locales": {
-    "zh-CN": ["维护收口：GitHub 更新器冻结，Store 最终 E2E 待真实交付。", "三语文档合同、首次启动主题背景与测量基线。"],
-    "ja-JP": ["保守収束：GitHub updater は凍結、Store 最終 E2E は実配信待ちです。", "三言語文書契約、初回起動テーマ背景、測定基準。"],
-    "en-US": ["Maintenance closeout: GitHub updater frozen; final Store E2E awaits real delivery.", "Trilingual documentation contract, first-run theme background, and measurement baselines."]
+  "notes": {
+    "zh-CN": { "title": "UrbanPlanToolbox v1.6.8", "items": ["GitHub updater 已真实验收并冻结；仅已证实 bug、安全问题或 Windows 平台/API 兼容性可改变它。", "v1.6.8 是 Store updater 的最终真实 E2E 目标，当前为 PENDING，不宣称已通过。", "当前正式文档补齐 zh-CN、ja-JP、en-US sibling files，并由 project-status.json 统一当前状态。", "首次启动向导背景改为浅色淡青色、深色深青色；保持布局、焦点和生命周期。", "建立启动、包体和依赖基线，完成 Light/Dark/DPI 维护性回归。", "修复卸载重装或 Windows 重置后保留业务数据会错误跳过首次使用向导的问题。", "统一应用内弹窗、下拉选择器及其他浮层界面的主题 Surface，使其与应用 Light、Dark 和系统主题视觉保持一致。"] },
+    "ja-JP": { "title": "UrbanPlanToolbox v1.6.8", "items": ["GitHub updater は実運用で検証済みかつ凍結です。", "v1.6.8 は Store updater の最終実 E2E 対象で、現在 PENDING です。", "project-status.json を基準に現在の文書を中国語・日本語・英語で整備しました。", "初回起動ガイドの背景をライトでは淡い青緑、ダークでは濃い青緑へ変更しました。", "起動、パッケージ、依存関係の測定基準とテーマ・DPI 回帰を整備しました。", "再インストールまたは Windows リセット後に保持された業務データが初回起動ガイドを誤ってスキップする問題を修正しました。", "アプリ内ダイアログ、ドロップダウン選択 UI、その他のフローティング Surface のテーマ表示を統一し、Light、Dark、システムテーマとの視覚的一貫性を改善しました。"] },
+    "en-US": { "title": "UrbanPlanToolbox v1.6.8", "items": ["The GitHub updater is real-world validated and frozen; only confirmed bugs, security issues, or Windows platform/API compatibility can change it.", "v1.6.8 is the final real Store updater E2E target and remains PENDING; it is not claimed as passed.", "Current documentation now has zh-CN, ja-JP, and en-US sibling files governed by project-status.json.", "First-run guide backgrounds are light cyan in Light theme and deep cyan in Dark theme while preserving layout, focus, and lifecycle.", "Established startup, package, and dependency baselines and closed Light/Dark/DPI maintenance regressions.", "Fixed retained business data incorrectly suppressing the first-run guide after reinstall or Windows Reset.", "Unified theme surfaces for in-app dialogs, dropdown selectors, and other transient UI so they remain visually consistent with the app's Light, Dark, and System themes."] }
   }
 }

@@ -156,15 +156,24 @@ jobs:
       - name: Resolve release notes
         shell: pwsh
         run: |
-          $notes = "docs/RELEASE-NOTES-v${{ steps.version.outputs.version }}.md"
-          if (Test-Path $notes) { Copy-Item $notes (Join-Path $env:RUNNER_TEMP 'release-notes.md') -Force }
-          else {
-            git fetch origin main --no-tags
-            $notesText = git show "origin/main:$notes"
-            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($notesText)) { throw "Release notes not found: $notes" }
-            Set-Content (Join-Path $env:RUNNER_TEMP 'release-notes.md') -Value $notesText -Encoding utf8
+          $version = '${{ steps.version.outputs.version }}'
+          $siblings = @(
+            "docs/RELEASE-NOTES-v$version.md",
+            "docs/RELEASE-NOTES-v$version.ja.md",
+            "docs/RELEASE-NOTES-v$version.en.md"
+          )
+          foreach ($sibling in $siblings) {
+            if (-not (Test-Path -LiteralPath $sibling -PathType Leaf)) { throw "Release Notes sibling not found: $sibling" }
           }
-          if ((Get-Content (Join-Path $env:RUNNER_TEMP 'release-notes.md') -Raw) -match '`n|\\n') { throw 'Release notes contain literal newline escapes.' }
+          $publishedNotes = Join-Path $env:RUNNER_TEMP 'release-notes.published.md'
+          & ./packaging/New-GitHubReleaseBody.ps1 -Version $version -OutputPath $publishedNotes
+          $body = Get-Content -LiteralPath $publishedNotes -Raw
+          foreach ($language in @('', '.ja', '.en')) {
+            $requiredUrl = "https://github.com/${{ github.repository }}/blob/v$version/docs/RELEASE-NOTES-v$version$language.md"
+            if (-not $body.Contains($requiredUrl)) { throw "Published Release body is missing tag-pinned language URL: $requiredUrl" }
+          }
+          if ($body -match '(?im)\]\(RELEASE-NOTES-v\d+\.\d+\.\d+\.(?:ja|en)\.md\)') { throw 'Published Release body contains repository-relative language links.' }
+          if ($body -match '`n|\\n') { throw 'Release notes contain literal newline escapes.' }
 
       - name: Create or reconcile GitHub Release
         if: steps.version.outputs.dry_run != 'true'
@@ -176,7 +185,7 @@ jobs:
           $releaseJson = gh api "repos/${{ github.repository }}/releases/tags/$tag" 2>&1
           if ($LASTEXITCODE -eq 0 -and $releaseJson) { $release = $releaseJson | ConvertFrom-Json }
           elseif (($releaseJson -join ' ') -match '(?i)404|not found') {
-            & gh release create $tag --verify-tag --title "UrbanPlanToolbox $tag" --notes-file (Join-Path $env:RUNNER_TEMP 'release-notes.md')
+            & gh release create $tag --verify-tag --title "UrbanPlanToolbox $tag" --notes-file (Join-Path $env:RUNNER_TEMP 'release-notes.published.md')
             if ($LASTEXITCODE -ne 0) { throw "GitHub Release creation failed: $LASTEXITCODE" }
             $releaseJson = gh api "repos/${{ github.repository }}/releases/tags/$tag" 2>&1
             if ($LASTEXITCODE -ne 0 -or -not $releaseJson) { throw "Created Release could not be read back: $($releaseJson -join ' ')" }
@@ -217,7 +226,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $version = '${{ steps.version.outputs.version }}'; $tag = "v$version"; $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'; $notesPath = Join-Path $env:RUNNER_TEMP 'release-notes.md'
+          $version = '${{ steps.version.outputs.version }}'; $tag = "v$version"; $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-ReleaseAssets'; $notesPath = Join-Path $env:RUNNER_TEMP 'release-notes.published.md'
           $releaseJson = gh api "repos/${{ github.repository }}/releases/tags/$tag" 2>&1
           if ($LASTEXITCODE -ne 0) { throw "Published Release read failed: $($releaseJson -join ' ')" }
           $release = $releaseJson | ConvertFrom-Json

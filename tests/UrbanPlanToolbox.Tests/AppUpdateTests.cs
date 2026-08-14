@@ -266,6 +266,49 @@ public sealed class AppUpdateTests
         Assert.Null(await service.GetAsync("1.5.9", "en-US"));
     }
 
+    [Theory]
+    [InlineData("zh-CN", "首次使用向导")]
+    [InlineData("ja-JP", "初回起動ガイド")]
+    [InlineData("en-US", "first-run guide")]
+    public async Task RemoteReleaseNotes168CanBeConsumedByProductionModelForEveryLocale(string locale, string expectedItem)
+    {
+        var root = FindRepositoryRoot();
+        var payload = File.ReadAllText(Path.Combine(root, "docs", "release-notes", "1.6.8.json"));
+        var service = new LocalizedReleaseNotesService(
+            new HttpClient(new ReleaseNotesHandler { Payload = payload }),
+            (_, _) => Task.FromResult<string?>(null));
+
+        var notes = await service.GetAsync("1.6.8", locale);
+
+        Assert.NotNull(notes);
+        Assert.Equal("1.6.8", notes!.Version);
+        Assert.False(string.IsNullOrWhiteSpace(notes.Notes[locale].Title));
+        Assert.NotEmpty(notes.Notes[locale].Items);
+        Assert.Contains(notes.Notes[locale].Items, item => item.Contains(expectedItem, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void BundledAndRemoteReleaseNotes168UseTheSameRuntimeContract()
+    {
+        var root = FindRepositoryRoot();
+        var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var bundled = System.Text.Json.JsonSerializer.Deserialize<LocalizedReleaseNotes>(File.ReadAllText(Path.Combine(root, "Assets", "Data", "ReleaseNotes", "1.6.8.json")), options);
+        var remote = System.Text.Json.JsonSerializer.Deserialize<LocalizedReleaseNotes>(File.ReadAllText(Path.Combine(root, "docs", "release-notes", "1.6.8.json")), options);
+
+        Assert.NotNull(bundled);
+        Assert.NotNull(remote);
+        Assert.Equal(bundled!.SchemaVersion, remote!.SchemaVersion);
+        Assert.Equal(bundled.Version, remote.Version);
+        Assert.Equal(bundled.Notes.Keys.Order(StringComparer.Ordinal), remote.Notes.Keys.Order(StringComparer.Ordinal));
+        foreach (var locale in new[] { "zh-CN", "ja-JP", "en-US" })
+        {
+            Assert.Equal(bundled.Notes[locale].Title, remote.Notes[locale].Title);
+            Assert.Equal(bundled.Notes[locale].Items, remote.Notes[locale].Items);
+            Assert.Contains(bundled.Notes[locale].Items, item => item.Contains(locale == "zh-CN" ? "首次" : locale == "ja-JP" ? "初回" : "first-run", StringComparison.OrdinalIgnoreCase));
+            Assert.Contains(bundled.Notes[locale].Items, item => item.Contains(locale == "zh-CN" ? "浮层" : locale == "ja-JP" ? "フローティング" : "transient UI", StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
     [Fact]
     public async Task GitHubUpToDateRetainsValidatedRemoteVersion()
     {

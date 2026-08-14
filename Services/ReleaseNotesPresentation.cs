@@ -16,8 +16,7 @@ public static class ReleaseNotesPresentation
             note.Items.All(item => !string.IsNullOrWhiteSpace(item)))
             return new(string.Join(Environment.NewLine, note.Items.Select(item => $"- {item}")), ReleaseNotesDisplaySource.LocalizedPackage);
 
-        // GitHub's release body is English for the published 1.6.2 release. It is
-        // admissible only for an English UI; other UIs must never silently cross-fallback.
+        // A GitHub release body is only admissible for an English UI; other UIs must never silently cross-fallback.
         if (normalizedLocale == "en-US" && !string.IsNullOrWhiteSpace(info.ReleaseNotes))
             return new(info.ReleaseNotes, ReleaseNotesDisplaySource.GitHubReleaseBody);
 

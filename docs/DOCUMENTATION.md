@@ -26,7 +26,8 @@ UrbanPlanToolbox 的文档采用“当前事实单一来源 + 历史事实不可
 ## 3. 历史事实的来源
 
 - `CHANGELOG.md`：产品历史变化的主时间线。
-- `docs/RELEASE-NOTES-vX.Y.Z.md` 与 `Assets/Data/ReleaseNotes/*.json`：对应版本的用户可见更新说明。
+- `docs/RELEASE-NOTES-vX.Y.Z.md`、`.ja.md`、`.en.md`：对应版本的人类可读更新说明；三份 sibling files 是唯一的 Markdown 编辑源。
+- `Assets/Data/ReleaseNotes/X.Y.Z.json`：应用运行时结构化更新说明的唯一编辑源；`docs/release-notes/X.Y.Z.json` 是由 `packaging/Sync-ReleaseNotes.ps1` 同步的 GitHub Pages 镜像，必须使用相同的 `notes` / locale / title / items schema。
 - GitHub Releases：GitHub 渠道是否真正发布的外部事实来源。
 - Partner Center / Microsoft Store 客户端：Store 是否通过认证并真正公开的最终事实来源。
 
@@ -85,6 +86,8 @@ RELIABILITY 定义启动、异步操作、更新、日志、数据恢复和发�
 ## 9. 文档语言政策
 
 UrbanPlanToolbox 正式支持 `zh-CN`、`ja-JP` 和 `en-US` 三种文档语言。当前 canonical documents 使用同名 sibling files：默认简体中文 `FILE.md`、日语 `FILE.ja.md`、英文 `FILE.en.md`；每份文件开头必须链接到另外两种语言。`project-status.json` 等机器可读 SSOT 的键不翻译，面向人的说明文档必须三语一致。历史证据、第三方许可证和法律原文不要求追溯翻译。
+
+Release Notes 同时有两种 presentation：Markdown sibling files 用于仓库阅读；单一结构化 JSON 使用 `zh-CN`、`ja-JP`、`en-US` 的 `notes` contract，供应用和 GitHub Pages 使用。GitHub Release body 从默认中文 Markdown 生成，替换为 tag-pinned sibling URLs，因此它不是第四份独立的 Release Notes source。
 
 ### Product
 
