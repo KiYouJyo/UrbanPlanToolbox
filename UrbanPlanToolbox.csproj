@@ -18,10 +18,10 @@
     <Nullable>enable</Nullable>
     <!-- Never let generated test outputs participate in WinUI PRI resource discovery. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);tests\**\*</DefaultItemExcludes>
-    <Version>1.6.8</Version>
-    <AssemblyVersion>1.6.8.0</AssemblyVersion>
-    <FileVersion>1.6.8.0</FileVersion>
-    <InformationalVersion>1.6.8</InformationalVersion>
+    <Version>1.6.9</Version>
+    <AssemblyVersion>1.6.9.0</AssemblyVersion>
+    <FileVersion>1.6.9.0</FileVersion>
+    <InformationalVersion>1.6.9</InformationalVersion>
     <DefineConstants Condition="'$(DistributionChannel)' == 'Store'">$(DefineConstants);URBANPLANTOOLBOX_STORE</DefineConstants>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <!-- The preview is a single offline MSIX: language candidates stay in its main PRI. -->

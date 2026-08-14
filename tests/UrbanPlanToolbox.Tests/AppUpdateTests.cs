@@ -127,6 +127,37 @@ public sealed class AppUpdateTests
         Assert.Equal(expected, new AppUpdateInfo(state).IsUpdateAvailable);
 
     [Fact]
+    public async Task RestartRequiredUsesApplicationRestartAndKeepsRetryOnFailure()
+    {
+        var service = new FixedUpdateService(AppUpdateState.RestartRequired, "1.6.9");
+        var restart = new UpdateRestartStub(false);
+        var viewModel = new UpdateViewModel(service, restart);
+
+        await viewModel.CheckAsync();
+        await viewModel.RestartAndUpdateAsync();
+
+        Assert.Equal(AppUpdateState.RestartRequired, viewModel.Info.State);
+        Assert.Equal("StubFailure", viewModel.RestartFailureReason);
+        Assert.Equal(1, restart.CallCount);
+        Assert.True(viewModel.CanInstall);
+    }
+
+    [Fact]
+    public void StoreCompletionUsesRestartRequiredAndGitHubLogicRemainsSeparate()
+    {
+        var root = FindRepositoryRoot();
+        var store = File.ReadAllText(Path.Combine(root, "Services", "StoreAppUpdateService.cs"));
+        var github = File.ReadAllText(Path.Combine(root, "Services", "GitHubAppUpdateService.cs"));
+        var about = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
+
+        Assert.Contains("StoreDeploymentCompleted", store);
+        Assert.Contains("new(AppUpdateState.RestartRequired)", store);
+        Assert.DoesNotContain("if (state.Equals(\"Completed\", StringComparison.OrdinalIgnoreCase)) return new(AppUpdateState.Completed)", store);
+        Assert.Contains("AppUpdateState.ReadyToInstall", github);
+        Assert.Contains("info.NeedsFinalRestart ? T(\"Action_RestartAndUpdate\")", about);
+    }
+
+    [Fact]
     public void GitHubChannelSupportsInAppInstallAndDoesNotOpenReleasesByDefault()
     {
         var context = DistributionChannelContext.For(DistributionChannel.GitHub);
@@ -539,7 +570,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.6.8", viewModel.CurrentVersion);
+        Assert.Equal("v1.6.9", viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);

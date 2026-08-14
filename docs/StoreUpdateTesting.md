@@ -24,9 +24,9 @@ Prove: **existing Store installation → check for updates → available version
 
 Capture the displayed state, package identity/version, deployment result, restart behavior, and retained user data. GitHub sideload packages and Store packages have independent identities and publishers, cannot upgrade over one another, and must be tested independently.
 
-## v1.6.8 temporary acceptance
+## v1.6.9 final Store E2E target
 
-- Target: `1.6.8`
+- Source: actual Microsoft Store `1.6.8`
+- Target: `1.6.9`
 - Status: **PENDING**
-- Source: the actual Microsoft Store version at test time; do not assume a source version in advance.
-- Record: source and target identity/version, `StorePackageUpdateState`, mapped application state, progress source, completion/failure result, restart behavior, and retained user data.
+- Prove: check → localized 1.6.9 notes → download → installing → Store `Completed` → `RestartRequired` → Restart and update → v1.6.9 launch → retained user data.

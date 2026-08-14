@@ -60,7 +60,9 @@ if ($status) {
     Test-Requirement ($status.distribution.microsoftStore.candidateProductVersion -eq $status.product.version) 'SSOT Store candidate version matches product version'
     $store = $status.distribution.microsoftStore
     $storeLifecycleIsTruthful =
-        ($store.candidateState -eq 'prepared-for-validation' -and $store.state -ne 'certification-submitted') -or
+        ($store.candidateState -eq 'prepared-for-validation' -and
+            $store.submittedProductVersion -ne $store.candidateProductVersion -and
+            $store.submittedPackageVersion -ne $store.candidatePackageVersion) -or
         ($store.candidateState -eq 'certification-submitted' -and
             $store.state -eq 'certification-submitted' -and
             $store.submittedProductVersion -eq $store.candidateProductVersion -and

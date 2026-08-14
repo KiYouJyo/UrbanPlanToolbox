@@ -13,4 +13,6 @@ public sealed record AppUpdateInfo(
 {
     public bool IsUpdateAvailable => State == AppUpdateState.UpdateAvailable;
     public bool IsReadyToInstall => State == AppUpdateState.ReadyToInstall;
+    public bool IsRestartRequired => State == AppUpdateState.RestartRequired;
+    public bool NeedsFinalRestart => State is AppUpdateState.ReadyToInstall or AppUpdateState.RestartRequired;
 }

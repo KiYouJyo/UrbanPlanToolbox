@@ -61,7 +61,13 @@ public sealed partial class AboutPage : Page
     private async void OnOpenNotices(object sender, RoutedEventArgs e) => await OpenDocumentAsync("THIRD-PARTY-NOTICES.md");
     private async void OnCheckUpdate(object sender, RoutedEventArgs e)
     {
-        if (_updates.Info.IsUpdateAvailable || _updates.Info.IsReadyToInstall)
+        if (_updates.Info.NeedsFinalRestart)
+        {
+            await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
+            await _updates.RestartAndUpdateAsync(_updateLifetime.Token);
+            return;
+        }
+        if (_updates.Info.IsUpdateAvailable)
         {
             await _updates.SetLocalizedNotesAsync(_releaseNotes, _localization.CurrentLanguage, _pageLifetime.Token);
             await _updates.DownloadAndInstallAsync(_updateLifetime.Token);
@@ -101,7 +107,7 @@ public sealed partial class AboutPage : Page
         UpdateNotesText.Text = display.Text;
 
         CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
-        CheckUpdateButton.Content = info.IsReadyToInstall ? T("Action_RestartAndUpdate") : info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
+        CheckUpdateButton.Content = info.NeedsFinalRestart ? T("Action_RestartAndUpdate") : info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
         UpdateStatusText.Text = T($"Update_State_{info.State}");
         UpdateStatusProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;
         UpdateStatusProgressRing.IsActive = checking;

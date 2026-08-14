@@ -14,9 +14,9 @@ public sealed class LocalizationService : ILocalizationService
 {
     private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> UpdateFallbacks = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.OrdinalIgnoreCase)
     {
-        ["zh-CN"] = new Dictionary<string, string> { ["Action_RestartAndUpdate"] = "重启并更新", ["Update_State_ReadyToInstall"] = "更新已下载，重启应用以完成安装" },
-        ["en-US"] = new Dictionary<string, string> { ["Action_RestartAndUpdate"] = "Restart and update", ["Update_State_ReadyToInstall"] = "Update downloaded. Restart the app to finish installing." },
-        ["ja-JP"] = new Dictionary<string, string> { ["Action_RestartAndUpdate"] = "再起動して更新", ["Update_State_ReadyToInstall"] = "更新をダウンロードしました。インストールを完了するにはアプリを再起動してください。" }
+        ["zh-CN"] = new Dictionary<string, string> { ["Action_RestartAndUpdate"] = "重启并更新", ["Update_State_ReadyToInstall"] = "更新已下载，重启应用以完成安装", ["Update_State_RestartRequired"] = "更新已安装，重启后完成更新" },
+        ["en-US"] = new Dictionary<string, string> { ["Action_RestartAndUpdate"] = "Restart and update", ["Update_State_ReadyToInstall"] = "Update downloaded. Restart the app to finish installing.", ["Update_State_RestartRequired"] = "The update is installed. Restart to complete the update." },
+        ["ja-JP"] = new Dictionary<string, string> { ["Action_RestartAndUpdate"] = "再起動して更新", ["Update_State_ReadyToInstall"] = "更新をダウンロードしました。インストールを完了するにはアプリを再起動してください。", ["Update_State_RestartRequired"] = "更新はインストール済みです。再起動すると更新が完了します" }
     };
     private readonly object _gate = new();
     private readonly SettingsService _settingsService;
