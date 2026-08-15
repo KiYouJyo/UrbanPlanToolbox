@@ -1,0 +1,1 @@
+{"version":"1.8.1","locales":{"zh-CN":["修复后台驻留时可能阻止卸载的问题，更新 WinUI 3 风格托盘菜单并精简项目页面。"],"ja-JP":["バックグラウンド常駐時のアンインストール問題を修正し、WinUI 3 スタイルのトレイメニューとプロジェクト画面を改善しました。"],"en-US":["Fixes resident-process uninstall behavior, refreshes the WinUI 3 tray menu, and streamlines project workspaces."]}}
