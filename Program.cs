@@ -2,7 +2,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Dispatching;
 using Microsoft.Windows.AppLifecycle;
 using UrbanPlanToolbox.Services;
-using Windows.ApplicationModel;
+using Package = Windows.ApplicationModel.Package;
+using PackageCatalog = Windows.ApplicationModel.PackageCatalog;
+using PackageUninstallingEventArgs = Windows.ApplicationModel.PackageUninstallingEventArgs;
 using WinRT;
 
 namespace UrbanPlanToolbox;
