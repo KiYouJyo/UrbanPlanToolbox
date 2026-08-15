@@ -1,17 +1,6 @@
 <Window x:Class="UrbanPlanToolbox.Views.TrayMenuWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <Window.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.ThemeDictionaries>
-        <ResourceDictionary x:Key="Light">
-          <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#12000000"/>
-          <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#1F000000"/>
-        </ResourceDictionary>
-      </ResourceDictionary.ThemeDictionaries>
-    </ResourceDictionary>
-  </Window.Resources>
-
   <Window.SystemBackdrop>
     <DesktopAcrylicBackdrop />
   </Window.SystemBackdrop>
@@ -22,6 +11,17 @@
           BorderThickness="1"
           CornerRadius="8"
           Padding="4">
+    <Border.Resources>
+      <ResourceDictionary>
+        <ResourceDictionary.ThemeDictionaries>
+          <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#12000000"/>
+            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#1F000000"/>
+          </ResourceDictionary>
+        </ResourceDictionary.ThemeDictionaries>
+      </ResourceDictionary>
+    </Border.Resources>
+
     <StackPanel Spacing="0">
       <Button x:Name="OpenButton" Click="OnOpen" Height="32" HorizontalAlignment="Stretch"
               HorizontalContentAlignment="Stretch" Padding="8,0" Background="Transparent"
