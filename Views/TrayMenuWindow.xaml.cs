@@ -14,9 +14,14 @@ public sealed partial class TrayMenuWindow : Window
 {
     private const double MenuWidthDip = 220;
     private const double MenuHeightDip = 154;
+    private static readonly nint HwndTopmost = new(-1);
+    private const uint SwpNoSize = 0x0001;
+    private const uint SwpNoMove = 0x0002;
+    private const uint SwpShowWindow = 0x0040;
 
     private bool _allowClose;
     private bool _isVisible;
+    private bool _hasActivatedSinceShow;
 
     public event EventHandler? OpenRequested;
     public event EventHandler? RecorderRequested;
@@ -27,7 +32,9 @@ public sealed partial class TrayMenuWindow : Window
     {
         InitializeComponent();
         AppWindow.IsShownInSwitchers = false;
-        AppWindow.SetPresenter(OverlappedPresenter.CreateForContextMenu());
+        var presenter = OverlappedPresenter.CreateForContextMenu();
+        presenter.IsAlwaysOnTop = true;
+        AppWindow.SetPresenter(presenter);
         AppWindow.Closing += OnClosing;
         Activated += OnActivated;
         LocalizationService.Default.LanguageChanged += OnLanguageChanged;
@@ -43,9 +50,18 @@ public sealed partial class TrayMenuWindow : Window
         var size = GetPhysicalMenuSize();
         AppWindow.Resize(size);
         AppWindow.Move(CalculatePopupPosition(cursorPosition, size));
-        AppWindow.Show();
-        Activate();
+        _hasActivatedSinceShow = false;
         _isVisible = true;
+        AppWindow.Show();
+
+        // The tray callback can arrive while Explorer's hidden-icons flyout owns the foreground.
+        // Explicitly promote this context-menu HWND so the menu also works when every other app
+        // window is hidden and remains above the shell flyout that launched it.
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        SetWindowPos(hwnd, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
+        Activate();
+        SetForegroundWindow(hwnd);
+        BringWindowToTop(hwnd);
     }
 
     public void HideMenu()
@@ -53,6 +69,7 @@ public sealed partial class TrayMenuWindow : Window
         if (!_isVisible) return;
         AppWindow.Hide();
         _isVisible = false;
+        _hasActivatedSinceShow = false;
     }
 
     public void CloseForExit()
@@ -80,6 +97,7 @@ public sealed partial class TrayMenuWindow : Window
         var right = workArea.X + workArea.Width;
         var bottom = workArea.Y + workArea.Height;
 
+        // Keep the accepted horizontal placement behavior; v1.8.1 only fixes z-order/activation.
         var x = cursor.X + size.Width <= right ? cursor.X : cursor.X - size.Width;
         var y = cursor.Y + size.Height <= bottom ? cursor.Y : cursor.Y - size.Height;
 
@@ -90,7 +108,17 @@ public sealed partial class TrayMenuWindow : Window
 
     private void OnActivated(object sender, WindowActivatedEventArgs args)
     {
-        if (_isVisible && args.WindowActivationState == WindowActivationState.Deactivated)
+        if (!_isVisible) return;
+        if (args.WindowActivationState != WindowActivationState.Deactivated)
+        {
+            _hasActivatedSinceShow = true;
+            return;
+        }
+
+        // Do not immediately dismiss a newly shown background-only menu if Explorer briefly
+        // retains activation. Once this window has actually been activated, normal click-away
+        // dismissal resumes.
+        if (_hasActivatedSinceShow)
             HideMenu();
     }
 
@@ -137,4 +165,16 @@ public sealed partial class TrayMenuWindow : Window
 
     [DllImport("user32.dll")]
     private static extern uint GetDpiForWindow(nint hwnd);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetForegroundWindow(nint hWnd);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool BringWindowToTop(nint hWnd);
 }
