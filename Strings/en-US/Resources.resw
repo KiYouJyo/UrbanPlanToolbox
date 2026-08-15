@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
+  <data name="Residency_Title" xml:space="preserve"><value>Background residency and inspiration recorder</value></data>
+  <data name="Residency_CloseToTray" xml:space="preserve"><value>Keep running after main window closes</value></data>
+  <data name="Residency_Startup" xml:space="preserve"><value>Start in background when I sign in</value></data>
+  <data name="Residency_EnableRecorder" xml:space="preserve"><value>Enable inspiration recorder</value></data>
+  <data name="Residency_ShowRecorder" xml:space="preserve"><value>Show recorder on background startup</value></data>
+  <data name="Residency_AlwaysOnTop" xml:space="preserve"><value>Keep recorder on top</value></data>
+  <data name="Residency_OpenRecorder" xml:space="preserve"><value>Open inspiration recorder</value></data>
+  <data name="Inspiration_DesignHeading" xml:space="preserve"><value>Design inspiration</value></data>
+  <data name="Inspiration_ResearchHeading" xml:space="preserve"><value>Research inspiration</value></data>
+  <data name="Inspiration_Unlinked" xml:space="preserve"><value>Unlinked project</value></data>
+  <data name="Inspiration_Title" xml:space="preserve"><value>Title</value></data><data name="Inspiration_Details" xml:space="preserve"><value>Details</value></data><data name="Inspiration_LinkedProject" xml:space="preserve"><value>Linked project</value></data><data name="Inspiration_Save" xml:space="preserve"><value>Save</value></data><data name="Inspiration_Delete" xml:space="preserve"><value>Delete</value></data><data name="Inspiration_New" xml:space="preserve"><value>New inspiration</value></data><data name="Inspiration_StatusNew" xml:space="preserve"><value>New inspiration</value></data><data name="Inspiration_StatusUnsaved" xml:space="preserve"><value>Unsaved</value></data>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
   </resheader>

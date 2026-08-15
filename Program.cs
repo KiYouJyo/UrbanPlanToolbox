@@ -9,9 +9,11 @@ namespace UrbanPlanToolbox;
 /// <summary>Owns process startup so instance arbitration occurs before WinUI is initialized.</summary>
 public static class Program
 {
+    public static bool IsBackgroundStartup { get; private set; }
     [STAThread]
     public static async Task Main(string[] args)
     {
+        IsBackgroundStartup = args.Any(argument => string.Equals(argument, "--background-startup", StringComparison.OrdinalIgnoreCase)) || string.Equals(AppInstance.GetCurrent().GetActivatedEventArgs().Kind.ToString(), "StartupTask", StringComparison.Ordinal);
         ComWrappersSupport.InitializeComWrappers();
 
         var currentInstance = AppInstance.GetCurrent();

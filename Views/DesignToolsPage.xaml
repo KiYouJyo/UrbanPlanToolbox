@@ -4,6 +4,7 @@
       <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" />
       <TextBlock x:Uid="Page_DesignTools_Description" Style="{StaticResource SubtitleTextBlockStyle}" />
       <controls:ToolCategoryBrowser x:Name="CategoryBrowser" />
+      <controls:InspirationCardsView x:Name="InspirationCards" />
     </StackPanel>
   </ScrollViewer>
 </Page>

@@ -8,6 +8,7 @@
   <Compile Include="../../Models/Projects/ProjectModels.cs" Link="Models/Projects/ProjectModels.cs" />
   <Compile Include="../../Services/PlanningCalculationService.cs" Link="Services/PlanningCalculationService.cs" />
   <Compile Include="../../Models/AppSettings.cs" Link="Models/AppSettings.cs" />
+  <Compile Include="../../Models/InspirationModels.cs" Link="Models/InspirationModels.cs" />
   <Compile Include="../../Models/MilestoneReminderRepeatInterval.cs" Link="Models/MilestoneReminderRepeatInterval.cs" />
   <Compile Include="../../Models/DataEnvelope.cs" Link="Models/DataEnvelope.cs" />
   <Compile Include="../../Models/DataStorageResult.cs" Link="Models/DataStorageResult.cs" />
@@ -16,6 +17,7 @@
   <Compile Include="../../Models/WorkflowReviewChecklistModels.cs" Link="Models/WorkflowReviewChecklistModels.cs" />
   <Compile Include="../../Services/SettingsService.cs" Link="Services/SettingsService.cs" />
   <Compile Include="../../Services/SettingsKeys.cs" Link="Services/SettingsKeys.cs" />
+  <Compile Include="../../Services/InspirationService.cs" Link="Services/InspirationService.cs" />
   <Compile Include="../../Models/FirstRunGuideState.cs" Link="Models/FirstRunGuideState.cs" />
   <Compile Include="../../Services/IFirstRunExperienceService.cs" Link="Services/IFirstRunExperienceService.cs" />
   <Compile Include="../../Services/FirstRunExperienceService.cs" Link="Services/FirstRunExperienceService.cs" />

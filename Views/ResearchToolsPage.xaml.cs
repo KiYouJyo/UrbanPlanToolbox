@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
 using UrbanPlanToolbox.Models.Tools;
 using UrbanPlanToolbox.Services;
+using UrbanPlanToolbox.Models;
 
 namespace UrbanPlanToolbox.Views;
 
@@ -14,5 +15,6 @@ public sealed partial class ResearchToolsPage : Page
             ToolPrimaryCategory.Research,
             ToolCategoryCatalog.Research,
             ToolSecondaryCategory.ResearchPreparation);
+        InspirationCards.Configure(InspirationCategory.Research);
     }
 }

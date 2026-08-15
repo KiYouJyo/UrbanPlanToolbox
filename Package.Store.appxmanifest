@@ -12,7 +12,7 @@
   <Identity
     Name="JoKiy.UrbanPlanToolbox"
     Publisher="CN=C4E4B33A-7B77-4121-897C-7D720A5471F8"
-    Version="1.7.5.0" />
+    Version="1.8.0.0" />
 
   <Properties>
     <DisplayName>ms-resource:AppDisplayName</DisplayName>
@@ -46,6 +46,9 @@
       <Extensions>
         <desktop:Extension Category="windows.toastNotificationActivation">
           <desktop:ToastNotificationActivation ToastActivatorCLSID="2E0EFA8D-723A-4BAA-95F4-4C5E0CE67A4D" />
+        </desktop:Extension>
+        <desktop:Extension Category="windows.startupTask" Executable="UrbanPlanToolbox.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="UrbanPlanToolboxBackgroundStartup" Enabled="false" DisplayName="ms-resource:AppDisplayName" />
         </desktop:Extension>
         <com:Extension Category="windows.comServer">
           <com:ComServer>

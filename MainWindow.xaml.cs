@@ -44,6 +44,7 @@ public sealed partial class MainWindow : Window
     private readonly Stopwatch _startupSplashVisibleClock = new();
     private SizeInt32 _lastNormalWindowSize;
     private bool _wasWindowMaximized;
+    private bool _allowClose;
 
     public event EventHandler? ShellReady;
 
@@ -58,6 +59,7 @@ public sealed partial class MainWindow : Window
         _uiSettings.ColorValuesChanged += OnSystemColorValuesChanged;
         RestoreWindowPlacement();
         AppWindow.Changed += OnAppWindowChanged;
+        AppWindow.Closing += OnAppWindowClosing;
         Closed += OnWindowClosed;
 
         StartupTiming.Default.Mark("T3 InitializeComponent complete");
@@ -79,6 +81,12 @@ public sealed partial class MainWindow : Window
         // native splash dismissal can reveal a title-bar-only black frame.
         FirstRunGuide.Closed += OnFirstRunGuideClosed;
     }
+    private void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
+        if (_allowClose || !new SettingsService().Load().CloseToTrayEnabled) return;
+        args.Cancel = true; AppWindow.Hide(); App.NotifyMainWindowHidden();
+    }
+    public void CloseForExit() { _allowClose = true; Close(); }
 
     private void RestoreWindowPlacement()
     {
@@ -121,6 +129,7 @@ public sealed partial class MainWindow : Window
     /// <summary>Restores and foregrounds this already-created main window for redirected activation.</summary>
     public void RestoreAndActivate()
     {
+        AppWindow.Show();
         if (AppWindow.Presenter is OverlappedPresenter presenter && presenter.State == OverlappedPresenterState.Minimized)
             presenter.Restore();
 

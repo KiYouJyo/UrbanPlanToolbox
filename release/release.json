@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.7.5", "packageVersion": "1.7.5.0" },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.8.0", "packageVersion": "1.8.0.0" },
   "classification": { "kind": "store-native-update-flow", "stability": "prepared-for-validation", "storeMilestone": false },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.7.5 新建项目窗口优化",
-    "ja-JP": "UrbanPlanToolbox v1.7.5 新規プロジェクト画面の改善",
-    "en-US": "UrbanPlanToolbox v1.7.5 new project dialog improvements"
+    "zh-CN": "UrbanPlanToolbox v1.8.0 后台驻留与灵感记录器",
+    "ja-JP": "UrbanPlanToolbox v1.8.0 バックグラウンド常駐とインスピレーション記録",
+    "en-US": "UrbanPlanToolbox v1.8.0 desktop residency and inspiration recorder"
   },
   "languageLabels": {
     "zh-CN": "简体中文",
@@ -15,8 +15,8 @@
     "en-US": "English"
   },
   "items": [
-    { "id": "wide-project-dialog", "zh-CN": "优化新建设计项目与研究项目窗口的宽度和表单布局。", "ja-JP": "新しい設計プロジェクトと研究プロジェクトの画面幅およびフォーム レイアウトを改善しました。", "en-US": "Improves the width and form layout of the new design and research project dialogs." },
-    { "id": "scrollbar-gutter", "zh-CN": "修复长表单滚动条覆盖输入框的问题。", "ja-JP": "長いフォームでスクロールバーが入力欄に重なる問題を修正しました。", "en-US": "Fixes scrollbars overlapping input controls in long forms." },
-    { "id": "updater-freeze", "zh-CN": "继续使用已经稳定的 Microsoft Store / GitHub 更新机制，本版本不改变更新行为。", "ja-JP": "安定している Microsoft Store / GitHub の更新機構を引き続き使用し、このバージョンでは更新動作を変更しません。", "en-US": "Continues to use the established Microsoft Store and GitHub update mechanisms; this version does not change update behavior." }
+    { "id": "desktop-residency", "zh-CN": "新增原生系统托盘、后台驻留和 Windows 登录后后台启动。", "ja-JP": "ネイティブのシステム トレイ、バックグラウンド常駐、Windows サインイン時のバックグラウンド起動を追加しました。", "en-US": "Adds a native system tray, background residency, and Windows sign-in background startup." },
+    { "id": "inspiration-recorder", "zh-CN": "新增独立本地灵感记录器，支持 Draft 恢复、历史浏览和置顶。", "ja-JP": "Draft の復元、履歴閲覧、常に手前に表示する機能を備えたローカルのインスピレーション記録を追加しました。", "en-US": "Adds a local inspiration recorder with Draft recovery, history browsing, and always-on-top support." },
+    { "id": "inspiration-cards", "zh-CN": "设计和科研工具页新增分类灵感卡片与可选项目关联。", "ja-JP": "設計および研究ツール ページに、分類済みのインスピレーション カードと任意のプロジェクト関連付けを追加しました。", "en-US": "Adds categorized inspiration cards and optional project links to design and research tools." }
   ]
 }

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
+  <data name="Residency_Title" xml:space="preserve"><value>バックグラウンド常駐とインスピレーション記録</value></data>
+  <data name="Residency_CloseToTray" xml:space="preserve"><value>メイン ウィンドウを閉じても実行を継続する</value></data>
+  <data name="Residency_Startup" xml:space="preserve"><value>サインイン時にバックグラウンドで起動する</value></data>
+  <data name="Residency_EnableRecorder" xml:space="preserve"><value>インスピレーション記録を有効にする</value></data>
+  <data name="Residency_ShowRecorder" xml:space="preserve"><value>バックグラウンド起動時に記録を表示する</value></data>
+  <data name="Residency_AlwaysOnTop" xml:space="preserve"><value>記録ウィンドウを常に手前に表示する</value></data>
+  <data name="Residency_OpenRecorder" xml:space="preserve"><value>インスピレーション記録を開く</value></data>
+  <data name="Inspiration_DesignHeading" xml:space="preserve"><value>設計のインスピレーション</value></data>
+  <data name="Inspiration_ResearchHeading" xml:space="preserve"><value>研究のインスピレーション</value></data>
+  <data name="Inspiration_Unlinked" xml:space="preserve"><value>未関連のプロジェクト</value></data>
+  <data name="Inspiration_Title" xml:space="preserve"><value>名前</value></data><data name="Inspiration_Details" xml:space="preserve"><value>詳細</value></data><data name="Inspiration_LinkedProject" xml:space="preserve"><value>関連プロジェクト</value></data><data name="Inspiration_Save" xml:space="preserve"><value>保存</value></data><data name="Inspiration_Delete" xml:space="preserve"><value>削除</value></data><data name="Inspiration_New" xml:space="preserve"><value>新しいインスピレーション</value></data><data name="Inspiration_StatusNew" xml:space="preserve"><value>新しいインスピレーション</value></data><data name="Inspiration_StatusUnsaved" xml:space="preserve"><value>未保存</value></data>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
   </resheader>

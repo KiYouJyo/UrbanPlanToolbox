@@ -27,6 +27,7 @@ public sealed partial class SettingsPage : Page
         MilestoneNotificationsDescription.Text = _localization.GetString("Settings_MilestoneNotificationsDescription");
         MilestoneNotificationsLabel.Text = _localization.GetString("Settings_MilestoneNotificationsLabel");
         MilestoneNotificationsRepeatLabel.Text = _localization.GetString("Settings_MilestoneNotificationsRepeatLabel");
+        ResidencyTitle.Text = _localization.GetString("Residency_Title"); CloseToTrayToggle.Header = _localization.GetString("Residency_CloseToTray"); StartupToggle.Header = _localization.GetString("Residency_Startup"); RecorderEnabledToggle.Header = _localization.GetString("Residency_EnableRecorder"); ShowRecorderOnStartupToggle.Header = _localization.GetString("Residency_ShowRecorder"); RecorderTopmostToggle.Header = _localization.GetString("Residency_AlwaysOnTop"); OpenRecorderButton.Content = _localization.GetString("Residency_OpenRecorder");
         MilestoneNotificationsToggle.OnContent = _localization.GetString("Settings_MilestoneNotificationsOn");
         MilestoneNotificationsToggle.OffContent = _localization.GetString("Settings_MilestoneNotificationsOff");
         ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text); ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
@@ -80,10 +81,24 @@ public sealed partial class SettingsPage : Page
         ThemeBox.SelectedIndex = settings.Theme switch { "Light" => 1, "Dark" => 2, _ => 0 };
         var language = LanguagePreference.Normalize(settings.Language); ApplyLanguageSelection(language);
         MilestoneNotificationsToggle.IsOn = settings.IsProjectMilestoneNotificationsEnabled;
+        CloseToTrayToggle.IsOn = settings.CloseToTrayEnabled; StartupToggle.IsOn = settings.StartWithWindows; RecorderEnabledToggle.IsOn = settings.InspirationRecorderEnabled; ShowRecorderOnStartupToggle.IsOn = settings.ShowRecorderOnBackgroundStartup; ShowRecorderOnStartupToggle.IsEnabled = settings.StartWithWindows && settings.InspirationRecorderEnabled; RecorderTopmostToggle.IsOn = settings.InspirationRecorderAlwaysOnTop;
         ApplyMilestoneReminderSettings(settings);
         _isApplying = false;
         ApplyTheme(settings.Theme);
     }
+    private void OnResidencyToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isApplying) return;
+        _settingsService.Update(s => { s.CloseToTrayEnabled = CloseToTrayToggle.IsOn; s.InspirationRecorderEnabled = RecorderEnabledToggle.IsOn; s.ShowRecorderOnBackgroundStartup = ShowRecorderOnStartupToggle.IsOn; s.InspirationRecorderAlwaysOnTop = RecorderTopmostToggle.IsOn; }); ShowRecorderOnStartupToggle.IsEnabled = StartupToggle.IsOn && RecorderEnabledToggle.IsOn;
+        StatusText.Text = _localization.GetString("Status_SettingsSaved");
+    }
+    private async void OnStartupToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isApplying) return; StartupToggle.IsEnabled = false; var enabled = await WindowsStartupService.Default.SetEnabledAsync(StartupToggle.IsOn); StartupToggle.IsEnabled = true;
+        if (enabled) { _settingsService.Update(s => s.StartWithWindows = StartupToggle.IsOn); ShowRecorderOnStartupToggle.IsEnabled = StartupToggle.IsOn && RecorderEnabledToggle.IsOn; StatusText.Text = _localization.GetString("Status_SettingsSaved"); }
+        else { _isApplying = true; StartupToggle.IsOn = _settingsService.Load().StartWithWindows; _isApplying = false; }
+    }
+    private async void OnOpenRecorder(object sender, RoutedEventArgs e) => await App.ShowInspirationRecorderAsync();
     private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
     private void OnReopenFirstRunGuide(object sender, RoutedEventArgs e) => App.MainWindow?.ShowFirstRunGuideFromSettings();
     private static void ConfigureAccessibility(FrameworkElement control, string name, string helpText) { AutomationProperties.SetName(control, name); AutomationProperties.SetHelpText(control, helpText); }

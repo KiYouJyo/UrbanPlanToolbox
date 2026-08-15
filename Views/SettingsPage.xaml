@@ -87,6 +87,18 @@
         </Border>
 
         <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="ResidencyTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <ToggleSwitch x:Name="CloseToTrayToggle" Toggled="OnResidencyToggled"/>
+            <ToggleSwitch x:Name="StartupToggle" Toggled="OnStartupToggled"/>
+            <ToggleSwitch x:Name="RecorderEnabledToggle" Toggled="OnResidencyToggled"/>
+            <ToggleSwitch x:Name="ShowRecorderOnStartupToggle" Toggled="OnResidencyToggled"/>
+            <ToggleSwitch x:Name="RecorderTopmostToggle" Toggled="OnResidencyToggled"/>
+            <Button x:Name="OpenRecorderButton" HorizontalAlignment="Left" Click="OnOpenRecorder"/>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="16">
             <StackPanel Spacing="4">
               <TextBlock x:Name="MilestoneNotificationsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>

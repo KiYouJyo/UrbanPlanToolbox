@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
+  <data name="Residency_Title" xml:space="preserve"><value>后台运行与灵感记录器</value></data>
+  <data name="Residency_CloseToTray" xml:space="preserve"><value>关闭主窗口后驻留后台</value></data>
+  <data name="Residency_Startup" xml:space="preserve"><value>登录 Windows 后后台启动</value></data>
+  <data name="Residency_EnableRecorder" xml:space="preserve"><value>启用灵感记录器</value></data>
+  <data name="Residency_ShowRecorder" xml:space="preserve"><value>后台启动时显示灵感记录器</value></data>
+  <data name="Residency_AlwaysOnTop" xml:space="preserve"><value>灵感记录器始终置顶</value></data>
+  <data name="Residency_OpenRecorder" xml:space="preserve"><value>打开灵感记录器</value></data>
+  <data name="Inspiration_DesignHeading" xml:space="preserve"><value>设计灵感</value></data>
+  <data name="Inspiration_ResearchHeading" xml:space="preserve"><value>科研灵感</value></data>
+  <data name="Inspiration_Unlinked" xml:space="preserve"><value>未关联项目</value></data>
+  <data name="Inspiration_Title" xml:space="preserve"><value>名称</value></data><data name="Inspiration_Details" xml:space="preserve"><value>详细信息</value></data><data name="Inspiration_LinkedProject" xml:space="preserve"><value>关联项目</value></data><data name="Inspiration_Save" xml:space="preserve"><value>保存</value></data><data name="Inspiration_Delete" xml:space="preserve"><value>删除</value></data><data name="Inspiration_New" xml:space="preserve"><value>新建灵感</value></data><data name="Inspiration_StatusNew" xml:space="preserve"><value>新灵感</value></data><data name="Inspiration_StatusUnsaved" xml:space="preserve"><value>未保存</value></data>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
   </resheader>

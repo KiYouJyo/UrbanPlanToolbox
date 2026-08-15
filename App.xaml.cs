@@ -28,6 +28,36 @@ public partial class App : Application
     private Window? _window;
     private static bool _redirectedActivationPending;
     public static MainWindow? MainWindow { get; private set; }
+    private static Views.InspirationRecorderWindow? _recorder;
+    private static TrayService? _tray;
+    public static async Task ShowInspirationRecorderAsync()
+    {
+        _recorder ??= new Views.InspirationRecorderWindow();
+        await _recorder.RefreshAsync();
+        _recorder.ShowRecorder();
+        _tray?.SetRecorderVisible(true);
+    }
+    public static void HideInspirationRecorder()
+    {
+        _recorder?.HideRecorder();
+        _tray?.SetRecorderVisible(false);
+    }
+    public static async Task ShowInspirationAsync(Guid id)
+    {
+        _recorder ??= new Views.InspirationRecorderWindow();
+        await _recorder.OpenInspirationAsync(id);
+        _tray?.SetRecorderVisible(true);
+    }
+    internal static void NotifyMainWindowHidden() => _tray?.SetRecorderVisible(_recorder is not null);
+    private static void InitializeTray()
+    {
+        _tray ??= new TrayService(); _tray.Initialize();
+        _tray.OpenRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(MainWindow.RestoreAndActivate);
+        _tray.RecorderRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(async () => { if (_recorder?.IsVisible == true) HideInspirationRecorder(); else await ShowInspirationRecorderAsync(); });
+        _tray.SettingsRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(() => { MainWindow.RestoreAndActivate(); MainWindow.Navigate(typeof(Views.SettingsPage)); });
+        _tray.ExitRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(ExitApplication);
+    }
+    private static void ExitApplication() { _tray?.Dispose(); _recorder?.CloseForExit(); MainWindow?.CloseForExit(); Current.Exit(); }
     
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -94,6 +124,7 @@ public partial class App : Application
             .GetColorValue(Windows.UI.ViewManagement.UIColorType.Background);
         var systemUsesLightTheme = (0.2126 * systemBackground.R) + (0.7152 * systemBackground.G) + (0.0722 * systemBackground.B) >= 128;
         _window = MainWindow = new MainWindow(settings.Theme, systemUsesLightTheme);
+        InitializeTray();
         ActivatePendingRedirectedWindow();
         StartupTiming.Default.Mark("Startup.WindowCreated");
         StartupTiming.Default.Mark("T4 Root content ready");
@@ -105,7 +136,9 @@ public partial class App : Application
         {
             if (startupWorkCompleted) MainWindow?.ShowFirstRunGuideIfNeeded();
         };
-        _window.Activate();
+        if (!Program.IsBackgroundStartup) _window.Activate();
+        else if (settings.InspirationRecorderEnabled && settings.ShowRecorderOnBackgroundStartup)
+            _window.DispatcherQueue.TryEnqueue(async () => await ShowInspirationRecorderAsync());
         StartupTiming.Default.Mark("Startup.WindowActivated");
         StartupTiming.Default.Mark("T8 Activate called");
         // Defer disk and notification work until a complete first frame is available.

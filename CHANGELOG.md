@@ -1,5 +1,13 @@
 # 更改日志
 
+## 1.8.0
+
+### Desktop residency and inspiration recorder
+
+- Adds a native Windows notification-area entry, close-to-tray lifecycle, and a user-controlled Windows sign-in background startup task.
+- Adds an independent local inspiration store with a persisted Draft, quick recorder, history navigation, and Design/Research classification.
+- Adds categorized inspiration cards to the existing design and research tool pages, with editing, optional compatible project links, and deletion.
+
 ## 1.7.5
 
 ### Platform foundation and updater freeze preparation

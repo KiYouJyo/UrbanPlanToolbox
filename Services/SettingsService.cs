@@ -38,6 +38,11 @@ public sealed class SettingsService
             TryRead(root, SettingsKeys.LastNormalWindowWidth, (int? value) => settings.LastNormalWindowWidth = value);
             TryRead(root, SettingsKeys.LastNormalWindowHeight, (int? value) => settings.LastNormalWindowHeight = value);
             TryRead(root, SettingsKeys.WasWindowMaximized, (bool value) => settings.WasWindowMaximized = value);
+            TryRead(root, SettingsKeys.CloseToTrayEnabled, (bool value) => settings.CloseToTrayEnabled = value);
+            TryRead(root, SettingsKeys.StartWithWindows, (bool value) => settings.StartWithWindows = value);
+            TryRead(root, SettingsKeys.InspirationRecorderEnabled, (bool value) => settings.InspirationRecorderEnabled = value);
+            TryRead(root, SettingsKeys.ShowRecorderOnBackgroundStartup, (bool value) => settings.ShowRecorderOnBackgroundStartup = value);
+            TryRead(root, SettingsKeys.InspirationRecorderAlwaysOnTop, (bool value) => settings.InspirationRecorderAlwaysOnTop = value);
             return Normalize(settings);
         }
         catch (JsonException) { return CreateDefaults(); }
