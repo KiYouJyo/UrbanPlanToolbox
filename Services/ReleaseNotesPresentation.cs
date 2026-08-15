@@ -12,7 +12,8 @@ public static class ReleaseNotesPresentation
     public static ReleaseNotesDisplay Resolve(AppUpdateInfo info, string locale, string unavailableText)
     {
         var normalizedLocale = LocalizedReleaseNotesService.NormalizeLocale(locale);
-        if (info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(normalizedLocale) is { Items.Count: > 0 } note &&
+        if (MatchesAvailableVersion(info.LocalizedReleaseNotes?.Version, info.AvailableVersion) &&
+            info.LocalizedReleaseNotes?.Notes.GetValueOrDefault(normalizedLocale) is { Items.Count: > 0 } note &&
             note.Items.All(item => !string.IsNullOrWhiteSpace(item)))
             return new(string.Join(Environment.NewLine, note.Items.Select(item => $"- {item}")), ReleaseNotesDisplaySource.LocalizedPackage);
 
@@ -22,4 +23,9 @@ public static class ReleaseNotesPresentation
 
         return new(unavailableText, ReleaseNotesDisplaySource.LocalizedEmptyFallback);
     }
+
+    private static bool MatchesAvailableVersion(string? notesVersion, string? availableVersion) =>
+        VersionParser.TryParseTag(notesVersion, out var notes) &&
+        VersionParser.TryParseTag(availableVersion, out var available) &&
+        notes == available;
 }
