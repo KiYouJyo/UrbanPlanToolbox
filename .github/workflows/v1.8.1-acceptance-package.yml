@@ -1,0 +1,122 @@
+name: Build v1.8.1 acceptance package
+
+on:
+  push:
+    branches:
+      - v1.8.1-fixes
+    paths:
+      - '.github/workflows/v1.8.1-acceptance-package.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Validate acceptance source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          [xml]$project = Get-Content -LiteralPath UrbanPlanToolbox.csproj -Raw
+          [xml]$manifest = Get-Content -LiteralPath Package.appxmanifest -Raw
+          $version = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
+          if ($version -cne '1.8.1') { throw "Unexpected product version: $version" }
+          if ($manifest.Package.Identity.Version -cne '1.8.1.0') { throw "Unexpected package version: $($manifest.Package.Identity.Version)" }
+
+      - name: Restore
+        run: dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Release -p:Platform=x64
+
+      - name: Build unsigned x64 MSIX bundle
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $output = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-Acceptance-AppPackages'
+          dotnet build UrbanPlanToolbox.csproj -c Release -p:Platform=x64 -p:GenerateAppxPackageOnBuild=true -p:AppxPackageSigningEnabled=false -p:AppxBundle=Always -p:AppxBundlePlatforms=x64 -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxPackageDir="$output\"
+          if ($LASTEXITCODE -ne 0) { throw "MSIX build failed: $LASTEXITCODE" }
+          $bundle = @(Get-ChildItem $output -Recurse -Filter '*.msixbundle' -File) | Select-Object -First 1
+          if (-not $bundle) { throw 'MSIX bundle was not produced.' }
+          if ($bundle.Name -cne 'UrbanPlanToolbox_1.8.1.0_x64.msixbundle') { throw "Unexpected bundle name: $($bundle.Name)" }
+          "BUNDLE_PATH=$($bundle.FullName)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Sign bundle and export public certificate
+        shell: pwsh
+        env:
+          RELEASE_CERTIFICATE_BASE64: ${{ secrets.GH_RELEASE_CERTIFICATE_BASE64 }}
+          RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ([string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_BASE64) -or [string]::IsNullOrWhiteSpace($env:RELEASE_CERTIFICATE_PASSWORD)) { throw 'GitHub release signing secrets are not configured.' }
+          $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-v1.8.1-acceptance'
+          New-Item -ItemType Directory -Force -Path $assets | Out-Null
+          $pfx = Join-Path $assets 'release-signing.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:RELEASE_CERTIFICATE_BASE64))
+          $securePassword = ConvertTo-SecureString $env:RELEASE_CERTIFICATE_PASSWORD -AsPlainText -Force
+          $certificate = Import-PfxCertificate -FilePath $pfx -CertStoreLocation Cert:\CurrentUser\My -Password $securePassword
+          if ($certificate.Subject -cne 'CN=AppPublisher' -or $certificate.Thumbprint -cne 'BD85AD77A651C86CA01A480C8E9BC64952993F98' -or -not $certificate.HasPrivateKey) { throw "Unexpected signing certificate: Subject=$($certificate.Subject); Thumbprint=$($certificate.Thumbprint); HasPrivateKey=$($certificate.HasPrivateKey)" }
+          $cer = Join-Path $assets 'UrbanPlanToolbox-1.8.1-Framework-Dependent.cer'
+          Export-Certificate -Cert $certificate -FilePath $cer | Out-Null
+          $kitsRoot = [Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
+          $signtool = Get-ChildItem (Join-Path $kitsRoot 'Windows Kits\10\bin') -Recurse -Filter signtool.exe | Where-Object FullName -match '\\x64\\signtool.exe$' | Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw 'x64 signtool.exe was not found.' }
+          & $signtool.FullName sign /fd SHA256 /sha1 $certificate.Thumbprint /tr http://timestamp.digicert.com /td SHA256 $env:BUNDLE_PATH
+          if ($LASTEXITCODE -ne 0) { throw "signtool sign failed: $LASTEXITCODE" }
+          $signature = Get-AuthenticodeSignature -FilePath $env:BUNDLE_PATH
+          if (-not $signature.SignerCertificate -or $signature.SignerCertificate.Subject -cne 'CN=AppPublisher' -or $signature.SignerCertificate.Thumbprint -cne $certificate.Thumbprint) { throw 'Signed bundle signer validation failed.' }
+          Copy-Item -LiteralPath $env:BUNDLE_PATH -Destination (Join-Path $assets 'UrbanPlanToolbox_1.8.1.0_x64.msixbundle') -Force
+          "ASSETS_DIR=$assets" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          "CERTIFICATE_PATH=$cer" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Generate one-click acceptance installer
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $staging = Join-Path $env:ASSETS_DIR 'staging'
+          & ./packaging/New-GitHubOneClickInstallerPackage.ps1 -SignedBundlePath $env:BUNDLE_PATH -PublicCertificatePath $env:CERTIFICATE_PATH -OutputDirectory $staging -DisplayVersion '1.8.1' -PackageVersion '1.8.1.0'
+          $packageRoot = Join-Path $staging 'UrbanPlanToolbox-v1.8.1-x64-one-click'
+          & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory $packageRoot
+          $zip = Join-Path $env:ASSETS_DIR 'UrbanPlanToolbox-v1.8.1-x64-one-click.zip'
+          Compress-Archive -LiteralPath $packageRoot -DestinationPath $zip -CompressionLevel Optimal
+          $extracted = Join-Path $env:ASSETS_DIR 'extracted'
+          Expand-Archive -LiteralPath $zip -DestinationPath $extracted -Force
+          & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory (Join-Path $extracted 'UrbanPlanToolbox-v1.8.1-x64-one-click') -ZipPath $zip
+          Remove-Item -LiteralPath $staging -Recurse -Force
+          Remove-Item -LiteralPath $extracted -Recurse -Force
+          Remove-Item -LiteralPath (Join-Path $env:ASSETS_DIR 'release-signing.pfx') -Force
+
+      - name: Write acceptance metadata and hashes
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @(
+            (Join-Path $env:ASSETS_DIR 'UrbanPlanToolbox_1.8.1.0_x64.msixbundle'),
+            (Join-Path $env:ASSETS_DIR 'UrbanPlanToolbox-v1.8.1-x64-one-click.zip'),
+            (Join-Path $env:ASSETS_DIR 'UrbanPlanToolbox-1.8.1-Framework-Dependent.cer')
+          )
+          $manifest = foreach ($file in $files) {
+            $item = Get-Item -LiteralPath $file
+            "{0}  {1}" -f (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant(), $item.Name
+          }
+          Set-Content -LiteralPath (Join-Path $env:ASSETS_DIR 'SHA256SUMS.txt') -Value $manifest -Encoding ascii
+          @(
+            'UrbanPlanToolbox v1.8.1 acceptance package',
+            "Source commit: $env:GITHUB_SHA",
+            'Purpose: manual acceptance only; not a published release or Store submission.',
+            'Build: Release x64, signed with the normal GitHub self-signed release certificate.'
+          ) | Set-Content -LiteralPath (Join-Path $env:ASSETS_DIR 'ACCEPTANCE.txt') -Encoding utf8
+
+      - name: Upload acceptance package
+        uses: actions/upload-artifact@v7
+        with:
+          name: UrbanPlanToolbox-v1.8.1-acceptance
+          path: ${{ env.ASSETS_DIR }}
+          if-no-files-found: error
+          retention-days: 7
