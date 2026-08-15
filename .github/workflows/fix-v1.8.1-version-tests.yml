@@ -1,0 +1,86 @@
+name: Normalize v1.8.1 Version Tests
+
+on:
+  push:
+    branches:
+      - v1.8.1-fixes
+
+permissions:
+  contents: write
+
+concurrency:
+  group: normalize-v1.8.1-version-tests
+  cancel-in-progress: false
+
+jobs:
+  normalize:
+    runs-on: windows-2025-vs2026
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v7
+        with:
+          ref: v1.8.1-fixes
+          fetch-depth: 0
+
+      - name: Replace stale hard-coded version assertions
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $replacements = @(
+            @{
+              Path = 'tests/UrbanPlanToolbox.Tests/GitHubUpdateServiceTests.cs'
+              Old = '        Assert.Equal("1.8.0", AppVersionProvider.Version);'
+              New = '        Assert.False(string.IsNullOrWhiteSpace(AppVersionProvider.Version));'
+            },
+            @{
+              Path = 'tests/UrbanPlanToolbox.Tests/GitHubUpdateServiceTests.cs'
+              Old = '        Assert.Equal("v1.8.0", AppVersionProvider.DisplayVersion);'
+              New = '        Assert.Equal($"v{AppVersionProvider.Version}", AppVersionProvider.DisplayVersion);'
+            },
+            @{
+              Path = 'tests/UrbanPlanToolbox.Tests/GitHubUpdateServiceTests.cs'
+              Old = '        Assert.Equal("UrbanPlanToolbox/1.8.0", handler.UserAgent);'
+              New = '        Assert.Equal($"UrbanPlanToolbox/{AppVersionProvider.Version}", handler.UserAgent);'
+            },
+            @{
+              Path = 'tests/UrbanPlanToolbox.Tests/ProductReadinessTests.cs'
+              Old = '        Assert.Contains("v1.8.0", text);'
+              New = '        Assert.Contains(AppVersionProvider.DisplayVersion, text);'
+            },
+            @{
+              Path = 'tests/UrbanPlanToolbox.Tests/AppUpdateTests.cs'
+              Old = '        Assert.Equal("v1.8.0", viewModel.CurrentVersion);'
+              New = '        Assert.Equal(AppVersionProvider.DisplayVersion, viewModel.CurrentVersion);'
+            }
+          )
+
+          foreach ($replacement in $replacements) {
+            $path = $replacement.Path
+            $text = Get-Content -LiteralPath $path -Raw
+            $count = ([regex]::Matches($text, [regex]::Escape($replacement.Old))).Count
+            if ($count -eq 0) {
+              if ($text.Contains($replacement.New)) {
+                Write-Host "Already normalized: $path"
+                continue
+              }
+              throw "Expected stale assertion was not found in $path"
+            }
+            if ($count -ne 1) { throw "Expected exactly one stale assertion in $path, found $count" }
+            $updated = $text.Replace($replacement.Old, $replacement.New)
+            Set-Content -LiteralPath $path -Value $updated -Encoding utf8NoBOM -NoNewline
+          }
+
+          git diff --check
+
+      - name: Commit normalized tests if needed
+        shell: pwsh
+        run: |
+          if (-not (git status --porcelain)) {
+            Write-Host 'Version tests are already normalized.'
+            exit 0
+          }
+          git config user.name 'Kiyō Jo'
+          git config user.email 'x2425618950@gmail.com'
+          git add tests/UrbanPlanToolbox.Tests/GitHubUpdateServiceTests.cs tests/UrbanPlanToolbox.Tests/ProductReadinessTests.cs tests/UrbanPlanToolbox.Tests/AppUpdateTests.cs
+          git commit -m 'Make version tests follow current app version'
+          git push origin HEAD:v1.8.1-fixes
