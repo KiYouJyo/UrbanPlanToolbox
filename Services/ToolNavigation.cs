@@ -15,7 +15,7 @@ public static class ToolNavigation
 
         if (frame.CurrentSourcePageType != tool.PageType)
         {
-            frame.Navigate(tool.PageType);
+            frame.Navigate(tool.PageType, tool.Id);
         }
 
         return true;

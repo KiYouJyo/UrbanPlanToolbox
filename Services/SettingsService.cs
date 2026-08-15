@@ -43,6 +43,14 @@ public sealed class SettingsService
             TryRead(root, SettingsKeys.InspirationRecorderEnabled, (bool value) => settings.InspirationRecorderEnabled = value);
             TryRead(root, SettingsKeys.ShowRecorderOnBackgroundStartup, (bool value) => settings.ShowRecorderOnBackgroundStartup = value);
             TryRead(root, SettingsKeys.InspirationRecorderAlwaysOnTop, (bool value) => settings.InspirationRecorderAlwaysOnTop = value);
+            var hasBackgroundResidency = root.ContainsKey(SettingsKeys.BackgroundResidencyEnabled);
+            var hasSilentStartup = root.ContainsKey(SettingsKeys.SilentStartupShowRecorder);
+            TryRead(root, SettingsKeys.BackgroundResidencyEnabled, (bool value) => settings.BackgroundResidencyEnabled = value);
+            TryRead(root, SettingsKeys.SilentStartupShowRecorder, (bool value) => settings.SilentStartupShowRecorder = value);
+            if (!hasBackgroundResidency)
+                settings.BackgroundResidencyEnabled = settings.CloseToTrayEnabled == true && settings.InspirationRecorderEnabled == true;
+            if (!hasSilentStartup)
+                settings.SilentStartupShowRecorder = settings.StartWithWindows == true && settings.ShowRecorderOnBackgroundStartup == true;
             return Normalize(settings);
         }
         catch (JsonException) { return CreateDefaults(); }
@@ -107,6 +115,7 @@ public sealed class SettingsService
             .Where(id => !string.IsNullOrWhiteSpace(id))
             .Distinct(StringComparer.Ordinal)
             .ToList();
+        if (settings.SilentStartupShowRecorder) settings.BackgroundResidencyEnabled = true;
         return settings;
     }
 

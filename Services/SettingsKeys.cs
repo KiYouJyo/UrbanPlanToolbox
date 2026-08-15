@@ -19,4 +19,6 @@ public static class SettingsKeys
     public const string InspirationRecorderEnabled = "InspirationRecorderEnabled";
     public const string ShowRecorderOnBackgroundStartup = "ShowRecorderOnBackgroundStartup";
     public const string InspirationRecorderAlwaysOnTop = "InspirationRecorderAlwaysOnTop";
+    public const string BackgroundResidencyEnabled = "BackgroundResidencyEnabled";
+    public const string SilentStartupShowRecorder = "SilentStartupShowRecorder";
 }

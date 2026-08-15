@@ -39,6 +39,10 @@
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <StackPanel x:Name="RecorderSettingsPanel" Spacing="12" Visibility="Collapsed">
+              <ToggleSwitch x:Name="BackgroundResidencyToggle" Toggled="OnBackgroundResidencyToggled" />
+              <ToggleSwitch x:Name="SilentStartupToggle" Toggled="OnSilentStartupToggled" />
+            </StackPanel>
             <Button x:Name="PrivacyButton" Click="OnPrivacy" HorizontalAlignment="Left" />
           </StackPanel>
         </ScrollViewer>

@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using UrbanPlanToolbox.Models.Navigation;
 using UrbanPlanToolbox.Services;
+using UrbanPlanToolbox.Models;
+using UrbanPlanToolbox.Models.Tools;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -160,6 +162,18 @@ public sealed partial class MainPage : Page
     private void NavigateTo(Type page)
     {
         if (ContentFrame.CurrentSourcePageType != page) ContentFrame.Navigate(page);
+    }
+
+    public void NavigateToInspiration(InspirationCategory category)
+    {
+        Navigation.SelectedItem = category == InspirationCategory.Design ? DesignItem : ResearchItem;
+        ContentFrame.Navigate(typeof(Views.InspirationManagementPage), category == InspirationCategory.Design ? ToolIds.DesignInspiration : ToolIds.ResearchInspiration);
+    }
+
+    public void NavigateToSettings()
+    {
+        Navigation.SelectedItem = Navigation.SettingsItem;
+        NavigateTo(typeof(Views.SettingsPage));
     }
 
     public ShellNavigationState CaptureState()

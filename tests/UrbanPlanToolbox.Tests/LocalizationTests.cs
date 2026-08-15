@@ -217,7 +217,7 @@ public sealed partial class LocalizationTests
         {
             var service = new ToolSearchService(ToolRegistry.Default, TestLocalization.For(language));
             var ids = Flatten(service.Search(string.Empty, _ => false)).Select(tool => tool.Id).ToArray();
-        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.DesignConceptDictionary, ToolIds.PlanningIndicatorCalculator, ToolIds.WorkflowReviewChecklist, ToolIds.PlanningTerminology, ToolIds.ColorPaletteRecorder, ToolIds.FieldSurveyPhotoGis, ToolIds.DrawingVersionComparator, ToolIds.RegulationsIndex, ToolIds.CoordinateBatchFormatConverter, ToolIds.CoordinateSystemConverter], ids);
+        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.DesignConceptDictionary, ToolIds.PlanningIndicatorCalculator, ToolIds.ResearchInspiration, ToolIds.WorkflowReviewChecklist, ToolIds.PlanningTerminology, ToolIds.ColorPaletteRecorder, ToolIds.DesignInspiration, ToolIds.FieldSurveyPhotoGis, ToolIds.DrawingVersionComparator, ToolIds.RegulationsIndex, ToolIds.CoordinateBatchFormatConverter, ToolIds.CoordinateSystemConverter], ids);
         }
     }
 

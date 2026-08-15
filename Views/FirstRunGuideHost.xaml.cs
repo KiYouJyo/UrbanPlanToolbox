@@ -68,9 +68,17 @@ public sealed partial class FirstRunGuideHost : UserControl
         PrivacyButton.Visibility = _step == 0 ? Visibility.Visible : Visibility.Collapsed;
         SkipButton.Content = _localization.GetString("FirstRunGuide_Skip");
         BackButton.Content = _localization.GetString("FirstRunGuide_Back");
-        NextButton.Content = _localization.GetString(_step == 3 ? "FirstRunGuide_Start" : "FirstRunGuide_Next");
+        RecorderSettingsPanel.Visibility = _step == 3 ? Visibility.Visible : Visibility.Collapsed;
+        _isBusy = true;
+        var settings = new SettingsService().Load();
+        BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled;
+        SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder;
+        _isBusy = false;
+        BackgroundResidencyToggle.Header = _localization.GetString("Residency_BackgroundRecorder");
+        SilentStartupToggle.Header = _localization.GetString("Residency_SilentStartupRecorder");
+        NextButton.Content = _localization.GetString(_step == 4 ? "FirstRunGuide_Start" : "FirstRunGuide_Next");
         BackButton.IsEnabled = _step > 0;
-        SkipButton.Visibility = _step < 3 ? Visibility.Visible : Visibility.Collapsed;
+        SkipButton.Visibility = _step < 4 ? Visibility.Visible : Visibility.Collapsed;
         AutomationProperties.SetName(GuideTitle, GuideTitle.Text);
         AutomationProperties.SetName(GuideBody, GuideBody.Text);
         AutomationProperties.SetName(OverlayRoot, GuideTitle.Text);
@@ -82,7 +90,7 @@ public sealed partial class FirstRunGuideHost : UserControl
     private void OnNext(object sender, RoutedEventArgs e)
     {
         if (_isBusy) return;
-        if (_step < 3)
+        if (_step < 4)
         {
             _step++;
             RefreshText();
@@ -91,6 +99,22 @@ public sealed partial class FirstRunGuideHost : UserControl
         }
 
         CompleteAndClose();
+    }
+
+    private void OnBackgroundResidencyToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isBusy) return;
+        var settings = new SettingsService().Update(s => { s.BackgroundResidencyEnabled = BackgroundResidencyToggle.IsOn; if (!s.BackgroundResidencyEnabled) s.SilentStartupShowRecorder = false; });
+        _isBusy = true; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder; _isBusy = false;
+    }
+
+    private async void OnSilentStartupToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isBusy) return;
+        var requested = SilentStartupToggle.IsOn;
+        if (!await WindowsStartupService.Default.SetEnabledAsync(requested)) { _isBusy = true; SilentStartupToggle.IsOn = new SettingsService().Load().SilentStartupShowRecorder; _isBusy = false; return; }
+        var settings = new SettingsService().Update(s => { s.SilentStartupShowRecorder = requested; if (requested) s.BackgroundResidencyEnabled = true; });
+        _isBusy = true; BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; _isBusy = false;
     }
 
     private void OnBack(object sender, RoutedEventArgs e)

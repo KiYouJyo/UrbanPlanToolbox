@@ -38,7 +38,7 @@ public sealed class VisualPolishPackagingTests
             var xaml = File.ReadAllText(source);
             Assert.Equal(
                 System.Text.RegularExpressions.Regex.Matches(xaml, "<ComboBox(?:\\s|>)").Count,
-                System.Text.RegularExpressions.Regex.Matches(xaml, "<ComboBox\\s+controls:TransientComboBoxTheme.Apply=\\\"True\\\"").Count);
+                System.Text.RegularExpressions.Regex.Matches(xaml, "<ComboBox[^>]*controls:TransientComboBoxTheme.Apply=\\\"True\\\"").Count);
         }
         foreach (var source in Directory.EnumerateFiles(Path.Combine(root, "Views"), "*.cs", SearchOption.AllDirectories))
         {

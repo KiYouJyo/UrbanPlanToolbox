@@ -60,7 +60,7 @@ public sealed class ToolSearchServiceTests
     {
         var groups = _service.Search(" ", _ => false);
 
-        Assert.Equal(["D", "G", "L", "P", "S", "T", "X", "Z"], groups.Select(group => group.Header));
+        Assert.Equal(["D", "G", "K", "L", "P", "S", "T", "X", "Z"], groups.Select(group => group.Header));
         Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.DesignConceptDictionary], groups[0].Tools.Select(tool => tool.Id));
         Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(groups[1].Tools).Id);
     }
@@ -72,7 +72,7 @@ public sealed class ToolSearchServiceTests
 
         Assert.Equal("已收藏", groups[0].Header);
         Assert.Equal(ToolIds.PlanningIndicatorCalculator, Assert.Single(groups[0].Tools).Id);
-        Assert.Equal(["D", "L", "P", "S", "T", "X", "Z"], groups.Skip(1).Select(group => group.Header));
+        Assert.Equal(["D", "K", "L", "P", "S", "T", "X", "Z"], groups.Skip(1).Select(group => group.Header));
         Assert.DoesNotContain(groups.Skip(1).SelectMany(group => group.Tools), tool => tool.Id == ToolIds.PlanningIndicatorCalculator);
     }
 

@@ -83,7 +83,7 @@ public sealed partial class MainWindow : Window
     }
     private void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
-        if (_allowClose || !new SettingsService().Load().CloseToTrayEnabled) return;
+        if (_allowClose || !new SettingsService().Load().BackgroundResidencyEnabled) return;
         args.Cancel = true; AppWindow.Hide(); App.NotifyMainWindowHidden();
     }
     public void CloseForExit() { _allowClose = true; Close(); }
@@ -341,6 +341,18 @@ public sealed partial class MainWindow : Window
     }
 
     public void Navigate(Type pageType) => RootFrame.Navigate(pageType);
+    public void NavigateToSettings()
+    {
+        RestoreAndActivate();
+        if (RootFrame.Content is MainPage mainPage) mainPage.NavigateToSettings();
+        else { RootFrame.Navigate(typeof(MainPage)); DispatcherQueue.TryEnqueue(() => (RootFrame.Content as MainPage)?.NavigateToSettings()); }
+    }
+    public void NavigateToInspiration(Models.InspirationCategory category)
+    {
+        RestoreAndActivate();
+        if (RootFrame.Content is MainPage mainPage) mainPage.NavigateToInspiration(category);
+        else { RootFrame.Navigate(typeof(MainPage)); DispatcherQueue.TryEnqueue(() => (RootFrame.Content as MainPage)?.NavigateToInspiration(category)); }
+    }
 
     /// <summary>Single window-level coordinator used by Settings and startup.</summary>
     public void ShowFirstRunGuideFromSettings() => ShowFirstRunGuide(FirstRunGuideLaunchMode.Manual);

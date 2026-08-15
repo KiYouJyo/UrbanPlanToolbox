@@ -30,6 +30,15 @@ public sealed class InspirationService
         var item = new Inspiration { Id = Guid.NewGuid(), Category = draft.Category, Title = draft.Title.Trim(), Content = draft.Content?.Trim() ?? string.Empty, CreatedAt = now, UpdatedAt = now };
         document.Items.Add(item); document.Draft = null; await WriteAsync(document, token); return item;
     }
+    public async Task<bool> CreateAsync(Inspiration item, CancellationToken token = default)
+    {
+        if (item.Id == Guid.Empty || string.IsNullOrWhiteSpace(item.Title)) return false;
+        var document = await ReadAsync(token);
+        if (document.Items.Any(existing => existing.Id == item.Id)) return false;
+        var now = DateTimeOffset.UtcNow;
+        document.Items.Add(new Inspiration { Id = item.Id, Category = item.Category, Title = item.Title.Trim(), Content = item.Content?.Trim() ?? string.Empty, LinkedProjectId = item.LinkedProjectId, CreatedAt = item.CreatedAt == default ? now : item.CreatedAt, UpdatedAt = now });
+        await WriteAsync(document, token); return true;
+    }
     public async Task<bool> SaveAsync(Inspiration item, CancellationToken token = default)
     {
         if (item.Id == Guid.Empty || string.IsNullOrWhiteSpace(item.Title)) return false;

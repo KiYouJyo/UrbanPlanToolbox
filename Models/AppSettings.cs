@@ -17,11 +17,14 @@ public sealed class AppSettings
     public int? LastNormalWindowWidth { get; set; }
     public int? LastNormalWindowHeight { get; set; }
     public bool WasWindowMaximized { get; set; }
-    public bool CloseToTrayEnabled { get; set; } = true;
-    public bool StartWithWindows { get; set; }
-    public bool InspirationRecorderEnabled { get; set; } = true;
-    public bool ShowRecorderOnBackgroundStartup { get; set; } = true;
-    public bool InspirationRecorderAlwaysOnTop { get; set; } = true;
+    public bool BackgroundResidencyEnabled { get; set; }
+    public bool SilentStartupShowRecorder { get; set; }
+    // Legacy persisted values are retained solely for one-time migration reads.
+    public bool? CloseToTrayEnabled { get; set; }
+    public bool? StartWithWindows { get; set; }
+    public bool? InspirationRecorderEnabled { get; set; }
+    public bool? ShowRecorderOnBackgroundStartup { get; set; }
+    public bool? InspirationRecorderAlwaysOnTop { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore]
     public bool IsProjectMilestoneNotificationsEnabled =>

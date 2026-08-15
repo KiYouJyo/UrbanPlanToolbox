@@ -20,6 +20,8 @@ public sealed class ToolRegistryTests
             tool => Assert.Equal(ToolIds.DesignConceptDictionary, tool.Id),
             tool => Assert.Equal(ToolIds.CoordinateSystemConverter, tool.Id),
             tool => Assert.Equal(ToolIds.PlanningTerminology, tool.Id),
+            tool => Assert.Equal(ToolIds.DesignInspiration, tool.Id),
+            tool => Assert.Equal(ToolIds.ResearchInspiration, tool.Id),
             tool => Assert.Equal(ToolIds.FieldSurveyPhotoGis, tool.Id),
             tool => Assert.Equal(ToolIds.CoordinateBatchFormatConverter, tool.Id));
         Assert.All(ToolRegistry.Default.All, tool => Assert.True(tool.IsAvailable));
@@ -105,12 +107,12 @@ public sealed class ToolRegistryTests
     [Fact]
     public void CategoryFiltersReturnMatchingTools()
     {
-        Assert.Equal(10, ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Design).Count);
-        Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.CoordinateSystemConverter, ToolIds.PlanningTerminology, ToolIds.CoordinateBatchFormatConverter], ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Research).Select(tool => tool.Id));
+        Assert.Equal(11, ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Design).Count);
+        Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.CoordinateSystemConverter, ToolIds.PlanningTerminology, ToolIds.ResearchInspiration, ToolIds.CoordinateBatchFormatConverter], ToolRegistry.Default.GetByPrimaryCategory(ToolPrimaryCategory.Research).Select(tool => tool.Id));
         Assert.Equal(
-            [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.DrawingVersionComparator, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.DesignConceptDictionary, ToolIds.PlanningTerminology, ToolIds.FieldSurveyPhotoGis, ToolIds.CoordinateBatchFormatConverter],
+            [ToolIds.PlanningIndicatorCalculator, ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.DrawingVersionComparator, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.DesignConceptDictionary, ToolIds.PlanningTerminology, ToolIds.DesignInspiration, ToolIds.FieldSurveyPhotoGis, ToolIds.CoordinateBatchFormatConverter],
             ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Design).Select(tool => tool.Id));
-        Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.CoordinateSystemConverter, ToolIds.PlanningTerminology, ToolIds.CoordinateBatchFormatConverter], ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Research).Select(tool => tool.Id));
+        Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.CoordinateSystemConverter, ToolIds.PlanningTerminology, ToolIds.ResearchInspiration, ToolIds.CoordinateBatchFormatConverter], ToolRegistry.Default.GetAvailableByPrimaryCategory(ToolPrimaryCategory.Research).Select(tool => tool.Id));
         Assert.Equal(
             [ToolIds.PlanningIndicatorCalculator, ToolIds.RegulationsIndex],
             ToolRegistry.Default.GetBySecondaryCategory(ToolSecondaryCategory.MasterPlanning).Select(tool => tool.Id));
@@ -153,7 +155,7 @@ public sealed class ToolRegistryTests
         Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.ColorPaletteRecorder, ToolIds.DrawingVersionComparator], ToolRegistry.Default.GetAvailableByCategories(
                 ToolPrimaryCategory.Design, ToolSecondaryCategory.DetailedDesign).Select(tool => tool.Id));
 
-        Assert.Equal([ToolIds.WorkflowReviewChecklist, ToolIds.PlanningTerminology, ToolIds.CoordinateBatchFormatConverter], ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis).Select(tool => tool.Id));
+        Assert.Equal([ToolIds.WorkflowReviewChecklist, ToolIds.PlanningTerminology, ToolIds.DesignInspiration, ToolIds.CoordinateBatchFormatConverter], ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.PreliminaryAnalysis).Select(tool => tool.Id));
         Assert.Equal([ToolIds.FieldSurveyPhotoGis], ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.FieldResearch).Select(tool => tool.Id));
         Assert.Equal([ToolIds.DesignConceptDictionary], ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Design, ToolSecondaryCategory.DesignDevelopment).Select(tool => tool.Id));
     }
@@ -165,7 +167,7 @@ public sealed class ToolRegistryTests
         {
             var tools = ToolRegistry.Default.GetAvailableByCategories(ToolPrimaryCategory.Research, category.SecondaryCategory);
             if (category.SecondaryCategory == ToolSecondaryCategory.ResearchPreparation)
-                Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.PlanningTerminology], tools.Select(tool => tool.Id));
+                Assert.Equal([ToolIds.ColorPaletteRecorder, ToolIds.WorkflowReviewChecklist, ToolIds.RegulationsIndex, ToolIds.PlanningTerminology, ToolIds.ResearchInspiration], tools.Select(tool => tool.Id));
             else if (category.SecondaryCategory == ToolSecondaryCategory.GeographicTools) Assert.Equal(ToolIds.CoordinateSystemConverter, Assert.Single(tools).Id);
             else if (category.SecondaryCategory == ToolSecondaryCategory.DataTools) Assert.Equal(ToolIds.CoordinateBatchFormatConverter, Assert.Single(tools).Id);
             else Assert.Empty(tools);
