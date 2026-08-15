@@ -112,14 +112,18 @@ public sealed partial class AboutPage : Page
         AppLogger.Default.Info("ReleaseNotes", "RenderUpdateNotesSource", $"State={info.State}; AvailableVersion={info.AvailableVersion}; Locale={LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage)}; Source={display.Source}");
 
         UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
-        UpdateTargetLabel.Visibility = Visibility.Visible;
-        UpdateTargetText.Visibility = Visibility.Visible;
-        UpdateTargetText.Text = string.IsNullOrWhiteSpace(info.AvailableVersion) ? string.Empty : $"v{info.AvailableVersion}";
+        var hasTrustedTargetVersion = !string.IsNullOrWhiteSpace(info.AvailableVersion);
+        UpdateTargetLabel.Visibility = hasTrustedTargetVersion ? Visibility.Visible : Visibility.Collapsed;
+        UpdateTargetText.Visibility = hasTrustedTargetVersion ? Visibility.Visible : Visibility.Collapsed;
+        UpdateTargetText.Text = hasTrustedTargetVersion ? $"v{info.AvailableVersion}" : string.Empty;
 
-        UpdateNotesLabel.Visibility = Visibility.Visible;
-        UpdateNotesContainer.Visibility = Visibility.Visible;
-        UpdateNotesText.Visibility = Visibility.Visible;
-        UpdateNotesText.Text = display.Text;
+        // Release notes are version-scoped. If Store reports availability before a trustworthy
+        // target version can be resolved, suppress metadata rather than showing stale notes from
+        // an older manifest or a previous check.
+        UpdateNotesLabel.Visibility = hasTrustedTargetVersion ? Visibility.Visible : Visibility.Collapsed;
+        UpdateNotesContainer.Visibility = hasTrustedTargetVersion ? Visibility.Visible : Visibility.Collapsed;
+        UpdateNotesText.Visibility = hasTrustedTargetVersion ? Visibility.Visible : Visibility.Collapsed;
+        UpdateNotesText.Text = hasTrustedTargetVersion ? display.Text : string.Empty;
 
         CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
         CheckUpdateButton.Content = info.NeedsFinalRestart ? T("Action_RestartAndUpdate") : info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
