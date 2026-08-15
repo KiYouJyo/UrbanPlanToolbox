@@ -45,6 +45,7 @@ public sealed partial class MainWindow : Window
     private SizeInt32 _lastNormalWindowSize;
     private bool _wasWindowMaximized;
     private bool _allowClose;
+    private bool _hasSavedWindowPlacement;
 
     public event EventHandler? ShellReady;
 
@@ -91,12 +92,27 @@ public sealed partial class MainWindow : Window
     private void RestoreWindowPlacement()
     {
         var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
+        var settings = new SettingsService().Load();
+        _hasSavedWindowPlacement = settings.LastNormalWindowWidth is not null && settings.LastNormalWindowHeight is not null;
         var placement = _windowPlacement.Load(new SizeInt32(workArea.Width, workArea.Height));
         _lastNormalWindowSize = new SizeInt32(placement.Width, placement.Height);
         _wasWindowMaximized = placement.WasMaximized;
         AppWindow.Resize(_lastNormalWindowSize);
         if (_wasWindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter)
+        {
             presenter.Maximize();
+        }
+        else if (!_hasSavedWindowPlacement)
+        {
+            CenterWindow(_lastNormalWindowSize, workArea);
+        }
+    }
+
+    private void CenterWindow(SizeInt32 size, RectInt32 workArea)
+    {
+        var x = workArea.X + Math.Max(0, (workArea.Width - size.Width) / 2);
+        var y = workArea.Y + Math.Max(0, (workArea.Height - size.Height) / 2);
+        AppWindow.Move(new PointInt32(x, y));
     }
 
     private void OnAppWindowChanged(AppWindow sender, AppWindowChangedEventArgs args)

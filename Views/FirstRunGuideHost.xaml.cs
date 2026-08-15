@@ -104,28 +104,59 @@ public sealed partial class FirstRunGuideHost : UserControl
     private async void OnBackgroundResidencyToggled(object sender, RoutedEventArgs e)
     {
         if (_isBusy) return;
-        if (!BackgroundResidencyToggle.IsOn && !await WindowsStartupService.Default.SetEnabledAsync(false))
+        _isBusy = true;
+        try
         {
-            _isBusy = true;
-            BackgroundResidencyToggle.IsOn = new SettingsService().Load().BackgroundResidencyEnabled;
-            _isBusy = false;
-            return;
+            var enabled = BackgroundResidencyToggle.IsOn;
+            if (!enabled) await WindowsStartupService.Default.SetEnabledAsync(false);
+
+            var settings = new SettingsService().Update(s =>
+            {
+                s.BackgroundResidencyEnabled = enabled;
+                if (!enabled) s.SilentStartupShowRecorder = false;
+            });
+
+            // One shared recorder lifecycle: OFF hides and tears down the
+            // recorder/tray, ON immediately shows the same recorder instance.
+            App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled);
+            if (settings.BackgroundResidencyEnabled) await App.ShowInspirationRecorderAsync(moveToPrimaryWorkAreaTopRight: true);
+
+            SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder;
         }
-        var settings = new SettingsService().Update(s => { s.BackgroundResidencyEnabled = BackgroundResidencyToggle.IsOn; if (!s.BackgroundResidencyEnabled) s.SilentStartupShowRecorder = false; });
-        // This establishes the residency lifecycle without showing the recorder
-        // while the user is still in the first-run guide.
-        App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled);
-        _isBusy = true; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder; _isBusy = false;
+        finally
+        {
+            _isBusy = false;
+        }
     }
 
     private async void OnSilentStartupToggled(object sender, RoutedEventArgs e)
     {
         if (_isBusy) return;
-        var requested = SilentStartupToggle.IsOn;
-        if (!await WindowsStartupService.Default.SetEnabledAsync(requested)) { _isBusy = true; SilentStartupToggle.IsOn = new SettingsService().Load().SilentStartupShowRecorder; _isBusy = false; return; }
-        var settings = new SettingsService().Update(s => { s.SilentStartupShowRecorder = requested; if (requested) s.BackgroundResidencyEnabled = true; });
-        App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled);
-        _isBusy = true; BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; _isBusy = false;
+        _isBusy = true;
+        try
+        {
+            var requested = SilentStartupToggle.IsOn;
+            if (!await WindowsStartupService.Default.SetEnabledAsync(requested))
+            {
+                SilentStartupToggle.IsOn = new SettingsService().Load().SilentStartupShowRecorder;
+                return;
+            }
+
+            var settings = new SettingsService().Update(s =>
+            {
+                s.SilentStartupShowRecorder = requested;
+                if (requested) s.BackgroundResidencyEnabled = true;
+            });
+
+            App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled);
+            if (requested) await App.ShowInspirationRecorderAsync(moveToPrimaryWorkAreaTopRight: true);
+
+            BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled;
+        }
+        finally
+        {
+            _isBusy = false;
+        }
     }
 
     private void OnBack(object sender, RoutedEventArgs e)

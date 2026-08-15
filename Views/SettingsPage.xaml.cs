@@ -89,23 +89,33 @@ public sealed partial class SettingsPage : Page
     private async void OnBackgroundResidencyToggled(object sender, RoutedEventArgs e)
     {
         if (_isApplying) return;
-        var enabled = BackgroundResidencyToggle.IsOn;
-        if (!enabled && !await WindowsStartupService.Default.SetEnabledAsync(false))
+        _isApplying = true;
+        try
         {
-            _isApplying = true;
-            BackgroundResidencyToggle.IsOn = _settingsService.Load().BackgroundResidencyEnabled;
-            _isApplying = false;
-            return;
+            var enabled = BackgroundResidencyToggle.IsOn;
+            if (!enabled) await WindowsStartupService.Default.SetEnabledAsync(false);
+
+            var settings = _settingsService.Update(s =>
+            {
+                s.BackgroundResidencyEnabled = enabled;
+                if (!enabled) s.SilentStartupShowRecorder = false;
+            });
+
+            App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled);
+            if (settings.BackgroundResidencyEnabled) await App.ShowInspirationRecorderAsync(moveToPrimaryWorkAreaTopRight: true);
+
+            SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder;
+            StatusText.Text = _localization.GetString("Status_SettingsSaved");
         }
-        _settingsService.Update(s => { s.BackgroundResidencyEnabled = enabled; if (!enabled) s.SilentStartupShowRecorder = false; });
-        App.ApplyBackgroundResidency(enabled);
-        _isApplying = true; SilentStartupToggle.IsOn = _settingsService.Load().SilentStartupShowRecorder; _isApplying = false;
-        StatusText.Text = _localization.GetString("Status_SettingsSaved");
+        finally
+        {
+            _isApplying = false;
+        }
     }
     private async void OnSilentStartupToggled(object sender, RoutedEventArgs e)
     {
         if (_isApplying) return; SilentStartupToggle.IsEnabled = false; var requested = SilentStartupToggle.IsOn; var enabled = await WindowsStartupService.Default.SetEnabledAsync(requested); SilentStartupToggle.IsEnabled = true;
-        if (enabled) { var settings = _settingsService.Update(s => { s.SilentStartupShowRecorder = requested; if (requested) s.BackgroundResidencyEnabled = true; }); App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled); _isApplying = true; BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder; _isApplying = false; StatusText.Text = _localization.GetString("Status_SettingsSaved"); }
+        if (enabled) { var settings = _settingsService.Update(s => { s.SilentStartupShowRecorder = requested; if (requested) s.BackgroundResidencyEnabled = true; }); App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled); if (requested) await App.ShowInspirationRecorderAsync(moveToPrimaryWorkAreaTopRight: true); _isApplying = true; BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder; _isApplying = false; StatusText.Text = _localization.GetString("Status_SettingsSaved"); }
         else { _isApplying = true; SilentStartupToggle.IsOn = _settingsService.Load().SilentStartupShowRecorder; _isApplying = false; }
     }
     private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
