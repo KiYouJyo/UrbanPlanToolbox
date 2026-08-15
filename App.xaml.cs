@@ -130,8 +130,11 @@ public partial class App : Application
             }
         }
 
-        NotifyMainWindowShown();
-        existingWindow.DispatcherQueue.TryEnqueue(existingWindow.RestoreAndActivate);
+        existingWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            NotifyMainWindowShown();
+            existingWindow.RestoreAndActivate();
+        });
     }
 
     private static void ActivatePendingRedirectedWindow()
@@ -144,8 +147,11 @@ public partial class App : Application
             existingWindow = MainWindow;
         }
 
-        NotifyMainWindowShown();
-        existingWindow.DispatcherQueue.TryEnqueue(existingWindow.RestoreAndActivate);
+        existingWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            NotifyMainWindowShown();
+            existingWindow.RestoreAndActivate();
+        });
     }
 
     /// <summary>
