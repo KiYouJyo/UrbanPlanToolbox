@@ -24,6 +24,7 @@ public sealed class TrayService : IDisposable
     private nint _window;
     private nint _icon;
     private bool _created;
+    private bool _iconVisible;
     private bool _recorderVisible;
     private TrayMenuWindow? _menuWindow;
 
@@ -32,7 +33,7 @@ public sealed class TrayService : IDisposable
     public event EventHandler? SettingsRequested;
     public event EventHandler? ExitRequested;
 
-    public void Initialize()
+    public void Initialize(bool iconVisible = true)
     {
         if (_created) return;
 
@@ -53,18 +54,40 @@ public sealed class TrayService : IDisposable
 
         Owners[_window] = this;
         _icon = LoadThemeAwareIcon();
-        var data = Data(Message | Icon | Tip);
-        if (!ShellNotifyIcon(Add, ref data))
-            throw new InvalidOperationException("Cannot create the tray icon.");
-
         _created = true;
         _uiSettings.ColorValuesChanged += OnSystemColorsChanged;
+
+        if (iconVisible)
+            SetIconVisible(true);
+    }
+
+    public void SetIconVisible(bool visible)
+    {
+        if (!_created || visible == _iconVisible) return;
+
+        if (visible)
+        {
+            var data = Data(Message | Icon | Tip);
+            if (!ShellNotifyIcon(Add, ref data))
+            {
+                AppLogger.Default.Warning("Tray", "TrayIconShowFailed", "Shell_NotifyIcon(NIM_ADD) returned false.");
+                return;
+            }
+
+            _iconVisible = true;
+            return;
+        }
+
+        var deleteData = Data(0);
+        ShellNotifyIcon(Delete, ref deleteData);
+        _iconVisible = false;
+        _menuWindow?.HideMenu();
     }
 
     public void SetRecorderVisible(bool visible)
     {
         _recorderVisible = visible;
-        if (_created)
+        if (_created && _iconVisible)
         {
             var data = Data(Tip);
             ShellNotifyIcon(Modify, ref data);
@@ -89,7 +112,7 @@ public sealed class TrayService : IDisposable
 
         var previous = _icon;
         _icon = replacement;
-        if (_created)
+        if (_created && _iconVisible)
         {
             var data = Data(Icon);
             ShellNotifyIcon(Modify, ref data);
@@ -111,7 +134,7 @@ public sealed class TrayService : IDisposable
 
     private void ShowMenu()
     {
-        if (!GetCursorPos(out var cursor)) return;
+        if (!_iconVisible || !GetCursorPos(out var cursor)) return;
 
         if (_menuWindow is null)
         {
@@ -147,8 +170,13 @@ public sealed class TrayService : IDisposable
 
         if (_window == 0) return;
         _uiSettings.ColorValuesChanged -= OnSystemColorsChanged;
-        var data = Data(0);
-        ShellNotifyIcon(Delete, ref data);
+        if (_iconVisible)
+        {
+            var data = Data(0);
+            ShellNotifyIcon(Delete, ref data);
+        }
+
+        _iconVisible = false;
         Owners.Remove(_window);
         DestroyWindow(_window);
         if (_icon != 0) DestroyIcon(_icon);
