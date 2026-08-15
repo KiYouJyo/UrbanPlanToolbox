@@ -23,7 +23,17 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
             var context = CreateContext();
             _updates = await context.GetAppAndOptionalStorePackageUpdatesAsync().AsTask(cancellationToken);
             if (_updates.Count == 0) return new(AppUpdateState.UpToDate, AvailableVersion: AppVersionProvider.Version, Source: UpdateInstallSource.Store);
-            var versionText = await _manifestService.GetVersionAsync(DistributionChannel.Store, cancellationToken);
+
+            // Store availability is authoritative. Display metadata is secondary and must never
+            // claim that an older/current version is the update target merely because a hosted
+            // manifest lags behind Store certification/rollout.
+            var hostedVersion = await _manifestService.GetVersionAsync(DistributionChannel.Store, cancellationToken);
+            var packageVersions = _updates.Select(TryGetPackageVersionText).ToArray();
+            var versionText = StoreUpdateVersionResolver.Resolve(AppVersionProvider.Version, packageVersions, hostedVersion);
+            AppLogger.Default.Info(
+                "StoreUpdate",
+                "StoreUpdateMetadataResolved",
+                $"Installed={AppVersionProvider.Version};PackageCandidates={string.Join(',', packageVersions.Where(value => !string.IsNullOrWhiteSpace(value)))};Hosted={hostedVersion ?? "null"};Resolved={versionText ?? "unknown"}");
             return new(AppUpdateState.UpdateAvailable, versionText, Source: UpdateInstallSource.Store);
         }
         catch (OperationCanceledException) { return new(AppUpdateState.Cancelled); }
@@ -62,6 +72,19 @@ public sealed class StoreAppUpdateService(AppDistributionChannelService channelS
     {
         // Store has one user action. This compatibility member is not part of its normal lifecycle.
         return new(AppUpdateState.Failed, "StoreInstallPendingUnsupported");
+    }
+
+    private static string? TryGetPackageVersionText(StorePackageUpdate update)
+    {
+        try
+        {
+            var version = update.Package.Id.Version;
+            return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private void ResetProgressTracking()
