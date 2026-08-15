@@ -632,7 +632,7 @@ public sealed class AppUpdateTests
 
         await viewModel.CheckAsync();
 
-        Assert.Equal("v1.8.0", viewModel.CurrentVersion);
+        Assert.Equal(AppVersionProvider.DisplayVersion, viewModel.CurrentVersion);
         Assert.Equal(expectedState, viewModel.Info.State);
         Assert.Equal(expectedDialog, viewModel.ShouldShowUpdateDialog);
         Assert.Equal(availableVersion, viewModel.Info.AvailableVersion);
