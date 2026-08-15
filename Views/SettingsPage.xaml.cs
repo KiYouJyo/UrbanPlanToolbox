@@ -27,6 +27,7 @@ public sealed partial class SettingsPage : Page
         MilestoneNotificationsDescription.Text = _localization.GetString("Settings_MilestoneNotificationsDescription");
         MilestoneNotificationsLabel.Text = _localization.GetString("Settings_MilestoneNotificationsLabel");
         MilestoneNotificationsRepeatLabel.Text = _localization.GetString("Settings_MilestoneNotificationsRepeatLabel");
+        ResidencyTitle.Text = _localization.GetString("Residency_Title"); BackgroundResidencyToggle.Header = _localization.GetString("Residency_BackgroundRecorder"); BackgroundResidencyDescription.Text = _localization.GetString("Residency_BackgroundRecorderDescription"); SilentStartupToggle.Header = _localization.GetString("Residency_SilentStartupRecorder"); SilentStartupDescription.Text = _localization.GetString("Residency_SilentStartupRecorderDescription");
         MilestoneNotificationsToggle.OnContent = _localization.GetString("Settings_MilestoneNotificationsOn");
         MilestoneNotificationsToggle.OffContent = _localization.GetString("Settings_MilestoneNotificationsOff");
         ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text); ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
@@ -80,9 +81,42 @@ public sealed partial class SettingsPage : Page
         ThemeBox.SelectedIndex = settings.Theme switch { "Light" => 1, "Dark" => 2, _ => 0 };
         var language = LanguagePreference.Normalize(settings.Language); ApplyLanguageSelection(language);
         MilestoneNotificationsToggle.IsOn = settings.IsProjectMilestoneNotificationsEnabled;
+        BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder;
         ApplyMilestoneReminderSettings(settings);
         _isApplying = false;
         ApplyTheme(settings.Theme);
+    }
+    private async void OnBackgroundResidencyToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isApplying) return;
+        _isApplying = true;
+        try
+        {
+            var enabled = BackgroundResidencyToggle.IsOn;
+            if (!enabled) await WindowsStartupService.Default.SetEnabledAsync(false);
+
+            var settings = _settingsService.Update(s =>
+            {
+                s.BackgroundResidencyEnabled = enabled;
+                if (!enabled) s.SilentStartupShowRecorder = false;
+            });
+
+            App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled);
+            if (settings.BackgroundResidencyEnabled) await App.ShowInspirationRecorderAsync(moveToPrimaryWorkAreaTopRight: true);
+
+            SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder;
+            StatusText.Text = _localization.GetString("Status_SettingsSaved");
+        }
+        finally
+        {
+            _isApplying = false;
+        }
+    }
+    private async void OnSilentStartupToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isApplying) return; SilentStartupToggle.IsEnabled = false; var requested = SilentStartupToggle.IsOn; var enabled = await WindowsStartupService.Default.SetEnabledAsync(requested); SilentStartupToggle.IsEnabled = true;
+        if (enabled) { var settings = _settingsService.Update(s => { s.SilentStartupShowRecorder = requested; if (requested) s.BackgroundResidencyEnabled = true; }); App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled); if (requested) await App.ShowInspirationRecorderAsync(moveToPrimaryWorkAreaTopRight: true); _isApplying = true; BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder; _isApplying = false; StatusText.Text = _localization.GetString("Status_SettingsSaved"); }
+        else { _isApplying = true; SilentStartupToggle.IsOn = _settingsService.Load().SilentStartupShowRecorder; _isApplying = false; }
     }
     private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };
     private void OnReopenFirstRunGuide(object sender, RoutedEventArgs e) => App.MainWindow?.ShowFirstRunGuideFromSettings();

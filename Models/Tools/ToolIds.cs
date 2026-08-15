@@ -13,4 +13,6 @@ public static class ToolIds
     public const string FieldSurveyPhotoGis = "field-survey-photo-gis";
     public const string DrawingVersionComparator = "drawing-version-comparator";
     public const string CoordinateBatchFormatConverter = "coordinate-batch-format-converter";
+    public const string DesignInspiration = "design-inspiration";
+    public const string ResearchInspiration = "research-inspiration";
 }

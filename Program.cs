@@ -9,17 +9,24 @@ namespace UrbanPlanToolbox;
 /// <summary>Owns process startup so instance arbitration occurs before WinUI is initialized.</summary>
 public static class Program
 {
+    public static bool IsBackgroundStartup { get; private set; }
     [STAThread]
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         ComWrappersSupport.InitializeComWrappers();
 
         var currentInstance = AppInstance.GetCurrent();
+        StartupTiming.Default.Mark($"T0 Process entry; activation={currentInstance.GetActivatedEventArgs().Kind}");
+        IsBackgroundStartup = args.Any(argument => string.Equals(argument, "--background-startup", StringComparison.OrdinalIgnoreCase)) || string.Equals(currentInstance.GetActivatedEventArgs().Kind.ToString(), "StartupTask", StringComparison.Ordinal);
         var mainInstance = AppInstance.FindOrRegisterForKey(SingleInstanceActivation.InstanceKey);
         if (!mainInstance.IsCurrent)
         {
             var activationArguments = currentInstance.GetActivatedEventArgs();
-            await mainInstance.RedirectActivationToAsync(activationArguments);
+            // This happens before WinUI owns the UI thread.  Awaiting from an async
+            // process entry point leaves the thread in a state that breaks TSF/IME
+            // composition in WinUI text controls. Complete the redirect synchronously
+            // before Application.Start establishes the WinUI dispatcher instead.
+            mainInstance.RedirectActivationToAsync(activationArguments).AsTask().GetAwaiter().GetResult();
             return;
         }
 

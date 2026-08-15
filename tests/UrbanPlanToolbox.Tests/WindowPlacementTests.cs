@@ -7,11 +7,20 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class WindowPlacementTests
 {
     [Fact]
-    public void MissingPlacementUsesTheExistingDefaultSize()
+    public void MissingPlacementUsesAWorkAreaProportionalMediumSize()
     {
         using var scope = new SettingsScope();
         var placement = new WindowPlacementService(new SettingsService(scope.Path)).Load(new SizeInt32(1920, 1080));
-        Assert.Equal(new WindowPlacement(1100, 760, false), placement);
+        Assert.Equal(new WindowPlacement(1344, 810, false), placement);
+    }
+
+    [Fact]
+    public void HighDpiFirstLaunchDefaultIsCenteredMediumNotTiny()
+    {
+        var placement = WindowPlacementService.CreateDefault(new SizeInt32(3200, 1904));
+        Assert.True(placement.Width >= 1900);
+        Assert.True(placement.Height >= 1200);
+        Assert.False(placement.WasMaximized);
     }
 
     [Theory]
@@ -40,7 +49,7 @@ public sealed class WindowPlacementTests
         using var scope = new SettingsScope();
         Directory.CreateDirectory(System.IO.Path.GetDirectoryName(scope.Path)!);
         File.WriteAllText(scope.Path, "{\"LastNormalWindowWidth\":0,\"LastNormalWindowHeight\":50,\"WasWindowMaximized\":true}");
-        Assert.Equal(new WindowPlacement(1100, 760, false), new WindowPlacementService(new SettingsService(scope.Path)).Load(new SizeInt32(1920, 1080)));
+        Assert.Equal(WindowPlacementService.CreateDefault(new SizeInt32(1920, 1080)), new WindowPlacementService(new SettingsService(scope.Path)).Load(new SizeInt32(1920, 1080)));
     }
 
     [Fact]

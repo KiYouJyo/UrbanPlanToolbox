@@ -14,4 +14,11 @@ public static class SettingsKeys
     public const string LastNormalWindowWidth = "LastNormalWindowWidth";
     public const string LastNormalWindowHeight = "LastNormalWindowHeight";
     public const string WasWindowMaximized = "WasWindowMaximized";
+    public const string CloseToTrayEnabled = "CloseToTrayEnabled";
+    public const string StartWithWindows = "StartWithWindows";
+    public const string InspirationRecorderEnabled = "InspirationRecorderEnabled";
+    public const string ShowRecorderOnBackgroundStartup = "ShowRecorderOnBackgroundStartup";
+    public const string InspirationRecorderAlwaysOnTop = "InspirationRecorderAlwaysOnTop";
+    public const string BackgroundResidencyEnabled = "BackgroundResidencyEnabled";
+    public const string SilentStartupShowRecorder = "SilentStartupShowRecorder";
 }

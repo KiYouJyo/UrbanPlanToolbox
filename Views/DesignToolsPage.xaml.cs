@@ -13,6 +13,6 @@ public sealed partial class DesignToolsPage : Page
         CategoryBrowser.Configure(
             ToolPrimaryCategory.Design,
             ToolCategoryCatalog.Design,
-            ToolSecondaryCategory.MasterPlanning);
+            ToolSecondaryCategory.PreliminaryAnalysis);
     }
 }

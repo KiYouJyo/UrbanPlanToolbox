@@ -5,7 +5,7 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class SingleInstanceActivationTests
 {
     [Fact]
-    public void StartupArbitratesBeforeWinUiAndWaitsForRedirectCompletion()
+    public void StartupArbitratesBeforeWinUiAndCompletesRedirectSynchronously()
     {
         var root = FindRepositoryRoot();
         var program = File.ReadAllText(Path.Combine(root, "Program.cs"));
@@ -13,12 +13,15 @@ public sealed class SingleInstanceActivationTests
         var applicationStart = program.IndexOf("Application.Start", StringComparison.Ordinal);
 
         Assert.True(registration >= 0 && registration < applicationStart);
-        Assert.Contains("await mainInstance.RedirectActivationToAsync(activationArguments)", program);
+        Assert.Contains("public static void Main(string[] args)", program);
+        Assert.Contains("mainInstance.RedirectActivationToAsync(activationArguments).AsTask().GetAwaiter().GetResult()", program);
+        Assert.DoesNotContain("public static async Task Main", program);
         Assert.Contains("if (!mainInstance.IsCurrent)", program);
         Assert.Contains("return;", program);
         Assert.Contains("mainInstance.Activated", program);
         Assert.Contains("DispatcherQueueSynchronizationContext", program);
         Assert.True(program.IndexOf("SynchronizationContext.SetSynchronizationContext", StringComparison.Ordinal) < program.IndexOf("new App()", StringComparison.Ordinal));
+        Assert.True(program.IndexOf("ComWrappersSupport.InitializeComWrappers", StringComparison.Ordinal) < program.IndexOf("AppInstance.GetCurrent", StringComparison.Ordinal));
     }
 
     [Fact]

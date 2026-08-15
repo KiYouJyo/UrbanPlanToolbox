@@ -44,6 +44,8 @@ public sealed partial class MainWindow : Window
     private readonly Stopwatch _startupSplashVisibleClock = new();
     private SizeInt32 _lastNormalWindowSize;
     private bool _wasWindowMaximized;
+    private bool _allowClose;
+    private bool _hasSavedWindowPlacement;
 
     public event EventHandler? ShellReady;
 
@@ -58,6 +60,7 @@ public sealed partial class MainWindow : Window
         _uiSettings.ColorValuesChanged += OnSystemColorValuesChanged;
         RestoreWindowPlacement();
         AppWindow.Changed += OnAppWindowChanged;
+        AppWindow.Closing += OnAppWindowClosing;
         Closed += OnWindowClosed;
 
         StartupTiming.Default.Mark("T3 InitializeComponent complete");
@@ -79,16 +82,37 @@ public sealed partial class MainWindow : Window
         // native splash dismissal can reveal a title-bar-only black frame.
         FirstRunGuide.Closed += OnFirstRunGuideClosed;
     }
+    private void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
+        if (_allowClose || !new SettingsService().Load().BackgroundResidencyEnabled) return;
+        args.Cancel = true; AppWindow.Hide(); App.NotifyMainWindowHidden();
+    }
+    public void CloseForExit() { _allowClose = true; Close(); }
 
     private void RestoreWindowPlacement()
     {
         var workArea = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
+        var settings = new SettingsService().Load();
+        _hasSavedWindowPlacement = settings.LastNormalWindowWidth is not null && settings.LastNormalWindowHeight is not null;
         var placement = _windowPlacement.Load(new SizeInt32(workArea.Width, workArea.Height));
         _lastNormalWindowSize = new SizeInt32(placement.Width, placement.Height);
         _wasWindowMaximized = placement.WasMaximized;
         AppWindow.Resize(_lastNormalWindowSize);
         if (_wasWindowMaximized && AppWindow.Presenter is OverlappedPresenter presenter)
+        {
             presenter.Maximize();
+        }
+        else if (!_hasSavedWindowPlacement)
+        {
+            CenterWindow(_lastNormalWindowSize, workArea);
+        }
+    }
+
+    private void CenterWindow(SizeInt32 size, RectInt32 workArea)
+    {
+        var x = workArea.X + Math.Max(0, (workArea.Width - size.Width) / 2);
+        var y = workArea.Y + Math.Max(0, (workArea.Height - size.Height) / 2);
+        AppWindow.Move(new PointInt32(x, y));
     }
 
     private void OnAppWindowChanged(AppWindow sender, AppWindowChangedEventArgs args)
@@ -121,6 +145,7 @@ public sealed partial class MainWindow : Window
     /// <summary>Restores and foregrounds this already-created main window for redirected activation.</summary>
     public void RestoreAndActivate()
     {
+        AppWindow.Show();
         if (AppWindow.Presenter is OverlappedPresenter presenter && presenter.State == OverlappedPresenterState.Minimized)
             presenter.Restore();
 
@@ -332,6 +357,18 @@ public sealed partial class MainWindow : Window
     }
 
     public void Navigate(Type pageType) => RootFrame.Navigate(pageType);
+    public void NavigateToSettings()
+    {
+        RestoreAndActivate();
+        if (RootFrame.Content is MainPage mainPage) mainPage.NavigateToSettings();
+        else { RootFrame.Navigate(typeof(MainPage)); DispatcherQueue.TryEnqueue(() => (RootFrame.Content as MainPage)?.NavigateToSettings()); }
+    }
+    public void NavigateToInspiration(Models.InspirationCategory category)
+    {
+        RestoreAndActivate();
+        if (RootFrame.Content is MainPage mainPage) mainPage.NavigateToInspiration(category);
+        else { RootFrame.Navigate(typeof(MainPage)); DispatcherQueue.TryEnqueue(() => (RootFrame.Content as MainPage)?.NavigateToInspiration(category)); }
+    }
 
     /// <summary>Single window-level coordinator used by Settings and startup.</summary>
     public void ShowFirstRunGuideFromSettings() => ShowFirstRunGuide(FirstRunGuideLaunchMode.Manual);

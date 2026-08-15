@@ -28,6 +28,55 @@ public partial class App : Application
     private Window? _window;
     private static bool _redirectedActivationPending;
     public static MainWindow? MainWindow { get; private set; }
+    private static Views.InspirationRecorderWindow? _recorder;
+    private static TrayService? _tray;
+    public static async Task ShowInspirationRecorderAsync(bool moveToPrimaryWorkAreaTopRight = false)
+    {
+        if (_recorder is null)
+        {
+            _recorder = new Views.InspirationRecorderWindow();
+            StartupTiming.Default.Mark("T5 Recorder window created");
+        }
+        await _recorder.RefreshAsync();
+        StartupTiming.Default.Mark("T4 Inspiration and draft ready");
+        _recorder.ShowRecorder(moveToPrimaryWorkAreaTopRight);
+        StartupTiming.Default.Mark("T6 Recorder shown and activated");
+        _tray?.SetRecorderVisible(true);
+    }
+    public static void HideInspirationRecorder()
+    {
+        _recorder?.HideRecorder();
+        _tray?.SetRecorderVisible(false);
+    }
+    public static void ApplyBackgroundResidency(bool enabled)
+    {
+        if (enabled) { InitializeTray(); return; }
+        HideInspirationRecorder();
+        _tray?.Dispose();
+        _tray = null;
+    }
+    public static async Task ShowInspirationAsync(Guid id)
+    {
+        _recorder ??= new Views.InspirationRecorderWindow();
+        await _recorder.OpenInspirationAsync(id);
+        _tray?.SetRecorderVisible(true);
+    }
+    public static void OpenInspirationManagement(Models.InspirationCategory category) => MainWindow?.DispatcherQueue.TryEnqueue(() => MainWindow.NavigateToInspiration(category));
+    internal static void NotifyMainWindowHidden() => _tray?.SetRecorderVisible(_recorder is not null);
+    private static void InitializeTray()
+    {
+        // The runtime switch can be toggled repeatedly.  Subscribe once only:
+        // duplicate subscriptions would execute every tray command more than once.
+        if (_tray is not null) return;
+        _tray = new TrayService();
+        _tray.Initialize();
+        StartupTiming.Default.Mark("T3 Tray ready");
+        _tray.OpenRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(MainWindow.RestoreAndActivate);
+        _tray.RecorderRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(async () => { if (_recorder?.IsVisible == true) HideInspirationRecorder(); else await ShowInspirationRecorderAsync(); });
+        _tray.SettingsRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(MainWindow.NavigateToSettings);
+        _tray.ExitRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(ExitApplication);
+    }
+    private static void ExitApplication() { _tray?.Dispose(); _recorder?.CloseForExit(); MainWindow?.CloseForExit(); Current.Exit(); }
     
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -36,7 +85,7 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-        StartupTiming.Default.Mark("T0 App constructor");
+        StartupTiming.Default.Mark("T0 App initialization start");
         UnhandledException += OnUnhandledException;
         AppLogger.Default.Info("App", "Constructed", "Application object initialized.");
     }
@@ -80,13 +129,13 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        StartupTiming.Default.Mark("T1 OnLaunched entered");
+        StartupTiming.Default.Mark($"T1 Launch activation received; background={Program.IsBackgroundStartup}");
         // This must precede SettingsService.Load and all other initialization:
         // a newly-created default settings file is not evidence of an upgrade.
         var firstRunExperience = FirstRunExperienceService.Default;
         firstRunExperience.PrepareForLaunch();
         var settings = new SettingsService().Load();
-        StartupTiming.Default.Mark("T6 Language and settings ready");
+        StartupTiming.Default.Mark("T2 Minimum settings loaded");
         LocalizationService.Default.ApplyPersistedLanguage(settings);
         StartupTiming.Default.Mark("T7 Language applied");
         StartupTiming.Default.Mark("T2 MainWindow creation start");
@@ -105,7 +154,17 @@ public partial class App : Application
         {
             if (startupWorkCompleted) MainWindow?.ShowFirstRunGuideIfNeeded();
         };
-        _window.Activate();
+        if (!Program.IsBackgroundStartup) _window.Activate();
+        else
+        {
+            // A background StartupTask must never flash the full shell.  The recorder
+            // remains an independently shown window; the shell is restored on demand.
+            MainWindow.AppWindow.Hide();
+            if (settings.BackgroundResidencyEnabled && settings.SilentStartupShowRecorder)
+                _window.DispatcherQueue.TryEnqueue(async () => await ShowInspirationRecorderAsync(moveToPrimaryWorkAreaTopRight: true));
+        }
+        // The native tray belongs only to the opt-in residency lifecycle.
+        if (settings.BackgroundResidencyEnabled) InitializeTray();
         StartupTiming.Default.Mark("Startup.WindowActivated");
         StartupTiming.Default.Mark("T8 Activate called");
         // Defer disk and notification work until a complete first frame is available.
