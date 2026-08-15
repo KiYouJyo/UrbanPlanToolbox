@@ -27,6 +27,7 @@ public partial class App : Application
     private static readonly object ActivationGate = new();
     private Window? _window;
     private static bool _redirectedActivationPending;
+    private static bool _mainWindowVisible;
     public static MainWindow? MainWindow { get; private set; }
     private static Views.InspirationRecorderWindow? _recorder;
     private static TrayService? _tray;
@@ -61,19 +62,41 @@ public partial class App : Application
         await _recorder.OpenInspirationAsync(id);
         _tray?.SetRecorderVisible(true);
     }
-    public static void OpenInspirationManagement(Models.InspirationCategory category) => MainWindow?.DispatcherQueue.TryEnqueue(() => MainWindow.NavigateToInspiration(category));
-    internal static void NotifyMainWindowHidden() => _tray?.SetRecorderVisible(_recorder is not null);
+    public static void OpenInspirationManagement(Models.InspirationCategory category) => MainWindow?.DispatcherQueue.TryEnqueue(() =>
+    {
+        NotifyMainWindowShown();
+        MainWindow.NavigateToInspiration(category);
+    });
+    internal static void NotifyMainWindowHidden()
+    {
+        _mainWindowVisible = false;
+        _tray?.SetIconVisible(true);
+        _tray?.SetRecorderVisible(_recorder?.IsVisible == true);
+    }
+    internal static void NotifyMainWindowShown()
+    {
+        _mainWindowVisible = true;
+        _tray?.SetIconVisible(false);
+    }
     private static void InitializeTray()
     {
         // The runtime switch can be toggled repeatedly.  Subscribe once only:
         // duplicate subscriptions would execute every tray command more than once.
         if (_tray is not null) return;
         _tray = new TrayService();
-        _tray.Initialize();
+        _tray.Initialize(iconVisible: !_mainWindowVisible);
         StartupTiming.Default.Mark("T3 Tray ready");
-        _tray.OpenRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(MainWindow.RestoreAndActivate);
+        _tray.OpenRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(() =>
+        {
+            NotifyMainWindowShown();
+            MainWindow.RestoreAndActivate();
+        });
         _tray.RecorderRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(async () => { if (_recorder?.IsVisible == true) HideInspirationRecorder(); else await ShowInspirationRecorderAsync(); });
-        _tray.SettingsRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(MainWindow.NavigateToSettings);
+        _tray.SettingsRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(() =>
+        {
+            NotifyMainWindowShown();
+            MainWindow.NavigateToSettings();
+        });
         _tray.ExitRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(ExitApplication);
     }
     private static void ExitApplication() { _tray?.Dispose(); _recorder?.CloseForExit(); MainWindow?.CloseForExit(); Current.Exit(); }
@@ -107,6 +130,7 @@ public partial class App : Application
             }
         }
 
+        NotifyMainWindowShown();
         existingWindow.DispatcherQueue.TryEnqueue(existingWindow.RestoreAndActivate);
     }
 
@@ -120,6 +144,7 @@ public partial class App : Application
             existingWindow = MainWindow;
         }
 
+        NotifyMainWindowShown();
         existingWindow.DispatcherQueue.TryEnqueue(existingWindow.RestoreAndActivate);
     }
 
@@ -154,11 +179,16 @@ public partial class App : Application
         {
             if (startupWorkCompleted) MainWindow?.ShowFirstRunGuideIfNeeded();
         };
-        if (!Program.IsBackgroundStartup) _window.Activate();
+        if (!Program.IsBackgroundStartup)
+        {
+            _window.Activate();
+            NotifyMainWindowShown();
+        }
         else
         {
             // A background StartupTask must never flash the full shell.  The recorder
             // remains an independently shown window; the shell is restored on demand.
+            _mainWindowVisible = false;
             MainWindow.AppWindow.Hide();
             if (settings.BackgroundResidencyEnabled && settings.SilentStartupShowRecorder)
                 _window.DispatcherQueue.TryEnqueue(async () => await ShowInspirationRecorderAsync(moveToPrimaryWorkAreaTopRight: true));
