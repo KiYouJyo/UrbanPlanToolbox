@@ -20,11 +20,11 @@ public sealed class AppSettings
     public bool BackgroundResidencyEnabled { get; set; }
     public bool SilentStartupShowRecorder { get; set; }
     // Legacy persisted values are retained solely for one-time migration reads.
-    public bool? CloseToTrayEnabled { get; set; }
-    public bool? StartWithWindows { get; set; }
-    public bool? InspirationRecorderEnabled { get; set; }
-    public bool? ShowRecorderOnBackgroundStartup { get; set; }
-    public bool? InspirationRecorderAlwaysOnTop { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public bool? CloseToTrayEnabled { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public bool? StartWithWindows { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public bool? InspirationRecorderEnabled { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public bool? ShowRecorderOnBackgroundStartup { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore] public bool? InspirationRecorderAlwaysOnTop { get; set; }
 
     [System.Text.Json.Serialization.JsonIgnore]
     public bool IsProjectMilestoneNotificationsEnabled =>

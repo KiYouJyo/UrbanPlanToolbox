@@ -27,7 +27,7 @@ public sealed partial class SettingsPage : Page
         MilestoneNotificationsDescription.Text = _localization.GetString("Settings_MilestoneNotificationsDescription");
         MilestoneNotificationsLabel.Text = _localization.GetString("Settings_MilestoneNotificationsLabel");
         MilestoneNotificationsRepeatLabel.Text = _localization.GetString("Settings_MilestoneNotificationsRepeatLabel");
-        ResidencyTitle.Text = _localization.GetString("Residency_Title"); BackgroundResidencyToggle.Header = _localization.GetString("Residency_BackgroundRecorder"); SilentStartupToggle.Header = _localization.GetString("Residency_SilentStartupRecorder");
+        ResidencyTitle.Text = _localization.GetString("Residency_Title"); BackgroundResidencyToggle.Header = _localization.GetString("Residency_BackgroundRecorder"); BackgroundResidencyDescription.Text = _localization.GetString("Residency_BackgroundRecorderDescription"); SilentStartupToggle.Header = _localization.GetString("Residency_SilentStartupRecorder"); SilentStartupDescription.Text = _localization.GetString("Residency_SilentStartupRecorderDescription");
         MilestoneNotificationsToggle.OnContent = _localization.GetString("Settings_MilestoneNotificationsOn");
         MilestoneNotificationsToggle.OffContent = _localization.GetString("Settings_MilestoneNotificationsOff");
         ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text); ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
@@ -90,7 +90,13 @@ public sealed partial class SettingsPage : Page
     {
         if (_isApplying) return;
         var enabled = BackgroundResidencyToggle.IsOn;
-        if (!enabled) await WindowsStartupService.Default.SetEnabledAsync(false);
+        if (!enabled && !await WindowsStartupService.Default.SetEnabledAsync(false))
+        {
+            _isApplying = true;
+            BackgroundResidencyToggle.IsOn = _settingsService.Load().BackgroundResidencyEnabled;
+            _isApplying = false;
+            return;
+        }
         _settingsService.Update(s => { s.BackgroundResidencyEnabled = enabled; if (!enabled) s.SilentStartupShowRecorder = false; });
         App.ApplyBackgroundResidency(enabled);
         _isApplying = true; SilentStartupToggle.IsOn = _settingsService.Load().SilentStartupShowRecorder; _isApplying = false;
@@ -99,7 +105,7 @@ public sealed partial class SettingsPage : Page
     private async void OnSilentStartupToggled(object sender, RoutedEventArgs e)
     {
         if (_isApplying) return; SilentStartupToggle.IsEnabled = false; var requested = SilentStartupToggle.IsOn; var enabled = await WindowsStartupService.Default.SetEnabledAsync(requested); SilentStartupToggle.IsEnabled = true;
-        if (enabled) { _settingsService.Update(s => { s.SilentStartupShowRecorder = requested; if (requested) s.BackgroundResidencyEnabled = true; }); _isApplying = true; var settings = _settingsService.Load(); BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder; _isApplying = false; StatusText.Text = _localization.GetString("Status_SettingsSaved"); }
+        if (enabled) { var settings = _settingsService.Update(s => { s.SilentStartupShowRecorder = requested; if (requested) s.BackgroundResidencyEnabled = true; }); App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled); _isApplying = true; BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder; _isApplying = false; StatusText.Text = _localization.GetString("Status_SettingsSaved"); }
         else { _isApplying = true; SilentStartupToggle.IsOn = _settingsService.Load().SilentStartupShowRecorder; _isApplying = false; }
     }
     private void ApplyLanguageSelection(string language) => LanguageBox.SelectedIndex = language switch { "zh-CN" => 1, "ja-JP" => 2, "en-US" => 3, _ => 0 };

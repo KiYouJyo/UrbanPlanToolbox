@@ -101,10 +101,20 @@ public sealed partial class FirstRunGuideHost : UserControl
         CompleteAndClose();
     }
 
-    private void OnBackgroundResidencyToggled(object sender, RoutedEventArgs e)
+    private async void OnBackgroundResidencyToggled(object sender, RoutedEventArgs e)
     {
         if (_isBusy) return;
+        if (!BackgroundResidencyToggle.IsOn && !await WindowsStartupService.Default.SetEnabledAsync(false))
+        {
+            _isBusy = true;
+            BackgroundResidencyToggle.IsOn = new SettingsService().Load().BackgroundResidencyEnabled;
+            _isBusy = false;
+            return;
+        }
         var settings = new SettingsService().Update(s => { s.BackgroundResidencyEnabled = BackgroundResidencyToggle.IsOn; if (!s.BackgroundResidencyEnabled) s.SilentStartupShowRecorder = false; });
+        // This establishes the residency lifecycle without showing the recorder
+        // while the user is still in the first-run guide.
+        App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled);
         _isBusy = true; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder; _isBusy = false;
     }
 
@@ -114,6 +124,7 @@ public sealed partial class FirstRunGuideHost : UserControl
         var requested = SilentStartupToggle.IsOn;
         if (!await WindowsStartupService.Default.SetEnabledAsync(requested)) { _isBusy = true; SilentStartupToggle.IsOn = new SettingsService().Load().SilentStartupShowRecorder; _isBusy = false; return; }
         var settings = new SettingsService().Update(s => { s.SilentStartupShowRecorder = requested; if (requested) s.BackgroundResidencyEnabled = true; });
+        App.ApplyBackgroundResidency(settings.BackgroundResidencyEnabled);
         _isBusy = true; BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; _isBusy = false;
     }
 

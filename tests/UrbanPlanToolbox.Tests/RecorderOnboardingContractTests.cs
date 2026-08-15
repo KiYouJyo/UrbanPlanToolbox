@@ -27,6 +27,17 @@ public sealed class RecorderOnboardingContractTests
         }
     }
 
+    [Fact]
+    public void EverySupportedLanguageShowsFiveGuidePages()
+    {
+        var root = FindRoot();
+        foreach (var language in new[] { "zh-CN", "ja-JP", "en-US" })
+        {
+            var resources = File.ReadAllText(Path.Combine(root, "Strings", language, "Resources.resw"));
+            Assert.Contains("<data name=\"FirstRunGuide_Step\" xml:space=\"preserve\"><value>{0} / 5</value></data>", resources);
+        }
+    }
+
     private static string FindRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)

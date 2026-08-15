@@ -65,7 +65,11 @@ public partial class App : Application
     internal static void NotifyMainWindowHidden() => _tray?.SetRecorderVisible(_recorder is not null);
     private static void InitializeTray()
     {
-        _tray ??= new TrayService(); _tray.Initialize();
+        // The runtime switch can be toggled repeatedly.  Subscribe once only:
+        // duplicate subscriptions would execute every tray command more than once.
+        if (_tray is not null) return;
+        _tray = new TrayService();
+        _tray.Initialize();
         StartupTiming.Default.Mark("T3 Tray ready");
         _tray.OpenRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(MainWindow.RestoreAndActivate);
         _tray.RecorderRequested += (_, _) => MainWindow?.DispatcherQueue.TryEnqueue(async () => { if (_recorder?.IsVisible == true) HideInspirationRecorder(); else await ShowInspirationRecorderAsync(); });

@@ -89,8 +89,14 @@
         <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="12">
             <TextBlock x:Name="ResidencyTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
-            <ToggleSwitch x:Name="BackgroundResidencyToggle" Toggled="OnBackgroundResidencyToggled"/>
-            <ToggleSwitch x:Name="SilentStartupToggle" Toggled="OnSilentStartupToggled"/>
+            <StackPanel Spacing="4">
+              <ToggleSwitch x:Name="BackgroundResidencyToggle" Toggled="OnBackgroundResidencyToggled"/>
+              <TextBlock x:Name="BackgroundResidencyDescription" Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <StackPanel Spacing="4">
+              <ToggleSwitch x:Name="SilentStartupToggle" Toggled="OnSilentStartupToggled"/>
+              <TextBlock x:Name="SilentStartupDescription" Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap"/>
+            </StackPanel>
           </StackPanel>
         </Border>
 
