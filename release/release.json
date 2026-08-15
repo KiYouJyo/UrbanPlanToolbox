@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.8.0", "packageVersion": "1.8.0.0" },
-  "classification": { "kind": "store-native-update-flow", "stability": "prepared-for-validation", "storeMilestone": false },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.8.1", "packageVersion": "1.8.1.0" },
+  "classification": { "kind": "maintenance-release", "stability": "prepared-for-validation", "storeMilestone": false },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.8.0 后台驻留与灵感记录器",
-    "ja-JP": "UrbanPlanToolbox v1.8.0 バックグラウンド常駐とインスピレーション記録",
-    "en-US": "UrbanPlanToolbox v1.8.0 desktop residency and inspiration recorder"
+    "zh-CN": "UrbanPlanToolbox v1.8.1 后台卸载、托盘菜单与项目页精简",
+    "ja-JP": "UrbanPlanToolbox v1.8.1 バックグラウンドアンインストール、トレイメニュー、プロジェクト画面の整理",
+    "en-US": "UrbanPlanToolbox v1.8.1 background uninstall, tray menu, and project workspace cleanup"
   },
   "languageLabels": {
     "zh-CN": "简体中文",
@@ -15,8 +15,8 @@
     "en-US": "English"
   },
   "items": [
-    { "id": "desktop-residency", "zh-CN": "新增原生系统托盘、后台驻留和 Windows 登录后后台启动。", "ja-JP": "ネイティブのシステム トレイ、バックグラウンド常駐、Windows サインイン時のバックグラウンド起動を追加しました。", "en-US": "Adds a native system tray, background residency, and Windows sign-in background startup." },
-    { "id": "inspiration-recorder", "zh-CN": "新增独立本地灵感记录器，支持 Draft 恢复、历史浏览和置顶。", "ja-JP": "Draft の復元、履歴閲覧、常に手前に表示する機能を備えたローカルのインスピレーション記録を追加しました。", "en-US": "Adds a local inspiration recorder with Draft recovery, history browsing, and always-on-top support." },
-    { "id": "inspiration-cards", "zh-CN": "设计和科研工具页新增分类灵感卡片与可选项目关联。", "ja-JP": "設計および研究ツール ページに、分類済みのインスピレーション カードと任意のプロジェクト関連付けを追加しました。", "en-US": "Adds categorized inspiration cards and optional project links to design and research tools." }
+    { "id": "resident-uninstall", "zh-CN": "修复后台驻留进程可能阻止 MSIX 正常卸载的问题。", "ja-JP": "バックグラウンド常駐プロセスが MSIX のアンインストールを妨げる場合がある問題を修正しました。", "en-US": "Fixes an issue where the resident background process could block MSIX uninstall." },
+    { "id": "winui-tray-menu", "zh-CN": "将系统托盘右键菜单改为紧凑的 WinUI 3 风格弹窗。", "ja-JP": "システムトレイの右クリックメニューをコンパクトな WinUI 3 スタイルのポップアップに変更しました。", "en-US": "Replaces the tray right-click menu with a compact WinUI 3-style popup." },
+    { "id": "project-workspace-cleanup", "zh-CN": "精简设计与研究项目页面，并将保存和重置操作统一移动到页面底部。", "ja-JP": "デザインおよび研究プロジェクト画面を整理し、保存とリセット操作をページ下部へ統一しました。", "en-US": "Streamlines design and research project workspaces and moves Save and Reset to the bottom." }
   ]
 }
