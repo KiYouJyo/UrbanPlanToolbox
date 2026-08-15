@@ -204,8 +204,6 @@ public sealed partial class LocalizationTests
         Assert.Equal(ToolIds.UnitScaleConverter, Assert.Single(Flatten(ja.Search("縮尺", _ => false))).Id);
         Assert.Equal(ToolIds.UnitScaleConverter, Assert.Single(Flatten(en.Search("scale", _ => false))).Id);
 
-        // The index is language-specific rather than a fixed Chinese index
-        // (the stable ID still matches in every language by design).
         Assert.Empty(Flatten(zh.Search("metrics", _ => false)));
         Assert.Empty(Flatten(en.Search("规划", _ => false)));
     }
@@ -217,7 +215,7 @@ public sealed partial class LocalizationTests
         {
             var service = new ToolSearchService(ToolRegistry.Default, TestLocalization.For(language));
             var ids = Flatten(service.Search(string.Empty, _ => false)).Select(tool => tool.Id).ToArray();
-        Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.DesignConceptDictionary, ToolIds.PlanningIndicatorCalculator, ToolIds.ResearchInspiration, ToolIds.WorkflowReviewChecklist, ToolIds.PlanningTerminology, ToolIds.ColorPaletteRecorder, ToolIds.DesignInspiration, ToolIds.FieldSurveyPhotoGis, ToolIds.DrawingVersionComparator, ToolIds.RegulationsIndex, ToolIds.CoordinateBatchFormatConverter, ToolIds.CoordinateSystemConverter], ids);
+            Assert.Equal([ToolIds.UnitScaleConverter, ToolIds.DesignConceptDictionary, ToolIds.PlanningIndicatorCalculator, ToolIds.ResearchInspiration, ToolIds.WorkflowReviewChecklist, ToolIds.PlanningTerminology, ToolIds.ColorPaletteRecorder, ToolIds.DesignInspiration, ToolIds.FieldSurveyPhotoGis, ToolIds.DrawingVersionComparator, ToolIds.RegulationsIndex, ToolIds.CoordinateBatchFormatConverter, ToolIds.CoordinateSystemConverter], ids);
         }
     }
 
@@ -241,23 +239,28 @@ public sealed partial class LocalizationTests
     }
 
     [Fact]
-    public void VersionConfigurationIs168AndChannelsRemainDistinct()
+    public void VersionConfigurationAndChannelsRemainDistinct()
     {
         var manifest = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Package.appxmanifest"));
-        Assert.Contains("Version=\"1.8.0.0\"", manifest);
+        var project = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "UrbanPlanToolbox.csproj"));
+        var versionMatch = Regex.Match(project, @"<Version>(\d+\.\d+\.\d+)</Version>");
+        Assert.True(versionMatch.Success, "UrbanPlanToolbox.csproj must contain a major.minor.patch Version.");
+        var version = versionMatch.Groups[1].Value;
+        var packageVersion = $"{version}.0";
+
+        Assert.Contains($"Version=\"{packageVersion}\"", manifest);
         var languages = Regex.Matches(manifest, "<Resource Language=\\\"([^\\\"]+)\\\"")
             .Select(match => match.Groups[1].Value).ToArray();
         Assert.Equal(["zh-CN", "ja-JP", "en-US"], languages);
         Assert.Contains("ms-resource:AppDisplayName", manifest);
 
-        var project = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "UrbanPlanToolbox.csproj"));
-        Assert.Contains("<Version>1.8.0</Version>", project);
-        Assert.Contains("<AssemblyVersion>1.8.0.0</AssemblyVersion>", project);
-        Assert.Contains("<FileVersion>1.8.0.0</FileVersion>", project);
-        Assert.Contains("<InformationalVersion>1.8.0</InformationalVersion>", project);
+        Assert.Contains($"<Version>{version}</Version>", project);
+        Assert.Contains($"<AssemblyVersion>{packageVersion}</AssemblyVersion>", project);
+        Assert.Contains($"<FileVersion>{packageVersion}</FileVersion>", project);
+        Assert.Contains($"<InformationalVersion>{version}</InformationalVersion>", project);
         var storeManifest = File.ReadAllText(Path.Combine(FindRepositoryRoot(), "Package.Store.appxmanifest"));
         Assert.Contains("Name=\"JoKiy.UrbanPlanToolbox\"", storeManifest);
-        Assert.Contains("Version=\"1.8.0.0\"", storeManifest);
+        Assert.Contains($"Version=\"{packageVersion}\"", storeManifest);
         Assert.DoesNotContain("Name=\"JoKiy.UrbanPlanToolbox\"", manifest);
         Assert.Contains("<DefaultLanguage>zh-CN</DefaultLanguage>", project);
         Assert.Contains("<AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>", project);

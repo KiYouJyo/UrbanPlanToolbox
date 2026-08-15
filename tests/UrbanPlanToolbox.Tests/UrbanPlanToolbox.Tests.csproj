@@ -77,6 +77,7 @@
   <Compile Include="../../Services/AppUpdateErrorMapper.cs" Link="Services/AppUpdateErrorMapper.cs" />
   <Compile Include="../../Services/MrtResourceKeyNormalizer.cs" Link="Services/MrtResourceKeyNormalizer.cs" />
   <Compile Include="../../Services/StoreUpdateProgressResolver.cs" Link="Services/StoreUpdateProgressResolver.cs" />
+  <Compile Include="../../Services/StoreUpdateVersionResolver.cs" Link="Services/StoreUpdateVersionResolver.cs" />
   <Compile Include="../../ViewModels/UpdateViewModel.cs" Link="ViewModels/UpdateViewModel.cs" />
   <Compile Include="../../Services/DistributionChannel.cs" Link="Services/DistributionChannel.cs" />
   <Compile Include="../../Services/DistributionChannelIdentity.cs" Link="Services/DistributionChannelIdentity.cs" />

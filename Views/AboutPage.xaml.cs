@@ -112,14 +112,31 @@ public sealed partial class AboutPage : Page
         AppLogger.Default.Info("ReleaseNotes", "RenderUpdateNotesSource", $"State={info.State}; AvailableVersion={info.AvailableVersion}; Locale={LocalizedReleaseNotesService.NormalizeLocale(_localization.CurrentLanguage)}; Source={display.Source}");
 
         UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
-        UpdateTargetLabel.Visibility = Visibility.Visible;
-        UpdateTargetText.Visibility = Visibility.Visible;
-        UpdateTargetText.Text = string.IsNullOrWhiteSpace(info.AvailableVersion) ? string.Empty : $"v{info.AvailableVersion}";
+        var hasTrustedTargetVersion = !string.IsNullOrWhiteSpace(info.AvailableVersion);
+        if (hasTrustedTargetVersion)
+        {
+            UpdateTargetLabel.Visibility = Visibility.Visible;
+            UpdateTargetText.Visibility = Visibility.Visible;
+            UpdateTargetText.Text = $"v{info.AvailableVersion}";
 
-        UpdateNotesLabel.Visibility = Visibility.Visible;
-        UpdateNotesContainer.Visibility = Visibility.Visible;
-        UpdateNotesText.Visibility = Visibility.Visible;
-        UpdateNotesText.Text = display.Text;
+            UpdateNotesLabel.Visibility = Visibility.Visible;
+            UpdateNotesContainer.Visibility = Visibility.Visible;
+            UpdateNotesText.Visibility = Visibility.Visible;
+            UpdateNotesText.Text = display.Text;
+        }
+        else
+        {
+            // Store availability and display metadata are separate concerns. When Store reports an
+            // update before a trustworthy target version can be resolved, suppress version-scoped
+            // rows rather than showing stale notes or an older hosted-manifest version.
+            UpdateTargetLabel.Visibility = Visibility.Collapsed;
+            UpdateTargetText.Visibility = Visibility.Collapsed;
+            UpdateTargetText.Text = string.Empty;
+            UpdateNotesLabel.Visibility = Visibility.Collapsed;
+            UpdateNotesContainer.Visibility = Visibility.Collapsed;
+            UpdateNotesText.Visibility = Visibility.Collapsed;
+            UpdateNotesText.Text = string.Empty;
+        }
 
         CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
         CheckUpdateButton.Content = info.NeedsFinalRestart ? T("Action_RestartAndUpdate") : info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");

@@ -1,0 +1,180 @@
+using System.Runtime.InteropServices;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
+using Microsoft.UI.Xaml.Controls;
+using UrbanPlanToolbox.Models;
+using UrbanPlanToolbox.Services;
+using Windows.Graphics;
+
+namespace UrbanPlanToolbox.Views;
+
+/// <summary>Compact WinUI 3 context-menu surface shown from the notification-area icon.</summary>
+public sealed partial class TrayMenuWindow : Window
+{
+    private const double MenuWidthDip = 220;
+    private const double MenuHeightDip = 154;
+    private static readonly nint HwndTopmost = new(-1);
+    private const uint SwpNoSize = 0x0001;
+    private const uint SwpNoMove = 0x0002;
+    private const uint SwpShowWindow = 0x0040;
+
+    private bool _allowClose;
+    private bool _isVisible;
+    private bool _hasActivatedSinceShow;
+
+    public event EventHandler? OpenRequested;
+    public event EventHandler? RecorderRequested;
+    public event EventHandler? SettingsRequested;
+    public event EventHandler? ExitRequested;
+
+    public TrayMenuWindow()
+    {
+        InitializeComponent();
+        AppWindow.IsShownInSwitchers = false;
+        var presenter = OverlappedPresenter.CreateForContextMenu();
+        presenter.IsAlwaysOnTop = true;
+        AppWindow.SetPresenter(presenter);
+        AppWindow.Closing += OnClosing;
+        Activated += OnActivated;
+        LocalizationService.Default.LanguageChanged += OnLanguageChanged;
+        SettingsService.SettingsChanged += OnSettingsChanged;
+        RefreshLocalizedStrings();
+        ApplyTheme(new SettingsService().Load().Theme);
+    }
+
+    public void ShowAt(PointInt32 cursorPosition, bool recorderVisible)
+    {
+        RecorderCheck.Visibility = recorderVisible ? Visibility.Visible : Visibility.Collapsed;
+
+        var size = GetPhysicalMenuSize();
+        AppWindow.Resize(size);
+        AppWindow.Move(CalculatePopupPosition(cursorPosition, size));
+        _hasActivatedSinceShow = false;
+        _isVisible = true;
+        AppWindow.Show();
+
+        // The tray callback can arrive while Explorer's hidden-icons flyout owns the foreground.
+        // Explicitly promote this context-menu HWND so the menu also works when every other app
+        // window is hidden and remains above the shell flyout that launched it.
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        SetWindowPos(hwnd, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
+        Activate();
+        SetForegroundWindow(hwnd);
+        BringWindowToTop(hwnd);
+    }
+
+    public void HideMenu()
+    {
+        if (!_isVisible) return;
+        AppWindow.Hide();
+        _isVisible = false;
+        _hasActivatedSinceShow = false;
+    }
+
+    public void CloseForExit()
+    {
+        _allowClose = true;
+        LocalizationService.Default.LanguageChanged -= OnLanguageChanged;
+        SettingsService.SettingsChanged -= OnSettingsChanged;
+        Close();
+    }
+
+    private SizeInt32 GetPhysicalMenuSize()
+    {
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var dpi = GetDpiForWindow(hwnd);
+        var scale = dpi == 0 ? 1d : dpi / 96d;
+        return new SizeInt32(
+            Math.Max(1, (int)Math.Round(MenuWidthDip * scale)),
+            Math.Max(1, (int)Math.Round(MenuHeightDip * scale)));
+    }
+
+    private static PointInt32 CalculatePopupPosition(PointInt32 cursor, SizeInt32 size)
+    {
+        var display = DisplayArea.GetFromPoint(cursor, DisplayAreaFallback.Primary);
+        var workArea = display.WorkArea;
+        var right = workArea.X + workArea.Width;
+        var bottom = workArea.Y + workArea.Height;
+
+        // Keep the accepted horizontal placement behavior; v1.8.1 only fixes z-order/activation.
+        var x = cursor.X + size.Width <= right ? cursor.X : cursor.X - size.Width;
+        var y = cursor.Y + size.Height <= bottom ? cursor.Y : cursor.Y - size.Height;
+
+        x = Math.Clamp(x, workArea.X, Math.Max(workArea.X, right - size.Width));
+        y = Math.Clamp(y, workArea.Y, Math.Max(workArea.Y, bottom - size.Height));
+        return new PointInt32(x, y);
+    }
+
+    private void OnActivated(object sender, WindowActivatedEventArgs args)
+    {
+        if (!_isVisible) return;
+        if (args.WindowActivationState != WindowActivationState.Deactivated)
+        {
+            _hasActivatedSinceShow = true;
+            return;
+        }
+
+        // Do not immediately dismiss a newly shown background-only menu if Explorer briefly
+        // retains activation. Once this window has actually been activated, normal click-away
+        // dismissal resumes.
+        if (_hasActivatedSinceShow)
+            HideMenu();
+    }
+
+    private void OnClosing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
+        if (_allowClose) return;
+        args.Cancel = true;
+        HideMenu();
+    }
+
+    private void OnLanguageChanged(object? sender, LanguageChangedEventArgs args) =>
+        DispatcherQueue.TryEnqueue(RefreshLocalizedStrings);
+
+    private void OnSettingsChanged(object? sender, AppSettings settings) =>
+        DispatcherQueue.TryEnqueue(() => ApplyTheme(settings.Theme));
+
+    private void ApplyTheme(string? theme) => ThemePreference.Apply(RootLayout, theme);
+
+    private void RefreshLocalizedStrings()
+    {
+        var localization = LocalizationService.Default;
+        SetMenuText(OpenButton, OpenText, localization.GetString("Tray_Open"));
+        SetMenuText(RecorderButton, RecorderText, localization.GetString("Tray_Recorder"));
+        SetMenuText(SettingsButton, SettingsText, localization.GetString("Tray_Settings"));
+        SetMenuText(ExitButton, ExitText, localization.GetString("Tray_Exit"));
+    }
+
+    private static void SetMenuText(Button button, TextBlock textBlock, string text)
+    {
+        textBlock.Text = text;
+        AutomationProperties.SetName(button, text);
+    }
+
+    private void InvokeAndHide(EventHandler? handler)
+    {
+        HideMenu();
+        handler?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnOpen(object sender, RoutedEventArgs e) => InvokeAndHide(OpenRequested);
+    private void OnRecorder(object sender, RoutedEventArgs e) => InvokeAndHide(RecorderRequested);
+    private void OnSettings(object sender, RoutedEventArgs e) => InvokeAndHide(SettingsRequested);
+    private void OnExit(object sender, RoutedEventArgs e) => InvokeAndHide(ExitRequested);
+
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(nint hwnd);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetForegroundWindow(nint hWnd);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool BringWindowToTop(nint hWnd);
+}
