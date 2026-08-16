@@ -25,14 +25,30 @@ public sealed class WebDavArchitectureTests
     }
 
     [Fact]
-    public void WebDavUpload_UsesTemporaryObjectAndMoveFinalization()
+    public void WebDavUpload_PutsFinalBackupAndVerifiesRemoteObject()
     {
         var client = Read("Services/WebDavClient.cs");
-        Assert.Contains("PROPFIND", client);
-        Assert.Contains("MKCOL", client);
-        Assert.Contains("MOVE", client);
-        Assert.Contains(".uploading", client);
-        Assert.Contains("Destination", client);
+        Assert.Contains("HttpMethod.Put", client);
+        Assert.Contains("request.Content.Headers.ContentLength = stream.Length;", client);
+        Assert.Contains("VerifyUploadedFileAsync", client);
+        Assert.Contains("VerifyWithHeadAsync", client);
+        Assert.Contains("VerifyWithPropFindAsync", client);
+        Assert.Contains("UploadSizeMismatch", client);
+        Assert.Contains("UploadNotVisibleAfterPut", client);
+        Assert.DoesNotContain(".uploading", client);
+        Assert.DoesNotContain("new(\"MOVE\")", client);
+    }
+
+    [Fact]
+    public void WebDavListing_UsesProviderTolerantDirectoryParser()
+    {
+        var client = Read("Services/WebDavClient.cs");
+        var parser = Read("Services/WebDavDirectoryListingParser.cs");
+        Assert.Contains("WebDavDirectoryListingParser.Parse", client);
+        Assert.Contains("displayname", parser);
+        Assert.Contains("Name.LocalName", parser);
+        Assert.Contains("Uri.UnescapeDataString", parser);
+        Assert.Contains("propstat", parser);
     }
 
     [Fact]
@@ -42,6 +58,19 @@ public sealed class WebDavArchitectureTests
         Assert.Contains("InspectAsync", cloudService);
         Assert.Contains("ImportAsync", cloudService);
         Assert.Contains("BackupValidationFailed", cloudService);
+    }
+
+    [Fact]
+    public void WebDavUi_ExposesExplicitRestoreAction()
+    {
+        var xaml = Read("Controls/WebDavDataManagementControl.xaml");
+        var code = Read("Controls/WebDavDataManagementControl.xaml.cs");
+        var localization = Read("Services/WebDavLocalization.cs");
+        Assert.Contains("WebDavRestoreButton", xaml);
+        Assert.Contains("Click=\"OnRestoreFromCloud\"", xaml);
+        Assert.Contains("OnRestoreFromCloud", code);
+        Assert.Contains("RestoreFromCloud", localization);
+        Assert.Contains("NoBackupsAfterCreate", localization);
     }
 
     [Fact]
