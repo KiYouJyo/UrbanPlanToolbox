@@ -1,0 +1,25 @@
+name: Cancel duplicate v1.8.2 publication orchestration
+
+on:
+  push:
+    branches:
+      - codex/v1.8.2-webdav-cloud-backup
+    paths:
+      - .github/workflows/cancel-v1.8.2-duplicate-orchestrator.yml
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Cancel duplicate orchestrator and its duplicate GitHub Release run
+        run: |
+          set -euo pipefail
+          gh run cancel 31922493721 --repo "${{ github.repository }}" || true
+          gh run cancel 31922504974 --repo "${{ github.repository }}" || true
+          echo "Cancelled duplicate orchestration run 31922493721 and duplicate GitHub Release run 31922504974 if still active."
