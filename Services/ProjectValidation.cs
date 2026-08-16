@@ -52,9 +52,11 @@ public static class ProjectValidation
             if (project.ResearchDetails is null) errors.Add("ResearchDetailsRequired");
             else
             {
-                ValidateRequiredText(project.ResearchDetails.ResearchField, MaxResearchFieldLength, "ResearchField", errors);
-                ValidateRequiredText(project.ResearchDetails.ResearchSubject, MaxResearchSubjectLength, "ResearchSubject", errors);
-                ValidateRequiredText(project.ResearchDetails.ResearchMethods, MaxResearchMethodsLength, "ResearchMethods", errors);
+                // Research details are intentionally optional at creation time so a project can be
+                // created quickly and completed later in Project Workspace.
+                ValidateOptionalText(project.ResearchDetails.ResearchField, MaxResearchFieldLength, "ResearchField", errors);
+                ValidateOptionalText(project.ResearchDetails.ResearchSubject, MaxResearchSubjectLength, "ResearchSubject", errors);
+                ValidateOptionalText(project.ResearchDetails.ResearchMethods, MaxResearchMethodsLength, "ResearchMethods", errors);
             }
         }
         if (project.CreatedAtUtc.Offset != TimeSpan.Zero || project.UpdatedAtUtc.Offset != TimeSpan.Zero ||
