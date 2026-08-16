@@ -96,7 +96,7 @@ public sealed class WebDavProfileService
             return false;
         }
 
-        var serverUrl = serverUri.AbsoluteUri.EndsWith('/', StringComparison.Ordinal) ? serverUri.AbsoluteUri : serverUri.AbsoluteUri + "/";
+        var serverUrl = serverUri.AbsoluteUri.EndsWith("/", StringComparison.Ordinal) ? serverUri.AbsoluteUri : serverUri.AbsoluteUri + "/";
         normalized = new WebDavProfile
         {
             ServerUrl = serverUrl,
