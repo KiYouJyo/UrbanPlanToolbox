@@ -11,7 +11,6 @@ public sealed partial class SettingsPage : Page
 {
     private readonly SettingsService _settingsService = new();
     private readonly ILocalizationService _localization = LocalizationService.Default;
-    private readonly WebDavDataManagementControl _webDavControl;
     private bool _isApplying;
 
     public SettingsPage()
@@ -37,12 +36,6 @@ public sealed partial class SettingsPage : Page
         ConfigureAccessibility(MilestoneNotificationsRepeatBox, MilestoneNotificationsRepeatLabel.Text, MilestoneNotificationsDescription.Text);
         Apply(_settingsService.Load());
         ClearDataButton.Content = _localization.GetString("DataManagement_Clear");
-        _webDavControl = new WebDavDataManagementControl();
-        if (DataActions.Parent is StackPanel dataPanel)
-        {
-            var statusIndex = dataPanel.Children.IndexOf(DataStatusBar);
-            dataPanel.Children.Insert(statusIndex >= 0 ? statusIndex : dataPanel.Children.Count, _webDavControl);
-        }
         Loaded += OnLoaded;
     }
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -245,7 +238,7 @@ public sealed partial class SettingsPage : Page
         {
             WebDavCredentialStore.Default.DeleteAll();
             await WebDavProfileService.Default.DeleteAsync();
-            await _webDavControl.RefreshConfigurationAsync();
+            await WebDavControl.RefreshConfigurationAsync();
             MilestoneReminderService.Default.ClearOwnedSchedules();
             Apply(new AppSettings());
         }
@@ -263,7 +256,7 @@ public sealed partial class SettingsPage : Page
     private void SetDataBusy(bool busy)
     {
         ExportButton.IsEnabled = ImportButton.IsEnabled = ClearDataButton.IsEnabled = !busy;
-        _webDavControl.SetExternalBusy(busy);
+        WebDavControl.SetExternalBusy(busy);
     }
     private static string FormatBytes(long bytes) => bytes >= 1024 * 1024 ? $"{bytes / (1024d * 1024d):0.##} MB" : $"{bytes / 1024d:0.##} KB";
 
