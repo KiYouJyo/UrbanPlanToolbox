@@ -18,7 +18,6 @@ public sealed class WebDavClient : IWebDavClient
 {
     private static readonly HttpMethod PropFindMethod = new("PROPFIND");
     private static readonly HttpMethod MkColMethod = new("MKCOL");
-    private static readonly HttpMethod MoveMethod = new("MOVE");
     private readonly HttpClient _httpClient;
 
     public WebDavClient(HttpMessageHandler? handler = null)
@@ -48,27 +47,12 @@ public sealed class WebDavClient : IWebDavClient
         var ensure = await EnsureCollectionAsync(normalized, password, cancellationToken).ConfigureAwait(false);
         if (!ensure.Succeeded) return ensure;
 
-        var temporaryName = $".{fileName}.{Guid.NewGuid():N}.uploading";
-        var temporaryUri = BuildFileUri(normalized, temporaryName);
         var finalUri = BuildFileUri(normalized, fileName);
-        var put = await PutFileAsync(normalized, password, temporaryUri, localPath, cancellationToken).ConfigureAwait(false);
+        var expectedLength = new FileInfo(localPath).Length;
+        var put = await PutFileAsync(normalized, password, finalUri, localPath, cancellationToken).ConfigureAwait(false);
         if (!put.Succeeded) return put;
 
-        try
-        {
-            using var request = CreateRequest(normalized, password, MoveMethod, temporaryUri);
-            request.Headers.TryAddWithoutValidation("Destination", finalUri.AbsoluteUri);
-            request.Headers.TryAddWithoutValidation("Overwrite", "F");
-            using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            if (response.StatusCode is HttpStatusCode.Created or HttpStatusCode.NoContent or HttpStatusCode.OK) return new(WebDavStatus.Success);
-            return FromStatusCode(response.StatusCode, "MoveFailed");
-        }
-        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested) { return new(WebDavStatus.Timeout, "MoveTimeout"); }
-        catch (HttpRequestException) { return new(WebDavStatus.TransportFailure, "MoveTransportFailure"); }
-        finally
-        {
-            await BestEffortDeleteAsync(normalized, password, temporaryUri).ConfigureAwait(false);
-        }
+        return await VerifyUploadedFileAsync(normalized, password, finalUri, fileName, expectedLength, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<WebDavListResult> ListAsync(WebDavProfile profile, string password, CancellationToken cancellationToken = default)
@@ -79,10 +63,7 @@ public sealed class WebDavClient : IWebDavClient
             var collectionUri = BuildCollectionUri(normalized);
             using var request = CreateRequest(normalized, password, PropFindMethod, collectionUri);
             request.Headers.TryAddWithoutValidation("Depth", "1");
-            request.Content = new StringContent(
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:displayname/><d:getcontentlength/><d:getlastmodified/><d:resourcetype/></d:prop></d:propfind>",
-                Encoding.UTF8,
-                "application/xml");
+            request.Content = CreatePropFindContent();
             using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             if ((int)response.StatusCode != 207)
             {
@@ -129,6 +110,87 @@ public sealed class WebDavClient : IWebDavClient
         return await SendNoContentAsync(normalized, password, HttpMethod.Delete, BuildFileUri(normalized, fileName), cancellationToken).ConfigureAwait(false);
     }
 
+    private async Task<WebDavResult> VerifyUploadedFileAsync(
+        WebDavProfile profile,
+        string password,
+        Uri fileUri,
+        string fileName,
+        long expectedLength,
+        CancellationToken cancellationToken)
+    {
+        WebDavResult lastResult = new(WebDavStatus.ProtocolFailure, "UploadVerificationFailed");
+        var delays = new[] { 0, 300, 900, 1800 };
+
+        foreach (var delayMs in delays)
+        {
+            if (delayMs > 0) await Task.Delay(delayMs, cancellationToken).ConfigureAwait(false);
+
+            var head = await VerifyWithHeadAsync(profile, password, fileUri, expectedLength, cancellationToken).ConfigureAwait(false);
+            if (head.Succeeded) return head;
+            lastResult = head;
+
+            var propFind = await VerifyWithPropFindAsync(profile, password, fileUri, fileName, expectedLength, cancellationToken).ConfigureAwait(false);
+            if (propFind.Succeeded) return propFind;
+            lastResult = propFind;
+        }
+
+        return lastResult;
+    }
+
+    private async Task<WebDavResult> VerifyWithHeadAsync(
+        WebDavProfile profile,
+        string password,
+        Uri fileUri,
+        long expectedLength,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var request = CreateRequest(profile, password, HttpMethod.Head, fileUri);
+            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode) return FromStatusCode(response.StatusCode, "UploadHeadVerificationFailed");
+
+            var remoteLength = response.Content.Headers.ContentLength;
+            if (remoteLength.HasValue)
+                return remoteLength.Value == expectedLength
+                    ? new(WebDavStatus.Success)
+                    : new(WebDavStatus.ProtocolFailure, "UploadSizeMismatch");
+
+            return new(WebDavStatus.ProtocolFailure, "UploadLengthUnavailable");
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested) { return new(WebDavStatus.Timeout, "UploadHeadVerificationTimeout"); }
+        catch (HttpRequestException) { return new(WebDavStatus.TransportFailure, "UploadHeadVerificationTransportFailure"); }
+    }
+
+    private async Task<WebDavResult> VerifyWithPropFindAsync(
+        WebDavProfile profile,
+        string password,
+        Uri fileUri,
+        string fileName,
+        long expectedLength,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var request = CreateRequest(profile, password, PropFindMethod, fileUri);
+            request.Headers.TryAddWithoutValidation("Depth", "0");
+            request.Content = CreatePropFindContent();
+            using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            if ((int)response.StatusCode != 207) return FromStatusCode(response.StatusCode, "UploadPropFindVerificationFailed");
+
+            var xml = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var item = WebDavDirectoryListingParser.Parse(xml)
+                .FirstOrDefault(candidate => string.Equals(candidate.FileName, fileName, StringComparison.OrdinalIgnoreCase));
+            if (item is null) return new(WebDavStatus.NotFound, "UploadNotVisibleAfterPut");
+            return item.Size == expectedLength
+                ? new(WebDavStatus.Success)
+                : new(WebDavStatus.ProtocolFailure, "UploadSizeMismatch");
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested) { return new(WebDavStatus.Timeout, "UploadPropFindVerificationTimeout"); }
+        catch (HttpRequestException) { return new(WebDavStatus.TransportFailure, "UploadPropFindVerificationTransportFailure"); }
+        catch (Exception exception) when (exception is System.Xml.XmlException or FormatException) { return new(WebDavStatus.ProtocolFailure, "UploadPropFindInvalidResponse"); }
+    }
+
     private async Task<WebDavResult> EnsureCollectionAsync(WebDavProfile profile, string password, CancellationToken cancellationToken)
     {
         var baseUri = new Uri(profile.ServerUrl, UriKind.Absolute);
@@ -158,6 +220,7 @@ public sealed class WebDavClient : IWebDavClient
             using var request = CreateRequest(profile, password, HttpMethod.Put, uri);
             request.Content = new StreamContent(stream);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            request.Content.Headers.ContentLength = stream.Length;
             using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             return response.IsSuccessStatusCode ? new(WebDavStatus.Success) : FromStatusCode(response.StatusCode, "UploadFailed");
         }
@@ -173,6 +236,7 @@ public sealed class WebDavClient : IWebDavClient
             using var request = CreateRequest(profile, password, HttpMethod.Put, uri);
             request.Content = new ByteArrayContent(payload);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            request.Content.Headers.ContentLength = payload.LongLength;
             using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
             return response.IsSuccessStatusCode ? new(WebDavStatus.Success) : FromStatusCode(response.StatusCode, "ProbeUploadFailed");
         }
@@ -192,12 +256,6 @@ public sealed class WebDavClient : IWebDavClient
         catch (HttpRequestException) { return new(WebDavStatus.TransportFailure, "RequestTransportFailure"); }
     }
 
-    private async Task BestEffortDeleteAsync(WebDavProfile profile, string password, Uri uri)
-    {
-        try { _ = await SendNoContentAsync(profile, password, HttpMethod.Delete, uri, CancellationToken.None).ConfigureAwait(false); }
-        catch (Exception) { }
-    }
-
     private static HttpRequestMessage CreateRequest(WebDavProfile profile, string password, HttpMethod method, Uri uri)
     {
         var request = new HttpRequestMessage(method, uri);
@@ -206,6 +264,11 @@ public sealed class WebDavClient : IWebDavClient
         request.Headers.UserAgent.ParseAdd($"UrbanPlanToolbox/{AppVersionProvider.Version}");
         return request;
     }
+
+    private static StringContent CreatePropFindContent() => new(
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:displayname/><d:getcontentlength/><d:getlastmodified/><d:resourcetype/></d:prop></d:propfind>",
+        Encoding.UTF8,
+        "application/xml");
 
     private static Uri BuildCollectionUri(WebDavProfile profile)
     {
