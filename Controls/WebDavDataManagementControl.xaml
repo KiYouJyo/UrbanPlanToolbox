@@ -14,6 +14,7 @@
     </StackPanel>
     <StackPanel Orientation="Horizontal" Spacing="8">
       <Button x:Name="WebDavBackupButton" Click="OnCreateCloudBackup"/>
+      <Button x:Name="WebDavRestoreButton" Click="OnRestoreFromCloud"/>
       <Button x:Name="WebDavManageButton" Click="OnManageCloudBackups"/>
       <Button x:Name="WebDavConfigureButton" Click="OnConfigureWebDav"/>
     </StackPanel>
