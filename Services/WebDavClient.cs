@@ -1,8 +1,6 @@
-using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Xml.Linq;
 using UrbanPlanToolbox.Models;
 
 namespace UrbanPlanToolbox.Services;
@@ -45,7 +43,7 @@ public sealed class WebDavClient : IWebDavClient
     public async Task<WebDavResult> UploadAsync(WebDavProfile profile, string password, string localPath, string fileName, CancellationToken cancellationToken = default)
     {
         if (!File.Exists(localPath)) return new(WebDavStatus.IoFailure, "LocalFileMissing");
-        if (!IsSafeBackupFileName(fileName)) return new(WebDavStatus.InvalidConfiguration, "FileNameInvalid");
+        if (!WebDavDirectoryListingParser.IsBackupFileName(fileName)) return new(WebDavStatus.InvalidConfiguration, "FileNameInvalid");
         if (!WebDavProfileService.TryNormalize(profile, out var normalized, out var errorCode)) return new(WebDavStatus.InvalidConfiguration, errorCode);
         var ensure = await EnsureCollectionAsync(normalized, password, cancellationToken).ConfigureAwait(false);
         if (!ensure.Succeeded) return ensure;
@@ -82,34 +80,19 @@ public sealed class WebDavClient : IWebDavClient
             using var request = CreateRequest(normalized, password, PropFindMethod, collectionUri);
             request.Headers.TryAddWithoutValidation("Depth", "1");
             request.Content = new StringContent(
-                "<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:getcontentlength/><d:getlastmodified/><d:resourcetype/></d:prop></d:propfind>",
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:displayname/><d:getcontentlength/><d:getlastmodified/><d:resourcetype/></d:prop></d:propfind>",
                 Encoding.UTF8,
                 "application/xml");
             using var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            if ((int)response.StatusCode != 207) return new(FromStatusCode(response.StatusCode, "PropFindFailed").Status, [], "PropFindFailed");
-            var xml = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var document = XDocument.Parse(xml, LoadOptions.None);
-            XNamespace dav = "DAV:";
-            var items = new List<CloudBackupItem>();
-            foreach (var responseElement in document.Descendants(dav + "response"))
+            if ((int)response.StatusCode != 207)
             {
-                var property = responseElement.Descendants(dav + "prop").FirstOrDefault();
-                if (property is null || property.Element(dav + "resourcetype")?.Element(dav + "collection") is not null) continue;
-                var href = responseElement.Element(dav + "href")?.Value;
-                if (string.IsNullOrWhiteSpace(href)) continue;
-                var segment = href.Replace('\\', '/').TrimEnd('/').Split('/').LastOrDefault();
-                if (string.IsNullOrWhiteSpace(segment)) continue;
-                var fileName = Uri.UnescapeDataString(segment);
-                if (!IsSafeBackupFileName(fileName)) continue;
-                _ = long.TryParse(property.Element(dav + "getcontentlength")?.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var size);
-                DateTimeOffset? lastModified = null;
-                if (DateTimeOffset.TryParse(property.Element(dav + "getlastmodified")?.Value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var parsedModified)) lastModified = parsedModified.ToUniversalTime();
-                DateTimeOffset? created = null;
-                string? version = null;
-                if (CloudBackupItem.TryParseFileName(fileName, out var parsedCreated, out var parsedVersion)) { created = parsedCreated; version = parsedVersion; }
-                items.Add(new CloudBackupItem(fileName, Math.Max(0, size), created, lastModified, version));
+                var failure = FromStatusCode(response.StatusCode, "PropFindFailed");
+                return new(failure.Status, [], failure.ErrorCode);
             }
-            return new(WebDavStatus.Success, items.OrderByDescending(item => item.SortTimeUtc).ToArray());
+
+            var xml = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var items = WebDavDirectoryListingParser.Parse(xml);
+            return new(WebDavStatus.Success, items);
         }
         catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested) { return new(WebDavStatus.Timeout, [], "PropFindTimeout"); }
         catch (HttpRequestException) { return new(WebDavStatus.TransportFailure, [], "PropFindTransportFailure"); }
@@ -118,7 +101,7 @@ public sealed class WebDavClient : IWebDavClient
 
     public async Task<WebDavResult> DownloadAsync(WebDavProfile profile, string password, string fileName, string destinationPath, CancellationToken cancellationToken = default)
     {
-        if (!IsSafeBackupFileName(fileName)) return new(WebDavStatus.InvalidConfiguration, "FileNameInvalid");
+        if (!WebDavDirectoryListingParser.IsBackupFileName(fileName)) return new(WebDavStatus.InvalidConfiguration, "FileNameInvalid");
         if (!WebDavProfileService.TryNormalize(profile, out var normalized, out var errorCode)) return new(WebDavStatus.InvalidConfiguration, errorCode);
         var temporaryPath = destinationPath + ".download";
         try
@@ -141,7 +124,7 @@ public sealed class WebDavClient : IWebDavClient
 
     public async Task<WebDavResult> DeleteAsync(WebDavProfile profile, string password, string fileName, CancellationToken cancellationToken = default)
     {
-        if (!IsSafeBackupFileName(fileName)) return new(WebDavStatus.InvalidConfiguration, "FileNameInvalid");
+        if (!WebDavDirectoryListingParser.IsBackupFileName(fileName)) return new(WebDavStatus.InvalidConfiguration, "FileNameInvalid");
         if (!WebDavProfileService.TryNormalize(profile, out var normalized, out var errorCode)) return new(WebDavStatus.InvalidConfiguration, errorCode);
         return await SendNoContentAsync(normalized, password, HttpMethod.Delete, BuildFileUri(normalized, fileName), cancellationToken).ConfigureAwait(false);
     }
@@ -232,12 +215,6 @@ public sealed class WebDavClient : IWebDavClient
     }
 
     private static Uri BuildFileUri(WebDavProfile profile, string fileName) => new(BuildCollectionUri(profile), Uri.EscapeDataString(fileName));
-
-    private static bool IsSafeBackupFileName(string fileName) =>
-        !string.IsNullOrWhiteSpace(fileName) &&
-        fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 &&
-        !fileName.Contains('/') && !fileName.Contains('\\') &&
-        fileName.EndsWith(".uptbackup", StringComparison.OrdinalIgnoreCase);
 
     private static WebDavResult FromStatusCode(HttpStatusCode statusCode, string fallbackCode) => statusCode switch
     {
