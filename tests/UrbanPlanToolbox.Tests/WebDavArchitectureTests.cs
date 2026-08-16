@@ -61,6 +61,19 @@ public sealed class WebDavArchitectureTests
         Assert.Contains("Grid.Column=\"2\"", block);
     }
 
+    [Fact]
+    public void WebDavSettingsControl_IsDeclaredInTheVisibleSettingsTree()
+    {
+        var xaml = Read("Views/SettingsPage.xaml");
+        var codeBehind = Read("Views/SettingsPage.xaml.cs");
+
+        Assert.Contains("<controls:WebDavDataManagementControl x:Name=\"WebDavControl\"/>", xaml);
+        Assert.Contains("WebDavControl.SetExternalBusy(busy);", codeBehind);
+        Assert.Contains("await WebDavControl.RefreshConfigurationAsync();", codeBehind);
+        Assert.DoesNotContain("DataActions.Parent", codeBehind);
+        Assert.DoesNotContain("new WebDavDataManagementControl()", codeBehind);
+    }
+
     private static string Read(string relativePath) => File.ReadAllText(Path.Combine(RepositoryRoot, relativePath));
 
     private static string FindRepositoryRoot()
