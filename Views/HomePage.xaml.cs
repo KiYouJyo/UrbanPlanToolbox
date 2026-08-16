@@ -1,4 +1,3 @@
-using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
@@ -94,75 +93,86 @@ public sealed partial class HomePage : Page
     {
         var isResearch = kind == ProjectKindCodes.Research;
         var name = CreateTextBox("Project_Field_Name", ProjectValidation.MaxNameLength);
-        var type = new ComboBox { Header = _localization.GetString(isResearch ? "ResearchProject_Field_Type" : "Project_Field_Type"), DisplayMemberPath = "Name", HorizontalAlignment = HorizontalAlignment.Stretch };
+        var type = new ComboBox
+        {
+            Header = _localization.GetString(isResearch ? "ResearchProject_Field_Type" : "Project_Field_Type"),
+            DisplayMemberPath = "Name",
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        };
         TransientComboBoxTheme.ApplyTo(type);
         var codes = isResearch ? ResearchProjectTypeCodes.All : ProjectTypeCodes.All;
-        type.ItemsSource = codes.Select(code => new ProjectTypeOption(code, isResearch ? ProjectPresentation.GetResearchTypeName(code, _localization) : ProjectPresentation.GetDesignTypeName(code, _localization))).ToArray();
+        type.ItemsSource = codes
+            .Select(code => new ProjectTypeOption(code, isResearch
+                ? ProjectPresentation.GetResearchTypeName(code, _localization)
+                : ProjectPresentation.GetDesignTypeName(code, _localization)))
+            .ToArray();
         type.SelectedIndex = 0;
-        var customType = CreateTextBox("Project_Field_CustomType", ProjectValidation.MaxTypeLength); customType.Visibility = Visibility.Collapsed;
-        type.SelectionChanged += (_, _) => customType.Visibility = (type.SelectedItem as ProjectTypeOption)?.Code == ProjectTypeCodes.Other ? Visibility.Visible : Visibility.Collapsed;
-        var panel = new StackPanel { Spacing = 10 };
-        panel.Children.Add(new TextBlock { Text = _localization.GetFormattedString("ProjectKind_Creating", ProjectPresentation.GetKindName(kind, _localization)), FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
-        panel.Children.Add(name); panel.Children.Add(type); panel.Children.Add(customType);
 
-        TextBox? area = null, latitude = null, longitude = null, description = null, requirements = null;
-        TextBox? field = null, subject = null, methods = null;
-        if (isResearch)
+        var customType = CreateTextBox("Project_Field_CustomType", ProjectValidation.MaxTypeLength);
+        customType.Visibility = Visibility.Collapsed;
+        type.SelectionChanged += (_, _) =>
+            customType.Visibility = (type.SelectedItem as ProjectTypeOption)?.Code == ProjectTypeCodes.Other
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+        var error = new TextBlock
         {
-            field = CreateTextBox("ResearchProject_Field_Field", ProjectValidation.MaxResearchFieldLength);
-            subject = CreateTextBox("ResearchProject_Field_Subject", ProjectValidation.MaxResearchSubjectLength, true, 110);
-            methods = CreateTextBox("ResearchProject_Field_Methods", ProjectValidation.MaxResearchMethodsLength, true, 110);
-            panel.Children.Add(field); panel.Children.Add(subject); panel.Children.Add(methods);
-        }
-        else
+            Foreground = (Brush)Application.Current.Resources["SystemFillColorCriticalBrush"],
+            TextWrapping = TextWrapping.Wrap
+        };
+
+        // Creating a project now captures identity only. Detailed design/research fields are
+        // completed in Project Workspace, where they can be edited in context without a long modal form.
+        var panel = new StackPanel
         {
-            area = CreateTextBox("Project_Field_AdministrativeArea", ProjectValidation.MaxAdministrativeAreaLength);
-            latitude = CreateTextBox("Project_Field_Latitude", 40); longitude = CreateTextBox("Project_Field_Longitude", 40);
-            description = CreateTextBox("Project_Field_Description", ProjectValidation.MaxDescriptionLength, true, 90);
-            requirements = CreateTextBox("Project_Field_PlanningRequirements", ProjectValidation.MaxPlanningRequirementsLength, true, 110);
-            panel.Children.Add(area);
-            panel.Children.Add(new TextBlock { Text = _localization.GetString("Project_Coordinates_Wgs84_Label"), FontWeight = FontWeights.SemiBold });
-            panel.Children.Add(latitude); panel.Children.Add(longitude); panel.Children.Add(description); panel.Children.Add(requirements);
-        }
-        var error = new TextBlock { Foreground = (Brush)Application.Current.Resources["SystemFillColorCriticalBrush"], TextWrapping = TextWrapping.Wrap };
+            Spacing = 12,
+            MinWidth = 420,
+            MaxWidth = 520
+        };
+        panel.Children.Add(name);
+        panel.Children.Add(type);
+        panel.Children.Add(customType);
         panel.Children.Add(error);
-        const double scrollBarGutter = 20;
-        var formLayout = new Border
+
+        var dialog = new ContentDialog
         {
-            Padding = new Thickness(0, 0, scrollBarGutter, 0),
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            Child = panel
+            XamlRoot = XamlRoot,
+            Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"),
+            Content = panel,
+            PrimaryButtonText = _localization.GetString("Action_Create"),
+            SecondaryButtonText = _localization.GetString("Action_Back"),
+            CloseButtonText = _localization.GetString("Action_Cancel"),
+            DefaultButton = ContentDialogButton.Primary
         };
-        var scrollViewer = new ScrollViewer
-        {
-            Content = formLayout,
-            MaxHeight = Math.Min(580, Math.Max(0, XamlRoot.Size.Height - 240)),
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            HorizontalContentAlignment = HorizontalAlignment.Stretch
-        };
-        // Keep the dialog at its content width. MaxWidth creates a wider outer layout slot
-        // that is left-anchored by this WinUI host even when the visible form is narrow.
-        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = _localization.GetString(isResearch ? "Project_New_ResearchTitle" : "Project_New_DesignTitle"), Content = scrollViewer, PrimaryButtonText = _localization.GetString("Action_Create"), SecondaryButtonText = _localization.GetString("Action_Back"), CloseButtonText = _localization.GetString("Action_Cancel"), DefaultButton = ContentDialogButton.Primary };
+
         dialog.PrimaryButtonClick += async (_, args) =>
         {
-            args.Cancel = true; var deferral = args.GetDeferral();
+            args.Cancel = true;
+            var deferral = args.GetDeferral();
             try
             {
                 var selected = (ProjectTypeOption)type.SelectedItem;
-                ProjectSaveResult result;
-                if (isResearch)
-                    result = await _projects.CreateResearchAsync(name.Text, selected.Code, customType.Text, field!.Text, subject!.Text, methods!.Text);
-                else
+                var result = isResearch
+                    ? await _projects.CreateResearchAsync(name.Text, selected.Code, customType.Text, null, null, null)
+                    : await _projects.CreateAsync(name.Text, selected.Code, customType.Text);
+
+                if (!result.Succeeded)
                 {
-                    if (!TryParseCoordinate(latitude!.Text, out var lat) || !TryParseCoordinate(longitude!.Text, out var lon)) { error.Text = _localization.GetString("Project_Error_InvalidCoordinate"); return; }
-                    result = await _projects.CreateAsync(name.Text, selected.Code, customType.Text, area!.Text, lat, lon, description!.Text, requirements!.Text);
+                    error.Text = LocalizeValidation(result.ValidationErrors);
+                    return;
                 }
-                if (!result.Succeeded) { error.Text = LocalizeValidation(result.ValidationErrors); return; }
-                args.Cancel = false; _sessionKind = kind; await RefreshAsync(); Frame.Navigate(typeof(ProjectWorkspacePage), result.Project!.Id);
+
+                args.Cancel = false;
+                _sessionKind = kind;
+                await RefreshAsync();
+                Frame.Navigate(typeof(ProjectWorkspacePage), result.Project!.Id);
             }
-            finally { deferral.Complete(); }
+            finally
+            {
+                deferral.Complete();
+            }
         };
+
         var dialogResult = await AppDialogService.Default.ShowAsync(dialog);
         if (dialogResult == ContentDialogResult.Secondary)
         {
@@ -201,13 +211,6 @@ public sealed partial class HomePage : Page
         }
     }
     private string LocalizeValidation(IReadOnlyList<string>? errors) => errors is null ? _localization.GetString("Project_Error_SaveFailed") : string.Join(Environment.NewLine, errors.Select(error => _localization.GetString($"ProjectValidation_{error}")));
-
-    private static bool TryParseCoordinate(string text, out decimal? value)
-    {
-        value = null; if (string.IsNullOrWhiteSpace(text)) return true;
-        if (decimal.TryParse(text, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.CurrentCulture, out var parsed) || decimal.TryParse(text, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out parsed)) { value = parsed; return true; }
-        return false;
-    }
 
     private sealed record ProjectKindOption(string Id, string Kind, string DisplayName);
     private sealed record KindChoice(string Kind, string Name, string Description);

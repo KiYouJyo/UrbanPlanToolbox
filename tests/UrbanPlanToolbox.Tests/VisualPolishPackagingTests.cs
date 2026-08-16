@@ -95,26 +95,26 @@ public sealed class VisualPolishPackagingTests
     }
 
     [Fact]
-    public void CreateProjectDialogUsesAdaptiveWideSharedFormLayout()
+    public void CreateProjectDialogUsesCompactSharedFormLayout()
     {
         var root = FindRepositoryRoot();
         var source = File.ReadAllText(Path.Combine(root, "Views", "HomePage.xaml.cs"));
 
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(source, "private async Task ShowCreateDialogAsync\\(string kind\\)").Cast<System.Text.RegularExpressions.Match>());
+        Assert.Contains("Spacing = 12", source);
+        Assert.Contains("MinWidth = 420", source);
+        Assert.Contains("MaxWidth = 520", source);
+        Assert.Contains("Content = panel", source);
+        Assert.Contains("TransientComboBoxTheme.ApplyTo(type);", source);
+        Assert.Contains("CreateResearchAsync(name.Text, selected.Code, customType.Text, null, null, null)", source);
+        Assert.Contains("CreateAsync(name.Text, selected.Code, customType.Text)", source);
         Assert.DoesNotContain("const double dialogMaxWidth = 760;", source);
         Assert.DoesNotContain("Width = dialogWidth", source);
-        Assert.DoesNotContain("MaxWidth = dialogMaxWidth", source);
-        Assert.DoesNotContain("HorizontalAlignment = HorizontalAlignment.Center", source);
-        Assert.DoesNotContain("VerticalAlignment = VerticalAlignment.Center", source);
-        Assert.Contains("const double scrollBarGutter = 20;", source);
-        Assert.Contains("Padding = new Thickness(0, 0, scrollBarGutter, 0)", source);
-        Assert.Contains("XamlRoot.Size.Height - 240", source);
-        Assert.Contains("VerticalScrollBarVisibility = ScrollBarVisibility.Auto", source);
-        Assert.Contains("HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled", source);
-        Assert.Contains("HorizontalContentAlignment = HorizontalAlignment.Stretch", source);
-        Assert.Contains("HorizontalAlignment = HorizontalAlignment.Stretch", source);
-        Assert.Contains("CreateResearchAsync(name.Text, selected.Code, customType.Text, field!.Text, subject!.Text, methods!.Text)", source);
-        Assert.Contains("CreateAsync(name.Text, selected.Code, customType.Text, area!.Text, lat, lon, description!.Text, requirements!.Text)", source);
+        Assert.DoesNotContain("const double scrollBarGutter = 20;", source);
+        Assert.DoesNotContain("XamlRoot.Size.Height - 240", source);
+        Assert.DoesNotContain("VerticalScrollBarVisibility = ScrollBarVisibility.Auto", source);
+        Assert.DoesNotContain("CreateResearchAsync(name.Text, selected.Code, customType.Text, field!.Text, subject!.Text, methods!.Text)", source);
+        Assert.DoesNotContain("CreateAsync(name.Text, selected.Code, customType.Text, area!.Text, lat, lon, description!.Text, requirements!.Text)", source);
     }
 
     [Fact]

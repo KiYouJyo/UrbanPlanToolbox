@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Automation;
+using UrbanPlanToolbox.Controls;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
 using Windows.Storage.Pickers;
@@ -233,7 +234,14 @@ public sealed partial class SettingsPage : Page
         if (await AppDialogService.Default.ShowAsync(second) != ContentDialogResult.Primary) return;
         SetDataBusy(true);
         var success = await new LocalDataResetService(AppDataPathProvider.Default).ResetAsync();
-        if (success) { MilestoneReminderService.Default.ClearOwnedSchedules(); Apply(new AppSettings()); }
+        if (success)
+        {
+            WebDavCredentialStore.Default.DeleteAll();
+            await WebDavProfileService.Default.DeleteAsync();
+            await WebDavControl.RefreshConfigurationAsync();
+            MilestoneReminderService.Default.ClearOwnedSchedules();
+            Apply(new AppSettings());
+        }
         DataStatusBar.Severity = success ? InfoBarSeverity.Success : InfoBarSeverity.Error;
         DataStatusBar.Message = _localization.GetString(success ? "DataManagement_ClearSuccess" : "DataManagement_ClearFailed");
         DataStatusBar.IsOpen = true;
@@ -245,7 +253,11 @@ public sealed partial class SettingsPage : Page
         if (App.MainWindow is null) return;
         WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
     }
-    private void SetDataBusy(bool busy) { ExportButton.IsEnabled = ImportButton.IsEnabled = ClearDataButton.IsEnabled = !busy; }
+    private void SetDataBusy(bool busy)
+    {
+        ExportButton.IsEnabled = ImportButton.IsEnabled = ClearDataButton.IsEnabled = !busy;
+        WebDavControl.SetExternalBusy(busy);
+    }
     private static string FormatBytes(long bytes) => bytes >= 1024 * 1024 ? $"{bytes / (1024d * 1024d):0.##} MB" : $"{bytes / 1024d:0.##} KB";
 
 }

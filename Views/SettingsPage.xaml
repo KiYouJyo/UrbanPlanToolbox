@@ -23,10 +23,6 @@
               <Setter Target="MilestoneNotificationsRepeatBox.(Grid.Row)" Value="0"/>
               <Setter Target="MilestoneNotificationsRepeatBox.(Grid.Column)" Value="1"/>
               <Setter Target="MilestoneNotificationsRepeatBox.Width" Value="280"/>
-              <Setter Target="ImportButton.(Grid.Row)" Value="0"/>
-              <Setter Target="ImportButton.(Grid.Column)" Value="1"/>
-              <Setter Target="ClearDataButton.(Grid.Row)" Value="0"/>
-              <Setter Target="ClearDataButton.(Grid.Column)" Value="2"/>
             </VisualState.Setters>
           </VisualState>
         </VisualStateGroup>
@@ -138,13 +134,17 @@
               <TextBlock x:Name="DataManagementTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
               <TextBlock x:Name="DataManagementDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
             </StackPanel>
-            <Grid x:Name="DataActions" HorizontalAlignment="Left" ColumnSpacing="8" RowSpacing="8">
-              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-              <Button x:Uid="DataManagement_Export" x:Name="ExportButton" Grid.Row="0" HorizontalAlignment="Left" Click="OnExport"/>
-              <Button x:Uid="DataManagement_Import" x:Name="ImportButton" Grid.Row="1" HorizontalAlignment="Left" Click="OnImport"/>
-              <Button x:Name="ClearDataButton" Grid.Row="2" HorizontalAlignment="Left" Click="OnClearData"/>
+            <Grid x:Name="DataActions" HorizontalAlignment="Left" ColumnSpacing="8">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <Button x:Uid="DataManagement_Export" x:Name="ExportButton" Grid.Column="0" HorizontalAlignment="Left" Click="OnExport"/>
+              <Button x:Uid="DataManagement_Import" x:Name="ImportButton" Grid.Column="1" HorizontalAlignment="Left" Click="OnImport"/>
+              <Button x:Name="ClearDataButton" Grid.Column="2" HorizontalAlignment="Left" Click="OnClearData"/>
             </Grid>
+            <controls:WebDavDataManagementControl x:Name="WebDavControl"/>
             <InfoBar x:Name="DataStatusBar" IsOpen="False"/>
           </StackPanel>
         </Border>
