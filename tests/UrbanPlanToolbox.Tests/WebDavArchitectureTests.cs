@@ -65,12 +65,13 @@ public sealed class WebDavArchitectureTests
 
     private static string FindRepositoryRoot()
     {
-        DirectoryInfo? directory = new(AppContext.BaseDirectory);
-        while (directory is not null)
+        for (DirectoryInfo? directory = new(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.csproj"))) return directory.FullName;
-            directory = directory.Parent;
+            if (File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.csproj")) &&
+                File.Exists(Path.Combine(directory.FullName, "Models", "AppSettings.cs")) &&
+                File.Exists(Path.Combine(directory.FullName, "Views", "SettingsPage.xaml")))
+                return directory.FullName;
         }
-        throw new DirectoryNotFoundException("UrbanPlanToolbox repository root was not found from the test output directory.");
+        throw new DirectoryNotFoundException("UrbanPlanToolbox repository root with source files was not found from the test output directory.");
     }
 }
