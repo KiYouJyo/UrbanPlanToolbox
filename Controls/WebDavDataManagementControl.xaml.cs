@@ -60,6 +60,7 @@ public sealed partial class WebDavDataManagementControl : UserControl
         WebDavTitle.Text = Text("Title");
         WebDavDescription.Text = Text("Description");
         WebDavBackupButton.Content = Text("BackupNow");
+        WebDavRestoreButton.Content = Text("RestoreFromCloud");
         WebDavManageButton.Content = Text("Manage");
         WebDavConfigureButton.Content = Text("Configure");
     }
@@ -138,6 +139,30 @@ public sealed partial class WebDavDataManagementControl : UserControl
         finally { SetBusy(false); }
     }
 
+    private async void OnRestoreFromCloud(object sender, RoutedEventArgs e)
+    {
+        SetBusy(true);
+        try
+        {
+            var result = await _cloudBackupService.ListAsync();
+            if (!result.Succeeded)
+            {
+                ShowStatus(InfoBarSeverity.Error, WebDavLocalization.StatusText(_localization.CurrentLanguage, result.Status, result.ErrorCode));
+                return;
+            }
+            if (result.Items.Count == 0)
+            {
+                await ShowNoBackupsStatusAsync();
+                return;
+            }
+
+            var selected = await SelectBackupAsync(result.Items, Text("RestorePickerTitle"), Text("Restore"));
+            if (selected is null) return;
+            _ = await RestoreBackupAsync(selected);
+        }
+        finally { SetBusy(false); }
+    }
+
     private async void OnManageCloudBackups(object sender, RoutedEventArgs e)
     {
         SetBusy(true);
@@ -153,13 +178,11 @@ public sealed partial class WebDavDataManagementControl : UserControl
                 }
                 if (result.Items.Count == 0)
                 {
-                    ShowStatus(InfoBarSeverity.Informational, Text("NoBackups"));
+                    await ShowNoBackupsStatusAsync();
                     return;
                 }
 
-                var list = new ListView { SelectionMode = ListViewSelectionMode.Single, MinWidth = 520, MaxHeight = 360 };
-                foreach (var item in result.Items)
-                    list.Items.Add(new ListViewItem { Content = FormatBackupItem(item), Tag = item });
+                var list = CreateBackupList(result.Items);
                 var dialog = new ContentDialog
                 {
                     XamlRoot = XamlRoot,
@@ -184,25 +207,8 @@ public sealed partial class WebDavDataManagementControl : UserControl
 
                 if (action == ContentDialogResult.Primary)
                 {
-                    var confirm = new ContentDialog
-                    {
-                        XamlRoot = XamlRoot,
-                        Title = Text("RestoreConfirmTitle"),
-                        Content = Text("RestoreConfirm"),
-                        PrimaryButtonText = Text("Restore"),
-                        CloseButtonText = Text("Close"),
-                        DefaultButton = ContentDialogButton.Close
-                    };
-                    if (await AppDialogService.Default.ShowAsync(confirm) != ContentDialogResult.Primary) continue;
-                    var restore = await _cloudBackupService.RestoreAsync(selected);
-                    if (restore.Succeeded)
-                    {
-                        var reminders = await MilestoneReminderService.Default.RefreshAsync();
-                        ShowStatus(reminders.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Warning,
-                            reminders.Succeeded ? Text("RestoreSuccess") : _localization.GetString("Milestone_Reminder_SchedulingFailed"));
-                    }
-                    else ShowStatus(InfoBarSeverity.Error, WebDavLocalization.StatusText(_localization.CurrentLanguage, restore.Status, restore.ErrorCode));
-                    return;
+                    if (await RestoreBackupAsync(selected)) return;
+                    continue;
                 }
 
                 var deleteConfirm = new ContentDialog
@@ -227,6 +233,67 @@ public sealed partial class WebDavDataManagementControl : UserControl
         finally { SetBusy(false); }
     }
 
+    private async Task<CloudBackupItem?> SelectBackupAsync(IReadOnlyList<CloudBackupItem> items, string title, string primaryButtonText)
+    {
+        var list = CreateBackupList(items);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Title = title,
+            Content = list,
+            PrimaryButtonText = primaryButtonText,
+            CloseButtonText = Text("Close"),
+            DefaultButton = ContentDialogButton.Close,
+            IsPrimaryButtonEnabled = false
+        };
+        list.SelectionChanged += (_, _) => dialog.IsPrimaryButtonEnabled = list.SelectedItem is ListViewItem { Tag: CloudBackupItem };
+        var action = await AppDialogService.Default.ShowAsync(dialog);
+        return action == ContentDialogResult.Primary && list.SelectedItem is ListViewItem { Tag: CloudBackupItem selected }
+            ? selected
+            : null;
+    }
+
+    private async Task<bool> RestoreBackupAsync(CloudBackupItem selected)
+    {
+        var confirm = new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Title = Text("RestoreConfirmTitle"),
+            Content = Text("RestoreConfirm"),
+            PrimaryButtonText = Text("Restore"),
+            CloseButtonText = Text("Close"),
+            DefaultButton = ContentDialogButton.Close
+        };
+        if (await AppDialogService.Default.ShowAsync(confirm) != ContentDialogResult.Primary) return false;
+
+        var restore = await _cloudBackupService.RestoreAsync(selected);
+        if (restore.Succeeded)
+        {
+            var reminders = await MilestoneReminderService.Default.RefreshAsync();
+            ShowStatus(reminders.Succeeded ? InfoBarSeverity.Success : InfoBarSeverity.Warning,
+                reminders.Succeeded ? Text("RestoreSuccess") : _localization.GetString("Milestone_Reminder_SchedulingFailed"));
+        }
+        else ShowStatus(InfoBarSeverity.Error, WebDavLocalization.StatusText(_localization.CurrentLanguage, restore.Status, restore.ErrorCode));
+        return true;
+    }
+
+    private async Task ShowNoBackupsStatusAsync()
+    {
+        var profile = await _cloudBackupService.GetProfileAsync();
+        var hadSuccessfulBackup = profile?.LastBackupAtUtc is not null;
+        ShowStatus(
+            hadSuccessfulBackup ? InfoBarSeverity.Warning : InfoBarSeverity.Informational,
+            Text(hadSuccessfulBackup ? "NoBackupsAfterCreate" : "NoBackups"));
+    }
+
+    private ListView CreateBackupList(IEnumerable<CloudBackupItem> items)
+    {
+        var list = new ListView { SelectionMode = ListViewSelectionMode.Single, MinWidth = 520, MaxHeight = 360 };
+        foreach (var item in items)
+            list.Items.Add(new ListViewItem { Content = FormatBackupItem(item), Tag = item });
+        return list;
+    }
+
     private string FormatBackupItem(CloudBackupItem item)
     {
         var timestamp = item.SortTimeUtc == DateTimeOffset.MinValue ? "—" : item.SortTimeUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
@@ -245,6 +312,7 @@ public sealed partial class WebDavDataManagementControl : UserControl
         var available = !_busy && !_externalBusy;
         WebDavConfigureButton.IsEnabled = available;
         WebDavBackupButton.IsEnabled = available && _configured;
+        WebDavRestoreButton.IsEnabled = available && _configured;
         WebDavManageButton.IsEnabled = available && _configured;
     }
 
