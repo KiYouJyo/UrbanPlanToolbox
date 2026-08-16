@@ -144,6 +144,7 @@
               <Button x:Uid="DataManagement_Import" x:Name="ImportButton" Grid.Column="1" HorizontalAlignment="Left" Click="OnImport"/>
               <Button x:Name="ClearDataButton" Grid.Column="2" HorizontalAlignment="Left" Click="OnClearData"/>
             </Grid>
+            <controls:WebDavDataManagementControl x:Name="WebDavControl"/>
             <InfoBar x:Name="DataStatusBar" IsOpen="False"/>
           </StackPanel>
         </Border>
