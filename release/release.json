@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.8.2", "packageVersion": "1.8.2.0" },
-  "classification": { "kind": "feature-release", "stability": "prepared-for-validation", "storeMilestone": false },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.8.3", "packageVersion": "1.8.3.0" },
+  "classification": { "kind": "update-management-hotfix", "stability": "prepared-for-validation", "storeMilestone": false },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.8.2 WebDAV 云存档",
-    "ja-JP": "UrbanPlanToolbox v1.8.2 WebDAV クラウドアーカイブ",
-    "en-US": "UrbanPlanToolbox v1.8.2 WebDAV cloud archive"
+    "zh-CN": "UrbanPlanToolbox v1.8.3 更新管理界面与显示修复",
+    "ja-JP": "UrbanPlanToolbox v1.8.3 更新管理画面と表示の修正",
+    "en-US": "UrbanPlanToolbox v1.8.3 update management UI and display fixes"
   },
   "languageLabels": { "zh-CN": "简体中文", "ja-JP": "日本語", "en-US": "English" },
   "items": [
-    { "id": "webdav-cloud-archive", "zh-CN": "在数据管理中加入 WebDAV 云存档，并保持本地数据为主数据源。", "ja-JP": "データ管理に WebDAV クラウドアーカイブを追加し、ローカルデータを主データソースとして維持します。", "en-US": "Adds WebDAV cloud archives while keeping local storage authoritative." },
-    { "id": "webdav-safe-transfer", "zh-CN": "复用 .uptbackup，并使用临时上传、MOVE 完成、校验与安全恢复流程。", "ja-JP": ".uptbackup を再利用し、一時アップロード、MOVE、検証、安全な復元を行います。", "en-US": "Reuses .uptbackup with temporary upload, MOVE finalization, validation, and safe restore." },
-    { "id": "webdav-credentials", "zh-CN": "WebDAV 密码使用 Windows Credential Locker 保存，不进入设置、备份或日志。", "ja-JP": "WebDAV パスワードは Windows Credential Locker に保存し、設定、バックアップ、ログには含めません。", "en-US": "Stores WebDAV passwords in Windows Credential Locker and excludes them from settings, backups, and logs." },
-    { "id": "data-actions-layout", "zh-CN": "本地数据管理三个按钮改为水平排列。", "ja-JP": "ローカルデータ管理の3ボタンを横一列にしました。", "en-US": "Places the three local data-management actions in one horizontal row." }
+    { "id": "update-metadata-visibility", "zh-CN": "修复 Microsoft Store 已检测到更新但目标版本元数据暂未解析时，可用版本与更新内容被隐藏的问题；未知值保持占位且不会显示陈旧版本信息。", "ja-JP": "Microsoft Store が更新を検出しても対象バージョンのメタデータが未解決の場合に、利用可能バージョンと更新内容が非表示になる問題を修正しました。未確定値はプレースホルダーのまま表示し、古いバージョン情報は表示しません。", "en-US": "Fixes Available version and What's new disappearing when Microsoft Store reports an update before trusted target-version metadata is resolved; unknown values stay visible as placeholders without surfacing stale metadata." },
+    { "id": "update-management-responsive-ui", "zh-CN": "重做“关于 > 更新管理”卡片，采用更紧凑的版本对比、更新内容和状态布局，并在较窄窗口自动切换为纵向排列。", "ja-JP": "「バージョン情報 > 更新管理」カードを再設計し、バージョン比較・更新内容・状態をよりコンパクトに配置し、狭いウィンドウでは自動的に縦配置へ切り替わるようにしました。", "en-US": "Redesigns About > Update management with a more compact version comparison, release-notes, and status layout that automatically stacks on narrower windows." },
+    { "id": "checking-progress-ring", "zh-CN": "检查更新时仅在操作按钮内显示一个 ProgressRing，避免重复的加载状态提示。", "ja-JP": "更新確認中は操作ボタン内にのみ 1 つの ProgressRing を表示し、重複した読み込み表示をなくしました。", "en-US": "Shows a single ProgressRing inside the update action button while checking, removing duplicate loading indicators." },
+    { "id": "release-notes-scrollbar-spacing", "zh-CN": "修复更新说明滚动条覆盖正文的问题，为滚动区域保留安全间距。", "ja-JP": "更新内容のスクロールバーが本文に重なる問題を修正し、スクロール領域に安全な余白を確保しました。", "en-US": "Fixes the release-notes scrollbar overlapping text by reserving safe spacing inside the scroll area." }
   ]
 }
