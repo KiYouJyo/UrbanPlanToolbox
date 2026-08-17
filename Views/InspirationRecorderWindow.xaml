@@ -1,7 +1,91 @@
-<Window x:Class="UrbanPlanToolbox.Views.InspirationRecorderWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:UrbanPlanToolbox.Controls">
-  <Window.SystemBackdrop><MicaBackdrop /></Window.SystemBackdrop>
-  <Grid x:Name="RootLayout" Background="Transparent"><Grid.RowDefinitions><RowDefinition Height="40"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-    <Grid x:Name="RecorderTitleBar" Margin="12,0,52,0" ColumnSpacing="2"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock x:Name="StatusText" VerticalAlignment="Center" Style="{StaticResource BodyTextBlockStyle}" TextTrimming="CharacterEllipsis"/><Button x:Name="OpenFullButton" Grid.Column="1" Click="OnOpenFull" Width="32" Height="32" VerticalAlignment="Center" Margin="0,-4,0,4" Padding="0" Background="Transparent" BorderBrush="Transparent" BorderThickness="0" CornerRadius="6"/></Grid>
-    <Grid Grid.Row="1" Padding="20,12,20,20" RowSpacing="12"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*" MinHeight="180"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><TextBox x:Name="TitleBox" TextChanged="OnChanged" TextCompositionStarted="OnTextCompositionStarted" TextCompositionEnded="OnTextCompositionEnded"/><ComboBox controls:TransientComboBoxTheme.Apply="True" Grid.Column="1" x:Name="CategoryBox" SelectionChanged="OnChanged"/></Grid><TextBox Grid.Row="1" x:Name="ContentBox" AcceptsReturn="True" TextWrapping="Wrap" VerticalAlignment="Stretch" TextChanged="OnChanged" TextCompositionStarted="OnTextCompositionStarted" TextCompositionEnded="OnTextCompositionEnded" KeyDown="OnKeyDown"/><Grid Grid.Row="2" ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Button x:Name="PreviousButton" Click="OnPrevious" MinWidth="40"/><Button x:Name="NextButton" Grid.Column="1" Click="OnNext" MinWidth="40"/><Button x:Name="NewButton" Grid.Column="2" Click="OnNew" MinWidth="40"/><Button x:Name="DeleteButton" Grid.Column="4" Click="OnDelete"/><Button x:Name="SaveButton" Grid.Column="5" Click="OnSave"/></Grid></Grid>
+<Window x:Class="UrbanPlanToolbox.Views.InspirationRecorderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:UrbanPlanToolbox.Controls">
+  <Window.SystemBackdrop>
+    <MicaBackdrop />
+  </Window.SystemBackdrop>
+
+  <Grid x:Name="RootLayout" Background="Transparent">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="40" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Grid x:Name="RecorderTitleBar"
+          Margin="16,0,52,0"
+          ColumnSpacing="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <TextBlock x:Name="StatusText"
+                 VerticalAlignment="Center"
+                 Style="{StaticResource BodyTextBlockStyle}"
+                 TextTrimming="CharacterEllipsis" />
+      <Button x:Name="OpenFullButton"
+              Grid.Column="1"
+              Click="OnOpenFull"
+              Width="32"
+              Height="32"
+              VerticalAlignment="Center"
+              Margin="0,-4,0,4"
+              Padding="0"
+              Background="Transparent"
+              BorderBrush="Transparent"
+              BorderThickness="0"
+              CornerRadius="6" />
+    </Grid>
+
+    <Grid Grid.Row="1"
+          Padding="16,10,16,16"
+          RowSpacing="12">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" MinHeight="180" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <Grid ColumnSpacing="10">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="120" />
+        </Grid.ColumnDefinitions>
+        <TextBox x:Name="TitleBox"
+                 TextChanged="OnChanged"
+                 TextCompositionStarted="OnTextCompositionStarted"
+                 TextCompositionEnded="OnTextCompositionEnded" />
+        <ComboBox x:Name="CategoryBox"
+                  Grid.Column="1"
+                  controls:TransientComboBoxTheme.Apply="True"
+                  SelectionChanged="OnChanged" />
+      </Grid>
+
+      <TextBox x:Name="ContentBox"
+               Grid.Row="1"
+               AcceptsReturn="True"
+               TextWrapping="Wrap"
+               VerticalAlignment="Stretch"
+               TextChanged="OnChanged"
+               TextCompositionStarted="OnTextCompositionStarted"
+               TextCompositionEnded="OnTextCompositionEnded"
+               KeyDown="OnKeyDown" />
+
+      <Grid Grid.Row="2" ColumnSpacing="8">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Button x:Name="PreviousButton" Click="OnPrevious" MinWidth="40" />
+        <Button x:Name="NextButton" Grid.Column="1" Click="OnNext" MinWidth="40" />
+        <Button x:Name="NewButton" Grid.Column="2" Click="OnNew" MinWidth="40" />
+        <Button x:Name="DeleteButton" Grid.Column="4" Click="OnDelete" />
+        <Button x:Name="SaveButton" Grid.Column="5" Click="OnSave" />
+      </Grid>
+    </Grid>
   </Grid>
 </Window>
