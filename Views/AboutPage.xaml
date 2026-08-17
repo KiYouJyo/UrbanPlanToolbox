@@ -30,6 +30,74 @@
             </VisualState.StateTriggers>
           </VisualState>
         </VisualStateGroup>
+        <VisualStateGroup x:Name="AboutResponsiveStates">
+          <VisualState x:Name="AboutCompact">
+            <VisualState.StateTriggers>
+              <AdaptiveTrigger MinWindowWidth="0" />
+            </VisualState.StateTriggers>
+            <VisualState.Setters>
+              <Setter Target="AppInfoPackage.(Grid.Row)" Value="1" />
+              <Setter Target="AppInfoPackage.(Grid.Column)" Value="0" />
+              <Setter Target="AppInfoArchitecture.(Grid.Row)" Value="2" />
+              <Setter Target="AppInfoArchitecture.(Grid.Column)" Value="0" />
+              <Setter Target="AppInfoChannel.(Grid.Row)" Value="3" />
+              <Setter Target="AppInfoChannel.(Grid.Column)" Value="0" />
+              <Setter Target="AppInfoPublisher.(Grid.Row)" Value="4" />
+              <Setter Target="AppInfoPublisher.(Grid.Column)" Value="0" />
+              <Setter Target="AppInfoTechnology.(Grid.Row)" Value="5" />
+              <Setter Target="AppInfoTechnology.(Grid.Column)" Value="0" />
+              <Setter Target="RepositoryTile.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="ReleasesTile.(Grid.Row)" Value="1" />
+              <Setter Target="ReleasesTile.(Grid.Column)" Value="0" />
+              <Setter Target="ReleasesTile.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="IssuesTile.(Grid.Row)" Value="2" />
+              <Setter Target="IssuesTile.(Grid.Column)" Value="0" />
+              <Setter Target="IssuesTile.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="LicenseTile.(Grid.Row)" Value="3" />
+              <Setter Target="LicenseTile.(Grid.Column)" Value="0" />
+              <Setter Target="LicenseTile.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="PrivacyButton.(Grid.Row)" Value="1" />
+              <Setter Target="PrivacyButton.(Grid.Column)" Value="0" />
+              <Setter Target="PrivacyButton.HorizontalAlignment" Value="Left" />
+              <Setter Target="NoticesButton.(Grid.Row)" Value="1" />
+              <Setter Target="NoticesButton.(Grid.Column)" Value="0" />
+              <Setter Target="NoticesButton.HorizontalAlignment" Value="Left" />
+            </VisualState.Setters>
+          </VisualState>
+          <VisualState x:Name="AboutWide">
+            <VisualState.StateTriggers>
+              <AdaptiveTrigger MinWindowWidth="760" />
+            </VisualState.StateTriggers>
+            <VisualState.Setters>
+              <Setter Target="AppInfoPackage.(Grid.Row)" Value="0" />
+              <Setter Target="AppInfoPackage.(Grid.Column)" Value="1" />
+              <Setter Target="AppInfoArchitecture.(Grid.Row)" Value="0" />
+              <Setter Target="AppInfoArchitecture.(Grid.Column)" Value="2" />
+              <Setter Target="AppInfoChannel.(Grid.Row)" Value="1" />
+              <Setter Target="AppInfoChannel.(Grid.Column)" Value="0" />
+              <Setter Target="AppInfoPublisher.(Grid.Row)" Value="1" />
+              <Setter Target="AppInfoPublisher.(Grid.Column)" Value="1" />
+              <Setter Target="AppInfoTechnology.(Grid.Row)" Value="1" />
+              <Setter Target="AppInfoTechnology.(Grid.Column)" Value="2" />
+              <Setter Target="RepositoryTile.(Grid.ColumnSpan)" Value="1" />
+              <Setter Target="ReleasesTile.(Grid.Row)" Value="0" />
+              <Setter Target="ReleasesTile.(Grid.Column)" Value="1" />
+              <Setter Target="ReleasesTile.(Grid.ColumnSpan)" Value="1" />
+              <Setter Target="IssuesTile.(Grid.Row)" Value="1" />
+              <Setter Target="IssuesTile.(Grid.Column)" Value="0" />
+              <Setter Target="IssuesTile.(Grid.ColumnSpan)" Value="1" />
+              <Setter Target="LicenseTile.(Grid.Row)" Value="1" />
+              <Setter Target="LicenseTile.(Grid.Column)" Value="1" />
+              <Setter Target="LicenseTile.(Grid.ColumnSpan)" Value="1" />
+              <Setter Target="PrivacyButton.(Grid.Row)" Value="0" />
+              <Setter Target="PrivacyButton.(Grid.Column)" Value="1" />
+              <Setter Target="PrivacyButton.HorizontalAlignment" Value="Right" />
+              <Setter Target="NoticesButton.(Grid.Row)" Value="0" />
+              <Setter Target="NoticesButton.(Grid.Column)" Value="1" />
+              <Setter Target="NoticesButton.HorizontalAlignment" Value="Right" />
+            </VisualState.Setters>
+          </VisualState>
+        </VisualStateGroup>
       </VisualStateManager.VisualStateGroups>
 
       <StackPanel x:Name="AboutContent"
@@ -38,7 +106,7 @@
                   Spacing="16">
         <TextBlock x:Uid="Page_About_Title" Style="{StaticResource TitleTextBlockStyle}" />
 
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+        <Border x:Name="ApplicationInformationCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="16">
             <Grid ColumnSpacing="12">
               <Grid.ColumnDefinitions>
@@ -56,72 +124,53 @@
                 <TextBlock x:Uid="About_Tagline" TextWrapping="Wrap" />
               </StackPanel>
             </Grid>
-            <TextBlock x:Uid="About_AppInformation" Style="{StaticResource SubtitleTextBlockStyle}" />
-            <Grid ColumnSpacing="16" RowSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="130" />
-                <ColumnDefinition Width="*" MinWidth="0" />
-              </Grid.ColumnDefinitions>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
-              <TextBlock x:Uid="About_DisplayVersionLabel" VerticalAlignment="Top" />
-              <TextBlock x:Name="DisplayVersionText" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
-              <TextBlock x:Uid="About_PackageVersionLabel" Grid.Row="1" VerticalAlignment="Top" />
-              <TextBlock x:Name="PackageVersionText" Grid.Row="1" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
-              <TextBlock x:Uid="About_ArchitectureLabel" Grid.Row="2" VerticalAlignment="Top" />
-              <TextBlock x:Name="ArchitectureText" Grid.Row="2" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
-              <TextBlock x:Uid="About_ChannelLabel" Grid.Row="3" VerticalAlignment="Top" />
-              <TextBlock x:Name="ChannelText" Grid.Row="3" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
-              <TextBlock x:Uid="About_PublisherLabel" Grid.Row="4" VerticalAlignment="Top" />
-              <TextBlock x:Name="PublisherText" Grid.Row="4" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
-              <TextBlock x:Uid="About_TechnologyLabel" Grid.Row="5" VerticalAlignment="Top" />
-              <TextBlock x:Uid="About_TechnologyValue" Grid.Row="5" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
-              <TextBlock x:Uid="About_CopyrightLabel" Grid.Row="6" VerticalAlignment="Top" />
-              <TextBlock x:Uid="About_CopyrightText" Grid.Row="6" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
-            </Grid>
-          </StackPanel>
-        </Border>
 
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
-          <StackPanel Spacing="12">
-            <TextBlock x:Uid="About_PrivacyTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
-            <TextBlock x:Uid="About_PrivacySummary" TextWrapping="Wrap" />
-            <Grid ColumnSpacing="8" RowSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <Button x:Name="PrivacyButton" Click="OnOpenPrivacy" />
-              <Button x:Name="NoticesButton" Grid.Column="1" Click="OnOpenNotices" />
-            </Grid>
-          </StackPanel>
-        </Border>
-
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
-          <StackPanel Spacing="12">
-            <TextBlock x:Uid="About_OpenSourceTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
-            <TextBlock x:Uid="About_OpenSourceSummary" TextWrapping="Wrap" />
-            <Grid ColumnSpacing="8" RowSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-              </Grid.RowDefinitions>
-              <Button x:Name="RepositoryButton" Click="OnOpenRepository" />
-              <Button x:Name="ReleasesButton" Grid.Column="1" Click="OnOpenReleases" />
-              <Button x:Name="IssuesButton" Grid.Row="1" Click="OnOpenIssues" />
-              <Button x:Name="LicenseButton" Grid.Row="1" Grid.Column="1" Click="OnOpenLicense" />
-            </Grid>
+            <Border Background="{ThemeResource ControlFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="14">
+              <Grid x:Name="AppInformationGrid" ColumnSpacing="20" RowSpacing="14">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" MinWidth="0" />
+                  <ColumnDefinition Width="*" MinWidth="0" />
+                  <ColumnDefinition Width="*" MinWidth="0" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel x:Name="AppInfoDisplay" Grid.Row="0" Grid.Column="0" Spacing="2">
+                  <TextBlock x:Uid="About_DisplayVersionLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                  <TextBlock x:Name="DisplayVersionText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel x:Name="AppInfoPackage" Grid.Row="1" Grid.Column="0" Spacing="2">
+                  <TextBlock x:Uid="About_PackageVersionLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                  <TextBlock x:Name="PackageVersionText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel x:Name="AppInfoArchitecture" Grid.Row="2" Grid.Column="0" Spacing="2">
+                  <TextBlock x:Uid="About_ArchitectureLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                  <TextBlock x:Name="ArchitectureText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel x:Name="AppInfoChannel" Grid.Row="3" Grid.Column="0" Spacing="2">
+                  <TextBlock x:Uid="About_ChannelLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                  <TextBlock x:Name="ChannelText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel x:Name="AppInfoPublisher" Grid.Row="4" Grid.Column="0" Spacing="2">
+                  <TextBlock x:Uid="About_PublisherLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                  <TextBlock x:Name="PublisherText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel x:Name="AppInfoTechnology" Grid.Row="5" Grid.Column="0" Spacing="2">
+                  <TextBlock x:Uid="About_TechnologyLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                  <TextBlock x:Uid="About_TechnologyValue" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+              </Grid>
+            </Border>
+            <TextBlock x:Uid="About_CopyrightText" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" TextWrapping="Wrap" />
           </StackPanel>
         </Border>
 
@@ -272,20 +321,86 @@
           </StackPanel>
         </Border>
 
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
-          <StackPanel Spacing="12">
-            <TextBlock x:Uid="About_DiagnosticsTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
-            <TextBlock x:Uid="About_DiagnosticsSummary" TextWrapping="Wrap" />
-            <Grid ColumnSpacing="8" RowSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <Button x:Name="CopyDiagnosticsButton" Click="OnCopyDiagnostics" />
-              <Button x:Name="OpenLogsButton" Grid.Column="1" Click="OnOpenLogs" />
+        <Border x:Name="ProjectOpenSourceCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4">
+              <TextBlock x:Uid="About_OpenSourceTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
+              <TextBlock x:Uid="About_OpenSourceSummary" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap" />
+            </StackPanel>
+            <Grid x:Name="ProjectOpenSourceGrid" ColumnSpacing="12" RowSpacing="12">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0" /><ColumnDefinition Width="*" MinWidth="0" /></Grid.ColumnDefinitions>
+              <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+
+              <Border x:Name="RepositoryTile" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                      Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                      BorderThickness="1" CornerRadius="8" Padding="14">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="GitHub" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                  <Button x:Name="RepositoryButton" Click="OnOpenRepository" HorizontalAlignment="Left" />
+                </StackPanel>
+              </Border>
+              <Border x:Name="ReleasesTile" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                      Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                      BorderThickness="1" CornerRadius="8" Padding="14">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Releases" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                  <Button x:Name="ReleasesButton" Click="OnOpenReleases" HorizontalAlignment="Left" />
+                </StackPanel>
+              </Border>
+              <Border x:Name="IssuesTile" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                      Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                      BorderThickness="1" CornerRadius="8" Padding="14">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Issues" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                  <Button x:Name="IssuesButton" Click="OnOpenIssues" HorizontalAlignment="Left" />
+                </StackPanel>
+              </Border>
+              <Border x:Name="LicenseTile" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                      Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                      BorderThickness="1" CornerRadius="8" Padding="14">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="MIT License" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                  <Button x:Name="LicenseButton" Click="OnOpenLicense" HorizontalAlignment="Left" />
+                </StackPanel>
+              </Border>
             </Grid>
           </StackPanel>
         </Border>
+
+        <Border x:Name="PrivacyLegalCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4">
+              <TextBlock x:Uid="About_PrivacyTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
+              <TextBlock x:Uid="About_PrivacySummary" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap" />
+            </StackPanel>
+            <Border Background="{ThemeResource ControlFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="14">
+              <StackPanel Spacing="14">
+                <Grid ColumnSpacing="16" RowSpacing="10">
+                  <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                  <TextBlock Text="PRIVACY.md" Grid.Row="0" Grid.Column="0" Style="{StaticResource SettingsRowLabelStyle}" VerticalAlignment="Center" />
+                  <Button x:Name="PrivacyButton" Grid.Row="1" Grid.Column="0" Click="OnOpenPrivacy" HorizontalAlignment="Left" />
+                </Grid>
+                <Border Height="1" Background="{ThemeResource ControlStrokeColorDefaultBrush}" />
+                <Grid ColumnSpacing="16" RowSpacing="10">
+                  <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                  <TextBlock Text="THIRD-PARTY-NOTICES.md" Grid.Row="0" Grid.Column="0" Style="{StaticResource SettingsRowLabelStyle}" VerticalAlignment="Center" />
+                  <Button x:Name="NoticesButton" Grid.Row="1" Grid.Column="0" Click="OnOpenNotices" HorizontalAlignment="Left" />
+                </Grid>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <Grid Visibility="Collapsed" automation:AutomationProperties.AccessibilityView="Raw">
+          <Button x:Name="CopyDiagnosticsButton" Click="OnCopyDiagnostics" />
+          <Button x:Name="OpenLogsButton" Click="OnOpenLogs" />
+        </Grid>
       </StackPanel>
     </Grid>
   </ScrollViewer>

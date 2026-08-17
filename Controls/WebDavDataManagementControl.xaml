@@ -3,21 +3,20 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <StackPanel Spacing="12">
-    <Border Height="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
     <StackPanel Spacing="4">
-      <TextBlock x:Name="WebDavTitle" Style="{StaticResource SettingsRowLabelStyle}"/>
-      <TextBlock x:Name="WebDavDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/>
+      <TextBlock x:Name="WebDavTitle" Style="{StaticResource BodyStrongTextBlockStyle}" />
+      <TextBlock x:Name="WebDavDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap" />
     </StackPanel>
     <StackPanel Spacing="2">
-      <TextBlock x:Name="WebDavConnectionStatus" Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap"/>
-      <TextBlock x:Name="WebDavLastBackup" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/>
+      <TextBlock x:Name="WebDavConnectionStatus" Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+      <TextBlock x:Name="WebDavLastBackup" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap" />
     </StackPanel>
     <StackPanel Orientation="Horizontal" Spacing="8">
-      <Button x:Name="WebDavBackupButton" Click="OnCreateCloudBackup"/>
-      <Button x:Name="WebDavRestoreButton" Click="OnRestoreFromCloud"/>
-      <Button x:Name="WebDavManageButton" Click="OnManageCloudBackups"/>
-      <Button x:Name="WebDavConfigureButton" Click="OnConfigureWebDav"/>
+      <Button x:Name="WebDavBackupButton" Click="OnCreateCloudBackup" />
+      <Button x:Name="WebDavRestoreButton" Click="OnRestoreFromCloud" />
+      <Button x:Name="WebDavManageButton" Click="OnManageCloudBackups" />
+      <Button x:Name="WebDavConfigureButton" Click="OnConfigureWebDav" />
     </StackPanel>
-    <InfoBar x:Name="WebDavStatusBar" IsOpen="False"/>
+    <InfoBar x:Name="WebDavStatusBar" IsOpen="False" />
   </StackPanel>
 </UserControl>
