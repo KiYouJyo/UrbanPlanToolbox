@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "channels": {
-    "github": { "version": "1.8.3" },
+    "github": { "version": "1.8.5" },
     "store": { "version": "1.8.2" }
   }
 }

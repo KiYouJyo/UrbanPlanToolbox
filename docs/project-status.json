@@ -7,7 +7,7 @@
   },
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.8.3",
+    "version": "1.8.5",
     "lifecycle": "stable-1.x",
     "platform": "Windows",
     "supportedArchitecture": "x64",
@@ -15,23 +15,23 @@
   },
   "distribution": {
     "github": {
-      "latestPublishedProductVersion": "1.8.3",
-      "latestPublishedPackageVersion": "1.8.3.0",
-      "latestPublishedReleaseTag": "v1.8.3",
-      "candidateProductVersion": "1.8.3",
-      "candidatePackageVersion": "1.8.3.0",
+      "latestPublishedProductVersion": "1.8.5",
+      "latestPublishedPackageVersion": "1.8.5.0",
+      "latestPublishedReleaseTag": "v1.8.5",
+      "candidateProductVersion": "1.8.5",
+      "candidatePackageVersion": "1.8.5.0",
       "candidateState": "published-and-validated",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
     "microsoftStore": {
-      "submittedProductVersion": "1.8.3",
-      "submittedPackageVersion": "1.8.3.0",
+      "submittedProductVersion": "1.8.5",
+      "submittedPackageVersion": "1.8.5.0",
       "state": "certification-submitted",
       "publicProductVersion": "1.8.2",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
-      "candidateProductVersion": "1.8.3",
-      "candidatePackageVersion": "1.8.3.0",
+      "candidateProductVersion": "1.8.5",
+      "candidatePackageVersion": "1.8.5.0",
       "candidateState": "certification-submitted",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
@@ -64,11 +64,11 @@
         "signer Subject pinning",
         "signer Thumbprint pinning"
       ],
-      "validation": "validated; v1.8.3 changes update-management presentation only and retain the existing download, verification, deployment, and restart path",
+      "validation": "validated; v1.8.5 changes Settings/About layout and inactive shell presentation only and do not reopen the existing download, verification, deployment, or restart path",
       "policy": "validated / frozen; future updater mechanism changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
-      "validation": "validated; v1.8.3 corrects update-management metadata visibility and responsive presentation without changing the frozen Store download/install operation",
+      "validation": "validated; v1.8.5 does not change the frozen Store download/install operation or its update-session behavior",
       "policy": "validated / fully frozen after the successful real Microsoft Store 1.7.4 to 1.7.5 E2E acceptance on 2026-08-14; future updater mechanism changes require a proven bug, security issue, or Windows / Microsoft Store platform/API compatibility requirement plus end-to-end regression evidence on the affected channel. One user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
     }
   },
