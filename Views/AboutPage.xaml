@@ -2,32 +2,289 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:automation="using:Microsoft.UI.Xaml.Automation">
-  <ScrollViewer HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
-    <Grid x:Name="AboutLayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Top" Padding="24,16,24,32">
-      <StackPanel x:Name="AboutContent" HorizontalAlignment="Left" MaxWidth="900" Spacing="16">
+  <ScrollViewer HorizontalScrollMode="Disabled"
+                HorizontalScrollBarVisibility="Disabled"
+                HorizontalContentAlignment="Stretch">
+    <Grid x:Name="AboutLayoutRoot"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Top"
+          Padding="24,16,24,32">
+      <VisualStateManager.VisualStateGroups>
+        <VisualStateGroup x:Name="UpdateLayoutStates">
+          <VisualState x:Name="CompactUpdateLayout">
+            <VisualState.StateTriggers>
+              <AdaptiveTrigger MinWindowWidth="0" />
+            </VisualState.StateTriggers>
+            <VisualState.Setters>
+              <Setter Target="UpdateNotesPanel.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="UpdateMetadataCard.(Grid.Row)" Value="1" />
+              <Setter Target="UpdateMetadataCard.(Grid.Column)" Value="0" />
+              <Setter Target="UpdateMetadataCard.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="UpdateMetadataCard.MaxWidth" Value="10000" />
+              <Setter Target="UpdateMetadataCard.Margin" Value="0,12,0,0" />
+            </VisualState.Setters>
+          </VisualState>
+          <VisualState x:Name="WideUpdateLayout">
+            <VisualState.StateTriggers>
+              <AdaptiveTrigger MinWindowWidth="980" />
+            </VisualState.StateTriggers>
+          </VisualState>
+        </VisualStateGroup>
+      </VisualStateManager.VisualStateGroups>
+
+      <StackPanel x:Name="AboutContent"
+                  HorizontalAlignment="Left"
+                  MaxWidth="840"
+                  Spacing="16">
         <TextBlock x:Uid="Page_About_Title" Style="{StaticResource TitleTextBlockStyle}" />
+
         <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="16">
-            <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*" MinWidth="0"/></Grid.ColumnDefinitions>
-              <Image x:Name="ProductLogo" Width="48" Height="48" VerticalAlignment="Top" automation:AutomationProperties.AccessibilityView="Raw" />
-              <StackPanel Grid.Column="1" MinWidth="0" Spacing="2"><TextBlock Text="UrbanPlanToolbox" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Uid="About_ProductName" Style="{StaticResource BodyStrongTextBlockStyle}"/><TextBlock x:Uid="About_Tagline" TextWrapping="Wrap"/></StackPanel>
+            <Grid ColumnSpacing="12">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="0" />
+              </Grid.ColumnDefinitions>
+              <Image x:Name="ProductLogo"
+                     Width="48"
+                     Height="48"
+                     VerticalAlignment="Top"
+                     automation:AutomationProperties.AccessibilityView="Raw" />
+              <StackPanel Grid.Column="1" MinWidth="0" Spacing="2">
+                <TextBlock Text="UrbanPlanToolbox" Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock x:Uid="About_ProductName" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <TextBlock x:Uid="About_Tagline" TextWrapping="Wrap" />
+              </StackPanel>
             </Grid>
             <TextBlock x:Uid="About_AppInformation" Style="{StaticResource SubtitleTextBlockStyle}" />
-            <Grid ColumnSpacing="16" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto" MinWidth="130"/><ColumnDefinition Width="*" MinWidth="0"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <TextBlock x:Uid="About_DisplayVersionLabel" VerticalAlignment="Top"/><TextBlock x:Name="DisplayVersionText" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-              <TextBlock x:Uid="About_PackageVersionLabel" Grid.Row="1" VerticalAlignment="Top"/><TextBlock x:Name="PackageVersionText" Grid.Row="1" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-              <TextBlock x:Uid="About_ArchitectureLabel" Grid.Row="2" VerticalAlignment="Top"/><TextBlock x:Name="ArchitectureText" Grid.Row="2" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-              <TextBlock x:Uid="About_ChannelLabel" Grid.Row="3" VerticalAlignment="Top"/><TextBlock x:Name="ChannelText" Grid.Row="3" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-              <TextBlock x:Uid="About_PublisherLabel" Grid.Row="4" VerticalAlignment="Top"/><TextBlock x:Name="PublisherText" Grid.Row="4" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-              <TextBlock x:Uid="About_TechnologyLabel" Grid.Row="5" VerticalAlignment="Top"/><TextBlock x:Uid="About_TechnologyValue" Grid.Row="5" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
-              <TextBlock x:Uid="About_CopyrightLabel" Grid.Row="6" VerticalAlignment="Top"/><TextBlock x:Uid="About_CopyrightText" Grid.Row="6" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <Grid ColumnSpacing="16" RowSpacing="8">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="130" />
+                <ColumnDefinition Width="*" MinWidth="0" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <TextBlock x:Uid="About_DisplayVersionLabel" VerticalAlignment="Top" />
+              <TextBlock x:Name="DisplayVersionText" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
+              <TextBlock x:Uid="About_PackageVersionLabel" Grid.Row="1" VerticalAlignment="Top" />
+              <TextBlock x:Name="PackageVersionText" Grid.Row="1" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
+              <TextBlock x:Uid="About_ArchitectureLabel" Grid.Row="2" VerticalAlignment="Top" />
+              <TextBlock x:Name="ArchitectureText" Grid.Row="2" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
+              <TextBlock x:Uid="About_ChannelLabel" Grid.Row="3" VerticalAlignment="Top" />
+              <TextBlock x:Name="ChannelText" Grid.Row="3" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
+              <TextBlock x:Uid="About_PublisherLabel" Grid.Row="4" VerticalAlignment="Top" />
+              <TextBlock x:Name="PublisherText" Grid.Row="4" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
+              <TextBlock x:Uid="About_TechnologyLabel" Grid.Row="5" VerticalAlignment="Top" />
+              <TextBlock x:Uid="About_TechnologyValue" Grid.Row="5" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
+              <TextBlock x:Uid="About_CopyrightLabel" Grid.Row="6" VerticalAlignment="Top" />
+              <TextBlock x:Uid="About_CopyrightText" Grid.Row="6" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top" />
             </Grid>
           </StackPanel>
         </Border>
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch"><StackPanel Spacing="12"><TextBlock x:Uid="About_PrivacyTitle" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Uid="About_PrivacySummary" TextWrapping="Wrap"/><Grid ColumnSpacing="8" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Button x:Name="PrivacyButton" Click="OnOpenPrivacy"/><Button x:Name="NoticesButton" Grid.Column="1" Click="OnOpenNotices"/></Grid></StackPanel></Border>
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch"><StackPanel Spacing="12"><TextBlock x:Uid="About_OpenSourceTitle" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Uid="About_OpenSourceSummary" TextWrapping="Wrap"/><Grid ColumnSpacing="8" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Button x:Name="RepositoryButton" Click="OnOpenRepository"/><Button x:Name="ReleasesButton" Grid.Column="1" Click="OnOpenReleases"/><Button x:Name="IssuesButton" Grid.Row="1" Click="OnOpenIssues"/><Button x:Name="LicenseButton" Grid.Row="1" Grid.Column="1" Click="OnOpenLicense"/></Grid></StackPanel></Border>
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch"><StackPanel Spacing="12"><TextBlock x:Uid="About_UpdateTitle" Style="{StaticResource SubtitleTextBlockStyle}"/><Grid ColumnSpacing="16" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto" MinWidth="130"/><ColumnDefinition Width="*" MinWidth="0"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><TextBlock x:Uid="About_CurrentVersionLabel" VerticalAlignment="Top"/><TextBlock x:Name="UpdateVersionText" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/><TextBlock x:Name="UpdateTargetLabel" x:Uid="About_UpdateTargetLabel" Grid.Row="1" VerticalAlignment="Top"/><Grid Grid.Row="1" Grid.Column="1" MinWidth="0" MinHeight="24"><TextBlock x:Name="UpdateTargetText" TextWrapping="Wrap" VerticalAlignment="Top"/></Grid><TextBlock x:Uid="About_UpdateSourceLabel" Grid.Row="2" VerticalAlignment="Top"/><TextBlock x:Name="UpdateSourceText" Grid.Row="2" Grid.Column="1" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Top"/><TextBlock x:Uid="About_UpdateStatusLabel" Grid.Row="3" VerticalAlignment="Top"/><StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Spacing="8"><ProgressRing x:Name="UpdateStatusProgressRing" Width="20" Height="20" IsActive="False" Visibility="Collapsed"/><TextBlock x:Name="UpdateStatusText" MinWidth="0" TextWrapping="Wrap" VerticalAlignment="Center"/></StackPanel></Grid><TextBlock x:Name="UpdateNotesLabel" x:Uid="About_UpdateNotesLabel"/><ScrollViewer x:Name="UpdateNotesContainer" MaxHeight="140" MinHeight="48"><TextBlock x:Name="UpdateNotesText" TextWrapping="Wrap"/></ScrollViewer><ProgressBar x:Name="UpdateProgressBar" Minimum="0" Maximum="100" Visibility="Collapsed"/><Button x:Name="CheckUpdateButton" Click="OnCheckUpdate"/></StackPanel></Border>
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch"><StackPanel Spacing="12"><TextBlock x:Uid="About_DiagnosticsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Uid="About_DiagnosticsSummary" TextWrapping="Wrap"/><Grid ColumnSpacing="8" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Button x:Name="CopyDiagnosticsButton" Click="OnCopyDiagnostics"/><Button x:Name="OpenLogsButton" Grid.Column="1" Click="OnOpenLogs"/></Grid></StackPanel></Border>
+
+        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="12">
+            <TextBlock x:Uid="About_PrivacyTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock x:Uid="About_PrivacySummary" TextWrapping="Wrap" />
+            <Grid ColumnSpacing="8" RowSpacing="8">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Button x:Name="PrivacyButton" Click="OnOpenPrivacy" />
+              <Button x:Name="NoticesButton" Grid.Column="1" Click="OnOpenNotices" />
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="12">
+            <TextBlock x:Uid="About_OpenSourceTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock x:Uid="About_OpenSourceSummary" TextWrapping="Wrap" />
+            <Grid ColumnSpacing="8" RowSpacing="8">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <Button x:Name="RepositoryButton" Click="OnOpenRepository" />
+              <Button x:Name="ReleasesButton" Grid.Column="1" Click="OnOpenReleases" />
+              <Button x:Name="IssuesButton" Grid.Row="1" Click="OnOpenIssues" />
+              <Button x:Name="LicenseButton" Grid.Row="1" Grid.Column="1" Click="OnOpenLicense" />
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border x:Name="UpdateManagementCard"
+                Style="{StaticResource SettingsSectionCardStyle}"
+                HorizontalAlignment="Stretch"
+                Padding="20">
+          <StackPanel Spacing="16">
+            <TextBlock x:Uid="About_UpdateTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+            <Border Background="{ThemeResource ControlFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="18,14">
+              <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" MinWidth="0" />
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" MinWidth="0" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Spacing="2" MinWidth="0">
+                  <TextBlock x:Uid="About_CurrentVersionLabel"
+                             Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                  <TextBlock x:Name="UpdateVersionText"
+                             FontSize="28"
+                             FontWeight="SemiBold"
+                             TextWrapping="Wrap" />
+                </StackPanel>
+                <TextBlock Grid.Column="1"
+                           Text="→"
+                           FontSize="22"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           VerticalAlignment="Center"
+                           Margin="4,8" />
+                <StackPanel Grid.Column="2" Spacing="2" MinWidth="0">
+                  <TextBlock x:Name="UpdateTargetLabel"
+                             x:Uid="About_UpdateTargetLabel"
+                             Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                  <TextBlock x:Name="UpdateTargetText"
+                             FontSize="28"
+                             FontWeight="SemiBold"
+                             TextWrapping="Wrap" />
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <Grid x:Name="UpdateBodyGrid" ColumnSpacing="12" RowSpacing="0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="0" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+
+              <Border x:Name="UpdateNotesPanel"
+                      Grid.Column="0"
+                      Background="{ThemeResource ControlFillColorDefaultBrush}"
+                      BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                      BorderThickness="1"
+                      CornerRadius="8"
+                      Padding="14">
+                <StackPanel Spacing="10">
+                  <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" MinWidth="0" />
+                      <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="UpdateNotesLabel"
+                               x:Uid="About_UpdateNotesLabel"
+                               Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:Name="UpdateNotesVersionText"
+                               Grid.Column="1"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               FontSize="12" />
+                  </Grid>
+                  <ScrollViewer x:Name="UpdateNotesContainer"
+                                MaxHeight="150"
+                                MinHeight="64"
+                                HorizontalScrollMode="Disabled"
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="UpdateNotesText"
+                               TextWrapping="Wrap"
+                               LineHeight="22" />
+                  </ScrollViewer>
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="UpdateMetadataCard"
+                      Grid.Column="1"
+                      MinWidth="220"
+                      MaxWidth="240"
+                      HorizontalAlignment="Stretch"
+                      Background="{ThemeResource ControlFillColorDefaultBrush}"
+                      BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                      BorderThickness="1"
+                      CornerRadius="8"
+                      Padding="14">
+                <StackPanel Spacing="12">
+                  <StackPanel Spacing="2">
+                    <TextBlock x:Uid="About_UpdateSourceLabel"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               FontSize="12" />
+                    <TextBlock x:Name="UpdateSourceText"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               TextWrapping="Wrap" />
+                  </StackPanel>
+                  <Border Height="1" Background="{ThemeResource ControlStrokeColorDefaultBrush}" />
+                  <StackPanel Spacing="2">
+                    <TextBlock x:Uid="About_UpdateStatusLabel"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               FontSize="12" />
+                    <TextBlock x:Name="UpdateStatusText"
+                               Style="{StaticResource BodyStrongTextBlockStyle}"
+                               TextWrapping="Wrap" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <ProgressBar x:Name="UpdateProgressBar"
+                         Minimum="0"
+                         Maximum="100"
+                         Visibility="Collapsed" />
+
+            <Grid ColumnSpacing="12">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="0" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Button x:Name="CheckUpdateButton"
+                      Grid.Column="1"
+                      Click="OnCheckUpdate">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <ProgressRing x:Name="CheckUpdateButtonProgressRing"
+                                Width="16"
+                                Height="16"
+                                IsActive="False"
+                                Visibility="Collapsed" />
+                  <TextBlock x:Name="CheckUpdateButtonText" VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="12">
+            <TextBlock x:Uid="About_DiagnosticsTitle" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock x:Uid="About_DiagnosticsSummary" TextWrapping="Wrap" />
+            <Grid ColumnSpacing="8" RowSpacing="8">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Button x:Name="CopyDiagnosticsButton" Click="OnCopyDiagnostics" />
+              <Button x:Name="OpenLogsButton" Grid.Column="1" Click="OnOpenLogs" />
+            </Grid>
+          </StackPanel>
+        </Border>
       </StackPanel>
     </Grid>
   </ScrollViewer>
