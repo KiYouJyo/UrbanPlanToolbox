@@ -10,6 +10,7 @@ public sealed class SettingsPageContractTests
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
+        var webDav = File.ReadAllText(Path.Combine(root, "Controls", "WebDavDataManagementControl.xaml"));
         Assert.True(Regex.Matches(xaml, "SettingsSectionCardStyle").Count >= 5);
         Assert.Contains("AdaptiveTrigger MinWindowWidth=\"520\"", xaml);
         Assert.Contains("x:Name=\"SettingsLayoutRoot\"", xaml);
@@ -23,12 +24,20 @@ public sealed class SettingsPageContractTests
             Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"1\"[\\s\\S]*?Width=\"250\"[\\s\\S]*?HorizontalAlignment=\"Right\"", xaml);
         foreach (var name in new[] { "BackgroundResidencyToggle", "SilentStartupToggle", "MilestoneNotificationsToggle", "RestoreDefaultsButton", "ReopenFirstRunGuideButton" })
             Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"1\"[\\s\\S]*?HorizontalAlignment=\"Right\"", xaml);
+        foreach (var name in new[] { "BackgroundResidencyToggle", "SilentStartupToggle", "MilestoneNotificationsToggle" })
+            Assert.Matches($"x:Name=\"{name}\"[^>]*Width=\"44\"[^>]*OnContent=\"\"[^>]*OffContent=\"\"[^>]*HorizontalAlignment=\"Right\"", xaml);
         foreach (var name in new[] { "AppearanceLanguageCard", "ResidencyCard", "MilestoneNotificationsCard", "DataManagementCard", "ApplicationMaintenanceCard" })
             Assert.Contains($"x:Name=\"{name}\"", xaml);
         Assert.Matches("x:Name=\"DataLocalPanel\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"0\"[\\s\\S]*?Grid.ColumnSpan=\"1\"", xaml);
         Assert.Matches("x:Name=\"DataCloudPanel\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"1\"[\\s\\S]*?Grid.ColumnSpan=\"1\"", xaml);
+        foreach (var name in new[] { "LocalBackupTitle", "LocalBackupDescription", "LocalBackupStatusLabel", "LocalBackupStatus" })
+            Assert.Contains($"x:Name=\"{name}\"", xaml);
+        Assert.True(Regex.Matches(xaml + webDav, "AccentButtonStyle").Count >= 3);
+        Assert.Contains("WebDavStatusLabel", webDav);
+        Assert.Contains("WebDavStatusValue", webDav);
+        Assert.DoesNotContain("WebDavLastBackup", webDav);
+        Assert.DoesNotContain("WebDavConnectionStatus", webDav);
         Assert.Contains("ControlFillColorDefaultBrush", xaml);
-        Assert.DoesNotContain("AccentButtonStyle", xaml);
         Assert.DoesNotContain("DisplayCalculationTitle", xaml);
         Assert.DoesNotContain("DecimalBox", xaml);
         Assert.DoesNotContain("AutoCalculateToggle", xaml);
