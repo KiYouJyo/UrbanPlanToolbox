@@ -8,6 +8,8 @@ GitHub 保留已经验证的版本发现、SHA-256、签名校验、部署与重
 
 2026-08-14 已完成真实 Microsoft Store **1.7.4 → 1.7.5** 端到端验收。至此 GitHub updater 与 Store updater 均为 **validated / fully frozen**，此前的 `final-e2e-pending` 状态正式结束。
 
-2026-08-17 的 **v1.8.3** 是针对已确认显示缺陷的受控例外：修复 Store 目标版本元数据暂未解析时更新字段被隐藏的问题，并重做更新卡片的响应式布局、检查按钮 ProgressRing 与滚动条安全间距。该版本不改变 GitHub 的下载/校验/部署/重启路径，也不改变 Microsoft Store 的 `RequestDownloadAndInstallStorePackageUpdatesAsync` 下载与安装事务，因此底层 updater 机制继续保持 frozen。
+2026-08-17 的 **v1.8.3** 是针对已确认显示缺陷的受控例外：修复 Store 目标版本元数据暂未解析时更新字段被隐藏的问题，并重做更新卡片的响应式布局、检查按钮 ProgressRing 与滚动条安全间距。该版本没有改变 GitHub 的下载/校验/部署/重启路径，也没有改变 Microsoft Store 的 `RequestDownloadAndInstallStorePackageUpdatesAsync` 下载与安装事务。
+
+随后发布的 **v1.8.4** 与 **v1.8.5** 继续沿用上述冻结机制。v1.8.5 仅调整设置/关于页面布局与窗口失焦时的外壳颜色表现，不修改更新管理的下载、校验、安装、重启或 Store 事务逻辑。因此底层 updater 机制继续保持 frozen。
 
 冻结后不再以功能优化、交互微调或重构为理由修改 updater。只有确认存在 updater 缺陷、安全问题，或 Windows / Microsoft Store 平台与 API 兼容性要求时才允许重新打开该模块；任何此类修改都必须重新提供受影响渠道的完整端到端回归证据后才能再次冻结。
