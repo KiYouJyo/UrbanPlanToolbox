@@ -9,7 +9,7 @@
     </StackPanel>
     <StackPanel Spacing="2">
       <TextBlock x:Name="WebDavStatusLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
-      <TextBlock x:Name="WebDavStatusValue" Style="{StaticResource BodyStrongTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" TextWrapping="Wrap" />
+      <TextBlock x:Name="WebDavStatusValue" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
     </StackPanel>
     <Grid HorizontalAlignment="Left" ColumnSpacing="8">
       <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
