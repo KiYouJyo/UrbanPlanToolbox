@@ -8,4 +8,6 @@ GitHub は検証済みの検出、SHA-256、署名、展開、再起動経路を
 
 2026-08-14 に、実際の Microsoft Store **1.7.4 → 1.7.5** エンドツーエンド受け入れ検証が完了しました。これにより GitHub updater と Store updater はともに **validated / fully frozen** となり、従来の `final-e2e-pending` 状態は終了します。
 
+2026-08-17 の **v1.8.3** は、確認済みの表示不具合に対する管理された例外です。信頼できる Store 対象バージョンのメタデータが未解決でも更新項目を表示したままにし、レスポンシブな更新カード、確認ボタン内の単一 ProgressRing、更新内容スクロールバーの安全な余白を修正しました。GitHub のダウンロード・検証・展開・再起動経路、および Microsoft Store の `RequestDownloadAndInstallStorePackageUpdatesAsync` トランザクションは変更していないため、基盤となる updater 機構は引き続き frozen です。
+
 凍結後は、機能追加、操作感の微調整、リファクタリングだけを理由として updater を変更しません。確認済みの updater 不具合、セキュリティ問題、または Windows / Microsoft Store のプラットフォーム・API 互換性要件がある場合に限り、このモジュールを再度開くことができます。その場合も、影響を受ける配布経路で完全な E2E 回帰証拠を再度そろえてから再凍結します。
