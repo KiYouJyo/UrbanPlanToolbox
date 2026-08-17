@@ -1,4 +1,4 @@
-﻿<Page x:Class="UrbanPlanToolbox.Views.SettingsPage"
+<Page x:Class="UrbanPlanToolbox.Views.SettingsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:controls="using:UrbanPlanToolbox.Controls">
@@ -24,7 +24,7 @@
             </VisualState.Setters>
           </VisualState>
           <VisualState x:Name="SettingsWide">
-            <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="980" /></VisualState.StateTriggers>
+            <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="720" /></VisualState.StateTriggers>
             <VisualState.Setters>
               <Setter Target="ThemeBox.(Grid.Row)" Value="0" /><Setter Target="ThemeBox.(Grid.Column)" Value="1" /><Setter Target="ThemeBox.(Grid.ColumnSpan)" Value="1" /><Setter Target="ThemeBox.Width" Value="280" /><Setter Target="ThemeBox.HorizontalAlignment" Value="Right" />
               <Setter Target="LanguageBox.(Grid.Row)" Value="0" /><Setter Target="LanguageBox.(Grid.Column)" Value="1" /><Setter Target="LanguageBox.(Grid.ColumnSpan)" Value="1" /><Setter Target="LanguageBox.Width" Value="280" /><Setter Target="LanguageBox.HorizontalAlignment" Value="Right" />
