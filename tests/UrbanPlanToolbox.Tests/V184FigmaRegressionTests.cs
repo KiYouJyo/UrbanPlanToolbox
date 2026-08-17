@@ -12,8 +12,12 @@ public sealed class V184FigmaRegressionTests
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
         var code = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
 
-        Assert.Contains("MaxWidth=\"1000\"", xaml);
+        Assert.Contains("x:Name=\"AboutContent\" HorizontalAlignment=\"Stretch\" MaxWidth=\"1000\"", xaml);
         Assert.Contains("Target=\"AppInformationGrid.RowSpacing\" Value=\"0\"", xaml);
+        Assert.Contains("x:Name=\"AppInfoRow2\" Height=\"0\"", xaml);
+        Assert.Contains("x:Name=\"AppInfoRow5\" Height=\"0\"", xaml);
+        Assert.Contains("Target=\"AppInfoRow2.Height\" Value=\"Auto\"", xaml);
+        Assert.Contains("Target=\"AppInfoRow5.Height\" Value=\"0\"", xaml);
         Assert.Contains("Target=\"ProjectOpenSourceGrid.RowSpacing\" Value=\"0\"", xaml);
         Assert.Contains("Target=\"PrivacyRowGrid.RowSpacing\" Value=\"0\"", xaml);
         Assert.Contains("Target=\"NoticesRowGrid.RowSpacing\" Value=\"0\"", xaml);
@@ -50,6 +54,8 @@ public sealed class V184FigmaRegressionTests
         Assert.Contains("CompactBackupStamp", webDavCode);
         Assert.DoesNotContain("WebDavLastBackup", webDav + webDavCode);
         Assert.DoesNotContain("WebDavConnectionStatus", webDav + webDavCode);
+        Assert.DoesNotContain("SystemFillColorSuccessBrush", settings);
+        Assert.DoesNotContain("AccentTextFillColorPrimaryBrush", webDav);
     }
 
     private static string FindRepositoryRoot()
