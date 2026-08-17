@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   update-version-history:
-    if: ${{ !contains(github.event.head_commit.message, '[skip closeout-index]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -86,5 +85,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add docs/index.html
-          git commit -m '[skip closeout-index] Update public version history for v1.8.3'
+          git commit -m 'Update public version history for v1.8.3'
           git push origin HEAD:closeout/v1.8.3
