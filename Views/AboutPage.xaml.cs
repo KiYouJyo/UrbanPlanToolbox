@@ -24,14 +24,58 @@ public sealed partial class AboutPage : Page
     {
         InitializeComponent();
         PopulateApplicationInfo();
-        PrivacyButton.Content = T("Action_Privacy"); NoticesButton.Content = T("Action_ThirdPartyNotices");
-        RepositoryButton.Content = T("Action_GitHubRepository"); ReleasesButton.Content = T("Action_Releases"); IssuesButton.Content = T("Action_SubmitIssue"); LicenseButton.Content = T("Action_ViewMitLicense");
+        ApplyModernizedSectionText();
         CheckUpdateButtonText.Text = T("Action_CheckForUpdates");
-        CopyDiagnosticsButton.Content = T("Action_CopyDiagnostics"); OpenLogsButton.Content = T("Action_OpenLogsFolder");
+        CopyDiagnosticsButton.Content = T("Action_CopyDiagnostics");
+        OpenLogsButton.Content = T("Action_OpenLogsFolder");
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
         ActualThemeChanged += OnActualThemeChanged;
         RenderUpdate();
+    }
+
+    private void ApplyModernizedSectionText()
+    {
+        ProjectOpenSourceTitleText.Text = L("项目与开源", "プロジェクトとオープンソース", "Project & open source");
+        ProjectOpenSourceSummaryText.Text = L(
+            "代码、版本、问题反馈与许可集中成一组，减少散落按钮。",
+            "コード、バージョン、フィードバック、ライセンスを一つのグループにまとめます。",
+            "Keep code, releases, feedback, and licensing together instead of scattering actions across the page.");
+
+        RepositoryTitleText.Text = L("GitHub 仓库", "GitHub リポジトリ", "GitHub repository");
+        RepositoryDescriptionText.Text = L("查看源码、README 与开发进度。", "ソースコード、README、開発状況を確認します。", "View source code, the README, and development progress.");
+        RepositoryButton.Content = L("打开仓库", "リポジトリを開く", "Open repository");
+
+        ReleasesTitleText.Text = "Releases";
+        ReleasesDescriptionText.Text = L("查看历史版本、安装包与发行说明。", "過去のバージョン、インストーラー、リリースノートを確認します。", "View version history, installers, and release notes.");
+        ReleasesButton.Content = L("查看版本", "リリースを見る", "View releases");
+
+        IssuesTitleText.Text = "Issues";
+        IssuesDescriptionText.Text = L("提交缺陷、建议与功能需求。", "不具合、提案、機能要望を送信します。", "Submit bugs, suggestions, and feature requests.");
+        IssuesButton.Content = L("打开 Issues", "Issues を開く", "Open Issues");
+
+        LicenseTitleText.Text = L("开源许可", "オープンソースライセンス", "Open-source license");
+        LicenseDescriptionText.Text = L("查看项目许可证与第三方授权边界。", "プロジェクトのライセンスと第三者ライセンスの範囲を確認します。", "Review the project license and third-party licensing boundaries.");
+        LicenseButton.Content = L("查看许可", "ライセンスを見る", "View license");
+
+        PrivacyLegalTitleText.Text = L("隐私与法律", "プライバシーと法的情報", "Privacy & legal");
+        PrivacyLegalSummaryText.Text = L(
+            "隐私政策和第三方声明放在页面末尾，低频但始终可达。",
+            "プライバシーポリシーと第三者声明をページ末尾にまとめ、必要なときにいつでも確認できます。",
+            "Privacy policy and third-party notices stay at the end of the page: low-frequency, but always reachable.");
+        PrivacyPolicyTitleText.Text = L("隐私政策", "プライバシーポリシー", "Privacy policy");
+        PrivacyPolicyDescriptionText.Text = L(
+            "应用默认离线运行，不要求账户；联网行为仅在用户主动触发时发生。",
+            "アプリは既定でオフライン動作し、アカウントは不要です。ネットワーク通信はユーザーが明示的に操作した場合のみ発生します。",
+            "The app is offline by default and requires no account; network access occurs only when the user explicitly initiates it.");
+        PrivacyButton.Content = L("查看隐私政策", "プライバシーポリシーを見る", "View privacy policy");
+
+        ThirdPartyTitleText.Text = L("第三方声明", "第三者声明", "Third-party notices");
+        ThirdPartyDescriptionText.Text = L(
+            "查看所用开源组件、许可证与必要的版权说明。",
+            "使用しているオープンソースコンポーネント、ライセンス、必要な著作権表示を確認します。",
+            "Review open-source components, licenses, and required copyright notices.");
+        NoticesButton.Content = L("查看第三方声明", "第三者声明を見る", "View third-party notices");
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -138,8 +182,6 @@ public sealed partial class AboutPage : Page
         UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
         var hasTrustedTargetVersion = !string.IsNullOrWhiteSpace(info.AvailableVersion);
 
-        // The Figma v2 card keeps every information region present across all states. Unknown
-        // Store metadata is represented with placeholders rather than changing the card shape.
         UpdateTargetLabel.Visibility = Visibility.Visible;
         UpdateTargetText.Visibility = Visibility.Visible;
         UpdateTargetText.Text = hasTrustedTargetVersion ? $"v{info.AvailableVersion}" : "—";
@@ -195,6 +237,13 @@ public sealed partial class AboutPage : Page
         }
     }
 
+    private string L(string zh, string ja, string en)
+    {
+        var language = _localization.CurrentLanguage;
+        if (language.StartsWith("ja", StringComparison.OrdinalIgnoreCase)) return ja;
+        if (language.StartsWith("en", StringComparison.OrdinalIgnoreCase)) return en;
+        return zh;
+    }
     private string T(string key) => _localization.GetString(key);
     private string TFormatted(string key, params object[] arguments) => _localization.GetFormattedString(key, arguments);
     private string ChannelLabel(DistributionChannelContext channel) => T(channel.DisplayResourceKey);
