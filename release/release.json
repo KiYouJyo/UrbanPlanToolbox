@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.8.4", "packageVersion": "1.8.4.0" },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.8.4", "packageVersion": "1.8.4.1" },
   "classification": { "kind": "settings-about-modernization", "stability": "prepared-for-validation", "storeMilestone": false },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
