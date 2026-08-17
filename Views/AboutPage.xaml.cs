@@ -113,30 +113,17 @@ public sealed partial class AboutPage : Page
 
         UpdateVersionText.Text = AppVersionProvider.DisplayVersion;
         var hasTrustedTargetVersion = !string.IsNullOrWhiteSpace(info.AvailableVersion);
-        if (hasTrustedTargetVersion)
-        {
-            UpdateTargetLabel.Visibility = Visibility.Visible;
-            UpdateTargetText.Visibility = Visibility.Visible;
-            UpdateTargetText.Text = $"v{info.AvailableVersion}";
 
-            UpdateNotesLabel.Visibility = Visibility.Visible;
-            UpdateNotesContainer.Visibility = Visibility.Visible;
-            UpdateNotesText.Visibility = Visibility.Visible;
-            UpdateNotesText.Text = display.Text;
-        }
-        else
-        {
-            // Store availability and display metadata are separate concerns. When Store reports an
-            // update before a trustworthy target version can be resolved, suppress version-scoped
-            // rows rather than showing stale notes or an older hosted-manifest version.
-            UpdateTargetLabel.Visibility = Visibility.Collapsed;
-            UpdateTargetText.Visibility = Visibility.Collapsed;
-            UpdateTargetText.Text = string.Empty;
-            UpdateNotesLabel.Visibility = Visibility.Collapsed;
-            UpdateNotesContainer.Visibility = Visibility.Collapsed;
-            UpdateNotesText.Visibility = Visibility.Collapsed;
-            UpdateNotesText.Text = string.Empty;
-        }
+        // Keep the update card structurally stable in every state. Store availability and
+        // version-scoped metadata are still treated separately: unknown target metadata is
+        // represented by placeholders instead of collapsing rows or surfacing stale data.
+        UpdateTargetLabel.Visibility = Visibility.Visible;
+        UpdateTargetText.Visibility = Visibility.Visible;
+        UpdateTargetText.Text = hasTrustedTargetVersion ? $"v{info.AvailableVersion}" : "—";
+        UpdateNotesLabel.Visibility = Visibility.Visible;
+        UpdateNotesContainer.Visibility = Visibility.Visible;
+        UpdateNotesText.Visibility = Visibility.Visible;
+        UpdateNotesText.Text = hasTrustedTargetVersion ? display.Text : T("Update_ReleaseNotesUnavailable");
 
         CheckUpdateButton.IsEnabled = _channel.CanCheckForUpdates && (_updates.CanCheck || _updates.Info.IsUpdateAvailable);
         CheckUpdateButton.Content = info.NeedsFinalRestart ? T("Action_RestartAndUpdate") : info.IsUpdateAvailable ? T("Action_DownloadAndInstall") : T("Action_CheckForUpdates");
