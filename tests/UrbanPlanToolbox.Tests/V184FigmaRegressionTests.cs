@@ -30,7 +30,7 @@ public sealed class V184FigmaRegressionTests
         Assert.Contains("代码、版本、问题反馈与许可集中成一组", code);
         Assert.Contains("应用默认离线运行，不要求账户", code);
         Assert.Contains("查看所用开源组件、许可证与必要的版权说明", code);
-        Assert.Equal(4, Regex.Matches(xaml, "DescriptionText\"").Count);
+        Assert.Equal(6, Regex.Matches(xaml, "DescriptionText\"").Count);
     }
 
     [Fact]
