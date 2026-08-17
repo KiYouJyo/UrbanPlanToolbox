@@ -1,4 +1,4 @@
-﻿<Page x:Class="UrbanPlanToolbox.Views.AboutPage"
+<Page x:Class="UrbanPlanToolbox.Views.AboutPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:automation="using:Microsoft.UI.Xaml.Automation">
@@ -66,7 +66,7 @@
           </VisualState>
           <VisualState x:Name="AboutWide">
             <VisualState.StateTriggers>
-              <AdaptiveTrigger MinWindowWidth="760" />
+              <AdaptiveTrigger MinWindowWidth="720" />
             </VisualState.StateTriggers>
             <VisualState.Setters>
               <Setter Target="AppInfoPackage.(Grid.Row)" Value="0" />
