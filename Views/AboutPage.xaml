@@ -397,10 +397,17 @@
           </StackPanel>
         </Border>
 
-        <Grid Visibility="Collapsed" automation:AutomationProperties.AccessibilityView="Raw">
-          <Button x:Name="CopyDiagnosticsButton" Click="OnCopyDiagnostics" />
-          <Button x:Name="OpenLogsButton" Click="OnOpenLogs" />
-        </Grid>
+        <!-- Legacy diagnostics actions remain non-visual only for source/API compatibility; the Diagnostics & logs card is removed from the UI. -->
+        <Border Style="{StaticResource SettingsSectionCardStyle}"
+                Visibility="Collapsed"
+                automation:AutomationProperties.AccessibilityView="Raw">
+          <StackPanel>
+            <TextBlock x:Uid="About_DiagnosticsTitle" />
+            <TextBlock x:Uid="About_DiagnosticsSummary" />
+            <Button x:Name="CopyDiagnosticsButton" Click="OnCopyDiagnostics" />
+            <Button x:Name="OpenLogsButton" Click="OnOpenLogs" />
+          </StackPanel>
+        </Border>
       </StackPanel>
     </Grid>
   </ScrollViewer>
