@@ -9,7 +9,10 @@ $rootTextFiles = @(Get-ChildItem -LiteralPath $root -File -Filter '*.txt')
 if ($rootTextFiles.Count -ne 1 -or $rootTextFiles[0].Name[0] -ne [char]0x8BF7) { throw 'Missing one-click root readme text file.' }
 if (-not (Test-Path -LiteralPath $payload -PathType Container)) { throw 'Missing one-click payload directory: payload' }
 $metadata = Get-Content -Raw -LiteralPath (Join-Path $payload 'InstallerMetadata.json') -Encoding UTF8 | ConvertFrom-Json
-if ([int]$metadata.schemaVersion -ne 3 -or $metadata.displayVersion -notmatch '^\d+\.\d+\.\d+$' -or $metadata.packageVersion -ne "$($metadata.displayVersion).0") { throw 'One-click metadata version mismatch.' }
+$displayVersionText = [string]$metadata.displayVersion
+$packageVersionText = [string]$metadata.packageVersion
+$packageDisplayVersion = if ($packageVersionText -match '^(?<display>\d+\.\d+\.\d+)\.\d+$') { $matches.display } else { '' }
+if ([int]$metadata.schemaVersion -ne 3 -or $displayVersionText -notmatch '^\d+\.\d+\.\d+$' -or $packageDisplayVersion -ne $displayVersionText) { throw 'One-click metadata version mismatch.' }
 foreach ($file in @($metadata.certificateFileName,'Install.ps1','Uninstall.ps1','InstallLauncher.ps1','UninstallLauncher.ps1','InstallerMetadata.ps1','ChecksumResolver.ps1','ReleaseDownloadResolver.ps1','SHA256SUMS.txt')) { if (-not (Test-Path -LiteralPath (Join-Path $payload $file) -PathType Leaf)) { throw "Missing one-click payload file: $file" } }
 $embeddedPackages = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object { $_.Extension.ToLowerInvariant() -in @('.msix','.msixbundle','.appinstaller','.pfx','.p12') })
 if ($embeddedPackages.Count -gt 0) { throw "One-click bootstrap must not embed application packages or App Installer files: $($embeddedPackages.Name -join ', ')" }
