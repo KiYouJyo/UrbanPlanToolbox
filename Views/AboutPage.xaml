@@ -207,6 +207,7 @@
                                 HorizontalScrollBarVisibility="Disabled"
                                 VerticalScrollBarVisibility="Auto">
                     <TextBlock x:Name="UpdateNotesText"
+                               Margin="0,0,18,0"
                                TextWrapping="Wrap"
                                LineHeight="22" />
                   </ScrollViewer>
