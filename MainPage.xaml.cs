@@ -21,6 +21,7 @@ public sealed partial class MainPage : Page
     private readonly ShellNavigationState? _initialState;
     private SplitView? _navigationSplitView;
     private bool _isNavigationPaneBackgroundHooked;
+    private bool _isWindowActive = true;
 
     public MainPage()
         : this(null)
@@ -93,7 +94,15 @@ public sealed partial class MainPage : Page
             _isNavigationPaneBackgroundHooked = true;
             Navigation.PaneOpening += (_, _) => QueueNavigationPaneBackgroundUpdate();
             ActualThemeChanged += (_, _) => QueueNavigationPaneBackgroundUpdate();
+            if (App.MainWindow is not null)
+                App.MainWindow.Activated += OnMainWindowActivated;
         }
+        QueueNavigationPaneBackgroundUpdate();
+    }
+
+    private void OnMainWindowActivated(object sender, WindowActivatedEventArgs args)
+    {
+        _isWindowActive = args.WindowActivationState != WindowActivationState.Deactivated;
         QueueNavigationPaneBackgroundUpdate();
     }
 
@@ -105,8 +114,11 @@ public sealed partial class MainPage : Page
         var themeKey = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast
             ? "HighContrast"
             : Navigation.ActualTheme == ElementTheme.Dark ? "Dark" : "Light";
+        var brushKey = _isWindowActive
+            ? "ShellNavigationPaneBackgroundBrush"
+            : "ShellNavigationPaneInactiveBackgroundBrush";
         var themeResources = Application.Current.Resources.ThemeDictionaries[themeKey] as ResourceDictionary;
-        if (_navigationSplitView is not null && themeResources?["ShellNavigationPaneBackgroundBrush"] is Brush brush)
+        if (_navigationSplitView is not null && themeResources?[brushKey] is Brush brush)
             _navigationSplitView.PaneBackground = brush;
     }
 
