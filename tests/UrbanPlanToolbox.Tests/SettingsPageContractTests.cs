@@ -17,7 +17,8 @@ public sealed class SettingsPageContractTests
         Assert.Contains("x:Name=\"SettingsCompact\"", xaml);
         Assert.Contains("x:Name=\"SettingsWide\"", xaml);
         Assert.Single(Regex.Matches(xaml, "<VisualStateManager.VisualStateGroups>").Cast<Match>());
-        Assert.Matches("x:Name=\"SettingsContent\"[\\s\\S]*?HorizontalAlignment=\"Stretch\"[\\s\\S]*?MaxWidth=\"1088\"", xaml);
+        Assert.Contains("x:Name=\"SettingsContent\" HorizontalAlignment=\"Stretch\" Spacing=\"16\"", xaml);
+        Assert.DoesNotContain("x:Name=\"SettingsContent\" HorizontalAlignment=\"Stretch\" MaxWidth=", xaml);
         foreach (var name in new[] { "ThemeBox", "LanguageBox", "ExportButton", "ImportButton", "ClearDataButton", "ApplicationSettingsTitle" })
             Assert.Single(Regex.Matches(xaml, $"x:Name=\"{name}\"").Cast<Match>());
         foreach (var name in new[] { "ThemeBox", "LanguageBox" })

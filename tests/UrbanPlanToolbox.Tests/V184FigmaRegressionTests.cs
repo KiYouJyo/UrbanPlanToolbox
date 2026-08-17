@@ -6,13 +6,14 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class V184FigmaRegressionTests
 {
     [Fact]
-    public void AboutPageKeepsWideCardsCompactAndDescriptive()
+    public void AboutPageKeepsWideCardsFullWidthAndDescriptive()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
         var code = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
 
-        Assert.Contains("x:Name=\"AboutContent\" HorizontalAlignment=\"Stretch\" MaxWidth=\"1000\"", xaml);
+        Assert.Contains("x:Name=\"AboutContent\" HorizontalAlignment=\"Stretch\" Spacing=\"16\"", xaml);
+        Assert.DoesNotContain("x:Name=\"AboutContent\" HorizontalAlignment=\"Stretch\" MaxWidth=", xaml);
         Assert.Contains("Target=\"AppInformationGrid.RowSpacing\" Value=\"0\"", xaml);
         Assert.Contains("x:Name=\"AppInfoRow2\" Height=\"0\"", xaml);
         Assert.Contains("x:Name=\"AppInfoRow5\" Height=\"0\"", xaml);

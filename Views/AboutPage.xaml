@@ -74,7 +74,7 @@
         </VisualStateGroup>
       </VisualStateManager.VisualStateGroups>
 
-      <StackPanel x:Name="AboutContent" HorizontalAlignment="Stretch" MaxWidth="1000" Spacing="16">
+      <StackPanel x:Name="AboutContent" HorizontalAlignment="Stretch" Spacing="16">
         <TextBlock x:Uid="Page_About_Title" Style="{StaticResource TitleTextBlockStyle}" />
 
         <Border x:Name="ApplicationInformationCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
