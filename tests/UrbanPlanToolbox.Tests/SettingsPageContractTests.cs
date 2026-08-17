@@ -11,7 +11,7 @@ public sealed class SettingsPageContractTests
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
         Assert.True(Regex.Matches(xaml, "SettingsSectionCardStyle").Count >= 5);
-        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"980\"", xaml);
+        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"720\"", xaml);
         Assert.Contains("x:Name=\"SettingsLayoutRoot\"", xaml);
         Assert.Contains("x:Name=\"SettingsCompact\"", xaml);
         Assert.Contains("x:Name=\"SettingsWide\"", xaml);
