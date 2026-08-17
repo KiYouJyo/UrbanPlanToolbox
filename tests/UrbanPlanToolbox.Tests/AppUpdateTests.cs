@@ -191,7 +191,10 @@ public sealed class AppUpdateTests
         Assert.Contains("StoreUpdateCompleted", store);
         Assert.Contains("new(AppUpdateState.Completed)", store);
         Assert.Contains("AppUpdateState.ReadyToInstall", github);
-        Assert.Contains("info.NeedsFinalRestart ? T(\"Action_RestartAndUpdate\")", about);
+        Assert.Contains("info.NeedsFinalRestart", about, StringComparison.Ordinal);
+        Assert.Contains("T(\"Action_RestartAndUpdate\")", about, StringComparison.Ordinal);
+        Assert.Contains("info.IsUpdateAvailable", about, StringComparison.Ordinal);
+        Assert.Contains("T(\"Action_DownloadAndInstall\")", about, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -324,26 +327,27 @@ public sealed class AppUpdateTests
     }
 
     [Fact]
-    public void AboutPageUsesOnlyTheStatusProgressRingAndNoDashPlaceholders()
+    public void AboutPageUsesOnlyTheButtonProgressRingAndStablePlaceholders()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
         var code = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
 
-        Assert.Contains("x:Name=\"UpdateStatusProgressRing\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"CheckUpdateButtonProgressRing\"", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("UpdateStatusProgressRing", xaml, StringComparison.Ordinal);
         Assert.DoesNotContain("UpdateTargetProgressRing", xaml, StringComparison.Ordinal);
         Assert.DoesNotContain("UpdateNotesProgressRing", xaml, StringComparison.Ordinal);
-        Assert.Contains("ProgressRing", xaml, StringComparison.Ordinal);
         Assert.Contains("var checking = info.State == AppUpdateState.Checking", code, StringComparison.Ordinal);
-        Assert.Contains("UpdateStatusProgressRing.IsActive = checking", code, StringComparison.Ordinal);
+        Assert.Contains("CheckUpdateButtonProgressRing.IsActive = checking", code, StringComparison.Ordinal);
+        Assert.Contains("CheckUpdateButtonProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
+        Assert.DoesNotContain("UpdateStatusProgressRing", code, StringComparison.Ordinal);
         Assert.Contains("UpdateTargetLabel.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateTargetText.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesLabel.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesContainer.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
         Assert.Contains("UpdateNotesText.Visibility = Visibility.Visible", code, StringComparison.Ordinal);
-        Assert.Contains("UpdateStatusProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed", code, StringComparison.Ordinal);
+        Assert.Contains("UpdateTargetText.Text = hasTrustedTargetVersion ? $\"v{info.AvailableVersion}\" : \"—\"", code, StringComparison.Ordinal);
         Assert.DoesNotContain("unavailableValue", code, StringComparison.Ordinal);
-        Assert.DoesNotContain("\\u2014", code, StringComparison.Ordinal);
     }
 
     [Fact]
