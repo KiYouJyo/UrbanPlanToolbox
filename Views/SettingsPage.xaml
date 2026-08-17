@@ -41,7 +41,7 @@
         </VisualStateGroup>
       </VisualStateManager.VisualStateGroups>
 
-      <StackPanel x:Name="SettingsContent" HorizontalAlignment="Left" MaxWidth="1088" Spacing="16">
+      <StackPanel x:Name="SettingsContent" HorizontalAlignment="Stretch" MaxWidth="1088" Spacing="16">
         <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" />
 
         <Border x:Name="AppearanceLanguageCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
