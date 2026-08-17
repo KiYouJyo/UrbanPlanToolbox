@@ -50,7 +50,7 @@ public sealed class StoreUpdateMetadataTests
     }
 
     [Fact]
-    public void AboutUpdateCardKeepsMetadataRowsVisibleWhenTargetVersionIsUnknown()
+    public void AboutUpdateCardKeepsMetadataRegionsVisibleWhenTargetVersionIsUnknown()
     {
         var root = FindRepositoryRoot();
         var source = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
@@ -67,6 +67,26 @@ public sealed class StoreUpdateMetadataTests
         Assert.DoesNotContain("UpdateNotesLabel.Visibility = Visibility.Collapsed", source);
         Assert.DoesNotContain("UpdateNotesContainer.Visibility = Visibility.Collapsed", source);
         Assert.DoesNotContain("UpdateNotesText.Visibility = Visibility.Collapsed", source);
+    }
+
+    [Fact]
+    public void AboutUpdateCardUsesResponsiveFigmaV2LayoutAndOnlyButtonSpinnerForChecking()
+    {
+        var root = FindRepositoryRoot();
+        var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
+        var code = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
+
+        Assert.Contains("MaxWidth=\"840\"", xaml);
+        Assert.Contains("x:Name=\"UpdateBodyGrid\"", xaml);
+        Assert.Contains("x:Name=\"CompactUpdateLayout\"", xaml);
+        Assert.Contains("x:Name=\"WideUpdateLayout\"", xaml);
+        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"980\"", xaml);
+        Assert.Contains("UpdateMetadataCard.(Grid.Row)", xaml);
+        Assert.Contains("UpdateMetadataCard.(Grid.ColumnSpan)", xaml);
+        Assert.Contains("x:Name=\"CheckUpdateButtonProgressRing\"", xaml);
+        Assert.DoesNotContain("x:Name=\"UpdateStatusProgressRing\"", xaml);
+        Assert.Contains("CheckUpdateButtonProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;", code);
+        Assert.Contains("CheckUpdateButtonProgressRing.IsActive = checking;", code);
     }
 
     private static string FindRepositoryRoot()
