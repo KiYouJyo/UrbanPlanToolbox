@@ -31,6 +31,7 @@
             <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="0" /></VisualState.StateTriggers>
             <VisualState.Setters>
               <Setter Target="AppInformationGrid.RowSpacing" Value="14" />
+              <Setter Target="AppInfoRow2.Height" Value="Auto" /><Setter Target="AppInfoRow3.Height" Value="Auto" /><Setter Target="AppInfoRow4.Height" Value="Auto" /><Setter Target="AppInfoRow5.Height" Value="Auto" />
               <Setter Target="AppInfoDisplay.Margin" Value="0" /><Setter Target="AppInfoPackage.Margin" Value="0" /><Setter Target="AppInfoArchitecture.Margin" Value="0" />
               <Setter Target="AppInfoPackage.(Grid.Row)" Value="1" /><Setter Target="AppInfoPackage.(Grid.Column)" Value="0" />
               <Setter Target="AppInfoArchitecture.(Grid.Row)" Value="2" /><Setter Target="AppInfoArchitecture.(Grid.Column)" Value="0" />
@@ -52,6 +53,7 @@
             <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="520" /></VisualState.StateTriggers>
             <VisualState.Setters>
               <Setter Target="AppInformationGrid.RowSpacing" Value="0" />
+              <Setter Target="AppInfoRow2.Height" Value="0" /><Setter Target="AppInfoRow3.Height" Value="0" /><Setter Target="AppInfoRow4.Height" Value="0" /><Setter Target="AppInfoRow5.Height" Value="0" />
               <Setter Target="AppInfoDisplay.Margin" Value="0,0,0,14" /><Setter Target="AppInfoPackage.Margin" Value="0,0,0,14" /><Setter Target="AppInfoArchitecture.Margin" Value="0,0,0,14" />
               <Setter Target="AppInfoPackage.(Grid.Row)" Value="0" /><Setter Target="AppInfoPackage.(Grid.Column)" Value="1" />
               <Setter Target="AppInfoArchitecture.(Grid.Row)" Value="0" /><Setter Target="AppInfoArchitecture.(Grid.Column)" Value="2" />
@@ -72,7 +74,7 @@
         </VisualStateGroup>
       </VisualStateManager.VisualStateGroups>
 
-      <StackPanel x:Name="AboutContent" HorizontalAlignment="Left" MaxWidth="1000" Spacing="16">
+      <StackPanel x:Name="AboutContent" HorizontalAlignment="Stretch" MaxWidth="1000" Spacing="16">
         <TextBlock x:Uid="Page_About_Title" Style="{StaticResource TitleTextBlockStyle}" />
 
         <Border x:Name="ApplicationInformationCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
@@ -87,12 +89,12 @@
               </StackPanel>
             </Grid>
             <Border Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14">
-              <Grid x:Name="AppInformationGrid" ColumnSpacing="20" RowSpacing="14">
+              <Grid x:Name="AppInformationGrid" ColumnSpacing="20" RowSpacing="0">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0" /><ColumnDefinition Width="*" MinWidth="0" /><ColumnDefinition Width="*" MinWidth="0" /></Grid.ColumnDefinitions>
-                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-                <StackPanel x:Name="AppInfoDisplay" Grid.Row="0" Grid.Column="0" Spacing="2"><TextBlock x:Uid="About_DisplayVersionLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Name="DisplayVersionText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
-                <StackPanel x:Name="AppInfoPackage" Grid.Row="0" Grid.Column="1" Spacing="2"><TextBlock x:Uid="About_PackageVersionLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Name="PackageVersionText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
-                <StackPanel x:Name="AppInfoArchitecture" Grid.Row="0" Grid.Column="2" Spacing="2"><TextBlock x:Uid="About_ArchitectureLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Name="ArchitectureText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
+                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition x:Name="AppInfoRow2" Height="0" /><RowDefinition x:Name="AppInfoRow3" Height="0" /><RowDefinition x:Name="AppInfoRow4" Height="0" /><RowDefinition x:Name="AppInfoRow5" Height="0" /></Grid.RowDefinitions>
+                <StackPanel x:Name="AppInfoDisplay" Grid.Row="0" Grid.Column="0" Margin="0,0,0,14" Spacing="2"><TextBlock x:Uid="About_DisplayVersionLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Name="DisplayVersionText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
+                <StackPanel x:Name="AppInfoPackage" Grid.Row="0" Grid.Column="1" Margin="0,0,0,14" Spacing="2"><TextBlock x:Uid="About_PackageVersionLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Name="PackageVersionText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
+                <StackPanel x:Name="AppInfoArchitecture" Grid.Row="0" Grid.Column="2" Margin="0,0,0,14" Spacing="2"><TextBlock x:Uid="About_ArchitectureLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Name="ArchitectureText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
                 <StackPanel x:Name="AppInfoChannel" Grid.Row="1" Grid.Column="0" Spacing="2"><TextBlock x:Uid="About_ChannelLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Name="ChannelText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
                 <StackPanel x:Name="AppInfoPublisher" Grid.Row="1" Grid.Column="1" Spacing="2"><TextBlock x:Uid="About_PublisherLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Name="PublisherText" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
                 <StackPanel x:Name="AppInfoTechnology" Grid.Row="1" Grid.Column="2" Spacing="2"><TextBlock x:Uid="About_TechnologyLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" /><TextBlock x:Uid="About_TechnologyValue" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" /></StackPanel>
@@ -141,8 +143,8 @@
             <Grid x:Name="ProjectOpenSourceGrid" ColumnSpacing="12" RowSpacing="12">
               <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0" /><ColumnDefinition Width="*" MinWidth="0" /></Grid.ColumnDefinitions>
               <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-              <Border x:Name="RepositoryTile" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14"><StackPanel Spacing="8"><TextBlock x:Name="RepositoryTitleText" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock x:Name="RepositoryDescriptionText" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/><Button x:Name="RepositoryButton" Click="OnOpenRepository" HorizontalAlignment="Left" /></StackPanel></Border>
-              <Border x:Name="ReleasesTile" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14"><StackPanel Spacing="8"><TextBlock x:Name="ReleasesTitleText" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock x:Name="ReleasesDescriptionText" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/><Button x:Name="ReleasesButton" Click="OnOpenReleases" HorizontalAlignment="Left" /></StackPanel></Border>
+              <Border x:Name="RepositoryTile" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" Margin="0,0,0,12" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14"><StackPanel Spacing="8"><TextBlock x:Name="RepositoryTitleText" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock x:Name="RepositoryDescriptionText" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/><Button x:Name="RepositoryButton" Click="OnOpenRepository" HorizontalAlignment="Left" /></StackPanel></Border>
+              <Border x:Name="ReleasesTile" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Margin="0,0,0,12" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14"><StackPanel Spacing="8"><TextBlock x:Name="ReleasesTitleText" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock x:Name="ReleasesDescriptionText" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/><Button x:Name="ReleasesButton" Click="OnOpenReleases" HorizontalAlignment="Left" /></StackPanel></Border>
               <Border x:Name="IssuesTile" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14"><StackPanel Spacing="8"><TextBlock x:Name="IssuesTitleText" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock x:Name="IssuesDescriptionText" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/><Button x:Name="IssuesButton" Click="OnOpenIssues" HorizontalAlignment="Left" /></StackPanel></Border>
               <Border x:Name="LicenseTile" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="1" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14"><StackPanel Spacing="8"><TextBlock x:Name="LicenseTitleText" Style="{StaticResource BodyStrongTextBlockStyle}" /><TextBlock x:Name="LicenseDescriptionText" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/><Button x:Name="LicenseButton" Click="OnOpenLicense" HorizontalAlignment="Left" /></StackPanel></Border>
             </Grid>
