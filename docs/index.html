@@ -64,7 +64,28 @@
 
     <section id="version-history" aria-labelledby="history-heading">
       <article class="card">
-        <h2>1.8.0</h2><p class="meta">当前发布版本 / 現在のリリースバージョン / Current release · 2026-08-15 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.0">GitHub Release</a> · Microsoft Store 已提交认证 / Microsoft Store 認証審査提出済み / Submitted for Microsoft Store certification</p>
+  <h2>1.8.3</h2><p class="meta">当前发布版本 / 現在のリリースバージョン / Current release · 2026-08-17 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.3">GitHub Release</a> · Microsoft Store 已提交认证 / Microsoft Store 認証審査提出済み / Submitted for Microsoft Store certification</p>
+  <div class="language"><strong>简体中文</strong><ul><li>修复 Store 目标版本元数据暂未解析时“可用版本”和“更新内容”被隐藏的问题，同时继续避免显示陈旧版本信息。</li><li>重做响应式更新管理卡片；检查更新时只在操作按钮内显示一个 ProgressRing。</li><li>修复更新说明滚动条覆盖正文的问题。</li></ul></div>
+  <div class="language" lang="ja"><strong>日本語</strong><ul><li>Store の対象バージョン情報が未解決のときに「利用可能バージョン」と更新内容が非表示になる問題を修正し、古い情報は引き続き表示しません。</li><li>レスポンシブな更新管理カードへ再設計し、更新確認中の ProgressRing は操作ボタン内の1つだけにしました。</li><li>更新内容のスクロールバーが本文に重なる問題を修正しました。</li></ul></div>
+  <div class="language" lang="en"><strong>English</strong><ul><li>Fixed Available version and release notes disappearing while trusted Store target metadata is unresolved, without surfacing stale metadata.</li><li>Redesigned the responsive Update management card and keeps a single ProgressRing inside the checking action button.</li><li>Fixed the release-notes scrollbar overlapping text.</li></ul></div>
+</article>
+
+<article class="card">
+  <h2>1.8.2</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-16 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.2">GitHub Release</a> · Microsoft Store 已发布 / Microsoft Store 公開済み / Published on Microsoft Store</p>
+  <div class="language"><strong>简体中文</strong><ul><li>在数据管理中加入 WebDAV 云存档，并保持本地数据为主数据源。</li><li>复用 .uptbackup 的校验与安全恢复流程，并使用 Windows Credential Locker 保存 WebDAV 密码。</li><li>精简新建设计与研究项目弹窗，将详细信息移到项目工作区补充。</li></ul></div>
+  <div class="language" lang="ja"><strong>日本語</strong><ul><li>データ管理に WebDAV クラウドアーカイブを追加し、ローカルデータを主データソースとして維持しました。</li><li>.uptbackup の検証・安全復元フローを再利用し、WebDAV パスワードは Windows Credential Locker に保存します。</li><li>設計・研究プロジェクトの新規作成ダイアログを簡素化し、詳細はプロジェクトワークスペースで補完するようにしました。</li></ul></div>
+  <div class="language" lang="en"><strong>English</strong><ul><li>Added WebDAV cloud archives while keeping local storage authoritative.</li><li>Reused .uptbackup validation and safe restore, with WebDAV passwords stored in Windows Credential Locker.</li><li>Streamlined new design and research project dialogs and moved detailed editing into Project Workspace.</li></ul></div>
+</article>
+
+<article class="card">
+  <h2>1.8.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-15 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.1">GitHub Release</a></p>
+  <div class="language"><strong>简体中文</strong><ul><li>修复后台驻留进程阻止 MSIX 卸载的问题，并将托盘菜单改为 WinUI 3 风格。</li><li>精简设计与研究项目工作区，并加强 Store 更新目标版本与更新说明的可信元数据边界。</li></ul></div>
+  <div class="language" lang="ja"><strong>日本語</strong><ul><li>バックグラウンド常駐プロセスが MSIX のアンインストールを妨げる問題を修正し、トレイメニューを WinUI 3 スタイルへ変更しました。</li><li>設計・研究プロジェクトワークスペースを簡素化し、Store 更新対象バージョンと更新内容の信頼できるメタデータ境界を強化しました。</li></ul></div>
+  <div class="language" lang="en"><strong>English</strong><ul><li>Fixed background residency blocking MSIX uninstall and moved the tray menu to a WinUI 3 surface.</li><li>Streamlined project workspaces and hardened trusted Store target-version and release-note metadata boundaries.</li></ul></div>
+</article>
+
+      <article class="card">
+        <h2>1.8.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-15 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.0">GitHub Release</a></p>
         <div class="language"><strong>简体中文</strong><ul><li>新增后台驻留、系统托盘与灵感记录器，支持设计/科研灵感快速记录与后续管理。</li><li>新增可选的 Windows 登录静默自启动；两个后台相关选项对新用户默认关闭。</li><li>首次启动向导新增灵感记录器介绍页，记录器支持置顶、右上角定位，并从任务栏和 Alt+Tab 切换器中隐藏。</li><li>完善深浅色标题栏、中日文输入法体验，并优化高 DPI 下主窗口的首次尺寸与居中定位。</li></ul></div>
         <div class="language" lang="ja"><strong>日本語</strong><ul><li>バックグラウンド常駐、システムトレイ、インスピレーションレコーダーを追加し、設計・研究アイデアをすばやく記録して後から整理できるようにしました。</li><li>Windows サインイン時のサイレント起動を追加し、2つのバックグラウンド関連設定は新規ユーザーでは既定でオフです。</li><li>初回起動ガイドにレコーダー紹介ページを追加し、最前面表示、右上配置、タスクバー / Alt+Tab 非表示に対応しました。</li><li>ライト / ダークのタイトルバー表示、日本語・中国語 IME、高 DPI 環境での初期ウィンドウサイズと中央配置を改善しました。</li></ul></div>
         <div class="language" lang="en"><strong>English</strong><ul><li>Added background residency, system tray support, and the Inspiration Recorder for quick design/research capture and later management.</li><li>Added optional silent Windows sign-in startup; both background-related settings default to off for new users.</li><li>Added a Recorder page to first-run onboarding, with topmost behavior, top-right placement, and no Taskbar or Alt+Tab entry.</li><li>Improved light/dark caption behavior, Chinese/Japanese IME handling, and DPI-aware initial MainWindow sizing and centering.</li></ul></div>
