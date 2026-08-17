@@ -7,165 +7,109 @@
                 HorizontalContentAlignment="Stretch">
     <Grid x:Name="SettingsLayoutRoot" HorizontalAlignment="Stretch" Padding="24,16,24,32">
       <VisualStateManager.VisualStateGroups>
-        <VisualStateGroup>
-          <VisualState x:Name="SettingsNarrow">
-            <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="0"/></VisualState.StateTriggers>
+        <VisualStateGroup x:Name="SettingsResponsiveStates">
+          <VisualState x:Name="SettingsCompact">
+            <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="0" /></VisualState.StateTriggers>
+            <VisualState.Setters>
+              <Setter Target="ThemeBox.(Grid.Row)" Value="1" /><Setter Target="ThemeBox.(Grid.Column)" Value="0" /><Setter Target="ThemeBox.(Grid.ColumnSpan)" Value="2" /><Setter Target="ThemeBox.Width" Value="240" /><Setter Target="ThemeBox.HorizontalAlignment" Value="Left" />
+              <Setter Target="LanguageBox.(Grid.Row)" Value="1" /><Setter Target="LanguageBox.(Grid.Column)" Value="0" /><Setter Target="LanguageBox.(Grid.ColumnSpan)" Value="2" /><Setter Target="LanguageBox.Width" Value="240" /><Setter Target="LanguageBox.HorizontalAlignment" Value="Left" />
+              <Setter Target="BackgroundResidencyToggle.(Grid.Row)" Value="1" /><Setter Target="BackgroundResidencyToggle.(Grid.Column)" Value="0" /><Setter Target="BackgroundResidencyToggle.(Grid.ColumnSpan)" Value="2" /><Setter Target="BackgroundResidencyToggle.HorizontalAlignment" Value="Left" />
+              <Setter Target="SilentStartupToggle.(Grid.Row)" Value="1" /><Setter Target="SilentStartupToggle.(Grid.Column)" Value="0" /><Setter Target="SilentStartupToggle.(Grid.ColumnSpan)" Value="2" /><Setter Target="SilentStartupToggle.HorizontalAlignment" Value="Left" />
+              <Setter Target="MilestoneNotificationsToggle.(Grid.Row)" Value="1" /><Setter Target="MilestoneNotificationsToggle.(Grid.Column)" Value="0" /><Setter Target="MilestoneNotificationsToggle.(Grid.ColumnSpan)" Value="2" /><Setter Target="MilestoneNotificationsToggle.HorizontalAlignment" Value="Left" />
+              <Setter Target="MilestoneNotificationsRepeatBox.(Grid.Row)" Value="1" /><Setter Target="MilestoneNotificationsRepeatBox.(Grid.Column)" Value="0" /><Setter Target="MilestoneNotificationsRepeatBox.(Grid.ColumnSpan)" Value="2" /><Setter Target="MilestoneNotificationsRepeatBox.Width" Value="240" /><Setter Target="MilestoneNotificationsRepeatBox.HorizontalAlignment" Value="Left" />
+              <Setter Target="RestoreDefaultsButton.(Grid.Row)" Value="1" /><Setter Target="RestoreDefaultsButton.(Grid.Column)" Value="0" /><Setter Target="RestoreDefaultsButton.(Grid.ColumnSpan)" Value="2" /><Setter Target="RestoreDefaultsButton.HorizontalAlignment" Value="Left" />
+              <Setter Target="ReopenFirstRunGuideButton.(Grid.Row)" Value="1" /><Setter Target="ReopenFirstRunGuideButton.(Grid.Column)" Value="0" /><Setter Target="ReopenFirstRunGuideButton.(Grid.ColumnSpan)" Value="2" /><Setter Target="ReopenFirstRunGuideButton.HorizontalAlignment" Value="Left" />
+              <Setter Target="DataLocalPanel.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="DataCloudPanel.(Grid.Row)" Value="1" /><Setter Target="DataCloudPanel.(Grid.Column)" Value="0" /><Setter Target="DataCloudPanel.(Grid.ColumnSpan)" Value="2" /><Setter Target="DataCloudPanel.Margin" Value="0,12,0,0" />
+            </VisualState.Setters>
           </VisualState>
           <VisualState x:Name="SettingsWide">
-            <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="720"/></VisualState.StateTriggers>
+            <VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="520" /></VisualState.StateTriggers>
             <VisualState.Setters>
-              <Setter Target="ThemeBox.(Grid.Row)" Value="0"/>
-              <Setter Target="ThemeBox.(Grid.Column)" Value="1"/>
-              <Setter Target="ThemeBox.Width" Value="280"/>
-              <Setter Target="LanguageBox.(Grid.Row)" Value="0"/>
-              <Setter Target="LanguageBox.(Grid.Column)" Value="1"/>
-              <Setter Target="LanguageBox.Width" Value="280"/>
-              <Setter Target="MilestoneNotificationsRepeatBox.(Grid.Row)" Value="0"/>
-              <Setter Target="MilestoneNotificationsRepeatBox.(Grid.Column)" Value="1"/>
-              <Setter Target="MilestoneNotificationsRepeatBox.Width" Value="280"/>
+              <Setter Target="ThemeBox.(Grid.Row)" Value="0" /><Setter Target="ThemeBox.(Grid.Column)" Value="1" /><Setter Target="ThemeBox.(Grid.ColumnSpan)" Value="1" /><Setter Target="ThemeBox.Width" Value="250" /><Setter Target="ThemeBox.HorizontalAlignment" Value="Right" />
+              <Setter Target="LanguageBox.(Grid.Row)" Value="0" /><Setter Target="LanguageBox.(Grid.Column)" Value="1" /><Setter Target="LanguageBox.(Grid.ColumnSpan)" Value="1" /><Setter Target="LanguageBox.Width" Value="250" /><Setter Target="LanguageBox.HorizontalAlignment" Value="Right" />
+              <Setter Target="BackgroundResidencyToggle.(Grid.Row)" Value="0" /><Setter Target="BackgroundResidencyToggle.(Grid.Column)" Value="1" /><Setter Target="BackgroundResidencyToggle.(Grid.ColumnSpan)" Value="1" /><Setter Target="BackgroundResidencyToggle.HorizontalAlignment" Value="Right" />
+              <Setter Target="SilentStartupToggle.(Grid.Row)" Value="0" /><Setter Target="SilentStartupToggle.(Grid.Column)" Value="1" /><Setter Target="SilentStartupToggle.(Grid.ColumnSpan)" Value="1" /><Setter Target="SilentStartupToggle.HorizontalAlignment" Value="Right" />
+              <Setter Target="MilestoneNotificationsToggle.(Grid.Row)" Value="0" /><Setter Target="MilestoneNotificationsToggle.(Grid.Column)" Value="1" /><Setter Target="MilestoneNotificationsToggle.(Grid.ColumnSpan)" Value="1" /><Setter Target="MilestoneNotificationsToggle.HorizontalAlignment" Value="Right" />
+              <Setter Target="MilestoneNotificationsRepeatBox.(Grid.Row)" Value="0" /><Setter Target="MilestoneNotificationsRepeatBox.(Grid.Column)" Value="1" /><Setter Target="MilestoneNotificationsRepeatBox.(Grid.ColumnSpan)" Value="1" /><Setter Target="MilestoneNotificationsRepeatBox.Width" Value="250" /><Setter Target="MilestoneNotificationsRepeatBox.HorizontalAlignment" Value="Right" />
+              <Setter Target="RestoreDefaultsButton.(Grid.Row)" Value="0" /><Setter Target="RestoreDefaultsButton.(Grid.Column)" Value="1" /><Setter Target="RestoreDefaultsButton.(Grid.ColumnSpan)" Value="1" /><Setter Target="RestoreDefaultsButton.HorizontalAlignment" Value="Right" />
+              <Setter Target="ReopenFirstRunGuideButton.(Grid.Row)" Value="0" /><Setter Target="ReopenFirstRunGuideButton.(Grid.Column)" Value="1" /><Setter Target="ReopenFirstRunGuideButton.(Grid.ColumnSpan)" Value="1" /><Setter Target="ReopenFirstRunGuideButton.HorizontalAlignment" Value="Right" />
+              <Setter Target="DataLocalPanel.(Grid.ColumnSpan)" Value="1" />
+              <Setter Target="DataCloudPanel.(Grid.Row)" Value="0" /><Setter Target="DataCloudPanel.(Grid.Column)" Value="1" /><Setter Target="DataCloudPanel.(Grid.ColumnSpan)" Value="1" /><Setter Target="DataCloudPanel.Margin" Value="0" />
             </VisualState.Setters>
           </VisualState>
         </VisualStateGroup>
       </VisualStateManager.VisualStateGroups>
-      <StackPanel x:Name="SettingsContent"
-                  HorizontalAlignment="Left"
-                  MaxWidth="900"
-                  Spacing="16">
-        <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}"/>
 
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+      <StackPanel x:Name="SettingsContent" HorizontalAlignment="Stretch" MaxWidth="1088" Spacing="16">
+        <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" />
+
+        <Border x:Name="AppearanceLanguageCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="16">
-            <StackPanel Spacing="4">
-              <TextBlock x:Name="AppearanceLanguageTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
-              <TextBlock x:Name="AppearanceLanguageDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
-            </StackPanel>
-            <Grid ColumnSpacing="24" RowSpacing="12">
-              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-              <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
-                <TextBlock x:Name="ThemeLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
-                <TextBlock x:Name="ThemeDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
+            <StackPanel Spacing="4"><TextBlock x:Name="AppearanceLanguageTitle" Style="{StaticResource SubtitleTextBlockStyle}" /><TextBlock x:Name="AppearanceLanguageDescription" Style="{StaticResource SettingsDescriptionStyle}" /></StackPanel>
+            <Border Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14">
+              <StackPanel Spacing="14">
+                <Grid ColumnSpacing="24" RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="264"/></Grid.ColumnDefinitions><StackPanel Grid.Row="0" Grid.Column="0" Spacing="4"><TextBlock x:Name="ThemeLabel" Style="{StaticResource SettingsRowLabelStyle}"/><TextBlock x:Name="ThemeDescription" Style="{StaticResource SettingsDescriptionStyle}"/></StackPanel><ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ThemeBox" Grid.Row="0" Grid.Column="1" Width="250" MinWidth="220" MaxWidth="360" HorizontalAlignment="Right" SelectionChanged="OnThemeChanged"><ComboBoxItem Tag="System" x:Uid="Setting_Theme_System"/><ComboBoxItem Tag="Light" x:Uid="Setting_Theme_Light"/><ComboBoxItem Tag="Dark" x:Uid="Setting_Theme_Dark"/></ComboBox></Grid>
+                <Border Height="1" Background="{ThemeResource ControlStrokeColorDefaultBrush}"/>
+                <Grid ColumnSpacing="24" RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="264"/></Grid.ColumnDefinitions><StackPanel Grid.Row="0" Grid.Column="0" Spacing="4"><TextBlock x:Name="LanguageLabel" Style="{StaticResource SettingsRowLabelStyle}"/><TextBlock x:Name="LanguageDescription" Style="{StaticResource SettingsDescriptionStyle}"/></StackPanel><ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="LanguageBox" Grid.Row="0" Grid.Column="1" Width="250" MinWidth="220" MaxWidth="360" HorizontalAlignment="Right" SelectionChanged="OnLanguageChanged"><ComboBoxItem Tag="system" x:Uid="Setting_Language_System"/><ComboBoxItem Tag="zh-CN" x:Uid="Setting_Language_ZhCn"/><ComboBoxItem Tag="ja-JP" x:Uid="Setting_Language_JaJp"/><ComboBoxItem Tag="en-US" x:Uid="Setting_Language_EnUs"/></ComboBox></Grid>
               </StackPanel>
-              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ThemeBox"
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        MinWidth="240"
-                        MaxWidth="360"
-                        HorizontalAlignment="Left"
-                        SelectionChanged="OnThemeChanged">
-                <ComboBoxItem Tag="System" x:Uid="Setting_Theme_System"/>
-                <ComboBoxItem Tag="Light" x:Uid="Setting_Theme_Light"/>
-                <ComboBoxItem Tag="Dark" x:Uid="Setting_Theme_Dark"/>
-              </ComboBox>
-            </Grid>
-            <Border Height="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
-            <Grid ColumnSpacing="24" RowSpacing="12">
-              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-              <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
-                <TextBlock x:Name="LanguageLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
-                <TextBlock x:Name="LanguageDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <Border x:Name="ResidencyCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4"><TextBlock x:Name="ResidencyTitle" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Name="ResidencySectionDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/></StackPanel>
+            <Border Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14">
+              <StackPanel Spacing="14">
+                <Grid ColumnSpacing="24" RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="264"/></Grid.ColumnDefinitions><StackPanel Grid.Row="0" Grid.Column="0" Spacing="4"><TextBlock Text="{Binding Header, ElementName=BackgroundResidencyToggle}" Style="{StaticResource SettingsRowLabelStyle}"/><TextBlock x:Name="BackgroundResidencyDescription" Style="{StaticResource SettingsDescriptionStyle}"/></StackPanel><ToggleSwitch x:Name="BackgroundResidencyToggle" Grid.Row="0" Grid.Column="1" Width="44" MinWidth="44" OnContent="" OffContent="" HorizontalAlignment="Right" VerticalAlignment="Center" Toggled="OnBackgroundResidencyToggled"><ToggleSwitch.HeaderTemplate><DataTemplate><Grid/></DataTemplate></ToggleSwitch.HeaderTemplate></ToggleSwitch></Grid>
+                <Border Height="1" Background="{ThemeResource ControlStrokeColorDefaultBrush}"/>
+                <Grid ColumnSpacing="24" RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="264"/></Grid.ColumnDefinitions><StackPanel Grid.Row="0" Grid.Column="0" Spacing="4"><TextBlock Text="{Binding Header, ElementName=SilentStartupToggle}" Style="{StaticResource SettingsRowLabelStyle}"/><TextBlock x:Name="SilentStartupDescription" Style="{StaticResource SettingsDescriptionStyle}"/></StackPanel><ToggleSwitch x:Name="SilentStartupToggle" Grid.Row="0" Grid.Column="1" Width="44" MinWidth="44" OnContent="" OffContent="" HorizontalAlignment="Right" VerticalAlignment="Center" Toggled="OnSilentStartupToggled"><ToggleSwitch.HeaderTemplate><DataTemplate><Grid/></DataTemplate></ToggleSwitch.HeaderTemplate></ToggleSwitch></Grid>
               </StackPanel>
-              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="LanguageBox"
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        MinWidth="240"
-                        MaxWidth="360"
-                        HorizontalAlignment="Left"
-                        SelectionChanged="OnLanguageChanged">
-                <ComboBoxItem Tag="system" x:Uid="Setting_Language_System"/>
-                <ComboBoxItem Tag="zh-CN" x:Uid="Setting_Language_ZhCn"/>
-                <ComboBoxItem Tag="ja-JP" x:Uid="Setting_Language_JaJp"/>
-                <ComboBoxItem Tag="en-US" x:Uid="Setting_Language_EnUs"/>
-              </ComboBox>
-            </Grid>
+            </Border>
           </StackPanel>
         </Border>
 
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
-          <StackPanel Spacing="12">
-            <TextBlock x:Name="ResidencyTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
-            <StackPanel Spacing="4">
-              <ToggleSwitch x:Name="BackgroundResidencyToggle" Toggled="OnBackgroundResidencyToggled"/>
-              <TextBlock x:Name="BackgroundResidencyDescription" Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap"/>
-            </StackPanel>
-            <StackPanel Spacing="4">
-              <ToggleSwitch x:Name="SilentStartupToggle" Toggled="OnSilentStartupToggled"/>
-              <TextBlock x:Name="SilentStartupDescription" Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap"/>
-            </StackPanel>
-          </StackPanel>
-        </Border>
-
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+        <Border x:Name="MilestoneNotificationsCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="16">
-            <StackPanel Spacing="4">
-              <TextBlock x:Name="MilestoneNotificationsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
-              <TextBlock x:Name="MilestoneNotificationsDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/>
-            </StackPanel>
-            <Grid ColumnSpacing="24" RowSpacing="8">
-              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-              <TextBlock x:Name="MilestoneNotificationsLabel" Grid.Column="0" Style="{StaticResource SettingsRowLabelStyle}" VerticalAlignment="Center"/>
-              <ToggleSwitch x:Name="MilestoneNotificationsToggle" Grid.Column="1" Toggled="OnMilestoneNotificationsToggled"/>
-            </Grid>
-            <Border Height="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
-            <Grid ColumnSpacing="24" RowSpacing="8">
-              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-              <TextBlock x:Name="MilestoneNotificationsRepeatLabel" Grid.Row="0" Grid.Column="0" Style="{StaticResource SettingsRowLabelStyle}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="MilestoneNotificationsRepeatBox"
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        MinWidth="240"
-                        MaxWidth="360"
-                        SelectionChanged="OnMilestoneNotificationsRepeatChanged">
-                <ComboBoxItem Tag="None" x:Uid="Settings_MilestoneNotificationsRepeatNone"/>
-                <ComboBoxItem Tag="Hours6" x:Uid="Settings_MilestoneNotificationsRepeatHours6"/>
-                <ComboBoxItem Tag="Hours12" x:Uid="Settings_MilestoneNotificationsRepeatHours12"/>
-                <ComboBoxItem Tag="Hours24" x:Uid="Settings_MilestoneNotificationsRepeatHours24"/>
-                <ComboBoxItem Tag="Days3" x:Uid="Settings_MilestoneNotificationsRepeatDays3"/>
-              </ComboBox>
+            <StackPanel Spacing="4"><TextBlock x:Name="MilestoneNotificationsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Name="MilestoneNotificationsDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/></StackPanel>
+            <Border Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14">
+              <StackPanel Spacing="14">
+                <Grid ColumnSpacing="24" RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="264"/></Grid.ColumnDefinitions><StackPanel Grid.Row="0" Grid.Column="0" Spacing="4"><TextBlock x:Name="MilestoneNotificationsLabel" Style="{StaticResource SettingsRowLabelStyle}" TextWrapping="Wrap"/><TextBlock x:Name="MilestoneNotificationsRowDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/></StackPanel><ToggleSwitch x:Name="MilestoneNotificationsToggle" Grid.Row="0" Grid.Column="1" Width="44" MinWidth="44" OnContent="" OffContent="" HorizontalAlignment="Right" VerticalAlignment="Center" Toggled="OnMilestoneNotificationsToggled"/></Grid>
+                <Border Height="1" Background="{ThemeResource ControlStrokeColorDefaultBrush}"/>
+                <Grid ColumnSpacing="24" RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="264"/></Grid.ColumnDefinitions><StackPanel Grid.Row="0" Grid.Column="0" Spacing="4"><TextBlock x:Name="MilestoneNotificationsRepeatLabel" Style="{StaticResource SettingsRowLabelStyle}" TextWrapping="Wrap"/><TextBlock x:Name="MilestoneRepeatDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/></StackPanel><ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="MilestoneNotificationsRepeatBox" Grid.Row="0" Grid.Column="1" Width="250" MinWidth="220" MaxWidth="360" HorizontalAlignment="Right" SelectionChanged="OnMilestoneNotificationsRepeatChanged"><ComboBoxItem Tag="None" x:Uid="Settings_MilestoneNotificationsRepeatNone"/><ComboBoxItem Tag="Hours6" x:Uid="Settings_MilestoneNotificationsRepeatHours6"/><ComboBoxItem Tag="Hours12" x:Uid="Settings_MilestoneNotificationsRepeatHours12"/><ComboBoxItem Tag="Hours24" x:Uid="Settings_MilestoneNotificationsRepeatHours24"/><ComboBoxItem Tag="Days3" x:Uid="Settings_MilestoneNotificationsRepeatDays3"/></ComboBox></Grid>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Border>
+
+        <Border x:Name="DataManagementCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4"><TextBlock x:Name="DataManagementTitle" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Name="DataManagementDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/></StackPanel>
+            <Grid x:Name="DataManagementGrid" ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="*" MinWidth="0"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+              <Border x:Name="DataLocalPanel" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14" VerticalAlignment="Stretch">
+                <StackPanel Spacing="12">
+                  <StackPanel Spacing="3"><TextBlock x:Name="LocalBackupTitle" Style="{StaticResource SettingsRowLabelStyle}"/><TextBlock x:Name="LocalBackupDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/></StackPanel>
+                  <StackPanel Spacing="2"><TextBlock x:Name="LocalBackupStatusLabel" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12"/><TextBlock x:Name="LocalBackupStatus" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap"/></StackPanel>
+                  <Grid x:Name="DataActions" HorizontalAlignment="Left" ColumnSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><Button x:Uid="DataManagement_Export" x:Name="ExportButton" Grid.Column="0" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" Click="OnExport"/><Button x:Uid="DataManagement_Import" x:Name="ImportButton" Grid.Column="1" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" Click="OnImport"/><Button x:Name="ClearDataButton" Grid.Column="2" HorizontalAlignment="Left" Click="OnClearData"/></Grid>
+                  <InfoBar x:Name="DataStatusBar" IsOpen="False"/>
+                </StackPanel>
+              </Border>
+              <Border x:Name="DataCloudPanel" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="1" Margin="0" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14" VerticalAlignment="Stretch"><controls:WebDavDataManagementControl x:Name="WebDavControl"/></Border>
             </Grid>
           </StackPanel>
         </Border>
 
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
+        <Border x:Name="ApplicationMaintenanceCard" Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
           <StackPanel Spacing="16">
-            <StackPanel Spacing="4">
-              <TextBlock x:Name="DataManagementTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
-              <TextBlock x:Name="DataManagementDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
-            </StackPanel>
-            <Grid x:Name="DataActions" HorizontalAlignment="Left" ColumnSpacing="8">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-              </Grid.ColumnDefinitions>
-              <Button x:Uid="DataManagement_Export" x:Name="ExportButton" Grid.Column="0" HorizontalAlignment="Left" Click="OnExport"/>
-              <Button x:Uid="DataManagement_Import" x:Name="ImportButton" Grid.Column="1" HorizontalAlignment="Left" Click="OnImport"/>
-              <Button x:Name="ClearDataButton" Grid.Column="2" HorizontalAlignment="Left" Click="OnClearData"/>
-            </Grid>
-            <controls:WebDavDataManagementControl x:Name="WebDavControl"/>
-            <InfoBar x:Name="DataStatusBar" IsOpen="False"/>
-          </StackPanel>
-        </Border>
-
-        <Border Style="{StaticResource SettingsSectionCardStyle}" HorizontalAlignment="Stretch">
-          <StackPanel Spacing="16">
-            <StackPanel Spacing="4">
-              <TextBlock x:Name="ApplicationSettingsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/>
-              <TextBlock x:Name="ApplicationSettingsDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
-            </StackPanel>
-            <StackPanel Spacing="4">
-              <TextBlock x:Name="RestoreDefaultsLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
-              <TextBlock x:Name="RestoreDefaultsDescription" Style="{StaticResource SettingsDescriptionStyle}"/>
-              <Button x:Uid="Action_RestoreDefaults" Click="OnRestore" HorizontalAlignment="Left"/>
-            </StackPanel>
-            <Border Height="1" Background="{ThemeResource CardStrokeColorDefaultBrush}"/>
-            <StackPanel Spacing="4">
-              <TextBlock x:Name="FirstRunGuideLabel" Style="{StaticResource SettingsRowLabelStyle}"/>
-              <TextBlock x:Name="FirstRunGuideDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/>
-              <Button x:Name="ReopenFirstRunGuideButton" Click="OnReopenFirstRunGuide" HorizontalAlignment="Left"/>
-            </StackPanel>
+            <StackPanel Spacing="4"><TextBlock x:Name="ApplicationSettingsTitle" Style="{StaticResource SubtitleTextBlockStyle}"/><TextBlock x:Name="ApplicationSettingsDescription" Style="{StaticResource SettingsDescriptionStyle}"/></StackPanel>
+            <Border Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14">
+              <StackPanel Spacing="14">
+                <Grid ColumnSpacing="24" RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="264"/></Grid.ColumnDefinitions><StackPanel Grid.Row="0" Grid.Column="0" Spacing="4"><TextBlock x:Name="RestoreDefaultsLabel" Style="{StaticResource SettingsRowLabelStyle}"/><TextBlock x:Name="RestoreDefaultsDescription" Style="{StaticResource SettingsDescriptionStyle}"/></StackPanel><Button x:Uid="Action_RestoreDefaults" x:Name="RestoreDefaultsButton" Grid.Row="0" Grid.Column="1" Click="OnRestore" HorizontalAlignment="Right"/></Grid>
+                <Border Height="1" Background="{ThemeResource ControlStrokeColorDefaultBrush}"/>
+                <Grid ColumnSpacing="24" RowSpacing="10"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="0"/><ColumnDefinition Width="264"/></Grid.ColumnDefinitions><StackPanel Grid.Row="0" Grid.Column="0" Spacing="4"><TextBlock x:Name="FirstRunGuideLabel" Style="{StaticResource SettingsRowLabelStyle}"/><TextBlock x:Name="FirstRunGuideDescription" Style="{StaticResource SettingsDescriptionStyle}" TextWrapping="Wrap"/></StackPanel><Button x:Name="ReopenFirstRunGuideButton" Grid.Row="0" Grid.Column="1" Click="OnReopenFirstRunGuide" HorizontalAlignment="Right"/></Grid>
+              </StackPanel>
+            </Border>
             <TextBlock x:Name="StatusText" Style="{StaticResource SettingsDescriptionStyle}"/>
           </StackPanel>
         </Border>

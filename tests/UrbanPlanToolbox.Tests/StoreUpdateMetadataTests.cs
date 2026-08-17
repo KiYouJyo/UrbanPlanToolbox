@@ -76,7 +76,7 @@ public sealed class StoreUpdateMetadataTests
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml"));
         var code = File.ReadAllText(Path.Combine(root, "Views", "AboutPage.xaml.cs"));
 
-        Assert.Contains("MaxWidth=\"840\"", xaml);
+        Assert.Contains("MaxWidth=\"1000\"", xaml);
         Assert.Contains("x:Name=\"UpdateBodyGrid\"", xaml);
         Assert.Contains("x:Name=\"CompactUpdateLayout\"", xaml);
         Assert.Contains("x:Name=\"WideUpdateLayout\"", xaml);

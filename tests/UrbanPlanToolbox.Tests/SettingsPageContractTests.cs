@@ -6,21 +6,38 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class SettingsPageContractTests
 {
     [Fact]
-    public void SettingsPageIsLeftAlignedCompactAndOmitsToolSpecificOptions()
+    public void SettingsPageMatchesFigmaWideLayoutAndKeepsCompactFallback()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
-        Assert.True(Regex.Matches(xaml, "SettingsSectionCardStyle").Count >= 4);
-        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"720\"", xaml);
+        var webDav = File.ReadAllText(Path.Combine(root, "Controls", "WebDavDataManagementControl.xaml"));
+        Assert.True(Regex.Matches(xaml, "SettingsSectionCardStyle").Count >= 5);
+        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"520\"", xaml);
         Assert.Contains("x:Name=\"SettingsLayoutRoot\"", xaml);
-        Assert.Contains("x:Name=\"SettingsNarrow\"", xaml);
+        Assert.Contains("x:Name=\"SettingsCompact\"", xaml);
         Assert.Contains("x:Name=\"SettingsWide\"", xaml);
         Assert.Single(Regex.Matches(xaml, "<VisualStateManager.VisualStateGroups>").Cast<Match>());
-        Assert.Matches("x:Name=\"SettingsContent\"[\\s\\S]*?HorizontalAlignment=\"Left\"[\\s\\S]*?MaxWidth=\"900\"", xaml);
+        Assert.Matches("x:Name=\"SettingsContent\"[\\s\\S]*?HorizontalAlignment=\"Stretch\"[\\s\\S]*?MaxWidth=\"1088\"", xaml);
         foreach (var name in new[] { "ThemeBox", "LanguageBox", "ExportButton", "ImportButton", "ClearDataButton", "ApplicationSettingsTitle" })
             Assert.Single(Regex.Matches(xaml, $"x:Name=\"{name}\"").Cast<Match>());
         foreach (var name in new[] { "ThemeBox", "LanguageBox" })
-            Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?MinWidth=\"240\"[\\s\\S]*?MaxWidth=\"360\"[\\s\\S]*?HorizontalAlignment=\"Left\"", xaml);
+            Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"1\"[\\s\\S]*?Width=\"250\"[\\s\\S]*?HorizontalAlignment=\"Right\"", xaml);
+        foreach (var name in new[] { "BackgroundResidencyToggle", "SilentStartupToggle", "MilestoneNotificationsToggle", "RestoreDefaultsButton", "ReopenFirstRunGuideButton" })
+            Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"1\"[\\s\\S]*?HorizontalAlignment=\"Right\"", xaml);
+        foreach (var name in new[] { "BackgroundResidencyToggle", "SilentStartupToggle", "MilestoneNotificationsToggle" })
+            Assert.Matches($"x:Name=\"{name}\"[^>]*Width=\"44\"[^>]*OnContent=\"\"[^>]*OffContent=\"\"[^>]*HorizontalAlignment=\"Right\"", xaml);
+        foreach (var name in new[] { "AppearanceLanguageCard", "ResidencyCard", "MilestoneNotificationsCard", "DataManagementCard", "ApplicationMaintenanceCard" })
+            Assert.Contains($"x:Name=\"{name}\"", xaml);
+        Assert.Matches("x:Name=\"DataLocalPanel\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"0\"[\\s\\S]*?Grid.ColumnSpan=\"1\"", xaml);
+        Assert.Matches("x:Name=\"DataCloudPanel\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"1\"[\\s\\S]*?Grid.ColumnSpan=\"1\"", xaml);
+        foreach (var name in new[] { "LocalBackupTitle", "LocalBackupDescription", "LocalBackupStatusLabel", "LocalBackupStatus" })
+            Assert.Contains($"x:Name=\"{name}\"", xaml);
+        Assert.True(Regex.Matches(xaml + webDav, "AccentButtonStyle").Count >= 3);
+        Assert.Contains("WebDavStatusLabel", webDav);
+        Assert.Contains("WebDavStatusValue", webDav);
+        Assert.DoesNotContain("WebDavLastBackup", webDav);
+        Assert.DoesNotContain("WebDavConnectionStatus", webDav);
+        Assert.Contains("ControlFillColorDefaultBrush", xaml);
         Assert.DoesNotContain("DisplayCalculationTitle", xaml);
         Assert.DoesNotContain("DecimalBox", xaml);
         Assert.DoesNotContain("AutoCalculateToggle", xaml);

@@ -1,19 +1,19 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.8.3", "packageVersion": "1.8.3.0" },
-  "classification": { "kind": "update-management-hotfix", "stability": "prepared-for-validation", "storeMilestone": false },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.8.4", "packageVersion": "1.8.4.0" },
+  "classification": { "kind": "settings-about-modernization", "stability": "prepared-for-validation", "storeMilestone": false },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.8.3 更新管理界面与显示修复",
-    "ja-JP": "UrbanPlanToolbox v1.8.3 更新管理画面と表示の修正",
-    "en-US": "UrbanPlanToolbox v1.8.3 update management UI and display fixes"
+    "zh-CN": "UrbanPlanToolbox v1.8.4 设置与关于页面现代化",
+    "ja-JP": "UrbanPlanToolbox v1.8.4 設定・バージョン情報画面のモダン化",
+    "en-US": "UrbanPlanToolbox v1.8.4 settings and About modernization"
   },
   "languageLabels": { "zh-CN": "简体中文", "ja-JP": "日本語", "en-US": "English" },
   "items": [
-    { "id": "update-metadata-visibility", "zh-CN": "修复 Microsoft Store 已检测到更新但目标版本元数据暂未解析时，可用版本与更新内容被隐藏的问题；未知值保持占位且不会显示陈旧版本信息。", "ja-JP": "Microsoft Store が更新を検出しても対象バージョンのメタデータが未解決の場合に、利用可能バージョンと更新内容が非表示になる問題を修正しました。未確定値はプレースホルダーのまま表示し、古いバージョン情報は表示しません。", "en-US": "Fixes Available version and What's new disappearing when Microsoft Store reports an update before trusted target-version metadata is resolved; unknown values stay visible as placeholders without surfacing stale metadata." },
-    { "id": "update-management-responsive-ui", "zh-CN": "重做“关于 > 更新管理”卡片，采用更紧凑的版本对比、更新内容和状态布局，并在较窄窗口自动切换为纵向排列。", "ja-JP": "「バージョン情報 > 更新管理」カードを再設計し、バージョン比較・更新内容・状態をよりコンパクトに配置し、狭いウィンドウでは自動的に縦配置へ切り替わるようにしました。", "en-US": "Redesigns About > Update management with a more compact version comparison, release-notes, and status layout that automatically stacks on narrower windows." },
-    { "id": "checking-progress-ring", "zh-CN": "检查更新时仅在操作按钮内显示一个 ProgressRing，避免重复的加载状态提示。", "ja-JP": "更新確認中は操作ボタン内にのみ 1 つの ProgressRing を表示し、重複した読み込み表示をなくしました。", "en-US": "Shows a single ProgressRing inside the update action button while checking, removing duplicate loading indicators." },
-    { "id": "release-notes-scrollbar-spacing", "zh-CN": "修复更新说明滚动条覆盖正文的问题，为滚动区域保留安全间距。", "ja-JP": "更新内容のスクロールバーが本文に重なる問題を修正し、スクロール領域に安全な余白を確保しました。", "en-US": "Fixes the release-notes scrollbar overlapping text by reserving safe spacing inside the scroll area." }
+    { "id": "settings-modern-cards", "zh-CN": "现代化重构设置页除更新管理以外的卡片结构，沿用现有 WinUI 3 卡片背景、边框与主题资源，不改变原有整体质感。", "ja-JP": "更新管理以外の設定カードをモダン化し、既存の WinUI 3 カード背景・境界線・テーマリソースを維持して、アプリ本来の質感を変えないようにしました。", "en-US": "Modernizes the Settings cards outside update management while preserving the app's existing WinUI 3 card backgrounds, borders, and theme resources instead of changing the overall visual material." },
+    { "id": "settings-logical-order-responsive", "zh-CN": "按使用逻辑将设置页重新排序为“外观与语言 → 后台与启动 → 项目通知 → 数据管理 → 应用维护”，并为窄窗口补充自适应纵向布局。", "ja-JP": "設定画面を「外観と言語 → バックグラウンドと起動 → プロジェクト通知 → データ管理 → アプリのメンテナンス」の順に整理し、狭いウィンドウでは自動的に縦配置へ切り替わるようにしました。", "en-US": "Reorders Settings by usage logic as Appearance & language → Background & startup → Project notifications → Data management → App maintenance, with adaptive vertical layouts on narrower windows." },
+    { "id": "about-modernization-remove-diagnostics", "zh-CN": "重构关于页的应用信息、项目与开源、隐私与法律卡片，保留 v1.8.3 更新管理卡片样式，并移除诊断与日志卡片。", "ja-JP": "バージョン情報画面のアプリ情報、プロジェクトとオープンソース、プライバシーと法的情報カードを再構成し、v1.8.3 の更新管理カードは維持したまま診断・ログカードを削除しました。", "en-US": "Reworks the About page's app information, project/open-source, and privacy/legal cards, keeps the v1.8.3 update-management card style, and removes the Diagnostics & logs card." },
+    { "id": "uniform-action-buttons", "zh-CN": "统一数据管理与 WebDAV 操作按钮为同一默认按钮视觉，不再混用强调色按钮；按钮文字也统一使用默认前景色。", "ja-JP": "データ管理と WebDAV の操作ボタンはすべて同じ標準ボタン外観と標準テキスト色に統一し、強調色ボタンの混在をなくしました。", "en-US": "Unifies Data Management and WebDAV actions on one standard button appearance and one standard button-text foreground, removing mixed accent-button treatments." }
   ]
 }

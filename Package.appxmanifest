@@ -9,63 +9,11 @@
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap uap5 com desktop rescap">
-
-  <Identity
-    Name="556F80C5-C4D4-452B-93B4-00DE3FA7AC29"
-    Publisher="CN=AppPublisher"
-    Version="1.8.3.0" />
-
+  <Identity Name="556F80C5-C4D4-452B-93B4-00DE3FA7AC29" Publisher="CN=AppPublisher" Version="1.8.4.0" />
   <mp:PhoneIdentity PhoneProductId="556F80C5-C4D4-452B-93B4-00DE3FA7AC29" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
-
-  <Properties>
-    <DisplayName>ms-resource:AppDisplayName</DisplayName>
-    <PublisherDisplayName>AppPublisher</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
-  </Properties>
-
-  <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0" />
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0" />
-  </Dependencies>
-
-  <Resources>
-    <Resource Language="zh-CN" />
-    <Resource Language="ja-JP" />
-    <Resource Language="en-US" />
-  </Resources>
-
-  <Applications>
-    <Application Id="App"
-      Executable="$targetnametoken$.exe"
-      EntryPoint="$targetentrypoint$">
-      <uap:VisualElements
-        DisplayName="ms-resource:AppDisplayName"
-        Description="ms-resource:AppDescription"
-        BackgroundColor="#202020"
-        Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#202020" uap5:Optional="true" />
-      </uap:VisualElements>
-      <Extensions>
-        <desktop:Extension Category="windows.toastNotificationActivation">
-          <desktop:ToastNotificationActivation ToastActivatorCLSID="2E0EFA8D-723A-4BAA-95F4-4C5E0CE67A4D" />
-        </desktop:Extension>
-        <desktop:Extension Category="windows.startupTask" Executable="UrbanPlanToolbox.exe" EntryPoint="Windows.FullTrustApplication">
-          <desktop:StartupTask TaskId="UrbanPlanToolboxBackgroundStartup" Enabled="false" DisplayName="ms-resource:AppDisplayName" />
-        </desktop:Extension>
-        <com:Extension Category="windows.comServer">
-          <com:ComServer>
-            <com:ExeServer Executable="UrbanPlanToolbox.exe" Arguments="----AppNotificationActivated:" DisplayName="UrbanPlanToolbox">
-              <com:Class Id="2E0EFA8D-723A-4BAA-95F4-4C5E0CE67A4D" />
-            </com:ExeServer>
-          </com:ComServer>
-        </com:Extension>
-      </Extensions>
-    </Application>
-  </Applications>
-
-  <Capabilities>
-    <rescap:Capability Name="runFullTrust" />
-    <rescap:Capability Name="packageManagement" />
-  </Capabilities>
+  <Properties><DisplayName>ms-resource:AppDisplayName</DisplayName><PublisherDisplayName>AppPublisher</PublisherDisplayName><Logo>Assets\StoreLogo.png</Logo></Properties>
+  <Dependencies><TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0" /><TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0" /></Dependencies>
+  <Resources><Resource Language="zh-CN" /><Resource Language="ja-JP" /><Resource Language="en-US" /></Resources>
+  <Applications><Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$"><uap:VisualElements DisplayName="ms-resource:AppDisplayName" Description="ms-resource:AppDescription" BackgroundColor="#202020" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png"><uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#202020" uap5:Optional="true" /></uap:VisualElements><Extensions><desktop:Extension Category="windows.toastNotificationActivation"><desktop:ToastNotificationActivation ToastActivatorCLSID="2E0EFA8D-723A-4BAA-95F4-4C5E0CE67A4D" /></desktop:Extension><desktop:Extension Category="windows.startupTask" Executable="UrbanPlanToolbox.exe" EntryPoint="Windows.FullTrustApplication"><desktop:StartupTask TaskId="UrbanPlanToolboxBackgroundStartup" Enabled="false" DisplayName="ms-resource:AppDisplayName" /></desktop:Extension><com:Extension Category="windows.comServer"><com:ComServer><com:ExeServer Executable="UrbanPlanToolbox.exe" Arguments="----AppNotificationActivated:" DisplayName="UrbanPlanToolbox"><com:Class Id="2E0EFA8D-723A-4BAA-95F4-4C5E0CE67A4D" /></com:ExeServer></com:ComServer></com:Extension></Extensions></Application></Applications>
+  <Capabilities><rescap:Capability Name="runFullTrust" /><rescap:Capability Name="packageManagement" /></Capabilities>
 </Package>
