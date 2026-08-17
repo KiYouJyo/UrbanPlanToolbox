@@ -17,23 +17,67 @@ public sealed partial class SettingsPage : Page
     {
         InitializeComponent();
         TitleText.Text = _localization.GetString("Navigation_Settings");
-        AppearanceLanguageTitle.Text = _localization.GetString("Settings_AppearanceLanguageTitle"); AppearanceLanguageDescription.Text = _localization.GetString("Settings_AppearanceLanguageDescription");
-        ThemeLabel.Text = _localization.GetString("Settings_ThemeLabel"); ThemeDescription.Text = _localization.GetString("Settings_ThemeDescription");
-        LanguageLabel.Text = _localization.GetString("Settings_LanguageLabel"); LanguageDescription.Text = _localization.GetString("Settings_LanguageDescription_Runtime");
-        ApplicationSettingsTitle.Text = _localization.GetString("Settings_ApplicationSettingsTitle"); ApplicationSettingsDescription.Text = _localization.GetString("Settings_ApplicationSettingsDescription");
-        RestoreDefaultsLabel.Text = _localization.GetString("Settings_RestoreDefaultsTitle"); RestoreDefaultsDescription.Text = _localization.GetString("Settings_RestoreDefaultsScopeDescription");
-        FirstRunGuideLabel.Text = _localization.GetString("FirstRunGuide_SettingsTitle"); FirstRunGuideDescription.Text = _localization.GetString("FirstRunGuide_SettingsDescription"); ReopenFirstRunGuideButton.Content = _localization.GetString("FirstRunGuide_SettingsAction");
-        DataManagementTitle.Text = _localization.GetString("Settings_DataManagementTitle"); DataManagementDescription.Text = _localization.GetString("Settings_DataManagementDescription");
+        AppearanceLanguageTitle.Text = _localization.GetString("Settings_AppearanceLanguageTitle");
+        AppearanceLanguageDescription.Text = _localization.GetString("Settings_AppearanceLanguageDescription");
+        ThemeLabel.Text = _localization.GetString("Settings_ThemeLabel");
+        ThemeDescription.Text = _localization.GetString("Settings_ThemeDescription");
+        LanguageLabel.Text = _localization.GetString("Settings_LanguageLabel");
+        LanguageDescription.Text = _localization.GetString("Settings_LanguageDescription_Runtime");
+
+        ApplicationSettingsTitle.Text = L("应用维护", "アプリのメンテナンス", "App maintenance");
+        ApplicationSettingsDescription.Text = L(
+            "低频维护操作统一放在页面底部，避免与日常设置混杂。",
+            "低頻度のメンテナンス操作をページ下部にまとめ、日常設定と分離します。",
+            "Keep infrequent maintenance actions at the bottom, separate from everyday settings.");
+        RestoreDefaultsLabel.Text = _localization.GetString("Settings_RestoreDefaultsTitle");
+        RestoreDefaultsDescription.Text = _localization.GetString("Settings_RestoreDefaultsScopeDescription");
+        FirstRunGuideLabel.Text = _localization.GetString("FirstRunGuide_SettingsTitle");
+        FirstRunGuideDescription.Text = _localization.GetString("FirstRunGuide_SettingsDescription");
+        ReopenFirstRunGuideButton.Content = _localization.GetString("FirstRunGuide_SettingsAction");
+
+        DataManagementTitle.Text = _localization.GetString("Settings_DataManagementTitle");
+        DataManagementDescription.Text = L(
+            "把本地备份与 WebDAV 云存档并列呈现：本地数据仍是唯一主数据源。",
+            "ローカルバックアップと WebDAV クラウドアーカイブを並べて表示します。ローカルデータが引き続き唯一の主データです。",
+            "Local backup and WebDAV cloud archive are shown side by side; local data remains the single source of truth.");
+        LocalBackupTitle.Text = L("本地备份", "ローカルバックアップ", "Local backup");
+        LocalBackupDescription.Text = L(
+            "导出或恢复完整 .uptbackup；危险清理操作保持独立。",
+            "完全な .uptbackup を書き出し・復元できます。危険な消去操作は独立して扱います。",
+            "Export or restore a complete .uptbackup; destructive cleanup stays separate.");
+        LocalBackupStatusLabel.Text = L("状态", "状態", "Status");
+        LocalBackupStatus.Text = L("本地数据正常", "ローカルデータは正常です", "Local data ready");
+
         MilestoneNotificationsTitle.Text = _localization.GetString("Settings_MilestoneNotificationsTitle");
-        MilestoneNotificationsDescription.Text = _localization.GetString("Settings_MilestoneNotificationsDescription");
+        MilestoneNotificationsDescription.Text = L(
+            "在项目关键节点到达时发送本机通知，并可设置默认重复提醒。",
+            "プロジェクトの重要な時点でローカル通知を送り、既定の再通知間隔を設定できます。",
+            "Send local notifications for project milestones and choose a default repeat interval.");
         MilestoneNotificationsLabel.Text = _localization.GetString("Settings_MilestoneNotificationsLabel");
+        MilestoneNotificationsRowDescription.Text = L(
+            "根据项目中的时间节点发送 Windows 本机通知。",
+            "プロジェクトのマイルストーンに基づいて Windows のローカル通知を送信します。",
+            "Send Windows local notifications from project milestones.");
         MilestoneNotificationsRepeatLabel.Text = _localization.GetString("Settings_MilestoneNotificationsRepeatLabel");
-        ResidencyTitle.Text = _localization.GetString("Residency_Title"); BackgroundResidencyToggle.Header = _localization.GetString("Residency_BackgroundRecorder"); BackgroundResidencyDescription.Text = _localization.GetString("Residency_BackgroundRecorderDescription"); SilentStartupToggle.Header = _localization.GetString("Residency_SilentStartupRecorder"); SilentStartupDescription.Text = _localization.GetString("Residency_SilentStartupRecorderDescription");
-        MilestoneNotificationsToggle.OnContent = _localization.GetString("Settings_MilestoneNotificationsOn");
-        MilestoneNotificationsToggle.OffContent = _localization.GetString("Settings_MilestoneNotificationsOff");
-        ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text); ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
-        ConfigureAccessibility(MilestoneNotificationsToggle, MilestoneNotificationsLabel.Text, MilestoneNotificationsDescription.Text);
-        ConfigureAccessibility(MilestoneNotificationsRepeatBox, MilestoneNotificationsRepeatLabel.Text, MilestoneNotificationsDescription.Text);
+        MilestoneRepeatDescription.Text = L(
+            "首次提醒后按所选间隔最多再提醒 3 次。",
+            "最初の通知後、選択した間隔で最大 3 回まで再通知します。",
+            "After the first reminder, repeat up to three times at the selected interval.");
+
+        ResidencyTitle.Text = _localization.GetString("Residency_Title");
+        ResidencySectionDescription.Text = L(
+            "控制后台驻留、登录启动与灵感记录器的显示方式。",
+            "バックグラウンド常駐、ログイン時起動、インスピレーションレコーダーの表示方法を管理します。",
+            "Control background residency, sign-in startup, and how the inspiration recorder appears.");
+        BackgroundResidencyToggle.Header = _localization.GetString("Residency_BackgroundRecorder");
+        BackgroundResidencyDescription.Text = _localization.GetString("Residency_BackgroundRecorderDescription");
+        SilentStartupToggle.Header = _localization.GetString("Residency_SilentStartupRecorder");
+        SilentStartupDescription.Text = _localization.GetString("Residency_SilentStartupRecorderDescription");
+
+        ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text);
+        ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
+        ConfigureAccessibility(MilestoneNotificationsToggle, MilestoneNotificationsLabel.Text, MilestoneNotificationsRowDescription.Text);
+        ConfigureAccessibility(MilestoneNotificationsRepeatBox, MilestoneNotificationsRepeatLabel.Text, MilestoneRepeatDescription.Text);
         Apply(_settingsService.Load());
         ClearDataButton.Content = _localization.GetString("DataManagement_Clear");
         Loaded += OnLoaded;
@@ -257,6 +301,13 @@ public sealed partial class SettingsPage : Page
     {
         ExportButton.IsEnabled = ImportButton.IsEnabled = ClearDataButton.IsEnabled = !busy;
         WebDavControl.SetExternalBusy(busy);
+    }
+    private string L(string zh, string ja, string en)
+    {
+        var language = _localization.CurrentLanguage;
+        if (language.StartsWith("ja", StringComparison.OrdinalIgnoreCase)) return ja;
+        if (language.StartsWith("en", StringComparison.OrdinalIgnoreCase)) return en;
+        return zh;
     }
     private static string FormatBytes(long bytes) => bytes >= 1024 * 1024 ? $"{bytes / (1024d * 1024d):0.##} MB" : $"{bytes / 1024d:0.##} KB";
 
