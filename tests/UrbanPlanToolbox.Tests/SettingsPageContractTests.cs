@@ -10,17 +10,23 @@ public sealed class SettingsPageContractTests
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
-        Assert.True(Regex.Matches(xaml, "SettingsSectionCardStyle").Count >= 4);
-        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"720\"", xaml);
+        Assert.True(Regex.Matches(xaml, "SettingsSectionCardStyle").Count >= 5);
+        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"980\"", xaml);
         Assert.Contains("x:Name=\"SettingsLayoutRoot\"", xaml);
-        Assert.Contains("x:Name=\"SettingsNarrow\"", xaml);
+        Assert.Contains("x:Name=\"SettingsCompact\"", xaml);
         Assert.Contains("x:Name=\"SettingsWide\"", xaml);
         Assert.Single(Regex.Matches(xaml, "<VisualStateManager.VisualStateGroups>").Cast<Match>());
-        Assert.Matches("x:Name=\"SettingsContent\"[\\s\\S]*?HorizontalAlignment=\"Left\"[\\s\\S]*?MaxWidth=\"900\"", xaml);
+        Assert.Matches("x:Name=\"SettingsContent\"[\\s\\S]*?HorizontalAlignment=\"Left\"[\\s\\S]*?MaxWidth=\"840\"", xaml);
         foreach (var name in new[] { "ThemeBox", "LanguageBox", "ExportButton", "ImportButton", "ClearDataButton", "ApplicationSettingsTitle" })
             Assert.Single(Regex.Matches(xaml, $"x:Name=\"{name}\"").Cast<Match>());
         foreach (var name in new[] { "ThemeBox", "LanguageBox" })
-            Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?MinWidth=\"240\"[\\s\\S]*?MaxWidth=\"360\"[\\s\\S]*?HorizontalAlignment=\"Left\"", xaml);
+            Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?MinWidth=\"220\"[\\s\\S]*?MaxWidth=\"360\"[\\s\\S]*?HorizontalAlignment=\"Left\"", xaml);
+        foreach (var name in new[] { "AppearanceLanguageCard", "ResidencyCard", "MilestoneNotificationsCard", "DataManagementCard", "ApplicationMaintenanceCard" })
+            Assert.Contains($"x:Name=\"{name}\"", xaml);
+        Assert.Contains("x:Name=\"DataLocalPanel\"", xaml);
+        Assert.Contains("x:Name=\"DataCloudPanel\"", xaml);
+        Assert.Contains("ControlFillColorDefaultBrush", xaml);
+        Assert.DoesNotContain("AccentButtonStyle", xaml);
         Assert.DoesNotContain("DisplayCalculationTitle", xaml);
         Assert.DoesNotContain("DecimalBox", xaml);
         Assert.DoesNotContain("AutoCalculateToggle", xaml);
