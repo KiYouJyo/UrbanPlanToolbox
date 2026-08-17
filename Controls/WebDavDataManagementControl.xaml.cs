@@ -33,17 +33,19 @@ public sealed partial class WebDavDataManagementControl : UserControl
         _configured = profile is not null && _cloudBackupService.HasCredential(profile);
         if (profile is null)
         {
-            WebDavConnectionStatus.Text = Text("NotConfigured");
-            WebDavLastBackup.Text = Text("LastBackupNever");
+            WebDavStatusValue.Text = Text("NotConfigured");
+        }
+        else if (!_configured)
+        {
+            WebDavStatusValue.Text = Text("CredentialMissing");
+        }
+        else if (profile.LastBackupAtUtc is null)
+        {
+            WebDavStatusValue.Text = Text("ConnectedNoBackup");
         }
         else
         {
-            WebDavConnectionStatus.Text = _configured
-                ? Format("Configured", new Uri(profile.ServerUrl).Host, profile.RemotePath)
-                : Text("CredentialMissing");
-            WebDavLastBackup.Text = profile.LastBackupAtUtc is null
-                ? Text("LastBackupNever")
-                : Format("LastBackup", profile.LastBackupAtUtc.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm"));
+            WebDavStatusValue.Text = Format("ConnectedLastBackup", CompactBackupStamp(profile.LastBackupAtUtc.Value));
         }
         UpdateButtons();
     }
@@ -59,6 +61,7 @@ public sealed partial class WebDavDataManagementControl : UserControl
     {
         WebDavTitle.Text = Text("Title");
         WebDavDescription.Text = Text("Description");
+        WebDavStatusLabel.Text = Text("StatusLabel");
         WebDavBackupButton.Content = Text("BackupNow");
         WebDavRestoreButton.Content = Text("RestoreFromCloud");
         WebDavManageButton.Content = Text("Manage");
@@ -299,6 +302,12 @@ public sealed partial class WebDavDataManagementControl : UserControl
         var timestamp = item.SortTimeUtc == DateTimeOffset.MinValue ? "—" : item.SortTimeUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
         var version = string.IsNullOrWhiteSpace(item.AppVersion) ? "—" : $"v{item.AppVersion}";
         return $"{timestamp}   {version}   {FormatBytes(item.Size)}\n{item.FileName}";
+    }
+
+    private static string CompactBackupStamp(DateTimeOffset backupAtUtc)
+    {
+        var local = backupAtUtc.ToLocalTime();
+        return local.Date == DateTimeOffset.Now.Date ? local.ToString("HH:mm") : local.ToString("yyyy-MM-dd HH:mm");
     }
 
     private void SetBusy(bool busy)
