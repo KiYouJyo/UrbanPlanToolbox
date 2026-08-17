@@ -87,6 +87,7 @@ public sealed class StoreUpdateMetadataTests
         Assert.DoesNotContain("x:Name=\"UpdateStatusProgressRing\"", xaml);
         Assert.Contains("CheckUpdateButtonProgressRing.Visibility = checking ? Visibility.Visible : Visibility.Collapsed;", code);
         Assert.Contains("CheckUpdateButtonProgressRing.IsActive = checking;", code);
+        Assert.DoesNotContain("UpdateStatusProgressRing", code);
     }
 
     private static string FindRepositoryRoot()
