@@ -24,7 +24,7 @@ public sealed class ProjectStorageService
         _storage = new JsonDataStorage(
             paths,
             ProjectSchemaVersion,
-            projectMigrations ?? [new ProjectV1ToV2Migration(), new ProjectV2ToV3Migration()],
+            projectMigrations ?? [new ProjectV1ToV2Migration(), new ProjectV2ToV3Migration(), new ProjectV3ToV4Migration()],
             diagnostics,
             allowUnversionedLegacySchema: true);
         _deleteFailureInjector = deleteFailureInjector;
