@@ -276,6 +276,8 @@ public sealed class ProjectStorageService
             try
             {
                 folderAccess?.Clear(read.Value!.WorkFolder);
+                foreach (var folder in read.Value.AdditionalFolders)
+                    folderAccess?.Clear(folder);
             }
             catch (Exception exception) when (exception is not OutOfMemoryException)
             {

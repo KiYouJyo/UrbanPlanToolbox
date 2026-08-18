@@ -129,6 +129,8 @@ public sealed class ProjectRecord
     public List<ProjectTodoItem> Todos { get; init; } = [];
     public List<PlanningSnapshot> PlanningSnapshots { get; init; } = [];
     public ProjectFolderReference? WorkFolder { get; set; }
+    /// <summary>Additional project folders linked from the Files workspace panel. WorkFolder remains the legacy primary folder.</summary>
+    public List<ProjectFolderReference> AdditionalFolders { get; init; } = [];
     /// <summary>
     /// Optional for backwards compatibility.  v1.9 initializes it lazily on first workspace
     /// open so old project files remain readable without a destructive data migration.

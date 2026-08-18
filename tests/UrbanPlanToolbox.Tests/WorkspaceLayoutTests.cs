@@ -26,7 +26,7 @@ public sealed class WorkspaceLayoutTests
         Assert.Contains("WorkspaceSurface", names);
         Assert.Contains("TileCanvas", names);
         Assert.Contains("AddPanelButton", names);
-        Assert.Contains("EditLayoutButton", names);
+        Assert.DoesNotContain("EditLayoutButton", names);
         Assert.Contains("UndoLayoutButton", names);
         Assert.Contains("ResetLayoutButton", names);
         Assert.Contains("DrawerLayer", names);
@@ -78,11 +78,17 @@ public sealed class WorkspaceLayoutTests
         Assert.Contains("WorkspaceLayout", source, StringComparison.Ordinal);
         Assert.Contains("RememberLayoutForUndo", source, StringComparison.Ordinal);
         Assert.Contains("OpenAddPanelDrawer", source, StringComparison.Ordinal);
+        Assert.Contains("OnTilePointerPressed", source, StringComparison.Ordinal);
+        Assert.Contains("ShowImageViewerAsync", source, StringComparison.Ordinal);
+        Assert.Contains("Stretch = Stretch.Uniform", source, StringComparison.Ordinal);
+        Assert.Contains("AdditionalFolders", File.ReadAllText(ProjectModelsPath()), StringComparison.Ordinal);
+        Assert.DoesNotContain("复制面板", source, StringComparison.Ordinal);
     }
 
     private static string WorkspacePath() => FindFromRepository("Views", "ProjectWorkspacePage.xaml");
     private static string WorkspaceCodePath() => FindFromRepository("Views", "ProjectWorkspacePage.xaml.cs");
     private static string LayoutServicePath() => FindFromRepository("Services", "ProjectWorkspaceLayoutService.cs");
+    private static string ProjectModelsPath() => FindFromRepository("Models", "Projects", "ProjectModels.cs");
 
     private static string FindFromRepository(params string[] parts)
     {

@@ -98,9 +98,8 @@ public sealed partial class ProjectWorkspacePage : Page
         EditOverviewCompactButton.Content = W("编辑概览", "Edit overview", "概要を編集");
         OverviewTitle.Text = W("项目概览", "Project overview", "プロジェクト概要");
         WorkspaceTitleText.Text = W("自定义工作台", "Custom workspace", "カスタムワークスペース");
-        WorkspaceSubtitleText.Text = W("长按面板标题拖动；选中后拖拽右下角调整尺寸，右键编辑内容", "Press and hold a panel title to move it; resize from the lower-right handle and right-click to edit", "パネル見出しを長押しして移動し、右下ハンドルでサイズ変更、右クリックで内容を編集できます");
+        WorkspaceSubtitleText.Text = W("长按任意面板进入调整状态；拖动移动，右下角拉伸尺寸，点击空白处完成，右键编辑内容", "Press and hold any panel to enter edit mode; drag to move, resize from the lower-right corner, click empty space to finish, and right-click to edit", "任意のパネルを長押しして編集状態に入り、ドラッグで移動、右下でサイズ変更、空白をクリックして完了、右クリックで内容を編集できます");
         AddPanelButton.Content = W("＋ 新建面板", "+ Add panel", "＋ パネルを追加");
-        EditLayoutButton.Content = W("编辑布局", "Edit layout", "レイアウトを編集");
         UndoLayoutButton.Content = W("撤销", "Undo", "元に戻す");
         ResetLayoutButton.Content = W("恢复默认", "Reset layout", "既定に戻す");
         ArchivedNotice.Text = W("已归档项目为只读状态。恢复项目后可继续编辑内容与布局。", "Archived projects are read-only. Restore the project to edit its content or layout.", "アーカイブ済みプロジェクトは読み取り専用です。復元すると内容とレイアウトを編集できます。");
@@ -153,7 +152,7 @@ public sealed partial class ProjectWorkspacePage : Page
         {
             OverviewTitle.Text = W("研究概览", "Research overview", "研究概要");
             WorkspaceTitleText.Text = W("自定义研究工作台", "Custom research workspace", "カスタム研究ワークスペース");
-            WorkspaceSubtitleText.Text = W("长按面板标题拖动；右键编辑研究内容，选中后可拉伸尺寸", "Press and hold a panel title to move it; right-click to edit research content and resize when selected", "パネル見出しを長押しして移動し、右クリックで研究内容を編集、選択後にサイズ変更できます");
+            WorkspaceSubtitleText.Text = W("长按任意面板进入调整状态；拖动移动，右下角拉伸尺寸，点击空白处完成，右键编辑研究内容", "Press and hold any panel to enter edit mode; drag to move, resize from the lower-right corner, click empty space to finish, and right-click to edit research content", "任意のパネルを長押しして編集状態に入り、ドラッグで移動、右下でサイズ変更、空白をクリックして完了、右クリックで研究内容を編集できます");
             OverviewDescriptionText.Text = _project.ResearchDetails?.ResearchSubject
                 ?? W("尚未填写研究对象或核心研究问题。", "No research subject or core question yet.", "研究対象・中心課題はまだ設定されていません。");
             OverviewLabel1.Text = W("研究领域", "Research field", "研究分野");
@@ -169,7 +168,7 @@ public sealed partial class ProjectWorkspacePage : Page
         {
             OverviewTitle.Text = W("项目概览", "Project overview", "プロジェクト概要");
             WorkspaceTitleText.Text = W("自定义工作台", "Custom workspace", "カスタムワークスペース");
-            WorkspaceSubtitleText.Text = W("长按面板标题拖动；选中后拖拽右下角调整尺寸，右键编辑内容", "Press and hold a panel title to move it; resize from the lower-right handle and right-click to edit", "パネル見出しを長押しして移動し、右下ハンドルでサイズ変更、右クリックで内容を編集できます");
+            WorkspaceSubtitleText.Text = W("长按任意面板进入调整状态；拖动移动，右下角拉伸尺寸，点击空白处完成，右键编辑内容", "Press and hold any panel to enter edit mode; drag to move, resize from the lower-right corner, click empty space to finish, and right-click to edit", "任意のパネルを長押しして編集状態に入り、ドラッグで移動、右下でサイズ変更、空白をクリックして完了、右クリックで内容を編集できます");
             OverviewDescriptionText.Text = _project.Description
                 ?? W("尚未填写项目说明。", "No project description yet.", "プロジェクト説明はまだありません。");
             OverviewLabel1.Text = W("项目类型", "Project type", "プロジェクト種別");
@@ -179,7 +178,13 @@ public sealed partial class ProjectWorkspacePage : Page
             OverviewLabel3.Text = W("时间节点", "Milestones", "マイルストーン");
             OverviewValue3.Text = _project.Milestones.Count.ToString(CultureInfo.CurrentCulture);
             OverviewLabel4.Text = W("工作文件夹", "Work folder", "作業フォルダー");
-            OverviewValue4.Text = _project.WorkFolder?.DisplayName ?? W("未设置", "Not set", "未設定");
+            var folders = GetLinkedFolders();
+            OverviewValue4.Text = folders.Count switch
+            {
+                0 => W("未设置", "Not set", "未設定"),
+                1 => folders[0].DisplayName,
+                _ => W($"{folders.Count} 个文件夹", $"{folders.Count} folders", $"{folders.Count} 個のフォルダー")
+            };
         }
     }
 
@@ -209,15 +214,12 @@ public sealed partial class ProjectWorkspacePage : Page
         var width = ActualWidth > 0 ? ActualWidth : XamlRoot?.Size.Width ?? 1280;
         _columnCount = width >= 1280 ? 12 : width >= 960 ? 8 : width >= 720 ? 6 : 1;
         var canEditLayout = _columnCount == 12 && _project is { IsArchived: false } && !_busy;
-        EditLayoutButton.IsEnabled = canEditLayout;
         if (!canEditLayout && _layoutEditing)
         {
             _layoutEditing = false;
             _selectedPanelId = null;
+            ClearPointerOperation();
         }
-        ToolTipService.SetToolTip(EditLayoutButton, canEditLayout
-            ? W("拖动或缩放磁贴", "Drag or resize tiles", "タイルをドラッグ・サイズ変更")
-            : W("展开窗口后可编辑布局；窄窗口只改变显示，不覆盖已保存布局。", "Widen the window to edit. Narrow layouts never overwrite the saved 12-column layout.", "ウィンドウを広げると編集できます。狭い表示は保存済み12列レイアウトを上書きしません。"));
     }
 
     private void RenderWorkspace()
@@ -259,9 +261,6 @@ public sealed partial class ProjectWorkspacePage : Page
         TileCanvas.Height = Math.Max(0, maxBottom);
         WorkspaceSurface.MinHeight = TileCanvas.Height;
         UndoLayoutButton.Visibility = _layoutUndo is null || !_layoutEditing ? Visibility.Collapsed : Visibility.Visible;
-        EditLayoutButton.Content = _layoutEditing
-            ? W("完成布局", "Done", "完了")
-            : W("编辑布局", "Edit layout", "レイアウトを編集");
     }
 
     private Border CreateTile(ProjectWorkspacePanel panel, double width, double height)
@@ -277,30 +276,26 @@ public sealed partial class ProjectWorkspacePage : Page
         };
         border.Tapped += OnTileTapped;
         border.ContextFlyout = CreatePanelMenu(panel);
+        border.PointerPressed += OnTilePointerPressed;
+        border.PointerMoved += OnTilePointerMoved;
+        border.PointerReleased += OnTilePointerReleased;
+        border.PointerCanceled += OnTilePointerCanceled;
+        ToolTipService.SetToolTip(border, W("长按进入调整状态；右键编辑", "Press and hold to arrange; right-click to edit", "長押しで配置を調整、右クリックで編集"));
 
         var root = new Grid { RowSpacing = 8 };
         root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
-        var header = new Grid
-        {
-  ColumnSpacing = 8,
-  Tag = panel.Id,
-  Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent)
-        };
+        var header = new Grid { ColumnSpacing = 8 };
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        header.PointerPressed += OnTileHeaderPointerPressed;
-        header.PointerMoved += OnTileHeaderPointerMoved;
-        header.PointerReleased += OnTileHeaderPointerReleased;
-        header.PointerCanceled += OnTileHeaderPointerCanceled;
-        ToolTipService.SetToolTip(header, W("长按拖动面板；右键编辑", "Press and hold to move; right-click to edit", "長押しで移動、右クリックで編集"));
 
         var title = new TextBlock
         {
   Text = string.IsNullOrWhiteSpace(panel.Title) ? PanelName(panel.Kind) : panel.Title,
   Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"],
-  TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center
+  TextTrimming = TextTrimming.CharacterEllipsis,
+  VerticalAlignment = VerticalAlignment.Center
         };
         header.Children.Add(title);
 
@@ -325,13 +320,20 @@ public sealed partial class ProjectWorkspacePage : Page
         {
   var resize = new Border
   {
-      Width = 18, Height = 18, Tag = panel.Id,
+      Width = 24, Height = 24, Tag = panel.Id,
       HorizontalAlignment = HorizontalAlignment.Right,
       VerticalAlignment = VerticalAlignment.Bottom,
+      Margin = new Thickness(0, 0, -4, -4),
       Background = ResourceBrush("AccentFillColorSecondaryBrush"),
       BorderBrush = ResourceBrush("AccentFillColorDefaultBrush"),
       BorderThickness = new Thickness(1),
-      CornerRadius = new CornerRadius(4)
+      CornerRadius = new CornerRadius(12),
+      Child = new TextBlock
+      {
+          Text = "↘", FontSize = 12,
+          HorizontalAlignment = HorizontalAlignment.Center,
+          VerticalAlignment = VerticalAlignment.Center
+      }
   };
   resize.PointerPressed += OnResizeHandlePointerPressed;
   resize.PointerMoved += OnPanelHandlePointerMoved;
@@ -369,9 +371,6 @@ public sealed partial class ProjectWorkspacePage : Page
 
         if (_project is { IsArchived: false })
         {
-  var duplicate = new MenuFlyoutItem { Text = W("复制面板", "Duplicate panel", "パネルを複製"), Tag = panel.Id };
-  duplicate.Click += OnDuplicatePanel;
-  menu.Items.Add(duplicate);
   menu.Items.Add(new MenuFlyoutSeparator());
   var delete = new MenuFlyoutItem { Text = W("删除面板", "Remove panel", "パネルを削除"), Tag = panel.Id };
   delete.Click += OnRemovePanel;
@@ -436,37 +435,39 @@ public sealed partial class ProjectWorkspacePage : Page
   ZoomMode = ZoomMode.Disabled
         };
         var strip = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
-        var cardWidth = Math.Clamp(panel.Width * Math.Max(80, _unitWidth) * .78, 220, 520);
-        var cardHeight = Math.Clamp(panel.Height * TileRowHeight - 64, 120, 320);
+        var cardWidth = Math.Clamp(panel.Width * Math.Max(80, _unitWidth) * .84, 260, 620);
+        var cardHeight = Math.Clamp(panel.Height * TileRowHeight - 64, 130, 360);
 
-        foreach (var item in items)
+        for (var index = 0; index < items.Count; index++)
         {
-  var visual = new Grid();
+  var item = items[index];
+  var itemIndex = index;
+  var visual = new Grid { Background = ResourceBrush("CardBackgroundFillColorDefaultBrush") };
   var bitmap = CreateBitmapImage(item.Source);
   if (bitmap is not null)
   {
-      visual.Children.Add(new Image { Source = bitmap, Stretch = Stretch.UniformToFill });
+      visual.Children.Add(new Image
+      {
+          Source = bitmap,
+          Stretch = Stretch.Uniform,
+          HorizontalAlignment = HorizontalAlignment.Stretch,
+          VerticalAlignment = VerticalAlignment.Stretch
+      });
   }
   else
   {
-      visual.Children.Add(new Border
+      visual.Children.Add(new FontIcon
       {
-          Background = ResourceBrush("CardBackgroundFillColorDefaultBrush"),
-          Child = new FontIcon
-          {
-              Glyph = "\uEB9F",
-              FontSize = 30,
-              Opacity = .4,
-              HorizontalAlignment = HorizontalAlignment.Center,
-              VerticalAlignment = VerticalAlignment.Center
-          }
+          Glyph = "\uEB9F", FontSize = 30, Opacity = .4,
+          HorizontalAlignment = HorizontalAlignment.Center,
+          VerticalAlignment = VerticalAlignment.Center
       });
   }
 
   var caption = new Border
   {
       VerticalAlignment = VerticalAlignment.Bottom,
-      Background = new SolidColorBrush(Windows.UI.Color.FromArgb(190, 20, 20, 20)),
+      Background = new SolidColorBrush(Windows.UI.Color.FromArgb(170, 20, 20, 20)),
       Padding = new Thickness(12, 8, 12, 8),
       Child = new TextBlock
       {
@@ -476,7 +477,7 @@ public sealed partial class ProjectWorkspacePage : Page
       }
   };
   visual.Children.Add(caption);
-  strip.Children.Add(new Border
+  var card = new Border
   {
       Width = cardWidth,
       Height = cardHeight,
@@ -484,36 +485,114 @@ public sealed partial class ProjectWorkspacePage : Page
       BorderBrush = ResourceBrush("CardStrokeColorDefaultBrush"),
       BorderThickness = new Thickness(1),
       Child = visual
-  });
+  };
+  card.Tapped += async (_, e) =>
+  {
+      e.Handled = true;
+      await ShowImageViewerAsync(items, itemIndex);
+  };
+  ToolTipService.SetToolTip(card, W("点击查看大图", "Click to view full image", "クリックして拡大表示"));
+  strip.Children.Add(card);
         }
 
         scroll.Content = strip;
+        scroll.PointerWheelChanged += (_, e) =>
+        {
+  var delta = e.GetCurrentPoint(scroll).Properties.MouseWheelDelta;
+  if (delta == 0) return;
+  var step = cardWidth + 12;
+  var target = delta > 0 ? Math.Max(0, scroll.HorizontalOffset - step) : scroll.HorizontalOffset + step;
+  scroll.ChangeView(target, null, null, true);
+  e.Handled = true;
+        };
         host.Children.Add(scroll);
+
         if (items.Count > 1)
         {
-  var previous = new Button
-  {
-      Content = "‹", Width = 38, Height = 38, MinWidth = 38,
-      HorizontalAlignment = HorizontalAlignment.Left,
-      VerticalAlignment = VerticalAlignment.Center,
-      Margin = new Thickness(6, 0, 0, 0),
-      Opacity = .9
-  };
-  previous.Click += (_, _) => scroll.ChangeView(Math.Max(0, scroll.HorizontalOffset - Math.Max(220, scroll.ViewportWidth * .82)), null, null, true);
+  var previous = CreateCarouselButton("‹", HorizontalAlignment.Left);
+  previous.Click += (_, _) => scroll.ChangeView(Math.Max(0, scroll.HorizontalOffset - (cardWidth + 12)), null, null, true);
   host.Children.Add(previous);
 
-  var next = new Button
-  {
-      Content = "›", Width = 38, Height = 38, MinWidth = 38,
-      HorizontalAlignment = HorizontalAlignment.Right,
-      VerticalAlignment = VerticalAlignment.Center,
-      Margin = new Thickness(0, 0, 6, 0),
-      Opacity = .9
-  };
-  next.Click += (_, _) => scroll.ChangeView(scroll.HorizontalOffset + Math.Max(220, scroll.ViewportWidth * .82), null, null, true);
+  var next = CreateCarouselButton("›", HorizontalAlignment.Right);
+  next.Click += (_, _) => scroll.ChangeView(scroll.HorizontalOffset + cardWidth + 12, null, null, true);
   host.Children.Add(next);
         }
         return host;
+    }
+
+    private Button CreateCarouselButton(string content, HorizontalAlignment alignment) => new()
+    {
+        Content = content,
+        Width = 44,
+        Height = 44,
+        MinWidth = 44,
+        FontSize = 24,
+        HorizontalAlignment = alignment,
+        VerticalAlignment = VerticalAlignment.Center,
+        Margin = alignment == HorizontalAlignment.Left ? new Thickness(8, 0, 0, 0) : new Thickness(0, 0, 8, 0),
+        Opacity = .94
+    };
+
+    private async Task ShowImageViewerAsync(IReadOnlyList<ShowcaseItem> items, int initialIndex)
+    {
+        if (items.Count == 0) return;
+        var index = Math.Clamp(initialIndex, 0, items.Count - 1);
+        var image = new Image { Stretch = Stretch.Uniform, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
+        var placeholder = new FontIcon { Glyph = "\uEB9F", FontSize = 44, Opacity = .45, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+        var media = new Grid
+        {
+  MinHeight = Math.Min(680, Math.Max(360, XamlRoot.Size.Height - 300)),
+  Background = ResourceBrush("CardBackgroundFillColorDefaultBrush")
+        };
+        media.Children.Add(image);
+        media.Children.Add(placeholder);
+
+        var title = new TextBlock { FontSize = 16, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap };
+        var counter = new TextBlock { Opacity = .58, VerticalAlignment = VerticalAlignment.Center };
+        var previous = new Button { Content = "‹", Width = 42, Height = 42, MinWidth = 42, FontSize = 22 };
+        var next = new Button { Content = "›", Width = 42, Height = 42, MinWidth = 42, FontSize = 22 };
+
+        void Refresh()
+        {
+  var item = items[index];
+  title.Text = item.Title;
+  counter.Text = $"{index + 1} / {items.Count}";
+  var bitmap = CreateBitmapImage(item.Source);
+  image.Source = bitmap;
+  image.Visibility = bitmap is null ? Visibility.Collapsed : Visibility.Visible;
+  placeholder.Visibility = bitmap is null ? Visibility.Visible : Visibility.Collapsed;
+  previous.IsEnabled = index > 0;
+  next.IsEnabled = index < items.Count - 1;
+        }
+        previous.Click += (_, _) => { if (index > 0) { index--; Refresh(); } };
+        next.Click += (_, _) => { if (index < items.Count - 1) { index++; Refresh(); } };
+        Refresh();
+
+        var toolbar = new Grid { ColumnSpacing = 10 };
+        toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        toolbar.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        toolbar.Children.Add(counter);
+        Grid.SetColumn(title, 1); toolbar.Children.Add(title);
+        Grid.SetColumn(previous, 2); toolbar.Children.Add(previous);
+        Grid.SetColumn(next, 3); toolbar.Children.Add(next);
+
+        var root = new Grid { RowSpacing = 12, Width = Math.Min(1100, Math.Max(560, XamlRoot.Size.Width - 180)) };
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        root.Children.Add(toolbar);
+        Grid.SetRow(media, 1); root.Children.Add(media);
+
+        var dialog = new ContentDialog
+        {
+  XamlRoot = XamlRoot,
+  Title = W("图片查看器", "Image viewer", "画像ビューアー"),
+  Content = root,
+  CloseButtonText = W("关闭", "Close", "閉じる"),
+  MaxWidth = Math.Min(1180, Math.Max(620, XamlRoot.Size.Width - 100))
+        };
+        await AppDialogService.Default.ShowAsync(dialog);
     }
 
     private UIElement BuildMilestones(ProjectWorkspacePanel panel)
@@ -589,15 +668,45 @@ public sealed partial class ProjectWorkspacePage : Page
   return stack;
         }
 
-        if (_project?.WorkFolder is { } folder)
-  stack.Children.Add(FileRow("\uE8B7", folder.DisplayName, folder.DisplayPath));
-        else
-  stack.Children.Add(FileRow("\uE8B7", W("工作文件夹", "Work folder", "作業フォルダー"), W("尚未设置", "Not configured", "未設定")));
+        var folders = GetLinkedFolders();
+        if (folders.Count == 0)
+        {
+  stack.Children.Add(new TextBlock
+  {
+      Text = W("右键此面板添加项目文件夹。", "Right-click this panel to add project folders.", "このパネルを右クリックしてプロジェクトフォルダーを追加できます。"),
+      Opacity = .62,
+      TextWrapping = TextWrapping.Wrap
+  });
+  return stack;
+        }
 
-        stack.Children.Add(FileRow("\uE7C3", W("项目归档", "Project archive", "プロジェクトアーカイブ"), _project?.IsArchived == true ? W("已归档", "Archived", "アーカイブ済み") : W("本地项目", "Local project", "ローカルプロジェクト")));
-        if (panel.Height > 1)
-  stack.Children.Add(FileRow("\uE753", W("云存档", "Cloud archive", "クラウド保存"), W("由数据管理统一同步", "Managed by Data Management", "データ管理から同期")));
+        foreach (var folder in folders.Take(panel.Height <= 1 ? 2 : 6))
+  stack.Children.Add(FileRow("\uE8B7", folder.DisplayName, folder.DisplayPath));
+        if (folders.Count > (panel.Height <= 1 ? 2 : 6))
+  stack.Children.Add(new TextBlock { Text = W($"还有 {folders.Count - (panel.Height <= 1 ? 2 : 6)} 个文件夹", $"{folders.Count - (panel.Height <= 1 ? 2 : 6)} more folders", $"ほか {folders.Count - (panel.Height <= 1 ? 2 : 6)} 個"), Opacity = .55 });
         return stack;
+    }
+
+    private IReadOnlyList<ProjectFolderReference> GetLinkedFolders()
+    {
+        if (_project is null) return [];
+        var result = new List<ProjectFolderReference>();
+        void Add(ProjectFolderReference? folder)
+        {
+  if (folder is null) return;
+  if (result.Any(existing => SameFolder(existing, folder))) return;
+  result.Add(folder);
+        }
+        Add(_project.WorkFolder);
+        foreach (var folder in _project.AdditionalFolders) Add(folder);
+        return result;
+    }
+
+    private static bool SameFolder(ProjectFolderReference left, ProjectFolderReference right)
+    {
+        if (!string.IsNullOrWhiteSpace(left.AccessToken) && !string.IsNullOrWhiteSpace(right.AccessToken) &&
+  string.Equals(left.AccessToken, right.AccessToken, StringComparison.Ordinal)) return true;
+        return string.Equals(left.DisplayPath, right.DisplayPath, StringComparison.OrdinalIgnoreCase);
     }
 
     private static UIElement FileRow(string glyph, string title, string subtitle)
@@ -925,7 +1034,7 @@ public sealed partial class ProjectWorkspacePage : Page
     {
         if (_project is null || _project.IsArchived) return;
         DrawerTitle.Text = W("添加面板", "Add panel", "パネルを追加");
-        DrawerSubtitle.Text = W("选择一种面板；添加后可在布局模式调整位置和大小", "Choose a panel. Position and size can be changed in layout mode.", "パネルを選択してください。追加後に位置とサイズを調整できます。");
+        DrawerSubtitle.Text = W("选择一种面板；添加后长按面板即可移动和调整尺寸", "Choose a panel. Press and hold it afterward to move or resize it.", "パネルを選択してください。追加後は長押しして移動・サイズ変更できます。");
         DrawerContent.Children.Clear(); DrawerFooter.Children.Clear();
 
         var searchHint = new TextBox { PlaceholderText = W("搜索面板类型", "Search panel types", "パネルを検索"), IsEnabled = false };
@@ -960,14 +1069,6 @@ public sealed partial class ProjectWorkspacePage : Page
         _selectedPanelId = panel.Id;
         await PersistProjectAsync(showSuccess: false);
         CloseDrawer();
-        RenderWorkspace();
-    }
-
-    private void OnToggleLayoutEditing(object sender, RoutedEventArgs e)
-    {
-        if (_project is null || _project.IsArchived || _columnCount != 12) return;
-        _layoutEditing = !_layoutEditing;
-        if (!_layoutEditing) _selectedPanelId = null;
         RenderWorkspace();
     }
 
@@ -1302,15 +1403,6 @@ public sealed partial class ProjectWorkspacePage : Page
         ShowDrawer();
     }
 
-    private async void OnDuplicatePanel(object sender, RoutedEventArgs e)
-    {
-        if (_project?.WorkspaceLayout is null || sender is not MenuFlyoutItem { Tag: Guid id }) return;
-        RememberLayoutForUndo();
-        var duplicate = ProjectWorkspaceLayoutService.DuplicatePanel(_project.WorkspaceLayout, _project.Kind, id);
-        _selectedPanelId = duplicate.Id;
-        await PersistProjectAsync(showSuccess: false); RenderWorkspace();
-    }
-
     private async void OnRemovePanel(object sender, RoutedEventArgs e)
     {
         if (_project?.WorkspaceLayout is null || sender is not MenuFlyoutItem { Tag: Guid id }) return;
@@ -1361,29 +1453,134 @@ public sealed partial class ProjectWorkspacePage : Page
     private void OpenFileDrawer()
     {
         if (_project is null) return;
+        var folders = GetLinkedFolders();
         DrawerTitle.Text = W("文件入口", "Files", "ファイル");
-        DrawerSubtitle.Text = _project.WorkFolder?.DisplayPath ?? W("尚未设置工作文件夹", "No work folder configured", "作業フォルダーは未設定です");
+        DrawerSubtitle.Text = folders.Count == 0
+  ? W("可链接多个项目文件夹", "Link multiple project folders", "複数のプロジェクトフォルダーをリンクできます")
+  : W($"已链接 {folders.Count} 个文件夹", $"{folders.Count} linked folders", $"{folders.Count} 個のフォルダーをリンク済み");
         DrawerContent.Children.Clear(); DrawerFooter.Children.Clear();
-        var summary = new Border { Style = (Style)Application.Current.Resources["SettingsSectionCardStyle"], Child = new TextBlock { Text = _project.WorkFolder?.DisplayPath ?? W("选择一个项目工作文件夹后，可从磁贴快速打开。", "Choose a project work folder to open it directly from the tile.", "作業フォルダーを選択するとタイルから直接開けます。"), TextWrapping = TextWrapping.Wrap } };
-        DrawerContent.Children.Add(summary);
-        var open = new Button { Content = _localization.GetString("Folder_Action_Open"), IsEnabled = _project.WorkFolder is { RequiresReselection: false } }; open.Click += OnOpenFolder;
-        DrawerContent.Children.Add(open);
+
         if (!_project.IsArchived)
         {
-            var select = new Button { Content = _localization.GetString(_project.WorkFolder is null ? "Folder_Action_Select" : "Folder_Action_Replace") }; select.Click += OnSelectFolder;
-            DrawerContent.Children.Add(select);
-            if (_project.WorkFolder is not null)
-            {
-                var clear = new Button { Content = _localization.GetString("Folder_Action_Clear") }; clear.Click += OnClearFolder; DrawerContent.Children.Add(clear);
-            }
+  var add = new Button
+  {
+      Content = W("＋ 添加文件夹", "+ Add folder", "＋ フォルダーを追加"),
+      HorizontalAlignment = HorizontalAlignment.Stretch
+  };
+  add.Click += OnAddFolder;
+  DrawerContent.Children.Add(add);
+        }
+
+        if (folders.Count == 0)
+        {
+  DrawerContent.Children.Add(new TextBlock
+  {
+      Text = W("尚未链接文件夹。添加后会直接显示在文件入口面板中。", "No folders are linked yet. Added folders appear directly in the Files panel.", "まだフォルダーがリンクされていません。追加するとファイルパネルに直接表示されます。"),
+      TextWrapping = TextWrapping.Wrap,
+      Opacity = .62
+  });
+        }
+
+        foreach (var folder in folders)
+        {
+  var card = new Border { Style = (Style)Application.Current.Resources["SettingsSectionCardStyle"], Padding = new Thickness(12) };
+  var row = new Grid { ColumnSpacing = 8 };
+  row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+  row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+  if (!_project.IsArchived) row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+  var text = new StackPanel { Spacing = 2 };
+  text.Children.Add(new TextBlock { Text = folder.DisplayName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, TextTrimming = TextTrimming.CharacterEllipsis });
+  text.Children.Add(new TextBlock { Text = folder.DisplayPath, FontSize = 11, Opacity = .58, TextTrimming = TextTrimming.CharacterEllipsis });
+  row.Children.Add(text);
+
+  var open = new Button { Content = W("打开", "Open", "開く"), Tag = folder, IsEnabled = !folder.RequiresReselection };
+  open.Click += OnOpenLinkedFolder;
+  Grid.SetColumn(open, 1); row.Children.Add(open);
+
+  if (!_project.IsArchived)
+  {
+      var remove = new Button { Content = W("移除", "Remove", "削除"), Tag = folder };
+      remove.Click += OnRemoveLinkedFolder;
+      Grid.SetColumn(remove, 2); row.Children.Add(remove);
+  }
+  card.Child = row;
+  DrawerContent.Children.Add(card);
         }
         ShowDrawer();
     }
 
-    private void OnTileHeaderPointerPressed(object sender, PointerRoutedEventArgs e)
+    private async void OnAddFolder(object sender, RoutedEventArgs e)
     {
-        if (_columnCount != 12 || _project is not { IsArchived: false } || _busy || sender is not FrameworkElement { Tag: Guid id } handle || !_tileViews.TryGetValue(id, out var tile)) return;
+        if (_project is null || _project.IsArchived) return;
+        var selected = await _folders.SelectAsync(_project.Id);
+        if (!selected.Succeeded || selected.Reference is null)
+        {
+  if (selected.ErrorKey != "ProjectFolder_SelectionCancelled") ShowError(selected.ErrorKey ?? "Project_Error_SaveFailed");
+  return;
+        }
+        if (GetLinkedFolders().Any(existing => SameFolder(existing, selected.Reference)))
+        {
+  _folders.Clear(selected.Reference);
+  OpenFileDrawer();
+  return;
+        }
+
+        var candidate = CloneProject(_project);
+        if (candidate.WorkFolder is null) candidate.WorkFolder = selected.Reference;
+        else candidate.AdditionalFolders.Add(selected.Reference);
+        candidate.UpdatedAtUtc = DateTimeOffset.UtcNow;
+        var result = await _projects.SaveAsync(candidate);
+        if (!result.Succeeded) _folders.Clear(selected.Reference);
+        await ApplyMutationAsync(result);
+        OpenFileDrawer();
+    }
+
+    private async void OnOpenLinkedFolder(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: ProjectFolderReference folder }) return;
+        var result = await _folders.OpenAsync(folder);
+        if (!result.Succeeded) ShowError(result.ErrorKey ?? "ProjectFolder_OpenFailed");
+    }
+
+    private async void OnRemoveLinkedFolder(object sender, RoutedEventArgs e)
+    {
+        if (_project is null || _project.IsArchived || sender is not Button { Tag: ProjectFolderReference folder }) return;
+        var candidate = CloneProject(_project);
+        if (candidate.WorkFolder is not null && SameFolder(candidate.WorkFolder, folder))
+        {
+  candidate.WorkFolder = candidate.AdditionalFolders.FirstOrDefault();
+  if (candidate.WorkFolder is not null)
+      candidate.AdditionalFolders.RemoveAll(item => SameFolder(item, candidate.WorkFolder));
+        }
+        else
+        {
+  candidate.AdditionalFolders.RemoveAll(item => SameFolder(item, folder));
+        }
+        candidate.UpdatedAtUtc = DateTimeOffset.UtcNow;
+        var result = await _projects.SaveAsync(candidate);
+        if (result.Succeeded) _folders.Clear(folder);
+        await ApplyMutationAsync(result);
+        OpenFileDrawer();
+    }
+
+    private void OnTilePointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (_columnCount != 12 || _project is not { IsArchived: false } || _busy ||
+  sender is not FrameworkElement { Tag: Guid id } handle || !_tileViews.TryGetValue(id, out var tile)) return;
+        var point = e.GetCurrentPoint(handle);
+        if (!point.Properties.IsLeftButtonPressed) return;
+
         CancelHoldCandidate();
+        if (_layoutEditing)
+        {
+  _selectedPanelId = id;
+  BeginPointerOperation(handle, e, PointerOperation.Move);
+  tile.BorderBrush = ResourceBrush("AccentFillColorDefaultBrush");
+  tile.BorderThickness = new Thickness(2);
+  return;
+        }
+
         _holdHandle = handle;
         _holdPanelId = id;
         _holdPointerId = e.Pointer.PointerId;
@@ -1394,14 +1591,14 @@ public sealed partial class ProjectWorkspacePage : Page
         _holdStartHeight = tile.Height;
         handle.CapturePointer(e.Pointer);
         _holdTimer = DispatcherQueue.CreateTimer();
-        _holdTimer.Interval = TimeSpan.FromMilliseconds(420);
+        _holdTimer.Interval = TimeSpan.FromMilliseconds(360);
         _holdTimer.IsRepeating = false;
         _holdTimer.Tick += (_, _) => ActivateHoldMove();
         _holdTimer.Start();
         e.Handled = true;
     }
 
-    private void OnTileHeaderPointerMoved(object sender, PointerRoutedEventArgs e)
+    private void OnTilePointerMoved(object sender, PointerRoutedEventArgs e)
     {
         if (_pointerOperation == PointerOperation.Move && _pointerHandle == sender)
         {
@@ -1412,13 +1609,13 @@ public sealed partial class ProjectWorkspacePage : Page
         var point = e.GetCurrentPoint(TileCanvas).Position;
         var dx = point.X - _holdStart.X;
         var dy = point.Y - _holdStart.Y;
-        if ((dx * dx) + (dy * dy) <= 64) return;
+        if ((dx * dx) + (dy * dy) <= 576) return;
         var handle = _holdHandle;
         CancelHoldCandidate();
         handle?.ReleasePointerCapture(e.Pointer);
     }
 
-    private void OnTileHeaderPointerReleased(object sender, PointerRoutedEventArgs e)
+    private void OnTilePointerReleased(object sender, PointerRoutedEventArgs e)
     {
         if (_pointerOperation == PointerOperation.Move && _pointerHandle == sender)
         {
@@ -1428,10 +1625,9 @@ public sealed partial class ProjectWorkspacePage : Page
         var handle = _holdHandle;
         CancelHoldCandidate();
         handle?.ReleasePointerCapture(e.Pointer);
-        e.Handled = true;
     }
 
-    private void OnTileHeaderPointerCanceled(object sender, PointerRoutedEventArgs e)
+    private void OnTilePointerCanceled(object sender, PointerRoutedEventArgs e)
     {
         if (_pointerOperation == PointerOperation.Move && _pointerHandle == sender)
         {
@@ -1478,7 +1674,16 @@ public sealed partial class ProjectWorkspacePage : Page
         {
   tile.BorderBrush = ResourceBrush("AccentFillColorDefaultBrush");
   tile.BorderThickness = new Thickness(2);
+  tile.Opacity = .94;
         }
+    }
+
+    private void OnWorkspaceCanvasTapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (!_layoutEditing || !ReferenceEquals(e.OriginalSource, sender) || _pointerOperation != PointerOperation.None) return;
+        _layoutEditing = false;
+        _selectedPanelId = null;
+        RenderWorkspace();
     }
 
     private void CancelHoldCandidate()
@@ -1628,38 +1833,6 @@ public sealed partial class ProjectWorkspacePage : Page
             result = new(title.Text, DateOnly.FromDateTime(date.Date.Value.LocalDateTime), includeTime.IsChecked == true ? TimeOnly.FromTimeSpan(time.SelectedTime!.Value) : null, notes.Text);
         };
         return await AppDialogService.Default.ShowAsync(dialog) == ContentDialogResult.Primary ? result : null;
-    }
-
-    private async void OnSelectFolder(object sender, RoutedEventArgs e)
-    {
-        if (_project is null || _project.IsArchived) return;
-        var previous = _project.WorkFolder;
-        var selected = await _folders.SelectAsync(_project.Id, previous);
-        if (!selected.Succeeded)
-        {
-            if (selected.ErrorKey != "ProjectFolder_SelectionCancelled") ShowError(selected.ErrorKey ?? "Project_Error_SaveFailed");
-            return;
-        }
-        _project.WorkFolder = selected.Reference; _project.UpdatedAtUtc = DateTimeOffset.UtcNow;
-        var result = await _projects.SaveAsync(_project);
-        if (result.Succeeded) _folders.Clear(previous); else { _folders.Clear(selected.Reference); _project.WorkFolder = previous; }
-        await ApplyMutationAsync(result); OpenFileDrawer();
-    }
-
-    private async void OnOpenFolder(object sender, RoutedEventArgs e)
-    {
-        if (_project?.WorkFolder is null) return;
-        var result = await _folders.OpenAsync(_project.WorkFolder);
-        if (!result.Succeeded) ShowError(result.ErrorKey ?? "ProjectFolder_OpenFailed");
-    }
-
-    private async void OnClearFolder(object sender, RoutedEventArgs e)
-    {
-        if (_project is null || _project.IsArchived) return;
-        var previous = _project.WorkFolder; _project.WorkFolder = null; _project.UpdatedAtUtc = DateTimeOffset.UtcNow;
-        var result = await _projects.SaveAsync(_project);
-        if (result.Succeeded) _folders.Clear(previous); else _project.WorkFolder = previous;
-        await ApplyMutationAsync(result); OpenFileDrawer();
     }
 
     private async void OnArchive(object sender, RoutedEventArgs e)
