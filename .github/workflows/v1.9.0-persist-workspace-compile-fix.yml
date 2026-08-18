@@ -1,0 +1,50 @@
+name: v1.9.0 Persist Workspace Compile Fix
+
+on:
+  push:
+    branches:
+      - codex/v1.9.0-project-workspace
+
+permissions:
+  contents: write
+
+jobs:
+  persist:
+    runs-on: windows-2025-vs2026
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v7
+        with:
+          ref: codex/v1.9.0-project-workspace
+          fetch-depth: 0
+
+      - name: Persist compiler compatibility fix
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $path = 'Views/ProjectWorkspacePage.xaml.cs'
+          $content = Get-Content -Raw $path
+          $old = @'
+                  var body = BuildPanelBody(panel);
+                  Grid.SetRow(body, 1);
+                  root.Children.Add(body);
+          '@
+          $new = @'
+                  var body = BuildPanelBody(panel);
+                  if (body is FrameworkElement bodyElement)
+                      Grid.SetRow(bodyElement, 1);
+                  root.Children.Add(body);
+          '@
+          if ($content.Contains($new)) {
+            Write-Host 'Compiler compatibility fix already persisted.'
+            exit 0
+          }
+          if (-not $content.Contains($old)) { throw 'Expected workspace body placement snippet was not found.' }
+          $content = $content.Replace($old, $new)
+          Set-Content -LiteralPath $path -Value $content -Encoding utf8 -NoNewline
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- $path
+          git commit -m 'fix(v1.9.0): compile workspace panel body placement'
+          git push origin HEAD:codex/v1.9.0-project-workspace
