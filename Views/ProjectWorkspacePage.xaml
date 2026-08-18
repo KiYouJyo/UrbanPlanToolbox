@@ -112,14 +112,8 @@
           </StackPanel>
         </Grid>
 
-        <Border x:Name="WorkspaceSurface" Grid.Row="4"
-                MinHeight="540"
-                CornerRadius="8"
-                BorderThickness="1"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                Padding="0">
-          <Canvas x:Name="TileCanvas" MinHeight="540" HorizontalAlignment="Stretch" SizeChanged="OnTileCanvasSizeChanged"/>
+        <Border x:Name="WorkspaceSurface" Grid.Row="4" Padding="0">
+          <Canvas x:Name="TileCanvas" MinHeight="0" HorizontalAlignment="Stretch" SizeChanged="OnTileCanvasSizeChanged"/>
         </Border>
 
         <TextBlock x:Name="ArchivedNotice" Grid.Row="5" TextWrapping="Wrap" Opacity="0.68" Visibility="Collapsed"/>
