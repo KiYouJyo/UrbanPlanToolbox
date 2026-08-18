@@ -465,7 +465,6 @@ public sealed partial class ProjectWorkspacePage
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
-        previous.Click += (_, _) => ChangeImage(-1);
         media.Children.Add(previous);
         var next = new Button
         {
@@ -477,9 +476,10 @@ public sealed partial class ProjectWorkspacePage
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
-        next.Click += (_, _) => ChangeImage(1);
         Grid.SetColumn(next, 2);
         media.Children.Add(next);
+        previous.Click += (_, _) => ChangeImage(-1);
+        next.Click += (_, _) => ChangeImage(1);
 
         void FitImageToViewport()
         {
