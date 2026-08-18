@@ -47,7 +47,7 @@ jobs:
           '@
           if (-not $content.Contains($old)) { throw 'Expected workspace body placement snippet was not found.' }
           $content = $content.Replace($old, $new)
-          Set-Content -LiteralPath $path -Value $content -Encoding utf8
+          Set-Content -LiteralPath $path -Value $content -Encoding utf8 -NoNewline
           git diff --check
           Write-Host 'Applied the narrow UIElement-to-FrameworkElement placement fix used by the acceptance build.'
 
