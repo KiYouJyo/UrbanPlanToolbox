@@ -9,7 +9,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: v1.9.0-signed-acceptance
@@ -28,33 +28,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
-      - name: Persist requested workspace UX corrections
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $carrier = '.github/workflows/v1.9.0-workspace-ux-round2.yml'
-          if (Test-Path $carrier) {
-            $raw = Get-Content -Raw $carrier
-            $match = [regex]::Match($raw, "(?s)          @'\r?\n(?<code>.*?)\r?\n          '@ \| Set-Content")
-            if (-not $match.Success) { throw 'Could not extract the workspace UX migration script.' }
-            $code = $match.Groups['code'].Value -replace '(?m)^          ', ''
-            $script = Join-Path $env:RUNNER_TEMP 'apply_workspace_ux.py'
-            Set-Content -LiteralPath $script -Value $code -Encoding utf8
-            python $script
-            if ($LASTEXITCODE -ne 0) { throw "Workspace UX migration failed: $LASTEXITCODE" }
-            git diff --check
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git rm -- $carrier
-            git add -- Views/ProjectWorkspacePage.xaml Views/ProjectWorkspacePage.xaml.cs
-            git commit -m 'fix(v1.9.0): make workspace panels directly interactive and editable'
-            git push origin HEAD:codex/v1.9.0-project-workspace
-          }
-          else {
-            Write-Host 'Workspace UX corrections are already persisted.'
-          }
-
-      - name: Apply v1.9.0 workspace compiler compatibility fix
+      - name: Verify workspace compiler compatibility
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -72,15 +46,13 @@ jobs:
                   root.Children.Add(body);
           '@
           if ($content.Contains($old)) {
-            $content = $content.Replace($old, $new)
-            Set-Content -LiteralPath $path -Value $content -Encoding utf8 -NoNewline
-            Write-Host 'Applied the narrow UIElement-to-FrameworkElement placement fix.'
+            throw 'Legacy UIElement Grid.SetRow placement remains in source.'
           }
-          elseif ($content.Contains($new)) {
-            Write-Host 'Workspace compiler compatibility fix is already present in source.'
+          if ($content.Contains($new)) {
+            Write-Host 'Workspace compiler compatibility pattern verified.'
           }
           else {
-            throw 'Expected workspace body placement snippet was not found.'
+            Write-Host 'Workspace body placement was refactored; compile/build stages are authoritative.'
           }
           git diff --check
 
