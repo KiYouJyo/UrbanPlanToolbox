@@ -314,7 +314,8 @@ public sealed partial class ProjectWorkspacePage : Page
         root.Children.Add(header);
 
         var body = BuildPanelBody(panel);
-        Grid.SetRow(body, 1);
+        if (body is FrameworkElement bodyElement)
+            Grid.SetRow(bodyElement, 1);
         root.Children.Add(body);
 
         if (_layoutEditing)
