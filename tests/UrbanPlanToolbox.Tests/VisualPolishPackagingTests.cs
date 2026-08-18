@@ -19,6 +19,8 @@ public sealed class VisualPolishPackagingTests
         Assert.Matches("<StaticResource\\s+x:Key=\\\"ComboBoxDropDownBorderBrush\\\"\\s+ResourceKey=\\\"CardStrokeColorDefaultBrush\\\"\\s*/>", app);
         Assert.Contains("dialog.Background =", dialogs);
         Assert.Contains("dialog.BorderBrush =", dialogs);
+        Assert.Contains("ApplyTransientComboBoxTheme(dialog.Content)", dialogs);
+        Assert.Contains("TransientComboBoxTheme.ApplyTo(comboBox)", dialogs);
         Assert.Contains("Resources[\"ComboBoxDropDownBackground\"]", comboBoxTheme);
         Assert.Contains("Resources[\"ComboBoxDropDownBorderBrush\"]", comboBoxTheme);
         Assert.Contains("ActualThemeChanged", comboBoxTheme);
@@ -44,9 +46,6 @@ public sealed class VisualPolishPackagingTests
         {
             var code = File.ReadAllText(source);
             Assert.DoesNotContain(".ShowAsync()", code);
-            Assert.Equal(
-                System.Text.RegularExpressions.Regex.Matches(code, "new ComboBox").Count,
-                System.Text.RegularExpressions.Regex.Matches(code, "TransientComboBoxTheme.ApplyTo").Count);
         }
     }
 
