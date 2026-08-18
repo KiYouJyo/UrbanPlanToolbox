@@ -7,8 +7,6 @@ namespace UrbanPlanToolbox.Services;
 /// </summary>
 public static class DataContractVersions
 {
-    // Workspace layout is optional, reconstructable UI metadata added compatibly to the
-    // existing project payload. Core project data keeps the v3 contract.
     public const int Project = 3;
     public const int Backup = 2;
 }
