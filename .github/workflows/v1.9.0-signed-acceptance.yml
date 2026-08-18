@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: v1.9.0-signed-acceptance
+  group: v1.9.0-signed-acceptance-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
@@ -50,7 +50,7 @@ jobs:
             git add -- Views/ProjectWorkspacePage.xaml Views/ProjectWorkspacePage.xaml.cs Models/Projects/ProjectModels.cs Services/ProjectStorageService.cs tests/UrbanPlanToolbox.Tests/WorkspaceLayoutTests.cs
             git commit -m 'fix(v1.9.0): adopt widget-style workspace interactions'
             git push origin HEAD:codex/v1.9.0-project-workspace
-            Write-Host 'Round 3 changes persisted; this run will stop so the new head can be validated.'
+            Write-Host 'Round 3 changes persisted; a new run will validate the new head.'
             exit 0
           }
           Write-Host 'Round 3 carrier absent; source is already persisted.'
