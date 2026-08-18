@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using UrbanPlanToolbox.Models.Projects;
+using UrbanPlanToolbox.Services;
 using Windows.Foundation;
 
 namespace UrbanPlanToolbox.Views;
@@ -86,12 +87,13 @@ public sealed partial class ProjectWorkspacePage
 
     private static void ReplaceRound4TileBody(Border tile, UIElement replacement)
     {
-        if (tile.Child is not Grid root) return;
+        if (tile.Child is not Grid root || replacement is not FrameworkElement replacementElement) return;
         var oldBody = root.Children
+            .OfType<FrameworkElement>()
             .Where(child => Grid.GetRow(child) == 1)
             .FirstOrDefault(child => child is not Border { Tag: Guid });
         if (oldBody is not null) root.Children.Remove(oldBody);
-        Grid.SetRow(replacement, 1);
+        Grid.SetRow(replacementElement, 1);
         root.Children.Insert(Math.Min(1, root.Children.Count), replacement);
     }
 
