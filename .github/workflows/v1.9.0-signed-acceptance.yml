@@ -9,10 +9,10 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: v1.9.0-signed-acceptance-${{ github.event_name }}
+  group: v1.9.0-signed-acceptance
   cancel-in-progress: true
 
 jobs:
@@ -27,33 +27,6 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-
-      - name: Persist workspace UX round 3
-        if: github.event_name == 'push'
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $carrier = '.github/workflows/v1.9.0-workspace-ux-round3.yml'
-          if (Test-Path $carrier) {
-            $raw = Get-Content -Raw $carrier
-            $match = [regex]::Match($raw, "(?s)          @'\r?\n(?<code>.*?)\r?\n          '@ \| Set-Content")
-            if (-not $match.Success) { throw 'Could not extract the round 3 workspace migration script.' }
-            $code = $match.Groups['code'].Value -replace '(?m)^          ', ''
-            $script = Join-Path $env:RUNNER_TEMP 'apply_workspace_round3.py'
-            Set-Content -LiteralPath $script -Value $code -Encoding utf8
-            python $script
-            if ($LASTEXITCODE -ne 0) { throw "Round 3 workspace migration failed: $LASTEXITCODE" }
-            git diff --check
-            git config user.name 'github-actions[bot]'
-            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git rm -- $carrier
-            git add -- Views/ProjectWorkspacePage.xaml Views/ProjectWorkspacePage.xaml.cs Models/Projects/ProjectModels.cs Services/ProjectStorageService.cs tests/UrbanPlanToolbox.Tests/WorkspaceLayoutTests.cs
-            git commit -m 'fix(v1.9.0): adopt widget-style workspace interactions'
-            git push origin HEAD:codex/v1.9.0-project-workspace
-            Write-Host 'Round 3 changes persisted; a new run will validate the new head.'
-            exit 0
-          }
-          Write-Host 'Round 3 carrier absent; source is already persisted.'
 
       - name: Verify workspace compiler compatibility
         shell: pwsh
