@@ -38,6 +38,59 @@ public static class ResearchProjectTypeCodes
     public static bool IsValid(string? value) => value is not null && All.Contains(value, StringComparer.Ordinal);
 }
 
+/// <summary>
+/// Stable workspace panel identifiers.  They are persisted in project.json and therefore
+/// intentionally independent from localized display names or concrete WinUI controls.
+/// </summary>
+public static class ProjectWorkspacePanelKinds
+{
+    public const string ImageShowcase = "image-showcase";
+    public const string Milestones = "milestones";
+    public const string Description = "description";
+    public const string Inspirations = "inspirations";
+    public const string Files = "files";
+    public const string KeyStrategies = "key-strategies";
+    public const string ResearchFramework = "research-framework";
+    public const string ResearchQuestion = "research-question";
+    public const string Chart = "chart";
+    public const string Literature = "literature";
+    public const string DataAndScripts = "data-and-scripts";
+    public const string ResearchProgress = "research-progress";
+    public const string TextNote = "text-note";
+    public const string Custom = "custom";
+
+    public static IReadOnlyList<string> All { get; } =
+    [
+        ImageShowcase, Milestones, Description, Inspirations, Files, KeyStrategies,
+        ResearchFramework, ResearchQuestion, Chart, Literature, DataAndScripts,
+        ResearchProgress, TextNote, Custom
+    ];
+
+    public static bool IsValid(string? value) => value is not null && All.Contains(value, StringComparer.Ordinal);
+}
+
+/// <summary>
+/// Project-scoped tile workspace.  Coordinates are always stored in the canonical 12-column
+/// grid.  Narrow-window rendering is derived from these values and never overwrites them.
+/// </summary>
+public sealed class ProjectWorkspaceLayout
+{
+    public int Version { get; set; } = 1;
+    public List<ProjectWorkspacePanel> Panels { get; init; } = [];
+}
+
+public sealed class ProjectWorkspacePanel
+{
+    public required Guid Id { get; init; }
+    public required string Kind { get; set; }
+    public string? Title { get; set; }
+    public int X { get; set; }
+    public int Y { get; set; }
+    public int Width { get; set; } = 2;
+    public int Height { get; set; } = 1;
+    public Dictionary<string, string> Settings { get; init; } = new(StringComparer.Ordinal);
+}
+
 public sealed class DesignProjectDetails
 {
     public string? AdministrativeRegion { get; set; }
@@ -76,6 +129,13 @@ public sealed class ProjectRecord
     public List<ProjectTodoItem> Todos { get; init; } = [];
     public List<PlanningSnapshot> PlanningSnapshots { get; init; } = [];
     public ProjectFolderReference? WorkFolder { get; set; }
+    /// <summary>Additional project folders linked from the Files workspace panel. WorkFolder remains the legacy primary folder.</summary>
+    public List<ProjectFolderReference> AdditionalFolders { get; init; } = [];
+    /// <summary>
+    /// Optional for backwards compatibility.  v1.9 initializes it lazily on first workspace
+    /// open so old project files remain readable without a destructive data migration.
+    /// </summary>
+    public ProjectWorkspaceLayout? WorkspaceLayout { get; set; }
     public bool IsArchived { get; set; }
     public required DateTimeOffset CreatedAtUtc { get; init; }
     public required DateTimeOffset UpdatedAtUtc { get; set; }

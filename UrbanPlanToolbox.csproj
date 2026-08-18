@@ -18,10 +18,10 @@
     <Nullable>enable</Nullable>
     <!-- Never let generated test outputs participate in WinUI PRI resource discovery. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);tests\**\*</DefaultItemExcludes>
-    <Version>1.8.5</Version>
-    <AssemblyVersion>1.8.5.0</AssemblyVersion>
-    <FileVersion>1.8.5.0</FileVersion>
-    <InformationalVersion>1.8.5</InformationalVersion>
+    <Version>1.9.0</Version>
+    <AssemblyVersion>1.9.0.0</AssemblyVersion>
+    <FileVersion>1.9.0.0</FileVersion>
+    <InformationalVersion>1.9.0</InformationalVersion>
     <DefineConstants Condition="'$(DistributionChannel)' == 'Store'">$(DefineConstants);URBANPLANTOOLBOX_STORE</DefineConstants>
     <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     <DefaultLanguage>zh-CN</DefaultLanguage>

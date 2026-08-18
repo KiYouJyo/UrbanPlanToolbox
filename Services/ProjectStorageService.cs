@@ -24,7 +24,7 @@ public sealed class ProjectStorageService
         _storage = new JsonDataStorage(
             paths,
             ProjectSchemaVersion,
-            projectMigrations ?? [new ProjectV1ToV2Migration(), new ProjectV2ToV3Migration()],
+            projectMigrations ?? [new ProjectV1ToV2Migration(), new ProjectV2ToV3Migration(), new ProjectV3ToV4Migration()],
             diagnostics,
             allowUnversionedLegacySchema: true);
         _deleteFailureInjector = deleteFailureInjector;
@@ -276,6 +276,8 @@ public sealed class ProjectStorageService
             try
             {
                 folderAccess?.Clear(read.Value!.WorkFolder);
+                foreach (var folder in read.Value.AdditionalFolders)
+                    folderAccess?.Clear(folder);
             }
             catch (Exception exception) when (exception is not OutOfMemoryException)
             {

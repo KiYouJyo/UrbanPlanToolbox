@@ -58,7 +58,9 @@ public sealed class SettingsPageContractTests
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
         var settings = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml.cs"));
         Assert.DoesNotContain("Milestone_Field_Reminder", code);
-        Assert.DoesNotContain("ReminderEnabled", code);
+        // The legacy persisted flag may be passed through unchanged for compatibility,
+        // but the project editor must not expose a per-milestone reminder control.
+        Assert.DoesNotContain("IsChecked = milestone?.ReminderEnabled", code);
         Assert.Contains("SetEnabledAsync", settings);
         Assert.Contains("GetSettingsAsync", settings);
         Assert.Contains("UpdateRepeatIntervalAsync", settings);
