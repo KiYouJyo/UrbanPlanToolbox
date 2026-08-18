@@ -7,8 +7,8 @@ namespace UrbanPlanToolbox.Services;
 /// </summary>
 public static class DataContractVersions
 {
-    // v4 adds the project-scoped customizable workspace layout.  Older builds must not
-    // silently rewrite v1.9 project files and drop this new persisted field.
-    public const int Project = 4;
+    // Workspace layout is optional, reconstructable UI metadata added compatibly to the
+    // existing project payload. Core project data keeps the v3 contract.
+    public const int Project = 3;
     public const int Backup = 2;
 }
