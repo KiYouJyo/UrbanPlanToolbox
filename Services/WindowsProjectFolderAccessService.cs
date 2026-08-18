@@ -31,19 +31,49 @@ public sealed class WindowsProjectFolderAccessService : IProjectFolderAccessServ
 
     public async Task<ProjectFolderAccessResult> OpenAsync(ProjectFolderReference reference)
     {
-        if (reference.RequiresReselection || string.IsNullOrWhiteSpace(reference.AccessToken))
-            return new(false, ErrorKey: "ProjectFolder_RequiresReselection");
-        try
+        ArgumentNullException.ThrowIfNull(reference);
+
+        if (!string.IsNullOrWhiteSpace(reference.AccessToken))
         {
-            var folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(reference.AccessToken);
-            return await Launcher.LaunchFolderAsync(folder)
-                ? new(true, reference)
-                : new(false, ErrorKey: "ProjectFolder_OpenFailed");
+            try
+            {
+                if (StorageApplicationPermissions.FutureAccessList.ContainsItem(reference.AccessToken))
+                {
+                    var tokenFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync(reference.AccessToken);
+                    if (await Launcher.LaunchFolderAsync(tokenFolder))
+                        return new(true, reference);
+                }
+            }
+            catch (Exception exception) when (exception is FileNotFoundException or UnauthorizedAccessException or ArgumentException)
+            {
+                // Package upgrades/reinstalls can invalidate FutureAccessList entries. Fall through to the durable path.
+            }
         }
-        catch (Exception exception) when (exception is FileNotFoundException or UnauthorizedAccessException or ArgumentException)
+
+        if (!string.IsNullOrWhiteSpace(reference.DisplayPath))
         {
-            return new(false, ErrorKey: "ProjectFolder_AccessExpired");
+            try
+            {
+                var pathFolder = await StorageFolder.GetFolderFromPathAsync(reference.DisplayPath);
+                if (await Launcher.LaunchFolderAsync(pathFolder))
+                {
+                    return new(true, new ProjectFolderReference
+                    {
+                        AccessToken = reference.AccessToken,
+                        DisplayName = string.IsNullOrWhiteSpace(reference.DisplayName) ? pathFolder.Name : reference.DisplayName,
+                        DisplayPath = pathFolder.Path,
+                        RequiresReselection = false
+                    });
+                }
+                return new(false, ErrorKey: "ProjectFolder_OpenFailed");
+            }
+            catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException or UnauthorizedAccessException or ArgumentException)
+            {
+                return new(false, ErrorKey: "ProjectFolder_AccessExpired");
+            }
         }
+
+        return new(false, ErrorKey: "ProjectFolder_RequiresReselection");
     }
 
     public void Clear(ProjectFolderReference? reference)
