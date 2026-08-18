@@ -430,7 +430,6 @@ public sealed partial class ProjectWorkspacePage
         };
         var viewport = new ScrollViewer
         {
-            Grid.Column = 1,
             HorizontalScrollMode = ScrollMode.Enabled,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
             VerticalScrollMode = ScrollMode.Enabled,
@@ -442,6 +441,7 @@ public sealed partial class ProjectWorkspacePage
             MaxZoomFactor = 6f,
             Content = image
         };
+        Grid.SetColumn(viewport, 1);
         media.Children.Add(viewport);
 
         var placeholder = new FontIcon
