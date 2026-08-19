@@ -34,8 +34,6 @@
     <Content Include="SUPPORT.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="LICENSE" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="Assets\Data\RegulationsIndex\regulations-index.v1.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    <Content Include="Assets\Data\PlanningTerminology\PlanningTerminology.v1.0.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="Assets\Data\ReleaseNotes\*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <None Include="data-sources\regulations\中日美欧建筑规划法规索引.xlsx" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
