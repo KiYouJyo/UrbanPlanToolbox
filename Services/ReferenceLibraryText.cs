@@ -10,7 +10,7 @@ public static class ReferenceLibraryText
         ["NoDataPack"] = ["尚未安装数据包", "データパックが未インストールです", "No data pack installed"],
         ["NoDataPackHint"] = ["从 UrbanPlanToolbox_Data 检查官方数据更新，或导入本地 .uptdata。", "UrbanPlanToolbox_Data から公式データを確認するか、ローカルの .uptdata を読み込んでください。", "Check UrbanPlanToolbox_Data for official data or import a local .uptdata pack."],
         ["CheckUpdate"] = ["检查更新", "更新を確認", "Check updates"],
-        ["CheckDataUpdate"] = ["↻ 检查数据更新", "↻ データ更新を確認", "↻ Check data updates"],
+        ["CheckDataUpdate"] = ["检查数据更新", "データ更新を確認", "Check data updates"],
         ["ManageSource"] = ["管理数据源", "データソースを管理", "Manage source"],
         ["ImportPack"] = ["导入 .uptdata", ".uptdata を読み込む", "Import .uptdata"],
         ["Rollback"] = ["回退上一版本", "前のバージョンへ戻す", "Roll back"],
