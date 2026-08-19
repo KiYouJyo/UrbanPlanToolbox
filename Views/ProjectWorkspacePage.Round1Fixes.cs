@@ -1,4 +1,6 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
+using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
@@ -14,45 +16,37 @@ public sealed partial class ProjectWorkspacePage
     private bool _round1FixesInitialized;
     private bool _round1Applying;
 
-    protected override void OnApplyTemplate()
+    private void OnRound1WorkspaceLoaded(object sender, RoutedEventArgs e)
     {
-        base.OnApplyTemplate();
-        Loaded -= OnRound1FixesLoaded;
-        Loaded += OnRound1FixesLoaded;
-    }
+        // Preserve the established Round4/Round5 initialization chain, then layer the
+        // repair hooks on the same guaranteed Page.Loaded path.  The previous
+        // OnApplyTemplate hook was not reliable for Page and could leave all design-only
+        // repairs dormant even though the code was packaged successfully.
+        OnWorkspaceLoaded(sender, e);
 
-    private void OnRound1FixesLoaded(object sender, RoutedEventArgs e)
-    {
-        if (_round1FixesInitialized) return;
-        _round1FixesInitialized = true;
-
-        // Run after the versioned workspace Loaded handlers have finished wiring their upgrades.
-        DispatcherQueue.TryEnqueue(() =>
+        if (_round1FixesInitialized)
         {
-            DrawerLayer.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(OnRound1DrawerKeyDown), true);
-            TileCanvas.LayoutUpdated += OnRound1CanvasLayoutUpdated;
-            RewireRound1OverviewEditor();
             ApplyRound1Fixes();
-        });
+            return;
+        }
+
+        _round1FixesInitialized = true;
+        DrawerLayer.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(OnRound1DrawerKeyDown), true);
+        TileCanvas.LayoutUpdated += OnRound1CanvasLayoutUpdated;
+
+        // Wire this before the async project read necessarily completes.  The handler
+        // decides between research/design at click time, so it remains correct after
+        // navigation finishes loading the project record.
+        RewireRound1OverviewEditor();
+        DispatcherQueue.TryEnqueue(ApplyRound1Fixes);
     }
 
     private void RewireRound1OverviewEditor()
     {
-        if (_project is null) return;
-
         EditOverviewButton.Click -= OnEditOverview;
         EditOverviewButton.Click -= OnRound1EditOverview;
         EditOverviewCompactButton.Click -= OnEditOverview;
         EditOverviewCompactButton.Click -= OnRound1EditOverview;
-
-        // Research overview already maps directly to field / subject / methods / milestones.
-        // The design overview uses the structured strategy editor introduced in this repair round.
-        if (_project.Kind == ProjectKindCodes.Research)
-        {
-            EditOverviewButton.Click += OnEditOverview;
-            EditOverviewCompactButton.Click += OnEditOverview;
-            return;
-        }
 
         EditOverviewButton.Click += OnRound1EditOverview;
         EditOverviewCompactButton.Click += OnRound1EditOverview;
@@ -133,12 +127,42 @@ public sealed partial class ProjectWorkspacePage
     private void OnRound1DrawerKeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key != VirtualKey.Escape || DrawerLayer.Visibility != Visibility.Visible) return;
-        CloseDrawer();
+
+        // Card editors place Cancel first and Save second in DrawerFooter.  Esc means
+        // "finish editing" in this workspace, so invoke the same Save button rather
+        // than silently discarding the current editor state.  Drawers without a save
+        // action (for example a picker/list drawer) still close normally.
+        var saveText = _localization.GetString("Project_Action_Save");
+        var saveButton = DrawerFooter.Children
+            .OfType<Button>()
+            .FirstOrDefault(button =>
+                button.IsEnabled &&
+                string.Equals(button.Content?.ToString(), saveText, StringComparison.Ordinal));
+
+        if (saveButton is not null)
+        {
+            var peer = new ButtonAutomationPeer(saveButton);
+            if (peer.GetPattern(PatternInterface.Invoke) is IInvokeProvider invokeProvider)
+                invokeProvider.Invoke();
+            else
+                CloseDrawer();
+        }
+        else
+        {
+            CloseDrawer();
+        }
+
         e.Handled = true;
     }
 
     private async void OnRound1EditOverview(object sender, RoutedEventArgs e)
     {
+        if (_project?.Kind == ProjectKindCodes.Research)
+        {
+            OnEditOverview(sender, e);
+            return;
+        }
+
         if (_project is null || _project.Kind != ProjectKindCodes.Design || _project.IsArchived || _busy) return;
 
         var name = new TextBox
