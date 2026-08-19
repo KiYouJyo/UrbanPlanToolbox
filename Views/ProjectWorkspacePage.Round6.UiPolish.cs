@@ -68,7 +68,7 @@ public sealed partial class ProjectWorkspacePage
                         ReplaceRound4TileBody(tile, BuildRound6Description());
                         break;
                     case ProjectWorkspacePanelKinds.ResearchQuestion:
-                        ReplaceRound4TileBody(tile, BuildRound6ResearchQuestion(panel));
+                        ReplaceRound4TileBody(tile, BuildRound6ResearchQuestion());
                         break;
                 }
 
@@ -125,15 +125,13 @@ public sealed partial class ProjectWorkspacePage
         };
     }
 
-    private UIElement BuildRound6ResearchQuestion(ProjectWorkspacePanel panel)
+    private UIElement BuildRound6ResearchQuestion()
     {
         var stack = new StackPanel { Spacing = 7 };
         var source = _project?.ResearchDetails?.ResearchSubject;
         var items = string.IsNullOrWhiteSpace(source)
             ? Array.Empty<string>()
-            : source.Split(['\r', '\n', '；', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Take(panel.Height <= 1 ? 3 : 8)
-                .ToArray();
+            : source.Split(['\r', '\n', '；', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         if (items.Length == 0)
         {
