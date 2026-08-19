@@ -3,439 +3,417 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>UrbanPlanToolbox</title>
+  <meta name="description" content="UrbanPlanToolbox — 面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。">
+  <meta name="theme-color" content="#0f6cbd">
+  <title>UrbanPlanToolbox · 规划工具箱</title>
   <style>
-    :root { color-scheme: light dark; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.65; }
-    body { max-width: 64rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
-    a { color: #168aad; }
-    nav { display: flex; flex-wrap: wrap; gap: .75rem 1rem; margin: 2rem 0; }
-    nav a { font-weight: 600; }
-    .lead { font-size: 1.1rem; max-width: 52rem; }
-    .section-heading { margin-top: 3rem; border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent); padding-bottom: .5rem; }
-    .card { border: 1px solid color-mix(in srgb, currentColor 25%, transparent); border-radius: .75rem; padding: 1rem 1.25rem; margin: 1rem 0; }
-    .card h3 { margin-bottom: .25rem; }
-    .meta { color: color-mix(in srgb, currentColor 70%, transparent); font-size: .95rem; }
-    .language { margin: .8rem 0; }
-    .language strong { display: block; }
-    ul { margin-top: .35rem; }
-    footer { margin-top: 3rem; font-size: .95rem; }
+    :root {
+      color-scheme: light dark;
+      font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+      --page: #f5f7fa;
+      --surface: rgba(255,255,255,.86);
+      --surface-strong: #ffffff;
+      --text: #1a1a1a;
+      --muted: #5d6570;
+      --line: rgba(0,0,0,.11);
+      --accent: #0f6cbd;
+      --accent-strong: #115ea3;
+      --accent-soft: rgba(15,108,189,.10);
+      --success: #107c10;
+      --warning: #8a6100;
+      --shadow: 0 14px 40px rgba(0,0,0,.08);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --max: 1180px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #0f1012;
+        --surface: rgba(31,32,35,.88);
+        --surface-strong: #202124;
+        --text: #f5f5f5;
+        --muted: #b4bac2;
+        --line: rgba(255,255,255,.12);
+        --accent: #60aeea;
+        --accent-strong: #8bc8f5;
+        --accent-soft: rgba(96,174,234,.13);
+        --success: #7ccf7c;
+        --warning: #f0c75e;
+        --shadow: 0 18px 48px rgba(0,0,0,.28);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% -10%, rgba(15,108,189,.16), transparent 34rem),
+        radial-gradient(circle at 90% 8%, rgba(77,166,255,.10), transparent 30rem),
+        var(--page);
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    .l { display: none !important; }
+    body.lang-zh .l.zh, body.lang-ja .l.ja, body.lang-en .l.en { display: revert !important; }
+    .shell { width: min(calc(100% - 32px), var(--max)); margin: 0 auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--page) 84%, transparent);
+      backdrop-filter: blur(24px) saturate(150%);
+    }
+    .topbar-inner { min-height: 64px; display: flex; align-items: center; gap: 18px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 650; text-decoration: none; white-space: nowrap; }
+    .brand-mark {
+      width: 30px; height: 30px; border-radius: 9px;
+      display: grid; place-items: center; color: white;
+      background: linear-gradient(145deg, #0f6cbd, #3a96dd);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.24);
+      font-size: 12px; font-weight: 750; letter-spacing: -.4px;
+    }
+    nav { display: flex; gap: 6px; margin-left: auto; align-items: center; }
+    nav a, .lang-switch button {
+      border: 0; background: transparent; color: var(--muted); text-decoration: none;
+      padding: 8px 10px; border-radius: 8px; font: inherit; font-size: 14px; cursor: pointer;
+    }
+    nav a:hover, .lang-switch button:hover { background: var(--accent-soft); color: var(--text); }
+    .lang-switch { display: flex; gap: 2px; margin-left: 6px; padding-left: 8px; border-left: 1px solid var(--line); }
+    .lang-switch button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 650; }
+    .hero { padding: 76px 0 42px; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr); gap: 34px; align-items: stretch; }
+    .eyebrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px; min-height: 28px; padding: 3px 10px;
+      border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 13px;
+    }
+    .pill.version { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); background: var(--accent-soft); font-weight: 650; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    h1 { margin: 0; font-size: clamp(40px, 7vw, 72px); line-height: 1.02; letter-spacing: -2.7px; font-weight: 680; }
+    .hero-lead { margin: 20px 0 0; max-width: 760px; font-size: clamp(18px, 2.4vw, 23px); color: var(--muted); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .button {
+      min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 8px 16px; border-radius: 10px; text-decoration: none; border: 1px solid var(--line);
+      background: var(--surface-strong); font-weight: 620; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .button.primary { background: var(--accent); color: #fff; border-color: transparent; }
+    .button.primary:hover { background: var(--accent-strong); }
+    .button:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+    .status-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xl); padding: 22px; box-shadow: var(--shadow); backdrop-filter: blur(24px); }
+    .status-panel h2 { margin: 0 0 18px; font-size: 18px; }
+    .status-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line); }
+    .status-row:first-of-type { border-top: 0; padding-top: 0; }
+    .status-label { font-weight: 620; }
+    .status-sub { margin-top: 3px; color: var(--muted); font-size: 13px; }
+    .status-badge { align-self: start; border-radius: 999px; padding: 3px 9px; font-size: 12px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+    .status-badge.ok { color: var(--success); background: color-mix(in srgb, var(--success) 10%, transparent); }
+    .status-badge.pending { color: var(--warning); background: color-mix(in srgb, var(--warning) 10%, transparent); }
+    section { padding: 38px 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+    .section-head h2 { margin: 0; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1px; }
+    .section-head p { margin: 6px 0 0; color: var(--muted); max-width: 720px; }
+    .grid { display: grid; gap: 14px; }
+    .grid.features { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .grid.channels { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .card { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius-lg); padding: 20px; backdrop-filter: blur(20px); }
+    .card h3 { margin: 0 0 7px; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); }
+    .feature-icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: var(--accent-soft); color: var(--accent); margin-bottom: 15px; font-weight: 700; }
+    .data-panel { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; border-radius: var(--radius-xl); padding: 26px; background: linear-gradient(135deg, var(--accent-soft), var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--line)); }
+    .data-panel h3 { margin: 0 0 8px; font-size: 26px; }
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; align-self: stretch; }
+    .stat { display: flex; flex-direction: column; justify-content: center; min-height: 110px; padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); }
+    .stat strong { font-size: 30px; line-height: 1.1; }
+    .stat span { margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .channel-card { position: relative; overflow: hidden; }
+    .channel-card .channel-meta { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); display: grid; gap: 6px; color: var(--muted); font-size: 14px; }
+    .release-card { border: 1px solid var(--line); border-radius: var(--radius-xl); background: var(--surface); overflow: hidden; }
+    .release-head { padding: 22px 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+    .release-head h3 { margin: 0; font-size: 24px; }
+    .release-head p { margin: 5px 0 0; color: var(--muted); }
+    .release-body { padding: 18px 24px 22px; }
+    .release-body ul { margin: 0; padding-left: 1.2rem; }
+    .release-body li + li { margin-top: 8px; }
+    details { border-top: 1px solid var(--line); }
+    summary { cursor: pointer; padding: 15px 24px; font-weight: 620; }
+    details .details-body { padding: 0 24px 20px; color: var(--muted); }
+    .fine-print { color: var(--muted); font-size: 13px; }
+    footer { margin-top: 34px; border-top: 1px solid var(--line); padding: 30px 0 46px; color: var(--muted); }
+    .footer-grid { display: flex; flex-wrap: wrap; gap: 12px 22px; justify-content: space-between; align-items: center; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 14px; }
+    .footer-links a { color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--text); }
+    @media (max-width: 900px) {
+      .hero-grid, .data-panel { grid-template-columns: 1fr; }
+      .grid.features { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      nav a:not(.always) { display: none; }
+    }
+    @media (max-width: 620px) {
+      .shell { width: min(calc(100% - 24px), var(--max)); }
+      .hero { padding-top: 48px; }
+      .grid.features, .grid.channels, .stats { grid-template-columns: 1fr; }
+      h1 { letter-spacing: -1.8px; }
+      .topbar-inner { min-height: 58px; gap: 8px; }
+      .brand span:last-child { display: none; }
+      .lang-switch { margin-left: auto; }
+      .lang-switch button { padding-inline: 8px; }
+      .status-panel { padding: 18px; }
+      .release-head { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   </style>
 </head>
-<body>
-  <header>
-    <h1>UrbanPlanToolbox</h1>
-    <p class="lead">面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。</p>
-    <p class="lead" lang="ja">都市・地域計画、建築設計、空間研究のためのオフライン優先 Windows ツールボックスです。</p>
-    <p class="lead" lang="en">An offline-first Windows toolbox for urban planning, architectural design, and spatial research.</p>
+<body class="lang-zh">
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="./" aria-label="UrbanPlanToolbox home">
+        <span class="brand-mark">UP</span><span>UrbanPlanToolbox</span>
+      </a>
+      <nav aria-label="Site navigation">
+        <a href="#features"><span class="l zh">功能</span><span class="l ja">機能</span><span class="l en">Features</span></a>
+        <a href="#data"><span class="l zh">资料库</span><span class="l ja">データ</span><span class="l en">Data</span></a>
+        <a href="#download"><span class="l zh">获取</span><span class="l ja">入手</span><span class="l en">Get app</span></a>
+        <a href="#release"><span class="l zh">版本</span><span class="l ja">リリース</span><span class="l en">Release</span></a>
+        <a class="always" href="support/"><span class="l zh">支持</span><span class="l ja">サポート</span><span class="l en">Support</span></a>
+      </nav>
+      <div class="lang-switch" aria-label="Language">
+        <button type="button" data-set-lang="zh" aria-pressed="true">中</button>
+        <button type="button" data-set-lang="ja" aria-pressed="false">日</button>
+        <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
   </header>
 
-  <nav aria-label="Site navigation">
-    <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest">最新版本 / 最新リリース / Latest release</a>
-    <a href="https://apps.microsoft.com/detail/9MWDPJG1BHKW">Microsoft Store 获取 / Microsoft Store から入手 / Get from Microsoft Store</a>
-    <a href="#version-history">版本历史 / バージョン履歴 / Version history</a>
-    <a href="privacy/">隐私政策 / プライバシーポリシー / Privacy</a>
-    <a href="support/">支持 / サポート / Support</a>
-    <a href="https://github.com/KiYouJyo/UrbanPlanToolbox">GitHub 项目 / GitHub プロジェクト / GitHub project</a>
-  </nav>
-
   <main>
-    <section aria-labelledby="distribution">
-      <h2 id="distribution" class="section-heading">获取应用 / アプリを入手 / Get the app</h2>
-      <div class="card">
-        <h3>Microsoft Store</h3>
-        <div class="language"><strong>简体中文</strong>推荐普通用户通过 Microsoft Store 安装并接收自动更新。</div>
-        <div class="language" lang="ja"><strong>日本語</strong>一般ユーザーには Microsoft Store からのインストールと自動更新を推奨します。</div>
-        <div class="language" lang="en"><strong>English</strong>Microsoft Store is the recommended installation and automatic update channel for most users.</div>
-        <p><a href="https://apps.microsoft.com/detail/9MWDPJG1BHKW">Microsoft Store / Microsoft Store から入手 / Get from Microsoft Store</a></p>
-      </div>
-      <div class="card">
-        <h3>GitHub Releases</h3>
-        <div class="language"><strong>简体中文</strong>GitHub Releases 提供 x64 自签名旁加载版本，适合需要手动下载安装包的用户。</div>
-        <div class="language" lang="ja"><strong>日本語</strong>GitHub Releases では、手動でパッケージを入手したいユーザー向けに x64 の自己署名サイドロード版を提供します。</div>
-        <div class="language" lang="en"><strong>English</strong>GitHub Releases provides a self-signed x64 sideloading build for users who need to download and install a package manually.</div>
-        <p><a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest">GitHub 发行版 / GitHub リリース / GitHub Releases</a></p>
-      </div>
-      <div class="card">
-        <div class="language"><strong>简体中文</strong>Microsoft Store 与 GitHub 旁加载版使用独立的应用身份、Publisher 和更新流程，不能互相覆盖升级。</div>
-        <div class="language" lang="ja"><strong>日本語</strong>Microsoft Store 版と GitHub サイドロード版は、アプリ ID、Publisher、更新フローが独立しており、相互に上書きアップグレードできません。</div>
-        <div class="language" lang="en"><strong>English</strong>The Microsoft Store and GitHub sideloading channels use separate app identities, Publishers, and update flows; neither channel can upgrade over the other.</div>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow">
+            <span class="pill version"><span class="dot"></span><span id="hero-version">v1.9.2</span></span>
+            <span class="pill">Windows · WinUI 3 · x64</span>
+            <span class="pill"><span class="l zh">离线优先</span><span class="l ja">オフライン優先</span><span class="l en">Offline-first</span></span>
+          </div>
+          <h1>UrbanPlanToolbox</h1>
+          <p class="hero-lead l zh">面向城乡规划、建筑设计与空间研究的现代 Windows 工具箱。把项目工作台、规划资料库、GIS/调研辅助、灵感记录与数据备份集中到一个离线优先的 WinUI 3 应用中。</p>
+          <p class="hero-lead l ja">都市・地域計画、建築設計、空間研究のためのモダンな Windows ツールボックス。プロジェクト、専門データ、GIS・調査支援、アイデア記録、バックアップをオフライン優先の WinUI 3 アプリに統合します。</p>
+          <p class="hero-lead l en">A modern Windows toolbox for urban planning, architectural design, and spatial research—bringing project workspaces, professional references, GIS/survey helpers, idea capture, and backup into one offline-first WinUI 3 app.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest"><span class="l zh">下载 GitHub 正式版</span><span class="l ja">GitHub 正式版を入手</span><span class="l en">Download GitHub release</span></a>
+            <a class="button" href="https://apps.microsoft.com/detail/9MWDPJG1BHKW">Microsoft Store</a>
+            <a class="button" href="https://github.com/KiYouJyo/UrbanPlanToolbox">GitHub</a>
+          </div>
+        </div>
+
+        <aside class="status-panel" aria-label="Distribution status">
+          <h2><span class="l zh">当前发行状态</span><span class="l ja">現在の配布状況</span><span class="l en">Current distribution status</span></h2>
+          <div class="status-row">
+            <div>
+              <div class="status-label">GitHub Releases</div>
+              <div class="status-sub"><span class="l zh">当前正式版本</span><span class="l ja">現在の正式版</span><span class="l en">Current stable release</span> · <span id="github-version">1.9.2</span></div>
+            </div>
+            <span class="status-badge ok"><span class="l zh">已发布</span><span class="l ja">公開済み</span><span class="l en">Published</span></span>
+          </div>
+          <div class="status-row">
+            <div>
+              <div class="status-label">Microsoft Store</div>
+              <div class="status-sub"><span class="l zh">已提交</span><span class="l ja">提出済み</span><span class="l en">Submitted</span> · <span id="store-candidate">1.9.2.0</span><br><span class="l zh">已确认公开版本</span><span class="l ja">確認済み公開版</span><span class="l en">Verified public version</span> · <span id="store-public">1.8.2</span></div>
+            </div>
+            <span id="store-status-badge" class="status-badge pending"><span class="l zh">认证中</span><span class="l ja">審査中</span><span class="l en">In certification</span></span>
+          </div>
+          <p class="fine-print l zh">两个渠道使用独立包身份与更新链，不能相互覆盖升级。Store 公开状态以 Microsoft Store / Partner Center 为准。</p>
+          <p class="fine-print l ja">2つの配布経路はパッケージ ID と更新経路が独立しており、相互に上書きできません。Store の公開状態は Microsoft Store / Partner Center を基準とします。</p>
+          <p class="fine-print l en">The two channels use independent package identities and update paths and cannot upgrade over each other. Store publication status follows Microsoft Store / Partner Center.</p>
+        </aside>
       </div>
     </section>
 
-    <section id="version-history" aria-labelledby="history-heading">
-      <article class="card">
-  <h2>1.8.3</h2><p class="meta">当前发布版本 / 現在のリリースバージョン / Current release · 2026-08-17 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.3">GitHub Release</a> · Microsoft Store 已提交认证 / Microsoft Store 認証審査提出済み / Submitted for Microsoft Store certification</p>
-  <div class="language"><strong>简体中文</strong><ul><li>修复 Store 目标版本元数据暂未解析时“可用版本”和“更新内容”被隐藏的问题，同时继续避免显示陈旧版本信息。</li><li>重做响应式更新管理卡片；检查更新时只在操作按钮内显示一个 ProgressRing。</li><li>修复更新说明滚动条覆盖正文的问题。</li></ul></div>
-  <div class="language" lang="ja"><strong>日本語</strong><ul><li>Store の対象バージョン情報が未解決のときに「利用可能バージョン」と更新内容が非表示になる問題を修正し、古い情報は引き続き表示しません。</li><li>レスポンシブな更新管理カードへ再設計し、更新確認中の ProgressRing は操作ボタン内の1つだけにしました。</li><li>更新内容のスクロールバーが本文に重なる問題を修正しました。</li></ul></div>
-  <div class="language" lang="en"><strong>English</strong><ul><li>Fixed Available version and release notes disappearing while trusted Store target metadata is unresolved, without surfacing stale metadata.</li><li>Redesigned the responsive Update management card and keeps a single ProgressRing inside the checking action button.</li><li>Fixed the release-notes scrollbar overlapping text.</li></ul></div>
-</article>
+    <section id="features">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <h2><span class="l zh">围绕规划与设计工作流构建</span><span class="l ja">計画・設計ワークフローのために</span><span class="l en">Built around planning and design workflows</span></h2>
+            <p class="l zh">不是单一计算器，而是一组可以独立使用、又共享项目与数据基础的专业工具。</p>
+            <p class="l ja">単一の計算機ではなく、独立して使えながらプロジェクトとデータ基盤を共有する専門ツール群です。</p>
+            <p class="l en">Not a single calculator, but a set of focused professional tools that can work independently while sharing a common project and data foundation.</p>
+          </div>
+        </div>
+        <div class="grid features">
+          <article class="card"><div class="feature-icon">01</div><h3><span class="l zh">项目工作台</span><span class="l ja">プロジェクト</span><span class="l en">Project workspace</span></h3><p class="l zh">设计与研究项目、归档、时间节点、工作文件夹与响应式自由磁贴工作台。</p><p class="l ja">設計・研究プロジェクト、アーカイブ、マイルストーン、作業フォルダー、レスポンシブな自由配置タイル。</p><p class="l en">Design/research projects, archives, milestones, work folders, and responsive customizable tile workspaces.</p></article>
+          <article class="card"><div class="feature-icon">02</div><h3><span class="l zh">灵感记录器</span><span class="l ja">アイデア記録</span><span class="l en">Inspiration Recorder</span></h3><p class="l zh">可选后台驻留与托盘入口，在不打断主工作流的情况下快速记录设计或科研灵感。</p><p class="l ja">任意のバックグラウンド常駐とトレイから、作業を妨げず設計・研究アイデアを素早く記録します。</p><p class="l en">Optional background residency and tray access for quick design/research capture without interrupting the main workflow.</p></article>
+          <article class="card"><div class="feature-icon">03</div><h3><span class="l zh">规划专业资料库</span><span class="l ja">専門データライブラリ</span><span class="l en">Professional libraries</span></h3><p class="l zh">法规索引、中日英规划术语与设计理念词典，统一搜索、筛选、详情与来源信息。</p><p class="l ja">法規索引、中日英都市計画用語集、デザインコンセプト辞典を共通の検索・詳細 UI で提供します。</p><p class="l en">Regulations, CN-JP-EN planning terminology, and design concepts with unified search, filtering, detail, and provenance.</p></article>
+          <article class="card"><div class="feature-icon">04</div><h3><span class="l zh">GIS 与调研辅助</span><span class="l ja">GIS・調査支援</span><span class="l en">GIS & survey helpers</span></h3><p class="l zh">WGS 84 / GCJ-02 / BD-09 坐标、本地 Shapefile 处理、调研照片 EXIF/GPS 与 GIS 点位导出。</p><p class="l ja">WGS 84 / GCJ-02 / BD-09 座標、ローカル Shapefile 処理、調査写真の EXIF/GPS と GIS ポイント出力。</p><p class="l en">WGS 84 / GCJ-02 / BD-09 coordinates, local Shapefile processing, and survey-photo EXIF/GPS with GIS point export.</p></article>
+          <article class="card"><div class="feature-icon">05</div><h3><span class="l zh">规划设计小工具</span><span class="l ja">計画・設計ツール</span><span class="l en">Planning utilities</span></h3><p class="l zh">规划指标、单位与比例尺、色卡方案、图纸版本对比、流程审核清单等轻量工具。</p><p class="l ja">計画指標、単位・縮尺、カラーパレット、図面差分、ワークフローチェックなどの軽量ツール。</p><p class="l en">Planning metrics, units/scales, color palettes, drawing comparison, workflow checks, and other lightweight utilities.</p></article>
+          <article class="card"><div class="feature-icon">06</div><h3><span class="l zh">本地数据与 WebDAV</span><span class="l ja">ローカルデータと WebDAV</span><span class="l en">Local data & WebDAV</span></h3><p class="l zh">本地数据保持主数据源；支持 .uptbackup 校验恢复与可选 WebDAV 云存档。</p><p class="l ja">ローカルデータを正本として維持し、.uptbackup の検証復元と任意の WebDAV クラウドアーカイブに対応します。</p><p class="l en">Local data remains authoritative, with verified .uptbackup restore and optional WebDAV cloud archives.</p></article>
+        </div>
+      </div>
+    </section>
 
-<article class="card">
-  <h2>1.8.2</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-16 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.2">GitHub Release</a> · Microsoft Store 已发布 / Microsoft Store 公開済み / Published on Microsoft Store</p>
-  <div class="language"><strong>简体中文</strong><ul><li>在数据管理中加入 WebDAV 云存档，并保持本地数据为主数据源。</li><li>复用 .uptbackup 的校验与安全恢复流程，并使用 Windows Credential Locker 保存 WebDAV 密码。</li><li>精简新建设计与研究项目弹窗，将详细信息移到项目工作区补充。</li></ul></div>
-  <div class="language" lang="ja"><strong>日本語</strong><ul><li>データ管理に WebDAV クラウドアーカイブを追加し、ローカルデータを主データソースとして維持しました。</li><li>.uptbackup の検証・安全復元フローを再利用し、WebDAV パスワードは Windows Credential Locker に保存します。</li><li>設計・研究プロジェクトの新規作成ダイアログを簡素化し、詳細はプロジェクトワークスペースで補完するようにしました。</li></ul></div>
-  <div class="language" lang="en"><strong>English</strong><ul><li>Added WebDAV cloud archives while keeping local storage authoritative.</li><li>Reused .uptbackup validation and safe restore, with WebDAV passwords stored in Windows Credential Locker.</li><li>Streamlined new design and research project dialogs and moved detailed editing into Project Workspace.</li></ul></div>
-</article>
+    <section id="data">
+      <div class="shell">
+        <div class="data-panel">
+          <div>
+            <span class="pill version">Data Pack 1.0</span>
+            <h3><span class="l zh">资料数据与应用版本独立演进</span><span class="l ja">データとアプリを独立して更新</span><span class="l en">Data evolves independently from the app</span></h3>
+            <p class="l zh">v1.9.2 将三套专业资料库接入独立的 UrbanPlanToolbox_Data 数据仓库。应用可主动检查官方 Catalog、下载新的 .uptdata，也支持本地导入和回退到上一版本。所有数据包在激活前都会进行 ID、Schema、最低应用版本、路径安全、大小与 SHA-256 完整性校验。</p>
+            <p class="l ja">v1.9.2 では3つの専門ライブラリを独立した UrbanPlanToolbox_Data に接続しました。公式 Catalog の確認、.uptdata の取得、ローカル読み込み、前版へのロールバックに対応し、有効化前に ID、Schema、最低アプリ版、パス安全性、サイズ、SHA-256 を検証します。</p>
+            <p class="l en">v1.9.2 connects all three professional libraries to the independent UrbanPlanToolbox_Data repository. The app can explicitly check the official catalog, download .uptdata packs, import local packs, and roll back to a prior version. Pack ID, schema, minimum app version, path safety, size, and SHA-256 integrity are validated before activation.</p>
+            <p class="fine-print l zh">数据更新仅由用户主动触发；断网时已安装数据包仍可离线使用。</p>
+            <p class="fine-print l ja">データ更新はユーザー操作時のみ行われ、オフラインでもインストール済みデータを利用できます。</p>
+            <p class="fine-print l en">Data updates are user-triggered; installed packs remain available offline.</p>
+          </div>
+          <div class="stats" aria-label="Data Pack 2026.08.1 statistics">
+            <div class="stat"><strong>221</strong><span><span class="l zh">法规索引</span><span class="l ja">法規索引</span><span class="l en">regulation entries</span></span></div>
+            <div class="stat"><strong>140</strong><span><span class="l zh">中日英术语</span><span class="l ja">中日英用語</span><span class="l en">trilingual terms</span></span></div>
+            <div class="stat"><strong>18</strong><span><span class="l zh">设计理念</span><span class="l ja">デザイン概念</span><span class="l en">design concepts</span></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<article class="card">
-  <h2>1.8.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-15 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.1">GitHub Release</a></p>
-  <div class="language"><strong>简体中文</strong><ul><li>修复后台驻留进程阻止 MSIX 卸载的问题，并将托盘菜单改为 WinUI 3 风格。</li><li>精简设计与研究项目工作区，并加强 Store 更新目标版本与更新说明的可信元数据边界。</li></ul></div>
-  <div class="language" lang="ja"><strong>日本語</strong><ul><li>バックグラウンド常駐プロセスが MSIX のアンインストールを妨げる問題を修正し、トレイメニューを WinUI 3 スタイルへ変更しました。</li><li>設計・研究プロジェクトワークスペースを簡素化し、Store 更新対象バージョンと更新内容の信頼できるメタデータ境界を強化しました。</li></ul></div>
-  <div class="language" lang="en"><strong>English</strong><ul><li>Fixed background residency blocking MSIX uninstall and moved the tray menu to a WinUI 3 surface.</li><li>Streamlined project workspaces and hardened trusted Store target-version and release-note metadata boundaries.</li></ul></div>
-</article>
+    <section id="download">
+      <div class="shell">
+        <div class="section-head"><div><h2><span class="l zh">选择发行渠道</span><span class="l ja">配布経路を選択</span><span class="l en">Choose a distribution channel</span></h2><p class="l zh">GitHub 更新更快；Microsoft Store 更适合希望由商店管理安装与更新的用户。</p><p class="l ja">GitHub は更新が速く、Microsoft Store はインストールと更新を Store に任せたいユーザー向けです。</p><p class="l en">GitHub updates more frequently; Microsoft Store is better for users who prefer Store-managed installation and updates.</p></div></div>
+        <div class="grid channels">
+          <article class="card channel-card">
+            <h3>GitHub Releases</h3>
+            <p class="l zh">提供 x64 自签名旁加载版本与一键安装包。首次安装完成后，可在应用内主动检查、下载并验证正式更新。</p><p class="l ja">x64 自己署名サイドロード版とワンクリック導入パッケージを提供します。導入後はアプリ内から正式更新を確認・取得・検証できます。</p><p class="l en">Provides the self-signed x64 sideload build and one-click installer. After first install, the app can explicitly check, download, and verify stable updates.</p>
+            <div class="channel-meta"><span><strong><span class="l zh">当前：</span><span class="l ja">現在：</span><span class="l en">Current: </span></strong><span id="github-version-2">1.9.2</span></span><span>SHA-256 · WinVerifyTrust · MSIX signature verification</span></div>
+            <div class="hero-actions"><a class="button primary" href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest"><span class="l zh">前往最新 Release</span><span class="l ja">最新 Release へ</span><span class="l en">Open latest release</span></a></div>
+          </article>
+          <article class="card channel-card">
+            <h3>Microsoft Store</h3>
+            <p class="l zh">由 Microsoft Store 管理安装与更新。v1.9.2.0 已提交认证；公开可用版本与认证进度以 Store 为准。</p><p class="l ja">インストールと更新を Microsoft Store が管理します。v1.9.2.0 は認証審査に提出済みで、公開状況は Store を基準とします。</p><p class="l en">Installation and updates are managed by Microsoft Store. v1.9.2.0 has been submitted for certification; public availability follows the Store.</p>
+            <div class="channel-meta"><span><strong><span class="l zh">提交：</span><span class="l ja">提出：</span><span class="l en">Submitted: </span></strong><span id="store-candidate-2">1.9.2.0</span></span><span><strong><span class="l zh">已确认公开：</span><span class="l ja">確認済み公開：</span><span class="l en">Verified public: </span></strong><span id="store-public-2">1.8.2</span></span></div>
+            <div class="hero-actions"><a class="button" href="https://apps.microsoft.com/detail/9MWDPJG1BHKW"><span class="l zh">在 Store 中查看</span><span class="l ja">Store で表示</span><span class="l en">View in Store</span></a></div>
+          </article>
+        </div>
+      </div>
+    </section>
 
-      <article class="card">
-        <h2>1.8.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-15 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.8.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增后台驻留、系统托盘与灵感记录器，支持设计/科研灵感快速记录与后续管理。</li><li>新增可选的 Windows 登录静默自启动；两个后台相关选项对新用户默认关闭。</li><li>首次启动向导新增灵感记录器介绍页，记录器支持置顶、右上角定位，并从任务栏和 Alt+Tab 切换器中隐藏。</li><li>完善深浅色标题栏、中日文输入法体验，并优化高 DPI 下主窗口的首次尺寸与居中定位。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>バックグラウンド常駐、システムトレイ、インスピレーションレコーダーを追加し、設計・研究アイデアをすばやく記録して後から整理できるようにしました。</li><li>Windows サインイン時のサイレント起動を追加し、2つのバックグラウンド関連設定は新規ユーザーでは既定でオフです。</li><li>初回起動ガイドにレコーダー紹介ページを追加し、最前面表示、右上配置、タスクバー / Alt+Tab 非表示に対応しました。</li><li>ライト / ダークのタイトルバー表示、日本語・中国語 IME、高 DPI 環境での初期ウィンドウサイズと中央配置を改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added background residency, system tray support, and the Inspiration Recorder for quick design/research capture and later management.</li><li>Added optional silent Windows sign-in startup; both background-related settings default to off for new users.</li><li>Added a Recorder page to first-run onboarding, with topmost behavior, top-right placement, and no Taskbar or Alt+Tab entry.</li><li>Improved light/dark caption behavior, Chinese/Japanese IME handling, and DPI-aware initial MainWindow sizing and centering.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.7.5</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.5">GitHub Release</a> · Microsoft Store 已发布 / Microsoft Store 公開済み / Published on Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>优化新建设计项目与研究项目窗口的宽度和表单布局，修复长表单滚动条覆盖输入框的问题，并保持既有更新机制不变。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>設計・研究プロジェクトの新規作成ウィンドウとフォーム配置を改善し、長いフォームでスクロールバーが入力欄に重なる問題を修正しました。既存の更新方式は変更していません。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Improved new design/research project window sizing and form layout, fixed scrollbars overlapping long-form inputs, and kept the existing update flow unchanged.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.7.4</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.4">GitHub Release</a> · Microsoft Store 已发布 / Microsoft Store 公開済み / Published on Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>Microsoft Store 更新恢复为 Windows 官方的一体式下载与安装流程，并在 Store 操作开始前注册 Windows 应用重启恢复；若旧进程仍然存活，则由应用级重启作为兜底。GitHub 更新与单实例行为保持不变。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>Microsoft Store 更新を Windows 公式の一体型ダウンロード・インストール フローへ戻し、Store 操作の開始前に Windows のアプリ再起動回復を登録します。旧プロセスが残る場合はアプリ側の再起動をフォールバックとして使用し、GitHub 更新と単一インスタンス動作は変更しません。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Restored Microsoft Store updates to the Windows-native combined download-and-install flow and registers Windows restart recovery before the Store operation; if the old process survives, the app-owned restart remains the fallback. GitHub updates and single-instance behavior are unchanged.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.7.3</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.3">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复 Microsoft Store 更新安装后应用关闭但不会自动重新启动的问题，并完善失败、取消与重试恢复。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>Microsoft Store 更新のインストール後にアプリが終了したまま再起動しない問題を修正し、失敗・キャンセル・再試行時の復旧処理を改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed the Microsoft Store update relaunch path after package deployment and improved recovery for cancellation, failure, and retry.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.7.2</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.2">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>引入默认单实例运行；重复启动会唤起已有窗口，并恢复最小化窗口。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>既定で単一インスタンス動作となり、再起動時は既存ウィンドウを前面に出し、最小化状態から復元します。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added default single-instance behavior; relaunching activates the existing window and restores it when minimized.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.7.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.1">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>将 Microsoft Store 更新修正为真正的“先下载、后安装”两阶段流程，下载完成前不再提前显示“重启并更新”。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>Microsoft Store 更新を「ダウンロード後に明示的にインストール」する二段階フローへ修正し、完了前に再起動ボタンが表示されないようにしました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Implemented a true download-then-explicit-install Microsoft Store flow so Restart and update no longer appears before download completion.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.7.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.7.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>更新任务改为应用会话级持续保留，并建立统一发布元数据、数据迁移与包体/依赖治理基线。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>更新状態をアプリ セッション全体で保持し、リリースメタデータ、データ移行、パッケージ/依存関係管理の基盤を統一しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Made update state persist across the app session and established unified release metadata, migration, package-size, and dependency baselines.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.9</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.9">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>统一 GitHub 与 Microsoft Store 更新后的重启交互，补齐旧版本读取目标版本三语更新说明及数据一致性检查。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>GitHub と Microsoft Store の更新後再起動フローを統一し、旧版からの多言語リリースノート取得とデータ整合性検証を改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Unified post-update restart behavior across GitHub and Microsoft Store and improved multilingual target-version notes and consistency checks.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.8</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-14 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.8">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>完成维护收口：冻结已验收的 GitHub updater，统一当前状态文档，并修复首次启动、主题浮层及 Light/Dark/DPI 回归问题。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>保守フェーズを収束し、検証済み GitHub updater を凍結、状態文書を統一し、初回起動・テーマ Surface・Light/Dark/DPI 回帰を修正しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Closed the maintenance cycle by freezing the validated GitHub updater, unifying current-state documentation, and fixing first-run, themed-surface, and Light/Dark/DPI regressions.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.7</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.7">GitHub Release</a> · Microsoft Store certification submitted / Microsoft Store 認証審査提出済み / Microsoft Store 已提交认证</p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复浅色和深色主题下标题栏应用图标的对比度。</li><li>修复任务栏与开始菜单图标的反向配色。</li><li>统一标题栏、任务栏和开始菜单的主题资源规则。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>ライト / ダークテーマでタイトルバーアイコンの視認性を修正しました。</li><li>タスクバーとスタートメニューのアイコン配色を修正しました。</li><li>タイトルバー、タスクバー、スタートメニューのテーマ別アイコン規則を統一しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed title-bar icon contrast across light and dark themes.</li><li>Fixed reversed taskbar and Start-menu icon colors.</li><li>Unified theme-aware resources for the title bar, taskbar, and Start menu.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.6</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.6">GitHub Release</a> · Microsoft Store 未发布 / Microsoft Store 未公開 / Not released on Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>优化启动体验与主窗口 Mica 的视觉衔接。</li><li>统一浅色和深色启动 Logo 的尺寸、清晰度和 DPI 表现。</li><li>记忆窗口大小与最大化状态，并安全恢复到当前显示器工作区。</li><li>仅通过 GitHub Releases 发布。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>起動体験とメインウィンドウの Mica 表示を改善しました。</li><li>ライトとダークの起動 Logo のサイズ、鮮明さ、DPI 表示を統一しました。</li><li>ウィンドウサイズと最大化状態を記憶し、安全に復元します。</li><li>GitHub Releases のみで公開します。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Improved startup presentation and Mica visual continuity.</li><li>Unified Light and Dark startup-logo sizing, sharpness, and DPI behavior.</li><li>Restores window size and maximized state safely.</li><li>Released through GitHub Releases only.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.5</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.5">GitHub Release</a> · Microsoft Store 未发布 / Microsoft Store 未公開 / Not released on Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复 GitHub 侧载更新包的签名验证问题。</li><li>改进 MSIXBundle 的 Windows 签名验证和发布者身份检查。</li><li>更新验证同时检查正式证书的 Publisher 与 Thumbprint。</li><li>保留 SHA-256 完整性校验并改进错误诊断。</li><li>本版本仅通过 GitHub Releases 发布。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>GitHub サイドロード更新パッケージの署名検証を修正。</li><li>MSIXBundle の Windows 署名検証と Publisher 確認を改善。</li><li>正式リリース証明書の Publisher と Thumbprint を確認。</li><li>SHA-256 整合性検証とエラー診断を改善。</li><li>GitHub Releases のみで公開。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed signature verification for GitHub sideload update packages.</li><li>Improved Windows signature and publisher validation for MSIXBundle updates.</li><li>Added production certificate publisher and thumbprint validation.</li><li>Retained SHA-256 integrity checks with improved diagnostics.</li><li>Released through GitHub Releases only.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.4</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.4">GitHub Release</a> · Microsoft Store 未发布 / Microsoft Store 未公開 / Not released on Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>统一大窗口与小窗口 NavigationView 左侧导航栏的背景视觉。</li><li>小窗口覆盖式菜单现在沿用大窗口常驻导航栏的样式。</li><li>保留现有响应式导航行为和主窗口 Mica 效果。</li><li>本版本仅通过 GitHub Releases 发布。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>大きなウィンドウと小さなウィンドウで NavigationView の背景表現を統一しました。</li><li>小さなウィンドウのオーバーレイ メニューでも、大きなウィンドウと同じナビゲーション背景スタイルを使用します。</li><li>レスポンシブ ナビゲーション動作とメイン ウィンドウの Mica 効果を維持しています。</li><li>このバージョンは GitHub Releases のみで公開します。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Unified NavigationView pane backgrounds across large and small window layouts.</li><li>The small-window overlay pane now uses the same navigation style as the persistent large-window pane.</li><li>Preserved responsive navigation behavior and the existing Mica backdrop.</li><li>Released through GitHub Releases only.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.3</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.3">GitHub Release</a> · Microsoft Store 未发布 / Microsoft Store 未公開 / Not released on Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>改进更新管理系统稳定性，修复卡片字段、占位内容和检查过程中的显示异常。</li><li>优化 GitHub 更新状态机，增加验证阶段并保护下载完成后的状态。</li><li>完善多语言更新说明支持，修复中文和日文界面错误显示英文说明的问题。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>更新管理システムを安定化し、カード項目、プレースホルダー、確認中の表示問題を修正しました。</li><li>GitHub 更新の状態遷移を改善し、検証段階とダウンロード完了後の状態保護を追加しました。</li><li>多言語の更新内容を改善し、中国語・日本語 UI に英語の説明が表示される問題を修正しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Improved update-management stability and fixed update-card fields, placeholders, and checking-state presentation.</li><li>Improved the GitHub update state machine with a verifying phase and post-download state protection.</li><li>Completed localized release-note support and fixed Chinese and Japanese UI fallback to English notes.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.2</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.2">GitHub Release</a> · Microsoft Store 未发布 / Microsoft Store 未公開 / Not released on Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复 GitHub 与 Microsoft Store 更新管理卡片中版本、更新内容和检查状态的显示稳定性。</li><li>保持字段结构与加载动画位置稳定，避免检查期间卡片高度跳变。</li><li>本版本仅通过 GitHub Releases 发布，不提交 Microsoft Store。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>GitHub と Microsoft Store の更新管理カードで、バージョン、更新内容、確認状態の表示を安定化しました。</li><li>項目構造と読み込み表示を維持し、確認中のカードサイズ変化を抑えます。</li><li>本バージョンは GitHub Releases のみで公開し、Microsoft Store には提出しません。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Stabilized version, release-note, and checking-state presentation in the shared GitHub and Microsoft Store update card.</li><li>Kept field structure and inline activity indicators stable during checks.</li><li>Released through GitHub Releases only; Microsoft Store is not part of this release.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.6.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.6.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>项目主页项目卡片新增工作文件夹快捷入口。</li><li>优化项目卡片更新时间与工作文件夹入口布局。</li><li>修复 Microsoft Store 最新版本状态下的无意义占位内容，并统一 GitHub 与 Store 更新状态展示。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>プロジェクトホームのカードに作業フォルダーのショートカットを追加しました。</li><li>更新日時と作業フォルダー入口のレイアウトを改善しました。</li><li>Microsoft Store の最新状態で不要なプレースホルダーが表示される問題を修正し、更新状態の表示を統一しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added a work-folder shortcut to project cards.</li><li>Improved the project-card layout for update time and work-folder access.</li><li>Fixed meaningless Microsoft Store up-to-date placeholders and unified update-state presentation.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.11</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.11">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复 GitHub 侧载更新跳转浏览器。</li><li>应用内直接下载并校验 MSIXBundle，再通过 Windows 包部署完成更新。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>GitHub 更新時にブラウザーへ遷移する問題を修正しました。</li><li>アプリ内で MSIXBundle を取得・検証し、Windows のパッケージ展開で更新します。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed GitHub updates opening the browser.</li><li>Added in-app MSIXBundle download and verification followed by Windows package deployment.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.10</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.10">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复最新版本时可用版本与更新内容显示为不可用。</li><li>优化尚未检查更新时的状态显示。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>最新バージョン使用時に利用可能バージョンとリリースノートが利用不可と表示される問題を修正しました。</li><li>更新確認前の状態表示を改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed unavailable version and release-note placeholders when already up to date.</li><li>Improved the pre-check state display.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.9</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-13 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.9">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复 Release Notes 与更新目标版本加载显示。</li><li>GitHub 与 Microsoft Store 使用各自的官方更新入口。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>Release Notes と更新対象バージョンの読み込み表示を修正しました。</li><li>GitHub と Microsoft Store はそれぞれの公式更新入口を使用します。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed Release Notes and target-version loading in the update UI.</li><li>Kept GitHub and Microsoft Store on their separate official update paths.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.8</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-12 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.8">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>恢复真实更新下载进度。</li><li>修复更新完成后的应用重启与 GitHub 一键安装包卸载契约。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>更新ダウンロードの実際の進捗表示を復元しました。</li><li>更新後のアプリ再起動と GitHub ワンクリックインストーラーのアンインストール契約を修正しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Restored real update download progress.</li><li>Fixed post-update restart behavior and the GitHub one-click installer uninstall contract.</li></ul></div>
-      </article>
-
-      <h2 id="history-heading" class="section-heading">版本历史 / バージョン履歴 / Version history</h2>
-      <p>以下列表根据公开 GitHub Releases、tags 及仓库发布资料整理，并按新到旧排列。/ 以下は公開 GitHub Releases、タグ、リポジトリのリリース資料を確認し、新しい順に整理しています。/ The list below is based on the public GitHub Releases, tags, and repository release materials, ordered from newest to oldest.</p>
-
-      <article class="card">
-        <h2>1.5.7</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-12 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.7">GitHub Release</a> · Microsoft Store 认证中 / Microsoft Store 認証中 / Microsoft Store certification pending</p>
-        <div class="language"><strong>简体中文</strong><ul><li>统一 GitHub 与 Microsoft Store 的更新检查、当前版本和更新目标语义。</li><li>修复 About 页面版权文本编码，并将 GitHub Release Notes 接入三语资源体系。</li><li>Microsoft Store 提交版本为 1.5.7.0；公开状态以 Partner Center 为准。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>GitHub と Microsoft Store の更新確認、現在のバージョン、更新対象の意味を統一しました。</li><li>About ページの著作権表示の文字コードを修正し、GitHub Release Notes を3言語リソースに接続しました。</li><li>Microsoft Store 提出パッケージは 1.5.7.0 です。公開状態は Partner Center を基準とします。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Unified update-check, current-version, and update-target semantics across GitHub and Microsoft Store.</li><li>Fixed the About-page copyright encoding and connected GitHub release notes to the trilingual resource system.</li><li>The Microsoft Store submission package is 1.5.7.0; public availability follows Partner Center status.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.6</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-12 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.6">GitHub Release</a> · Microsoft Store 未操作 / Microsoft Store 未操作 / Microsoft Store not involved</p>
-        <div class="language"><strong>简体中文</strong><ul><li>GitHub 版支持用户主动触发的 App Installer 应用内检查、下载和安装更新。</li><li>首次安装推荐使用 GitHub Release 中的一键安装包；安装器会验证并按需导入现有公开证书，然后启动 Windows App Installer。</li><li>v1.5.6 未启用后台自动检查、启动时自动检查或无人值守更新。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>GitHub 版では、ユーザーが操作した場合に App Installer によるアプリ内更新確認、ダウンロード、インストールを利用できます。</li><li>初回インストールには GitHub Release のワンクリック インストーラーを推奨します。既存の公開証明書を検証し、必要な場合だけ取り込んで Windows App Installer を起動します。</li><li>v1.5.6 ではバックグラウンド、自動起動時、無人更新を有効にしていません。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>GitHub installations support user-triggered in-app update checks, downloads, and installation through App Installer.</li><li>For first-time installation, use the one-click installer from the GitHub Release. It validates the existing public certificate, imports it only when required, and starts Windows App Installer.</li><li>v1.5.6 does not enable background, launch-time, or unattended update checks.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.4</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-12 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.4">GitHub Release</a> · Microsoft Store 认证中 / Microsoft Store 認証中 / GitHub released · Microsoft Store certification pending</p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复更新弹窗标题本地化资源显示异常。</li><li>重构 Microsoft Store 应用内更新进度回调，提高真实下载进度显示可靠性。</li><li>改进安装阶段状态、更新生命周期和诊断能力。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>更新ダイアログのタイトルにリソースキーが表示される問題を修正しました。</li><li>Microsoft Store アプリ内更新の進捗処理を見直し、実際のダウンロード進捗表示の信頼性を改善しました。</li><li>インストール状態、更新ライフサイクル、診断機能を改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed the localization-resource display issue in the update dialog title.</li><li>Revised Microsoft Store in-app update progress handling for more reliable real download progress reporting.</li><li>Improved installation state handling, update lifecycle behavior, and diagnostics.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.2</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-08 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.2">GitHub Release</a> · Microsoft Store 认证中 / Microsoft Store 認証中 / GitHub released · Microsoft Store certification pending</p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复更新弹窗标题显示资源键的问题。</li><li>Microsoft Store 更新增加真实下载进度，并区分下载与部署状态。</li><li>改进失败恢复、进度边界处理和重复操作保护。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>更新ダイアログのタイトルにリソースキーが表示される問題を修正しました。</li><li>Microsoft Store 更新に実際のダウンロード進捗を追加し、ダウンロードと展開状態を区別します。</li><li>失敗後の復帰、進捗値の境界処理、重複操作防止を改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed the localization-key display issue in the update dialog title.</li><li>Added real Microsoft Store download progress with download/deployment state handling.</li><li>Improved failure recovery, progress safeguards, and duplicate-action protection.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-08 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.1">GitHub Release</a> · Microsoft Store 认证状态以 Partner Center 为准 / Microsoft Store の状態は Partner Center を基準 / Store status follows Partner Center</p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增 DD、DDM、DMS 坐标点批量格式转换工具。</li><li>支持粘贴以及 CSV、TSV、TXT 导入并导出标准化 CSV。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>DD、DDM、DMS 座標の一括フォーマット変換ツールを追加しました。</li><li>貼り付けと CSV・TSV・TXT の読み込み、標準化 CSV の出力に対応しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added batch coordinate-format conversion for DD, DDM, and DMS.</li><li>Added paste and CSV, TSV, and TXT import with standardized CSV export.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.5.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-07 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.5.0">GitHub Release</a> · Microsoft Store 未操作 / Microsoft Store 未操作 / Microsoft Store not operated</p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增图纸版本差异对比器，支持 PNG、JPG/JPEG 和 PDF 页面。</li><li>提供叠加、擦除、缩放、平移和差异结果导出。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>PNG、JPG/JPEG、PDF ページに対応する図面バージョン比較を追加しました。</li><li>重ね合わせ、ワイプ、ズーム、パン、差分出力に対応しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added Drawing Version Comparator for PNG, JPG/JPEG, and PDF pages.</li><li>Added overlay, wipe, zoom, pan, and difference-image export.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.4.2</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-07 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.4.2">GitHub Release</a> · Microsoft Store 不在发布范围 / Microsoft Store 対象外 / Not included in Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增调研照片整理器，支持照片批量导入、EXIF/GPS 读取、标签和备注。</li><li>支持 Shapefile 点位与 CSV 元数据导出，原始照片保持不变。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>調査写真整理ツールを追加し、写真の一括読み込み、EXIF/GPS、タグ、メモに対応しました。</li><li>Shapefile ポイントと CSV メタデータを出力でき、元写真は変更しません。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added Survey Photo Organizer with batch import, EXIF/GPS metadata, tags, and notes.</li><li>Added Shapefile-point and CSV-metadata export while preserving original photos.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.4.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-07 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.4.1">GitHub Release</a> · Microsoft Store 不在发布范围 / Microsoft Store 対象外 / Not included in Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增中日英规划术语库，包含 140 条核心术语及定义。</li><li>支持多语言、读音、缩写、别名、术语关系和来源信息检索。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>140 の主要用語を収録した中日英都市・空間計画用語集を追加しました。</li><li>多言語、かな読み、略語、別名、用語関係、出典情報の検索に対応しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added CN-JP-EN Planning Terminology with 140 core terms and definitions.</li><li>Added multilingual, reading, abbreviation, alias, relationship, and source search.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.4.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-07 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.4.0">GitHub Release</a> · Microsoft Store 跳过 / Microsoft Store スキップ / Skipped by Microsoft Store policy</p>
-        <div class="language"><strong>简体中文</strong><ul><li>完成工具注册、设置、数据模式、迁移、备份和启动管线的 Foundation 更新。</li><li>新增本地日志、诊断信息和四步骤首次使用向导。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>ツール登録、設定、データスキーマ、移行、バックアップ、起動パイプラインを更新しました。</li><li>ローカルログ、診断情報、4ステップの初回起動ガイドを追加しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Updated tool registration, settings, data schema, migrations, backups, and startup foundations.</li><li>Added local logging, diagnostics, and a four-step first-run guide.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.3.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-06 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.3.1">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增介绍隐私、项目、工具和搜索的四步骤首次使用向导。</li><li>支持从“应用设置”重新打开向导，并改进首次启动与升级迁移。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>プライバシー、プロジェクト、ツール、検索を紹介する4ステップの初回ガイドを追加しました。</li><li>「アプリ設定」からガイドを再度開けるようにし、初回起動とアップグレード時の移行を改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added a four-step first-run guide covering privacy, projects, tools, and search.</li><li>Added a Reopen guide action in Application settings and improved first-launch and upgrade migration.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.3.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-06 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.3.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>支持简体中文、日语和英语即时切换，无需重启。</li><li>新增项目时间节点提醒设置、重复间隔和最多三次重复提醒。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>アプリを再起動せずに、簡体字中国語・日本語・英語を切り替えられるようになりました。</li><li>マイルストーン通知の設定、再通知間隔、最大3回の再通知に対応しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Switch instantly between Simplified Chinese, Japanese, and English without restarting.</li><li>Added milestone reminder settings, repeat intervals, and up to three repeat notifications.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.2.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-05 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.2.1">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>修复 Store 身份识别，并恢复旁加载版的 GitHub Releases 更新检查。</li><li>增加手动触发的 Microsoft Store 草稿上传流程，分离上传、认证和发布阶段。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>Store ID の検出を修正し、サイドロード版の GitHub Releases 更新確認を復元しました。</li><li>手動起動の Microsoft Store ドラフトアップロードフローを追加し、アップロード・認証・公開を分離しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Fixed Store identity detection and restored GitHub Releases update checks for sideloaded builds.</li><li>Added a manually triggered Microsoft Store draft-upload flow with separate upload, certification, and publication stages.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.2.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-04 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.2.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>Store 安装版支持在应用内检查、下载和安装 Store 更新。</li><li>完善关于页、隐私与开源说明，以及 GitHub / Store 双发行渠道资料。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>Store インストール版で、アプリ内から Store 更新を確認・ダウンロード・インストールできるようになりました。</li><li>About ページ、プライバシー、オープンソース、GitHub / Store の二つの配布経路の説明を整備しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Store installations can check for, download, and install Store updates in the app.</li><li>Improved the About page, privacy and open-source information, and the GitHub / Store dual-channel documentation.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>1.1.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-08-04 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.1.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增 WGS 84、GCJ-02 与 BD-09 点坐标本地转换。</li><li>新增二维 Shapefile 转换，并重构设置页与三语发布资料。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>WGS 84、GCJ-02、BD-09 のポイント座標をローカルで変換できるようになりました。</li><li>2D Shapefile 変換を追加し、設定ページと3言語の配布資料を再構成しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added local point-coordinate conversion for WGS 84, GCJ-02, and BD-09.</li><li>Added 2D Shapefile conversion and reworked the Settings page and trilingual release materials.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.5.0 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-08-04 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.5.0">GitHub Release</a> · Microsoft Store 已发布 / Microsoft Store 公開済み / Published on Microsoft Store</p>
-        <div class="language"><strong>简体中文</strong><ul><li>统一应用、MSIX、关于页和更新 User-Agent 使用 0.5.0 Preview。</li><li>提供 x64 framework-dependent 自签名旁加载包，并保持 Store 与 GitHub 渠道独立。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>アプリ、MSIX、About ページ、更新 User-Agent の表示を 0.5.0 Preview に統一しました。</li><li>x64 framework-dependent の自己署名サイドロードパッケージを提供し、Store と GitHub の経路を分離しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Unified the app, MSIX, About page, and update User-Agent around 0.5.0 Preview.</li><li>Provided a self-signed x64 framework-dependent sideloading package while keeping Store and GitHub channels separate.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.4.3 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-08-02 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.4.3">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增流程审核清单、法规索引库和设计理念词典等离线工具。</li><li>支持多分类工具入口，并保持用户数据和备份格式兼容。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>ワークフローレビュー、法規インデックス、デザインコンセプト辞典などのオフラインツールを追加しました。</li><li>複数カテゴリのツール入口に対応し、ユーザーデータとバックアップ形式の互換性を維持しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added offline workflow review, regulation index, and design-concept dictionary tools.</li><li>Added multi-category tool entry points while preserving user-data and backup-format compatibility.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.4.0 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-08-02 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.4.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增色卡方案记录器和卡片式配色管理。</li><li>支持项目原图、多色系记录以及方案图片与数据导入导出。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>カラーパレット記録ツールとカード形式の配色管理を追加しました。</li><li>プロジェクト画像、複数の色系統、配色画像とデータのインポート・エクスポートに対応しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added a color-palette recorder and card-based palette management.</li><li>Added project-image support, multiple color groups, and palette image/data import and export.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.11.1 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-08-01 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.11.1">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>完善原生启动资源、视觉间距、卡片操作和状态徽章。</li><li>新增项目时间节点的 Windows 本地通知，并保持数据格式兼容。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>ネイティブ起動リソース、画面間隔、カード操作、ステータスバッジを改善しました。</li><li>プロジェクトのマイルストーン向け Windows ローカル通知を追加し、データ形式の互換性を維持しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Improved native startup resources, visual spacing, card actions, and status badges.</li><li>Added Windows local notifications for project milestones while preserving data-format compatibility.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.10 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-08-01 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.10">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>统一对话框、通知、忙碌状态、未保存修改和危险操作保护。</li><li>改进启动导航可靠性、主题恢复和三语 MSIX 资源验证。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>ダイアログ、通知、ビジー状態、未保存変更、危険操作の保護を統一しました。</li><li>起動・ナビゲーションの信頼性、テーマ復元、3言語 MSIX リソース検証を改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Unified dialog, notification, busy-state, unsaved-change, and dangerous-action protection.</li><li>Improved startup and navigation reliability, theme restoration, and trilingual MSIX resource validation.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.9 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-08-01 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.9">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增可靠的本地数据存储、原子写入、备份恢复和迁移基础。</li><li>将欢迎主页升级为项目主页，新增设计项目、研究项目及归档恢复。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>信頼性の高いローカルデータ保存、アトミック書き込み、バックアップ復元、移行基盤を追加しました。</li><li>ウェルカムページをプロジェクトページへ改修し、設計・研究プロジェクトとアーカイブ復元を追加しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added reliable local storage, atomic writes, backup recovery, and migration foundations.</li><li>Changed the welcome page into a project page with design and research projects and archive recovery.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.7 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-08-01 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.7">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>迁移至 zh-CN、ja-JP、en-US 三语 MRT Core 资源体系。</li><li>新增语言设置、本地化服务和本地化自动测试。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>zh-CN、ja-JP、en-US の3言語 MRT Core リソース体系へ移行しました。</li><li>言語設定、ローカライズサービス、ローカライズ自動テストを追加しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Moved to a three-language MRT Core resource system for zh-CN, ja-JP, and en-US.</li><li>Added language settings, a localization service, and automated localization tests.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.6 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-08-01 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.6">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>统一设计与科研工具分类、工具卡片和现有工具迁移。</li><li>新增工具搜索与收藏基础，并完善图标与打包资源。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>設計・研究ツールの分類、ツールカード、既存ツールの移行を統一しました。</li><li>ツール検索とお気に入りの基盤を追加し、アイコンとパッケージリソースを改善しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Unified design and research tool categories, tool cards, and existing-tool migration.</li><li>Added the foundation for tool search and favorites and improved icon and packaging resources.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.3 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-07-31 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.3">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>建立欢迎页、常用功能、设计工具、科研工具和项目归档的一线导航。</li><li>采用稳定内部 ID，并将现有工具迁移到对应分类页面。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>ウェルカム、一般機能、設計ツール、研究ツール、プロジェクトアーカイブの主要ナビゲーションを構築しました。</li><li>安定した内部 ID を採用し、既存ツールを対応するカテゴリーページへ移行しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Established primary navigation for welcome, common functions, design tools, research tools, and project archive.</li><li>Adopted stable internal IDs and moved existing tools into their category pages.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.2 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-07-31 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.2">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增不可变工具信息模型与稳定工具 ID。</li><li>建立设计与科研工具的分级分类、排序、筛选和重复 ID 检测。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>不変のツール情報モデルと安定したツール ID を追加しました。</li><li>設計・研究ツールの階層カテゴリ、並べ替え、絞り込み、重複 ID 検出を構築しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added an immutable tool-information model and stable tool IDs.</li><li>Built hierarchical design and research categories with sorting, filtering, and duplicate-ID detection.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.1 Preview</h2><p class="meta">历史预览版 / 過去のプレビュー版 / Previous preview release · 2026-07-31 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.1">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>接入应用图标资源，并移除默认宽磁贴和启动屏模板依赖。</li><li>整理底部关于与设置入口，并更新预览版显示说明。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>アプリアイコンリソースを統合し、既定のワイドタイルとスプラッシュテンプレートへの依存を削除しました。</li><li>下部の About と設定の入口を整理し、プレビュー版の表示説明を更新しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Integrated application icon resources and removed the default wide-tile and splash-template dependencies.</li><li>Organized the bottom About and Settings entries and updated the preview-release display text.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.3.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-07-31 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.3.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增关于页中的 GitHub 项目仓库链接。</li><li>建立首版项目主页导航与基础工具入口。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>About ページに GitHub プロジェクトリポジトリへのリンクを追加しました。</li><li>初期のプロジェクトホームナビゲーションと基本ツール入口を構築しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added a GitHub project-repository link to the About page.</li><li>Established the initial project-home navigation and basic tool entry points.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.2.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-07-30 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.2.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>新增单位换算与比例尺换算工具。</li><li>采用可测试的十进制定点计算，并完成 x64 构建与预览发布。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>単位変換と縮尺変換ツールを追加しました。</li><li>テスト可能な十進固定小数点計算を採用し、x64 ビルドとプレビュー公開を完了しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Added unit-conversion and scale-conversion tools.</li><li>Used testable decimal fixed-point calculations and completed the x64 build and preview release.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.1.1</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-07-30 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.1.1">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>建立官方 WinUI 3 项目基线与初始工具箱结构。</li><li>完善首个预览版本的构建、测试和发布资料。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>公式 WinUI 3 プロジェクトの基盤と初期ツールボックス構造を整備しました。</li><li>最初のプレビュー版のビルド、テスト、リリース資料を整備しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Established the official WinUI 3 project baseline and initial toolbox structure.</li><li>Completed build, test, and release materials for the first preview version.</li></ul></div>
-      </article>
-
-      <article class="card">
-        <h2>0.1.0</h2><p class="meta">历史版本 / 過去のバージョン / Previous release · 2026-07-30 · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v0.1.0">GitHub Release</a></p>
-        <div class="language"><strong>简体中文</strong><ul><li>发布 UrbanPlanToolbox 的首个公开版本。</li><li>建立 WinUI 3 应用、离线工具箱和 GitHub 发布基础。</li></ul></div>
-        <div class="language" lang="ja"><strong>日本語</strong><ul><li>UrbanPlanToolbox の最初の公開版をリリースしました。</li><li>WinUI 3 アプリ、オフラインツールボックス、GitHub リリースの基盤を構築しました。</li></ul></div>
-        <div class="language" lang="en"><strong>English</strong><ul><li>Released the first public version of UrbanPlanToolbox.</li><li>Established the WinUI 3 app, offline toolbox, and GitHub release foundations.</li></ul></div>
-      </article>
+    <section id="release">
+      <div class="shell">
+        <div class="section-head"><div><h2><span class="l zh">最新版本</span><span class="l ja">最新リリース</span><span class="l en">Latest release</span></h2><p class="l zh">页面会从项目状态事实源读取当前 GitHub 版本，并加载对应三语发布说明，减少网站与应用版本不同步。</p><p class="l ja">ページはプロジェクト状態の SSOT から現在の GitHub 版を読み、対応する3言語リリースノートを読み込むため、サイトの更新遅れを減らします。</p><p class="l en">This page reads the current GitHub version from the project-status source of truth and loads the matching trilingual release notes to reduce future site drift.</p></div></div>
+        <article class="release-card">
+          <div class="release-head">
+            <div><h3 id="release-title">UrbanPlanToolbox v1.9.2</h3><p id="release-subtitle">Professional libraries and Data Pack 1.0</p></div>
+            <a id="release-link" class="button" href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v1.9.2">GitHub Release</a>
+          </div>
+          <div class="release-body" id="release-notes">
+            <ul class="l zh"><li>重构建筑与规划法规索引、中日英规划术语库和设计理念词典。</li><li>三套资料库接入独立 UrbanPlanToolbox_Data，并引入 Data Pack 1.0。</li><li>支持官方 Catalog 检查、.uptdata 下载/导入、完整性校验与上一版本回退。</li></ul>
+            <ul class="l ja"><li>法規索引、中日英都市計画用語集、デザインコンセプト辞典を刷新しました。</li><li>3つのライブラリを独立した UrbanPlanToolbox_Data と Data Pack 1.0 に接続しました。</li><li>公式 Catalog、.uptdata の取得/読み込み、完全性検証、前版へのロールバックに対応しました。</li></ul>
+            <ul class="l en"><li>Rebuilds the regulations index, CN-JP-EN planning terminology, and design concepts dictionary.</li><li>Moves all three libraries to the independent UrbanPlanToolbox_Data repository and Data Pack 1.0.</li><li>Adds official catalog checks, .uptdata download/import, integrity validation, and rollback.</li></ul>
+          </div>
+          <details>
+            <summary><span class="l zh">最近版本：v1.9.1 与 v1.9.0</span><span class="l ja">最近のリリース：v1.9.1 / v1.9.0</span><span class="l en">Recent releases: v1.9.1 and v1.9.0</span></summary>
+            <div class="details-body">
+              <p class="l zh"><strong>v1.9.1</strong>：稳定性与项目工作台维护，修复项目布局反馈循环，并完善重点策略卡片与 Markdown 展示。<br><strong>v1.9.0</strong>：引入设计/研究项目的响应式自由磁贴工作台与 12 列项目级布局。</p>
+              <p class="l ja"><strong>v1.9.1</strong>：安定性とプロジェクトワークスペース保守、レイアウト更新ループの修正、重点戦略カードと Markdown 表示の改善。<br><strong>v1.9.0</strong>：設計・研究プロジェクトにレスポンシブな自由配置タイルと12列レイアウトを導入。</p>
+              <p class="l en"><strong>v1.9.1</strong>: stability and project-workspace maintenance, fixing the layout feedback loop and improving key-strategy cards and Markdown rendering.<br><strong>v1.9.0</strong>: introduced responsive customizable tile workspaces and the canonical 12-column project layout.</p>
+              <p><a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases"><span class="l zh">查看全部 GitHub Releases</span><span class="l ja">すべての GitHub Releases</span><span class="l en">View all GitHub Releases</span></a> · <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/CHANGELOG.md">CHANGELOG</a></p>
+            </div>
+          </details>
+        </article>
+      </div>
     </section>
   </main>
 
   <footer>
-    <a href="privacy/">隐私政策 / プライバシーポリシー / Privacy</a> ·
-    <a href="support/">支持 / サポート / Support</a> ·
-    <a href="https://github.com/KiYouJyo/UrbanPlanToolbox">GitHub 项目 / GitHub プロジェクト / GitHub project</a>
+    <div class="shell footer-grid">
+      <div>UrbanPlanToolbox · MIT License · Windows x64</div>
+      <div class="footer-links">
+        <a href="privacy/"><span class="l zh">隐私政策</span><span class="l ja">プライバシー</span><span class="l en">Privacy</span></a>
+        <a href="support/"><span class="l zh">支持</span><span class="l ja">サポート</span><span class="l en">Support</span></a>
+        <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/issues">Issues</a>
+        <a href="https://github.com/KiYouJyo/UrbanPlanToolbox">GitHub</a>
+      </div>
+    </div>
   </footer>
+
+  <script>
+    (() => {
+      const body = document.body;
+      const langButtons = [...document.querySelectorAll('[data-set-lang]')];
+      const htmlLang = { zh: 'zh-CN', ja: 'ja-JP', en: 'en' };
+      const noteKey = { zh: 'zh-CN', ja: 'ja-JP', en: 'en-US' };
+      let currentLang = localStorage.getItem('upt-lang') || ((navigator.language || '').toLowerCase().startsWith('ja') ? 'ja' : (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'zh');
+      if (!htmlLang[currentLang]) currentLang = 'zh';
+
+      function applyLanguage(lang) {
+        currentLang = lang;
+        body.classList.remove('lang-zh', 'lang-ja', 'lang-en');
+        body.classList.add(`lang-${lang}`);
+        document.documentElement.lang = htmlLang[lang];
+        langButtons.forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.setLang === lang)));
+        localStorage.setItem('upt-lang', lang);
+        renderReleaseNotes();
+      }
+      langButtons.forEach(btn => btn.addEventListener('click', () => applyLanguage(btn.dataset.setLang)));
+
+      let loadedNotes = null;
+      function renderReleaseNotes() {
+        if (!loadedNotes) return;
+        const note = loadedNotes.notes?.[noteKey[currentLang]];
+        if (!note) return;
+        const title = document.getElementById('release-title');
+        const subtitle = document.getElementById('release-subtitle');
+        const notes = document.getElementById('release-notes');
+        title.textContent = `UrbanPlanToolbox v${loadedNotes.version}`;
+        subtitle.textContent = note.title.replace(`UrbanPlanToolbox v${loadedNotes.version} `, '');
+        notes.innerHTML = '';
+        const list = document.createElement('ul');
+        for (const item of note.items || []) {
+          const li = document.createElement('li');
+          li.textContent = item;
+          list.appendChild(li);
+        }
+        notes.appendChild(list);
+      }
+
+      async function hydrateStatus() {
+        try {
+          const response = await fetch('project-status.json', { cache: 'no-store' });
+          if (!response.ok) return;
+          const status = await response.json();
+          const githubVersion = status?.distribution?.github?.latestPublishedProductVersion || status?.product?.version;
+          const storeCandidate = status?.distribution?.microsoftStore?.submittedPackageVersion || status?.distribution?.microsoftStore?.candidatePackageVersion;
+          const storePublic = status?.distribution?.microsoftStore?.publicProductVersion;
+          const storeState = status?.distribution?.microsoftStore?.state || '';
+
+          if (githubVersion) {
+            document.getElementById('hero-version').textContent = `v${githubVersion}`;
+            document.getElementById('github-version').textContent = githubVersion;
+            document.getElementById('github-version-2').textContent = githubVersion;
+            const releaseLink = document.getElementById('release-link');
+            releaseLink.href = `https://github.com/KiYouJyo/UrbanPlanToolbox/releases/tag/v${githubVersion}`;
+            try {
+              const notesResponse = await fetch(`release-notes/${githubVersion}.json`, { cache: 'no-store' });
+              if (notesResponse.ok) {
+                loadedNotes = await notesResponse.json();
+                renderReleaseNotes();
+              }
+            } catch (_) { }
+          }
+          if (storeCandidate) {
+            document.getElementById('store-candidate').textContent = storeCandidate;
+            document.getElementById('store-candidate-2').textContent = storeCandidate;
+          }
+          if (storePublic) {
+            document.getElementById('store-public').textContent = storePublic;
+            document.getElementById('store-public-2').textContent = storePublic;
+          }
+          if (storeState === 'published') {
+            const badge = document.getElementById('store-status-badge');
+            badge.classList.remove('pending');
+            badge.classList.add('ok');
+            badge.innerHTML = '<span class="l zh">已发布</span><span class="l ja">公開済み</span><span class="l en">Published</span>';
+          }
+        } catch (_) { }
+      }
+
+      applyLanguage(currentLang);
+      hydrateStatus();
+    })();
+  </script>
 </body>
 </html>
