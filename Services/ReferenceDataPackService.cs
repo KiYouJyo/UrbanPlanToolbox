@@ -16,6 +16,7 @@ public sealed class ReferenceDataPackService
     private readonly DataPackCatalogService _catalog;
     private readonly DataPackInstaller _installer;
     private readonly DataPackResolver _resolver;
+    private readonly SemaphoreSlim _bundledPackGate = new(1, 1);
 
     public static ReferenceDataPackService Default { get; } = CreateDefault();
 
@@ -30,7 +31,13 @@ public sealed class ReferenceDataPackService
 
     private static ReferenceDataPackService CreateDefault() => new(AppDataPathProvider.Default, SharedHttpClient);
 
-    public Task<ReferenceDataPackContent?> LoadActiveAsync(string packId, CancellationToken cancellationToken = default) => _resolver.ResolveActiveAsync(packId, cancellationToken);
+    public async Task<ReferenceDataPackContent?> LoadActiveAsync(string packId, CancellationToken cancellationToken = default)
+    {
+        ValidatePackId(packId);
+        await EnsureBundledPackCurrentAsync(packId, cancellationToken).ConfigureAwait(false);
+        return await _resolver.ResolveActiveAsync(packId, cancellationToken).ConfigureAwait(false);
+    }
+
     public Task<ReferenceDataPackState?> GetActiveStateAsync(string packId, CancellationToken cancellationToken = default) => _resolver.GetActiveStateAsync(packId, cancellationToken);
     public Task<IReadOnlyList<ReferenceDataPackState>> GetInstalledVersionsAsync(string packId, CancellationToken cancellationToken = default) => _resolver.GetInstalledVersionsAsync(packId, cancellationToken);
     public Task<ReferenceDataPackState> ImportAsync(string packId, string sourcePath, string sourceKind = "local", CancellationToken cancellationToken = default) => _installer.InstallFromFileAsync(packId, sourcePath, sourceKind, cancellationToken);
@@ -44,6 +51,47 @@ public sealed class ReferenceDataPackService
     }
 
     public Task<ReferenceDataPackState> DownloadAndInstallAsync(string packId, ReferenceDataPackCatalogEntry entry, CancellationToken cancellationToken = default) => _installer.DownloadAndInstallAsync(packId, entry, cancellationToken);
+
+    private async Task EnsureBundledPackCurrentAsync(string packId, CancellationToken cancellationToken)
+    {
+        var bundledDirectory = Path.Combine(AppContext.BaseDirectory, "Assets", "DataPacks", "Bundled");
+        if (!Directory.Exists(bundledDirectory)) return;
+
+        await _bundledPackGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var current = await _resolver.GetActiveStateAsync(packId, cancellationToken).ConfigureAwait(false);
+            var currentVersion = ParseDataVersion(current?.Version);
+            string? bestPath = null;
+            var bestVersion = DataPackVersion.Zero;
+
+            foreach (var archivePath in Directory.EnumerateFiles(bundledDirectory, $"{packId}-*.uptdata", SearchOption.TopDirectoryOnly))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                try
+                {
+                    var validated = await _installer.ValidateArchiveAsync(packId, archivePath, cancellationToken).ConfigureAwait(false);
+                    var candidateVersion = ParseDataVersion(validated.Manifest.Version);
+                    if (candidateVersion.CompareTo(bestVersion) <= 0) continue;
+                    bestVersion = candidateVersion;
+                    bestPath = archivePath;
+                }
+                catch (Exception exception) when (exception is InvalidDataException or IOException or JsonException)
+                {
+                    AppLogger.Default.Warning(nameof(ReferenceDataPackService), "bundled_pack_skipped", $"{Path.GetFileName(archivePath)}: {exception.Message}");
+                }
+            }
+
+            if (bestPath is null || bestVersion == DataPackVersion.Zero || bestVersion.CompareTo(currentVersion) <= 0) return;
+
+            var installed = await _installer.InstallFromFileAsync(packId, bestPath, "bundled", cancellationToken).ConfigureAwait(false);
+            AppLogger.Default.Info(nameof(ReferenceDataPackService), "bundled_pack_activated", $"{packId}@{installed.Version}");
+        }
+        finally
+        {
+            _bundledPackGate.Release();
+        }
+    }
 
     public static string GetLocalized(IReadOnlyDictionary<string, string>? values, string language)
     {
