@@ -10,7 +10,7 @@ public sealed class PlanningTerminologyTests
     private readonly PlanningTerminologyService _service = PlanningTerminologyService.LoadPackaged();
 
     [Fact]
-    public void BundledDatasetLoadsAndCountsValidate() => Assert.Equal((1, "1.0.0", 140, 266, 198, 24, 31), (_service.Dataset.SchemaVersion, _service.Dataset.DataVersion, _service.Dataset.Counts.Terms, _service.Dataset.Counts.Aliases, _service.Dataset.Counts.Relations, _service.Dataset.Counts.HighRisk, _service.Dataset.Counts.Sources));
+    public void LegacyBundledDatasetLoadsAndCountsValidate() => Assert.Equal((1, "1.0.0", 140, 266, 198, 24, 31), (_service.Dataset.SchemaVersion, _service.Dataset.DataVersion, _service.Dataset.Counts.Terms, _service.Dataset.Counts.Aliases, _service.Dataset.Counts.Relations, _service.Dataset.Counts.HighRisk, _service.Dataset.Counts.Sources));
 
     [Fact]
     public void RepresentativeTermsRemainIntact()
@@ -27,7 +27,7 @@ public sealed class PlanningTerminologyTests
 
     [Theory]
     [InlineData("城镇开发边界", 20)] [InlineData("市街化区域", 37)] [InlineData("Urbanization Promotion Area", 37)] [InlineData("控规", 27)] [InlineData("TOD", 79)] [InlineData("GWR", 108)] [InlineData("ようせきりつ", 65)] [InlineData("FAR", 65)] [InlineData("HousingControlArea", 136)] [InlineData("floor area ratio", 65)]
-    public void SearchSupportsPrimaryAliasAndReading(string query, int expectedId) => Assert.Equal(expectedId, _service.Search(query).First().Term.Id);
+    public void LegacySearchSupportsPrimaryAliasAndReading(string query, int expectedId) => Assert.Equal(expectedId, _service.Search(query).First().Term.Id);
 
     [Fact]
     public void RelationsAndHighRiskComparisonsResolve()
@@ -84,42 +84,43 @@ public sealed class PlanningTerminologyTests
     }
 
     [Fact]
-    public void NarrowLayoutKeepsTermListAndRemovesBackOnlyControl()
+    public void TerminologyPageUsesFigmaDataPackSourceAndTwoPaneLayout()
     {
         var xaml = File.ReadAllText(FindRepoFile(Path.Combine("Views", "PlanningTerminologyPage.xaml")));
         var code = File.ReadAllText(FindRepoFile(Path.Combine("Views", "PlanningTerminologyPage.xaml.cs")));
-        Assert.DoesNotContain("x:Name=\"BackButton\"", xaml, StringComparison.Ordinal);
-        Assert.Contains("Grid.SetRow(ResultsPanel, 0)", code, StringComparison.Ordinal);
-        Assert.Contains("Grid.SetRow(DetailScroll, 1)", code, StringComparison.Ordinal);
-        Assert.DoesNotContain("ResultsPanel.Visibility = Visibility.Collapsed", code, StringComparison.Ordinal);
-        Assert.Contains("StartBringIntoView", code, StringComparison.Ordinal);
-        Assert.Contains("Grid.SetColumn(CategoryBox, 1)", code, StringComparison.Ordinal);
+
+        Assert.Contains("x:Name=\"BackButton\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"CurrentSourceLabel\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"HeaderCheckButton\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"ManageButton\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"TermsList\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"DetailPanel\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"JurisdictionBox\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"CategoryBox\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("<ListView.ItemTemplate>", xaml, StringComparison.Ordinal);
+        Assert.Contains("ItemsWrapGrid", xaml, StringComparison.Ordinal);
+
+        Assert.Contains("ReferenceDataPackIds.PlanningTerminology", code, StringComparison.Ordinal);
+        Assert.Contains("ReferenceDataPackService.Default.LoadActiveAsync(PackId)", code, StringComparison.Ordinal);
+        Assert.Contains("ReferenceDataPackPageCoordinator.CheckAndInstallUpdateAsync", code, StringComparison.Ordinal);
+        Assert.Contains("ReferenceDataPackPageCoordinator.ManageAsync", code, StringComparison.Ordinal);
+        Assert.Contains("BuildAliasesByTerm", code, StringComparison.Ordinal);
+        Assert.Contains("HighRiskEquivalences", code, StringComparison.Ordinal);
+        Assert.Contains("RelatedTermIds", code, StringComparison.Ordinal);
+        Assert.DoesNotContain("PlanningTerminologyService.LoadPackaged", code, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void WideTwoPaneViewportsShareStretchRow()
+    public void TerminologyPageStacksListAndDetailForNarrowLayouts()
     {
         var xaml = File.ReadAllText(FindRepoFile(Path.Combine("Views", "PlanningTerminologyPage.xaml")));
+        var code = File.ReadAllText(FindRepoFile(Path.Combine("Views", "PlanningTerminologyPage.xaml.cs")));
         Assert.Contains("x:Name=\"ContentGrid\"", xaml, StringComparison.Ordinal);
         Assert.Contains("<RowDefinition Height=\"*\"/><RowDefinition Height=\"0\"/>", xaml, StringComparison.Ordinal);
-        Assert.Contains("Grid.Row=\"0\" Grid.Column=\"0\" x:Name=\"ResultsPanel\"", xaml, StringComparison.Ordinal);
-        Assert.Contains("Grid.Row=\"0\" x:Name=\"DetailScroll\" Grid.Column=\"1\"", xaml, StringComparison.Ordinal);
-        Assert.Contains("x:Name=\"ResultsPanel\" HorizontalAlignment=\"Stretch\" VerticalAlignment=\"Stretch\" MinHeight=\"0\"", xaml, StringComparison.Ordinal);
-        Assert.Contains("x:Name=\"ResultsList\"", xaml, StringComparison.Ordinal);
-        Assert.Contains("x:Name=\"DetailScroll\"", xaml, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void WideLeftPaneTracksRightPaneActualHeightWithoutChangingNarrowLayout()
-    {
-        var xaml = File.ReadAllText(FindRepoFile(Path.Combine("Views", "PlanningTerminologyPage.xaml")));
-        var code = File.ReadAllText(FindRepoFile(Path.Combine("Views", "PlanningTerminologyPage.xaml.cs")));
-        Assert.Contains("ApplyUnifiedContentHeight", code, StringComparison.Ordinal);
-        Assert.Contains("ContentGrid.Height = availableHeight", code, StringComparison.Ordinal);
-        Assert.Contains("ResultsList.Height = availableHeight", code, StringComparison.Ordinal);
-        Assert.Contains("Root.RowDefinitions[index].ActualHeight", code, StringComparison.Ordinal);
-        Assert.Contains("ResultsPanel.ClearValue(FrameworkElement.HeightProperty)", code, StringComparison.Ordinal);
-        Assert.Contains("if (_isNarrow)", code, StringComparison.Ordinal);
+        Assert.Contains("Grid.SetRow(ListPanel, 0)", code, StringComparison.Ordinal);
+        Assert.Contains("Grid.SetRow(DetailPanel, 1)", code, StringComparison.Ordinal);
+        Assert.Contains("Grid.SetColumnSpan(DetailPanel, 2)", code, StringComparison.Ordinal);
+        Assert.Contains("e.NewSize.Width < 900", code, StringComparison.Ordinal);
     }
 
     private static string FindRepoFile(string relativePath)
