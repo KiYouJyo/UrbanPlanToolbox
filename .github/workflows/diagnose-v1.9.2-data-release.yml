@@ -1,0 +1,62 @@
+name: Diagnose Data Pack 1.0 release
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnose-v1.9.2-data-release.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-release-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download and verify published packs
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://github.com/KiYouJyo/UrbanPlanToolbox_Data/releases/download/data-2026.08.1'
+          declare -A expected_sha=(
+            [design-concepts]='f7b257780ae646a1634f71b8a269c546c78b173ca069671fea0bc16e9185a678'
+            [planning-regulations]='4e08355d240c06ae24c299a8fd10361cb8e5752957f6e1536b715c0e4a7020f4'
+            [planning-terminology]='db192b722af918c85355842de1ce55842933fda228b1a24a5b02fd276cb37ca4'
+          )
+          declare -A expected_size=(
+            [design-concepts]='8485'
+            [planning-regulations]='19496'
+            [planning-terminology]='51279'
+          )
+          for id in design-concepts planning-regulations planning-terminology; do
+            file="${id}-2026.08.1.uptdata"
+            echo "=== $file ==="
+            curl --fail --location --retry 2 --retry-delay 1 --silent --show-error "$base/$file" --output "$file"
+            actual_size="$(stat -c%s "$file")"
+            actual_sha="$(sha256sum "$file" | awk '{print $1}')"
+            echo "size=$actual_size sha256=$actual_sha"
+            test "$actual_size" = "${expected_size[$id]}"
+            test "$actual_sha" = "${expected_sha[$id]}"
+            unzip -t "$file"
+            python - "$file" "$id" <<'PY'
+          import json, sys, zipfile
+          path, expected_id = sys.argv[1:]
+          with zipfile.ZipFile(path) as archive:
+              manifest = json.loads(archive.read('manifest.json'))
+              assert manifest['id'] == expected_id, manifest
+              assert manifest['version'] == '2026.08.1', manifest
+              assert manifest['schemaVersion'] == 1, manifest
+              assert manifest['minAppVersion'] == '1.9.2', manifest
+              assert manifest['publisher'] == 'UrbanPlanToolbox', manifest
+              files = manifest['files']
+              assert len(files) == 1, files
+              payload = json.loads(archive.read(files[0]['path']))
+              assert payload['schemaVersion'] == 1, payload.get('schemaVersion')
+              assert payload['dataVersion'] == '2026.08.1', payload.get('dataVersion')
+              collection = payload['terms'] if expected_id == 'planning-terminology' else payload['entries']
+              assert collection, expected_id
+              if expected_id == 'planning-regulations':
+                  assert all(item.get('stableId') and item.get('originalTitle') and item.get('officialUrl') for item in collection)
+              print(f"{expected_id}: payload entries={len(collection)}")
+          PY
+          done
