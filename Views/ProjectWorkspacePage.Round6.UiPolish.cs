@@ -81,14 +81,10 @@ public sealed partial class ProjectWorkspacePage
 
     private void ApplyRound6WorkspaceCardBackgrounds()
     {
-        // CardBackgroundFillColorDefaultBrush is intentionally translucent. The overview
-        // card and runtime-created Canvas tiles were therefore composited through two
-        // different visual paths and did not look identical. Give both surfaces the same
-        // opaque theme-aware brush so the workspace visually reads as one card system.
-        var dark = ActualTheme == ElementTheme.Dark;
-        var background = new SolidColorBrush(dark
-            ? Windows.UI.Color.FromArgb(255, 43, 43, 43)
-            : Windows.UI.Color.FromArgb(255, 252, 252, 252));
+        // Match the first-level cards used by About and Settings. Using the shared Fluent
+        // theme resource keeps the intended Mica translucency in both light and dark themes
+        // instead of forcing a solid dark rectangle in the project workspace.
+        var background = ResourceBrush("CardBackgroundFillColorDefaultBrush");
         OverviewCard.Background = background;
         foreach (var tile in _tileViews.Values)
             tile.Background = background;
