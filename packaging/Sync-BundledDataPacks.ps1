@@ -82,7 +82,7 @@ try {
         $uri = [Uri]$downloadUrl
         $fileName = [Uri]::UnescapeDataString([IO.Path]::GetFileName($uri.AbsolutePath))
         if ($fileName -cne "$packId-$($pack.version).uptdata") {
-            throw "Unexpected data-pack file name for $packId: $fileName"
+            throw "Unexpected data-pack file name for ${packId}: $fileName"
         }
 
         $destination = Join-Path $temp $fileName
