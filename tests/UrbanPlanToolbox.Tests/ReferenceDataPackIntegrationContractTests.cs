@@ -69,7 +69,7 @@ public sealed class ReferenceDataPackIntegrationContractTests
     }
 
     [Fact]
-    public void ProfessionalLibraryControlsUseVisibleBackButtonsAnimatedUpdateButtonsAndRightFilterClusters()
+    public void ProfessionalLibraryControlsUseStandardBackButtonsAnimatedUpdateButtonsAndRightFilterClusters()
     {
         var root = FindRepositoryRoot();
         foreach (var page in new[]
@@ -80,7 +80,8 @@ public sealed class ReferenceDataPackIntegrationContractTests
         })
         {
             var xaml = File.ReadAllText(Path.Combine(root, page));
-            Assert.Contains("<HyperlinkButton x:Name=\"BackButton\"", xaml, StringComparison.Ordinal);
+            Assert.Contains("<Button x:Name=\"BackButton\"", xaml, StringComparison.Ordinal);
+            Assert.DoesNotContain("<HyperlinkButton x:Name=\"BackButton\"", xaml, StringComparison.Ordinal);
             Assert.Contains("AnimatedUpdateButton x:Name=\"HeaderCheckButton\"", xaml, StringComparison.Ordinal);
             Assert.Contains("AnimatedUpdateButton x:Name=\"CheckButton\"", xaml, StringComparison.Ordinal);
             Assert.Contains("x:Name=\"FilterOptionsPanel\"", xaml, StringComparison.Ordinal);
@@ -96,9 +97,8 @@ public sealed class ReferenceDataPackIntegrationContractTests
         var button = File.ReadAllText(Path.Combine(root, "Controls", "AnimatedUpdateButton.cs"));
         Assert.Contains("ProgressRing", button, StringComparison.Ordinal);
         Assert.Contains("_clickedBusy && !IsEnabled", button, StringComparison.Ordinal);
-        Assert.Contains("ApplyBackButtonChrome", button, StringComparison.Ordinal);
-        Assert.Contains("Color.FromArgb(255", button, StringComparison.Ordinal);
-        Assert.DoesNotContain("backButton.Background = ResolveBrush(\"CardBackgroundFillColorDefaultBrush\")", button, StringComparison.Ordinal);
+        Assert.DoesNotContain("ApplyBackButtonChrome", button, StringComparison.Ordinal);
+        Assert.DoesNotContain("Color.FromArgb(255", button, StringComparison.Ordinal);
     }
 
     [Fact]
