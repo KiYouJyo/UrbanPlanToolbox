@@ -84,9 +84,12 @@ public sealed class ProjectWorkspaceRepairContractTests
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.csproj"))) return directory.FullName;
+            var hasProject = File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.csproj"));
+            var hasViews = File.Exists(Path.Combine(directory.FullName, "Views", "ProjectWorkspacePage.xaml"));
+            var hasServices = Directory.Exists(Path.Combine(directory.FullName, "Services"));
+            if (hasProject && hasViews && hasServices) return directory.FullName;
             directory = directory.Parent;
         }
-        throw new DirectoryNotFoundException("Repository root could not be located.");
+        throw new DirectoryNotFoundException("Repository source root could not be located.");
     }
 }
