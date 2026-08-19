@@ -1,9 +1,11 @@
 [简体中文](RELEASE-NOTES-v1.9.1.md) | [日本語](RELEASE-NOTES-v1.9.1.ja.md) | English
 
-# UrbanPlanToolbox v1.9.1 Engineering closeout and version governance
+# UrbanPlanToolbox v1.9.1 Stability and project workspace maintenance
 
-- Aligns application, assembly, GitHub/Store manifest, candidate release metadata, and project-status SSOT versions, eliminating the split between the 1.9.0 build state and stale 1.8.5 documentation state.
-- Strengthens CI documentation consistency checks so project-status product and candidate package versions must match `release/release.json`, the project file, and both manifests. Future version-source drift is detected before merge.
-- Replaces the hard-coded 1.9.0 signed-acceptance path with a version-agnostic flow driven by current release metadata, removing the need to clone an acceptance workflow for each maintenance version.
-- Backfills CHANGELOG history for 1.8.1 through 1.9.0 and adds trilingual plus structured runtime release notes for 1.9.1.
-- This closeout does not change project schemas, the backup format, updater behavior, or user-facing features. v1.9.1 is currently a validation candidate only; it does not automatically create a GitHub Release or submit to Microsoft Store.
+- Closes out 1.9.1 version-source alignment, trilingual release notes, signed acceptance, and dual-channel release governance.
+- Maintains the design-project workspace: the overview uses key-strategy information and strategies can be maintained item by item; research projects no longer offer results-chart or data/scripts cards.
+- Fixes a layout-update feedback loop that could freeze or terminate the app when opening a project, with stronger regression coverage.
+- Key-strategy cards now wrap to the available card width and scroll vertically when content exceeds the card height.
+- Privacy and third-party notices now render as formatted Markdown instead of exposing Markdown source markers.
+- Project schema 3, backup format 2, and the established updater mechanisms remain unchanged.
+- After full CI and Signed Acceptance validation, this version is authorized for publication to both GitHub Releases and Microsoft Store.

@@ -20,7 +20,7 @@
       "latestPublishedReleaseTag": "v1.8.5",
       "candidateProductVersion": "1.9.1",
       "candidatePackageVersion": "1.9.1.0",
-      "candidateState": "prepared-for-validation",
+      "candidateState": "approved-for-publication",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -32,7 +32,7 @@
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
       "candidateProductVersion": "1.9.1",
       "candidatePackageVersion": "1.9.1.0",
-      "candidateState": "not-approved-for-submission",
+      "candidateState": "approved-for-submission",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
@@ -64,11 +64,11 @@
         "signer Subject pinning",
         "signer Thumbprint pinning"
       ],
-      "validation": "validated and frozen; the v1.9.1 engineering closeout does not change download, verification, deployment, or restart behavior",
+      "validation": "validated and frozen; v1.9.1 does not change download, verification, deployment, or restart behavior",
       "policy": "validated / frozen; future updater mechanism changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
-      "validation": "validated and frozen; the v1.9.1 engineering closeout does not change the Store download/install operation or its update-session behavior",
+      "validation": "validated and frozen; v1.9.1 does not change the Store download/install operation or its update-session behavior",
       "policy": "validated / fully frozen after the successful real Microsoft Store 1.7.4 to 1.7.5 E2E acceptance on 2026-08-14; future updater mechanism changes require a proven bug, security issue, or Windows / Microsoft Store platform/API compatibility requirement plus end-to-end regression evidence on the affected channel. One user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
     }
   },
@@ -95,10 +95,10 @@
       "keep documentation governance and current-state metadata single-sourced",
       "preserve the frozen updater mechanism and reopen it only for a proven bug, security issue, or Windows platform/API compatibility requirement with end-to-end regression evidence",
       "standardize tool-page layout, state presentation, responsive behavior, and accessibility",
-      "make Project the context center for tool workflows without turning the app into a file manager",
+      "keep project organization lightweight and avoid forcing independent tools into a single workflow",
       "formalize project and backup schema migration contracts",
       "establish startup, package-size, dependency, and native-component budgets",
-      "then deepen GIS/data interoperability and planning-specific productivity workflows"
+      "then deepen GIS/data interoperability and planning-specific productivity tools"
     ]
   }
 }
