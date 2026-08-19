@@ -81,13 +81,29 @@ public sealed partial class ProjectWorkspacePage
 
     private void ApplyRound6WorkspaceCardBackgrounds()
     {
-        // Match the first-level cards used by About and Settings. Using the shared Fluent
-        // theme resource keeps the intended Mica translucency in both light and dark themes
-        // instead of forcing a solid dark rectangle in the project workspace.
-        var background = ResourceBrush("CardBackgroundFillColorDefaultBrush");
-        OverviewCard.Background = background;
+        // Dark mode has already been accepted visually. Preserve its exact runtime brush
+        // assignment and only change the light-mode path below.
+        if (ActualTheme != ElementTheme.Light)
+        {
+            var background = ResourceBrush("CardBackgroundFillColorDefaultBrush");
+            OverviewCard.Background = background;
+            foreach (var tile in _tileViews.Values)
+                tile.Background = background;
+            return;
+        }
+
+        // About and Settings first-level cards do not receive a code-behind brush override;
+        // they are rendered through SettingsSectionCardStyle. In light mode the previous
+        // ResourceBrush assignment became a local value and produced a visibly different
+        // composited surface. Remove that local value and let the exact same style/theme
+        // resource pipeline render the project cards.
+        OverviewCard.ClearValue(Border.BackgroundProperty);
+        var firstLevelStyle = (Style)Application.Current.Resources["SettingsSectionCardStyle"];
         foreach (var tile in _tileViews.Values)
-            tile.Background = background;
+        {
+            tile.Style = firstLevelStyle;
+            tile.ClearValue(Border.BackgroundProperty);
+        }
     }
 
     private void ApplyRound6StateBadge()
