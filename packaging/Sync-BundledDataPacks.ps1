@@ -16,9 +16,11 @@ $projectPath = Join-Path $PSScriptRoot '..\UrbanPlanToolbox.csproj'
 
 function Get-ProjectVersion {
     [xml]$project = Get-Content -LiteralPath $projectPath -Raw
-    $value = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
-    if ([string]::IsNullOrWhiteSpace([string]$value)) { throw 'UrbanPlanToolbox.csproj does not declare Version.' }
-    return [Version]::Parse([string]$value)
+    $node = $project.SelectSingleNode('/Project/PropertyGroup/Version')
+    if ($null -eq $node -or [string]::IsNullOrWhiteSpace($node.InnerText)) {
+        throw 'UrbanPlanToolbox.csproj does not declare Version.'
+    }
+    return [Version]::Parse($node.InnerText.Trim())
 }
 
 function Get-CatalogSize([object]$pack) {
