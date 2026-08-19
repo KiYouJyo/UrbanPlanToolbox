@@ -38,15 +38,23 @@ public sealed partial class ProjectWorkspacePage
 
     private void RewireRound1OverviewEditor()
     {
-        // Research overview already maps directly to field / subject / methods / milestones.
-        // The design overview needs a dedicated editor because key strategies are now discrete items.
-        if (_project?.Kind == ProjectKindCodes.Research) return;
+        if (_project is null) return;
 
         EditOverviewButton.Click -= OnEditOverview;
         EditOverviewButton.Click -= OnRound1EditOverview;
-        EditOverviewButton.Click += OnRound1EditOverview;
         EditOverviewCompactButton.Click -= OnEditOverview;
         EditOverviewCompactButton.Click -= OnRound1EditOverview;
+
+        // Research overview already maps directly to field / subject / methods / milestones.
+        // The design overview uses the structured strategy editor introduced in this repair round.
+        if (_project.Kind == ProjectKindCodes.Research)
+        {
+            EditOverviewButton.Click += OnEditOverview;
+            EditOverviewCompactButton.Click += OnEditOverview;
+            return;
+        }
+
+        EditOverviewButton.Click += OnRound1EditOverview;
         EditOverviewCompactButton.Click += OnRound1EditOverview;
     }
 
@@ -58,6 +66,7 @@ public sealed partial class ProjectWorkspacePage
         _round1Applying = true;
         try
         {
+            RewireRound1OverviewEditor();
             ApplyRound1OverviewMetrics();
             UpgradeRound1StrategyTileMenus();
         }
@@ -223,7 +232,7 @@ public sealed partial class ProjectWorkspacePage
         if (_project is null || _project.Kind != ProjectKindCodes.Design || _project.IsArchived) return;
 
         DrawerTitle.Text = W("编辑重点策略", "Edit key strategies", "重点戦略を編集");
-        DrawerSubtitle.Text = W("一条一条记录策略，而不是在一个文本框内混合输入。", "Keep strategies as separate items instead of mixing them in one text box.", "1つのテキスト欄にまとめず、戦略を1件ずつ記録します。" );
+        DrawerSubtitle.Text = W("一条一条记录策略，而不是在一个文本框内混合输入。", "Keep strategies as separate items instead of mixing them in one text box.", "1つのテキスト欄にまとめず、戦略を1件ずつ記録します。");
         DrawerContent.Children.Clear();
         DrawerFooter.Children.Clear();
 
