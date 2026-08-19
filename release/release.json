@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "product": { "name": "UrbanPlanToolbox", "version": "1.9.2", "packageVersion": "1.9.2.0" },
-  "classification": { "kind": "feature-release", "stability": "validation-pending", "storeMilestone": false },
-  "channels": { "github": { "publish": false }, "microsoftStore": { "submit": false } },
+  "classification": { "kind": "feature-release", "stability": "approved-for-publication", "storeMilestone": false },
+  "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
     "zh-CN": "UrbanPlanToolbox v1.9.2 专业资料库与 Data Pack 1.0",
