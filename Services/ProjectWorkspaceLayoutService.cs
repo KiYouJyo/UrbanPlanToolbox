@@ -20,21 +20,16 @@ public static class ProjectWorkspaceLayoutService
         ProjectWorkspacePanelKinds.Description,
         ProjectWorkspacePanelKinds.Inspirations,
         ProjectWorkspacePanelKinds.Files,
-        ProjectWorkspacePanelKinds.KeyStrategies,
-        ProjectWorkspacePanelKinds.TextNote,
-        ProjectWorkspacePanelKinds.Custom
+        ProjectWorkspacePanelKinds.KeyStrategies
     ];
 
     private static readonly string[] ResearchKinds =
     [
         ProjectWorkspacePanelKinds.ResearchFramework,
         ProjectWorkspacePanelKinds.ResearchQuestion,
-        ProjectWorkspacePanelKinds.Literature,
         ProjectWorkspacePanelKinds.ResearchProgress,
         ProjectWorkspacePanelKinds.Inspirations,
-        ProjectWorkspacePanelKinds.Files,
-        ProjectWorkspacePanelKinds.TextNote,
-        ProjectWorkspacePanelKinds.Custom
+        ProjectWorkspacePanelKinds.Files
     ];
 
     public static IReadOnlyList<string> GetAllowedPanelKinds(string projectKind) =>
@@ -60,8 +55,7 @@ public static class ProjectWorkspaceLayoutService
         {
             layout.Panels.Add(Create(ProjectWorkspacePanelKinds.ResearchFramework, 0, 0, 9, 3));
             layout.Panels.Add(Create(ProjectWorkspacePanelKinds.ResearchQuestion, 9, 0, 3, 3));
-            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.Literature, 0, 3, 4, 3));
-            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.ResearchProgress, 4, 3, 8, 3));
+            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.ResearchProgress, 0, 3, 12, 2));
         }
         else
         {
