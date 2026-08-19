@@ -16,9 +16,9 @@ public static class ProjectStrategyList
     public static string Serialize(IEnumerable<string> strategies)
     {
         ArgumentNullException.ThrowIfNull(strategies);
-        return string.Join(Environment.NewLine,
-            strategies.Select(item => item?.Trim())
-                .Where(item => !string.IsNullOrWhiteSpace(item))!);
+        return string.Join(
+            Environment.NewLine,
+            strategies.Select(item => item.Trim()).Where(item => !string.IsNullOrWhiteSpace(item)));
     }
 
     public static int Count(string? source) => Parse(source).Count;
