@@ -18,10 +18,17 @@ public sealed class ReferenceDataPackManifest
     public Dictionary<string, string> DisplayName { get; init; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, string> Description { get; init; } = new(StringComparer.OrdinalIgnoreCase);
     public string MinAppVersion { get; init; } = string.Empty;
-    public string DataPath { get; init; } = string.Empty;
-    public string? SchemaPath { get; init; }
     public string Publisher { get; init; } = string.Empty;
     public string Channel { get; init; } = string.Empty;
+    public List<ReferenceDataPackFile> Files { get; init; } = [];
+    public string? DataPath { get; init; }
+}
+
+public sealed class ReferenceDataPackFile
+{
+    public string Path { get; init; } = string.Empty;
+    public long Size { get; init; }
+    public string Sha256 { get; init; } = string.Empty;
 }
 
 public sealed record ReferenceDataPackState
@@ -39,6 +46,25 @@ public sealed record ReferenceDataPackContent(
     ReferenceDataPackState State,
     string DataJson,
     string ArchivePath);
+
+public sealed class ReferenceDataPackCatalog
+{
+    public int CatalogVersion { get; init; }
+    public string ReleaseTag { get; init; } = string.Empty;
+    public List<ReferenceDataPackCatalogItem> Packs { get; init; } = [];
+}
+
+public sealed class ReferenceDataPackCatalogItem
+{
+    public string Id { get; init; } = string.Empty;
+    public string Version { get; init; } = string.Empty;
+    public int SchemaVersion { get; init; }
+    public string MinAppVersion { get; init; } = string.Empty;
+    public Dictionary<string, string> DisplayName { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+    public long Size { get; init; }
+    public string Sha256 { get; init; } = string.Empty;
+    public string DownloadUrl { get; init; } = string.Empty;
+}
 
 public sealed record ReferenceDataPackCatalogEntry(
     string PackId,
@@ -90,14 +116,14 @@ public sealed class PlanningTerminologyPackDocument
     public string DataVersion { get; init; } = string.Empty;
     public string LastReviewed { get; init; } = string.Empty;
     public List<string> Languages { get; init; } = [];
-    public JsonElement Counts { get; init; }
+    public PlanningTerminologyCounts Counts { get; init; } = new();
     public List<string> EquivalenceEnum { get; init; } = [];
     public List<PlanningTerminologyRecord> Terms { get; init; } = [];
+    public List<TerminologyAlias> Aliases { get; init; } = [];
+    public List<TerminologyRelation> Relations { get; init; } = [];
+    public List<HighRiskEquivalence> HighRiskEquivalences { get; init; } = [];
+    public Dictionary<string, TerminologySource> Sources { get; init; } = new(StringComparer.OrdinalIgnoreCase);
     public JsonElement Migration { get; init; }
-    public List<JsonElement> Aliases { get; init; } = [];
-    public List<JsonElement> Edges { get; init; } = [];
-    public List<JsonElement> HighRisk { get; init; } = [];
-    public List<JsonElement> Sources { get; init; } = [];
 }
 
 public sealed class PlanningTerminologyRecord
@@ -115,9 +141,15 @@ public sealed class PlanningTerminologyRecord
     public string DefinitionZh { get; init; } = string.Empty;
     public string DefinitionJa { get; init; } = string.Empty;
     public string DefinitionEn { get; init; } = string.Empty;
-
-    [System.Text.Json.Serialization.JsonExtensionData]
-    public Dictionary<string, JsonElement> Extra { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+    public List<string> Aliases { get; init; } = [];
+    public string ConfusableOrRelated { get; init; } = string.Empty;
+    public List<string> SourceIds { get; init; } = [];
+    public string SourceStatus { get; init; } = string.Empty;
+    public string ReviewNote { get; init; } = string.Empty;
+    public string TranslationStatus { get; init; } = string.Empty;
+    public string LastReviewed { get; init; } = string.Empty;
+    public List<int> RelatedTermIds { get; init; } = [];
+    public string ReleaseStatus { get; init; } = string.Empty;
 }
 
 public sealed class DesignConceptsPackDocument
@@ -125,8 +157,16 @@ public sealed class DesignConceptsPackDocument
     public int SchemaVersion { get; init; }
     public string DataVersion { get; init; } = string.Empty;
     public string LastReviewed { get; init; } = string.Empty;
-    public List<JsonElement> Sources { get; init; } = [];
+    public List<DesignConceptSource> Sources { get; init; } = [];
     public List<DesignConceptRecord> Entries { get; init; } = [];
+}
+
+public sealed class DesignConceptSource
+{
+    public string Id { get; init; } = string.Empty;
+    public Dictionary<string, string> Name { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+    public string Type { get; init; } = string.Empty;
+    public Dictionary<string, string> Note { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 }
 
 public sealed class DesignConceptRecord
