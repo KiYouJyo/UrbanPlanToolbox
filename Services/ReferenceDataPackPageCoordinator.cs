@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Storage.Pickers;
@@ -7,6 +8,8 @@ namespace UrbanPlanToolbox.Services;
 
 public static class ReferenceDataPackPageCoordinator
 {
+    private static readonly ConcurrentDictionary<string, string> CloudVersionCache = new(StringComparer.Ordinal);
+
     public static async Task<bool> CheckAndInstallUpdateAsync(FrameworkElement host, string packId, InfoBar statusBar, CancellationToken cancellationToken = default)
     {
         var service = ReferenceDataPackService.Default;
@@ -15,9 +18,16 @@ public static class ReferenceDataPackPageCoordinator
             var update = await service.CheckForUpdateAsync(packId, cancellationToken);
             if (update.Remote is null)
             {
+                CloudVersionCache[packId] = ReferenceLibraryText.Get("CloudUnavailable");
                 Show(statusBar, ReferenceLibraryText.Get("CatalogUnavailable"), InfoBarSeverity.Informational);
                 return false;
             }
+
+            CloudVersionCache[packId] = ReferenceLibraryText.Get(
+                "CloudVersion",
+                update.Remote.Version,
+                update.UpdateAvailable ? ReferenceLibraryText.Get("UpdateAvailable", update.Remote.Version) : ReferenceLibraryText.Get("Latest"));
+
             if (!update.UpdateAvailable)
             {
                 Show(statusBar, ReferenceLibraryText.Get("AlreadyLatest"), InfoBarSeverity.Success);
@@ -39,12 +49,15 @@ public static class ReferenceDataPackPageCoordinator
                 Show(statusBar, ReferenceLibraryText.Get("CatalogUnavailable"), InfoBarSeverity.Warning);
                 return false;
             }
+
             var installed = await service.DownloadAndInstallAsync(packId, update.Remote, cancellationToken);
+            CloudVersionCache[packId] = ReferenceLibraryText.Get("CloudVersion", update.Remote.Version, ReferenceLibraryText.Get("Latest"));
             Show(statusBar, ReferenceLibraryText.Get("UpdateInstalled", installed.Version), InfoBarSeverity.Success);
             return true;
         }
         catch (Exception exception)
         {
+            CloudVersionCache[packId] = ReferenceLibraryText.Get("CloudUnavailable");
             AppLogger.Default.Error(nameof(ReferenceDataPackPageCoordinator), "data_update_failed", exception, packId);
             Show(statusBar, ReferenceLibraryText.Get("PackFailed", exception.Message), InfoBarSeverity.Error);
             return false;
@@ -111,19 +124,13 @@ public static class ReferenceDataPackPageCoordinator
         }
     }
 
-    public static async Task<string> GetCloudVersionTextAsync(string packId, CancellationToken cancellationToken = default)
+    public static Task<string> GetCloudVersionTextAsync(string packId, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var update = await ReferenceDataPackService.Default.CheckForUpdateAsync(packId, cancellationToken);
-            return update.Remote is null
-                ? ReferenceLibraryText.Get("CloudUnavailable")
-                : ReferenceLibraryText.Get("CloudVersion", update.Remote.Version, update.UpdateAvailable ? ReferenceLibraryText.Get("UpdateAvailable", update.Remote.Version) : ReferenceLibraryText.Get("Latest"));
-        }
-        catch
-        {
-            return ReferenceLibraryText.Get("CloudUnavailable");
-        }
+        ReferenceDataPackService.ValidatePackId(packId);
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(CloudVersionCache.TryGetValue(packId, out var text)
+            ? text
+            : ReferenceLibraryText.Get("CloudUnavailable"));
     }
 
     private static void Show(InfoBar bar, string message, InfoBarSeverity severity)
