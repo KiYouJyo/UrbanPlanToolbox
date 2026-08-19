@@ -113,6 +113,5 @@ internal static class MarkdownDocumentView
         return grid;
     }
 
-    private static Brush? ResourceBrush(string key) =>
-        Application.Current.Resources.TryGetValue(key, out var value) ? value as Brush : null;
+    private static Brush ResourceBrush(string key) => (Brush)Application.Current.Resources[key];
 }
