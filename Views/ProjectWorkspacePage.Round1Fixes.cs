@@ -31,6 +31,13 @@ public sealed partial class ProjectWorkspacePage
         _round1FixesInitialized = true;
         DrawerLayer.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(OnRound1DrawerKeyDown), true);
 
+        // TextBox/ComboBox can consume keyboard input before a routed KeyDown reaches
+        // the drawer.  A page-level accelerator reliably catches Escape while any card
+        // editor is focused; the routed handler below remains as a fallback.
+        var escape = new KeyboardAccelerator { Key = VirtualKey.Escape };
+        escape.Invoked += OnRound1EscapeAcceleratorInvoked;
+        KeyboardAccelerators.Add(escape);
+
         // LayoutUpdated is only used to discover freshly recreated tiles.  All writes
         // performed from this path are idempotent so the handler can never create a
         // layout-update feedback loop.
@@ -107,9 +114,75 @@ public sealed partial class ProjectWorkspacePage
             if (panel?.Kind != ProjectWorkspacePanelKinds.KeyStrategies) continue;
             if (_round1StrategyTiles.TryGetValue(panel.Id, out var hooked) && ReferenceEquals(hooked, pair.Value)) continue;
 
+            // The original body uses a horizontal StackPanel, which measures text with
+            // effectively unlimited width and prevents wrapping.  Replace it once per
+            // freshly rendered tile with a constrained two-column layout in a vertical
+            // ScrollViewer so every strategy remains readable at any card height.
+            ReplaceRound4TileBody(pair.Value, BuildRound1Strategies());
             pair.Value.ContextFlyout = CreateRound1StrategyMenu(panel);
             _round1StrategyTiles[panel.Id] = pair.Value;
         }
+    }
+
+    private UIElement BuildRound1Strategies()
+    {
+        var items = ProjectStrategyList.Parse(_project?.PlanningRequirements);
+        var stack = new StackPanel
+        {
+            Spacing = 10,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        };
+
+        if (items.Count == 0)
+        {
+            stack.Children.Add(new TextBlock
+            {
+                Text = W("右键添加重点策略。", "Right-click to add key strategies.", "右クリックして重点戦略を追加できます。"),
+                Opacity = .62,
+                TextWrapping = TextWrapping.Wrap
+            });
+        }
+        else
+        {
+            foreach (var item in items)
+            {
+                var row = new Grid
+                {
+                    ColumnSpacing = 8,
+                    HorizontalAlignment = HorizontalAlignment.Stretch
+                };
+                row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                row.Children.Add(new TextBlock
+                {
+                    Text = "•",
+                    Opacity = .55,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new Thickness(0, 2, 0, 0)
+                });
+
+                var text = new TextBlock
+                {
+                    Text = item,
+                    TextWrapping = TextWrapping.Wrap,
+                    HorizontalAlignment = HorizontalAlignment.Stretch
+                };
+                Grid.SetColumn(text, 1);
+                row.Children.Add(text);
+                stack.Children.Add(row);
+            }
+        }
+
+        return new ScrollViewer
+        {
+            VerticalScrollMode = ScrollMode.Enabled,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollMode = ScrollMode.Disabled,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            Content = stack
+        };
     }
 
     private FlyoutBase CreateRound1StrategyMenu(ProjectWorkspacePanel panel)
@@ -137,10 +210,22 @@ public sealed partial class ProjectWorkspacePage
         return menu;
     }
 
+    private void OnRound1EscapeAcceleratorInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs e)
+    {
+        if (DrawerLayer.Visibility != Visibility.Visible) return;
+        CompleteRound1DrawerEdit();
+        e.Handled = true;
+    }
+
     private void OnRound1DrawerKeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key != VirtualKey.Escape || DrawerLayer.Visibility != Visibility.Visible) return;
+        CompleteRound1DrawerEdit();
+        e.Handled = true;
+    }
 
+    private void CompleteRound1DrawerEdit()
+    {
         // In card editors Esc means "finish editing": invoke the same Save action so
         // the current values are persisted before the drawer closes.  Non-edit drawers
         // that do not expose a Save button simply close.
@@ -155,16 +240,13 @@ public sealed partial class ProjectWorkspacePage
         {
             var peer = new ButtonAutomationPeer(saveButton);
             if (peer.GetPattern(PatternInterface.Invoke) is IInvokeProvider invokeProvider)
+            {
                 invokeProvider.Invoke();
-            else
-                CloseDrawer();
-        }
-        else
-        {
-            CloseDrawer();
+                return;
+            }
         }
 
-        e.Handled = true;
+        CloseDrawer();
     }
 
     private async void OnRound1EditOverview(object sender, RoutedEventArgs e)

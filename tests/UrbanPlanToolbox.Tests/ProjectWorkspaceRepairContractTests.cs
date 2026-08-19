@@ -33,13 +33,15 @@ public sealed class ProjectWorkspaceRepairContractTests
     }
 
     [Fact]
-    public void WorkspaceCardEditorsSaveOnEscape()
+    public void WorkspaceCardEditorsSaveOnEscapeEvenWhenTextInputHasFocus()
     {
         var root = FindRepositoryRoot();
         var fixes = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round1Fixes.cs"));
 
         Assert.Contains("UIElement.KeyDownEvent", fixes);
-        Assert.Contains("VirtualKey.Escape", fixes);
+        Assert.Contains("new KeyboardAccelerator { Key = VirtualKey.Escape }", fixes);
+        Assert.Contains("escape.Invoked += OnRound1EscapeAcceleratorInvoked", fixes);
+        Assert.Contains("CompleteRound1DrawerEdit();", fixes);
         Assert.Contains("Project_Action_Save", fixes);
         Assert.Contains("ButtonAutomationPeer", fixes);
         Assert.Contains("IInvokeProvider", fixes);
@@ -61,6 +63,27 @@ public sealed class ProjectWorkspaceRepairContractTests
         Assert.Contains("ProjectStrategyList.Serialize", fixes);
         Assert.Contains("['\\r', '\\n', '；', ';']", strategyList);
         Assert.Contains("StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries", strategyList);
+    }
+
+    [Fact]
+    public void KeyStrategyCardWrapsEveryItemAndScrollsVertically()
+    {
+        var root = FindRepositoryRoot();
+        var fixes = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round1Fixes.cs"));
+        var start = fixes.IndexOf("private UIElement BuildRound1Strategies", StringComparison.Ordinal);
+        var end = fixes.IndexOf("private FlyoutBase CreateRound1StrategyMenu", start, StringComparison.Ordinal);
+        var renderer = fixes[start..end];
+
+        Assert.Contains("ProjectStrategyList.Parse", renderer);
+        Assert.Contains("new Grid", renderer);
+        Assert.Contains("GridUnitType.Star", renderer);
+        Assert.Contains("TextWrapping = TextWrapping.Wrap", renderer);
+        Assert.Contains("VerticalScrollMode = ScrollMode.Enabled", renderer);
+        Assert.Contains("VerticalScrollBarVisibility = ScrollBarVisibility.Auto", renderer);
+        Assert.Contains("HorizontalScrollMode = ScrollMode.Disabled", renderer);
+        Assert.Contains("HorizontalContentAlignment = HorizontalAlignment.Stretch", renderer);
+        Assert.DoesNotContain(".Take(", renderer);
+        Assert.DoesNotContain("TextTrimming", renderer);
     }
 
     [Fact]
