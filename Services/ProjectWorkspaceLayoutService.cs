@@ -29,9 +29,7 @@ public static class ProjectWorkspaceLayoutService
     [
         ProjectWorkspacePanelKinds.ResearchFramework,
         ProjectWorkspacePanelKinds.ResearchQuestion,
-        ProjectWorkspacePanelKinds.Chart,
         ProjectWorkspacePanelKinds.Literature,
-        ProjectWorkspacePanelKinds.DataAndScripts,
         ProjectWorkspacePanelKinds.ResearchProgress,
         ProjectWorkspacePanelKinds.Inspirations,
         ProjectWorkspacePanelKinds.Files,
@@ -62,10 +60,8 @@ public static class ProjectWorkspaceLayoutService
         {
             layout.Panels.Add(Create(ProjectWorkspacePanelKinds.ResearchFramework, 0, 0, 9, 3));
             layout.Panels.Add(Create(ProjectWorkspacePanelKinds.ResearchQuestion, 9, 0, 3, 3));
-            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.Chart, 0, 3, 6, 3));
-            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.Literature, 6, 3, 3, 3));
-            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.DataAndScripts, 9, 3, 3, 3));
-            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.ResearchProgress, 0, 6, 12, 2));
+            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.Literature, 0, 3, 4, 3));
+            layout.Panels.Add(Create(ProjectWorkspacePanelKinds.ResearchProgress, 4, 3, 8, 3));
         }
         else
         {
