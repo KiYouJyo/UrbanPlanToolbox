@@ -18,7 +18,7 @@ public sealed class DesignConceptDictionaryTests : IDisposable
     }
 
     [Fact]
-    public async Task EmptyDictionaryIsOfflineAndRoundTripsWithSchemaOne()
+    public async Task LegacyPersonalDictionaryStorageStillRoundTripsWithSchemaOne()
     {
         var empty = await _service.ReadAsync();
         Assert.True(empty.HasValue);
@@ -89,46 +89,54 @@ public sealed class DesignConceptDictionaryTests : IDisposable
     }
 
     [Fact]
-    public void ConceptPageKeepsVirtualizationAndUsesOneWholeCardAction()
+    public void ConceptPageUsesFigmaReadOnlyLibraryLayout()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml"));
-        Assert.Contains("<ListView x:Name=\"ConceptsList\"", xaml);
+        var code = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml.cs"));
+
+        Assert.Contains("x:Name=\"CurrentSourceLabel\"", xaml);
+        Assert.Contains("x:Name=\"SourceNameText\"", xaml);
+        Assert.Contains("x:Name=\"HeaderCheckButton\"", xaml);
+        Assert.Contains("x:Name=\"ManageButton\"", xaml);
+        Assert.Contains("x:Name=\"ConceptsList\"", xaml);
         Assert.Contains("<ListView.ItemTemplate>", xaml);
-        Assert.Contains("Click=\"OnConceptClick\"", xaml);
+        Assert.Contains("x:Name=\"DetailPanel\"", xaml);
+        Assert.Contains("x:Name=\"ProjectTypeBox\"", xaml);
+        Assert.Contains("x:Name=\"TagBox\"", xaml);
+        Assert.Contains("x:Name=\"SortBox\"", xaml);
+        Assert.Contains("ItemsWrapGrid", xaml);
         Assert.Contains("TextWrapping=\"Wrap\"", xaml);
-        Assert.DoesNotContain("EditButton", xaml);
-        Assert.DoesNotContain("DeleteButton", xaml[..xaml.IndexOf("<ListView", StringComparison.Ordinal)]);
-        var tagXaml = File.ReadAllText(Path.Combine(root, "Controls", "EditableTagList.xaml"));
-        Assert.Contains("ItemsWrapGrid", tagXaml);
-        Assert.Contains("AutomationProperties.Name=\"Remove tag\"", tagXaml);
+        Assert.DoesNotContain("NewButton", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("EditorPanel", xaml, StringComparison.Ordinal);
+
+        Assert.Contains("ReferenceDataPackIds.DesignConcepts", code);
+        Assert.Contains("ReferenceDataPackService.Default.LoadActiveAsync(PackId)", code);
+        Assert.Contains("ReferenceDataPackPageCoordinator.CheckAndInstallUpdateAsync", code);
+        Assert.Contains("ReferenceDataPackPageCoordinator.ManageAsync", code);
+        Assert.Contains("ResolveSources", code);
+        Assert.DoesNotContain("new DesignConceptDictionaryService", code, StringComparison.Ordinal);
+        Assert.DoesNotContain("OnSaveClick", code, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void ConceptPageUsesDisplayMembersAndStableResponsiveContainers()
+    public void ConceptPageKeepsThreeLocalizedFiltersAndResponsiveTwoPaneLayout()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml"));
-        Assert.Equal(3, Count(xaml, "DisplayMemberPath=\"Display\""));
-        Assert.Equal(3, Count(xaml, "SelectedValuePath=\"Value\""));
-        Assert.Contains("ProjectTypeFilter\" Grid.Row=\"1\" Grid.Column=\"0\"", xaml);
-        Assert.Contains("TagFilter\" Grid.Row=\"1\" Grid.Column=\"1\"", xaml);
-        Assert.Contains("SortBox\" Grid.Row=\"1\" Grid.Column=\"2\"", xaml);
-        Assert.Contains("HorizontalContentAlignment=\"Stretch\"", xaml);
-        Assert.Contains("x:Name=\"ContentPanel\"", xaml);
-        Assert.Contains("HorizontalAlignment=\"Stretch\"", xaml);
-        Assert.DoesNotContain("x:Name=\"ContentPanel\"\n                    Style=\"{StaticResource PageContentStackPanelStyle}\"\n                    MaxWidth=", xaml);
-        Assert.Contains("AdaptiveTrigger MinWindowWidth=\"720\"", xaml);
-        Assert.DoesNotContain("ActualWidth", xaml);
-        Assert.DoesNotContain("FilterChoice.ToString", xaml);
-        Assert.DoesNotContain("Width=\"400\"", xaml);
         var code = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml.cs"));
-        Assert.Contains("NewButton.Visibility = Visibility.Collapsed", code);
-        Assert.Contains("NewButton.Visibility = Visibility.Visible", code);
-        var settingsXaml = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml"));
-        var settingsCode = File.ReadAllText(Path.Combine(root, "Views", "SettingsPage.xaml.cs"));
-        Assert.DoesNotContain("TestNotificationButton", settingsXaml);
-        Assert.DoesNotContain("OnSendTestNotification", settingsCode);
+        Assert.Equal(3, Count(xaml, "ItemTemplate=\"{StaticResource ReferenceFilterChoiceTemplate}\""));
+        Assert.DoesNotContain("DisplayMemberPath=\"Display\"", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("SelectedValuePath=\"Value\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("ReferenceFilterLabelConverter", xaml, StringComparison.Ordinal);
+        Assert.Contains("x:Name=\"ContentGrid\"", xaml);
+        Assert.Contains("HorizontalContentAlignment=\"Stretch\"", xaml);
+        Assert.Contains("Grid.SetRow(ListPanel, 0)", code);
+        Assert.Contains("Grid.SetRow(DetailPanel, 1)", code);
+        Assert.Contains("Grid.SetColumnSpan(DetailPanel, 2)", code);
+        Assert.Contains("e.NewSize.Width < 900", code);
+        Assert.DoesNotContain("ActualWidth", code);
+        Assert.DoesNotContain("Width=\"400\"", xaml);
     }
 
     [Fact]

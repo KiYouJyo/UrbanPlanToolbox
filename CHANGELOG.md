@@ -1,5 +1,21 @@
 # 更改日志
 
+## 1.9.2
+
+### Professional libraries and Data Pack 1.0
+
+- Rebuilds the architecture/planning regulations index, Chinese-Japanese-English planning terminology, and design concepts dictionary around the new Figma search-list/detail-pane layouts.
+- Connects all three redesigned libraries to the independently versioned `KiYouJyo/UrbanPlanToolbox_Data` repository instead of using the legacy app-repository snapshots as runtime data.
+- Adds `DataPackResolver`, `DataPackCatalogService`, and `DataPackInstaller` for the versioned official catalog, GitHub Release downloads, local `.uptdata` import, installed-version resolution, and rollback.
+- Validates Data Pack 1.0 manifest identity, schema, minimum app version, safe paths, declared file sizes, and SHA-256 before activation; undeclared payloads and path traversal are rejected.
+- Targets the initial `2026.08.1` set of 221 regulation entries, 140 trilingual planning terms, and 18 editorial design concepts, with filters/counts/provenance generated from the active pack.
+- Keeps data update checks user-triggered and installed packs locally available when offline; prior valid versions remain available for rollback.
+- Keeps project schema version 3, backup format version 2, and the existing GitHub/Microsoft Store application updater mechanisms unchanged.
+
+### Release boundary
+
+- Candidate only: GitHub publication and Microsoft Store submission remain disabled in `release/release.json` until CI, Signed Acceptance, and the initial immutable `data-2026.08.1` Data Pack release are verified.
+
 ## 1.9.1
 
 ### Engineering closeout and version governance
@@ -554,7 +570,7 @@
 
 ### Changed
 
-- 将规划指标快速计算器迁入“总体设计”，将单位与比例尺换算器迁入“详细设计”。
+- 将现有规划指标快速计算器迁入“总体设计”，将单位与比例尺换算器迁入“详细设计”。
 - 工具卡片直接使用 `ToolDefinition` 元数据，并通过稳定工具 ID、`ToolRegistry` 和 `ToolNavigation` 打开，为后续收藏功能建立统一入口。
 
 ### Notes

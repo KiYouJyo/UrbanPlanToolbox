@@ -40,7 +40,7 @@ public sealed class RegulationsIndexTests
     }
 
     [Fact]
-    public void PackagedJsonSnapshotDeserializesAndPassesRuntimeValidation()
+    public void LegacyPackagedJsonRemainsReadableForMigrationAndRegressionOnly()
     {
         var root = new DirectoryInfo(AppContext.BaseDirectory);
         while (root is not null && !Directory.Exists(Path.Combine(root.FullName, "Assets", "Data", "RegulationsIndex"))) root = root.Parent;
@@ -53,27 +53,31 @@ public sealed class RegulationsIndexTests
     }
 
     [Fact]
-    public void RegulationsPageUsesVirtualizedListTemplatesAndTriLanguageLinkResources()
+    public void RegulationsPageUsesFigmaTwoPaneDataPackLayout()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "RegulationsIndexPage.xaml"));
-        Assert.Contains("<ListView x:Name=\"EntriesList\"", xaml);
+        var code = File.ReadAllText(Path.Combine(root, "Views", "RegulationsIndexPage.xaml.cs"));
+
+        Assert.Contains("x:Name=\"CurrentSourceLabel\"", xaml);
+        Assert.Contains("x:Name=\"SourceNameText\"", xaml);
+        Assert.Contains("x:Name=\"HeaderCheckButton\"", xaml);
+        Assert.Contains("x:Name=\"ManageButton\"", xaml);
+        Assert.Contains("x:Name=\"EntriesList\"", xaml);
         Assert.Contains("<ListView.ItemTemplate>", xaml);
-        Assert.Contains("IsTabStop\" Value=\"False\"", xaml);
-        Assert.Contains("UseSystemFocusVisuals\" Value=\"False\"", xaml);
-        Assert.Contains("FocusVisualMargin=\"0\"", xaml);
-        Assert.Contains("FocusVisualSecondaryThickness=\"0\"", xaml);
-        Assert.Contains("CornerRadius=\"{StaticResource CardFocusCornerRadius}\"", xaml);
-        Assert.Contains("CornerRadius=\"{StaticResource CardCornerRadius}\"", xaml);
-        Assert.Contains("CardFocusCornerRadius", xaml);
+        Assert.Contains("x:Name=\"DetailPanel\"", xaml);
+        Assert.Contains("x:Name=\"RegionBox\"", xaml);
+        Assert.Contains("x:Name=\"TopicBox\"", xaml);
+        Assert.Contains("x:Name=\"StatusBox\"", xaml);
         Assert.Contains("TextWrapping=\"Wrap\"", xaml);
-        Assert.Contains("<ListView x:Name=\"PortalsList\"", xaml);
-        foreach (var language in new[] { "zh-CN", "ja-JP", "en-US" })
-        {
-            var resources = File.ReadAllText(Path.Combine(root, "Strings", language, "Resources.resw"));
-            Assert.Contains("Regulations_OpenOfficial", resources);
-            Assert.Contains("Regulations_OpenFailed", resources);
-        }
+
+        Assert.Contains("ReferenceDataPackIds.PlanningRegulations", code);
+        Assert.Contains("ReferenceDataPackService.Default.LoadActiveAsync(PackId)", code);
+        Assert.Contains("ReferenceDataPackPageCoordinator.CheckAndInstallUpdateAsync", code);
+        Assert.Contains("ReferenceDataPackPageCoordinator.ManageAsync", code);
+        Assert.Contains("Grid.SetRow(DetailPanel, 1)", code);
+        Assert.DoesNotContain("RegulationsIndexService.LoadPackaged", code, StringComparison.Ordinal);
+        Assert.DoesNotContain("PortalsList", xaml, StringComparison.Ordinal);
     }
 
     [Fact]

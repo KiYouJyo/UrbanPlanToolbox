@@ -2,7 +2,7 @@
     x:Class="UrbanPlanToolbox.Views.ProjectWorkspacePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Loaded="OnRound1WorkspaceLoaded"
+    Loaded="OnRound6WorkspaceLoaded"
     SizeChanged="OnPageSizeChanged">
 
   <Grid>
@@ -77,7 +77,13 @@
               </StackPanel>
               <Button x:Name="EditOverviewCompactButton" Grid.Column="1" Click="OnEditOverview"/>
             </Grid>
-            <TextBlock x:Name="OverviewDescriptionText" TextWrapping="Wrap" MaxLines="3" TextTrimming="CharacterEllipsis" Opacity="0.82"/>
+            <ScrollViewer MaxHeight="96"
+                          VerticalScrollMode="Enabled"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollMode="Disabled"
+                          HorizontalScrollBarVisibility="Disabled">
+              <TextBlock x:Name="OverviewDescriptionText" TextWrapping="Wrap" Opacity="0.82"/>
+            </ScrollViewer>
             <Grid ColumnSpacing="10">
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>

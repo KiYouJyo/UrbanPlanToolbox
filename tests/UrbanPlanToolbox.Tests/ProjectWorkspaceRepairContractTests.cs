@@ -10,8 +10,10 @@ public sealed class ProjectWorkspaceRepairContractTests
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.xaml"));
         var fixes = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round1Fixes.cs"));
+        var polish = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round6.UiPolish.cs"));
 
-        Assert.Contains("Loaded=\"OnRound1WorkspaceLoaded\"", xaml);
+        Assert.Contains("Loaded=\"OnRound6WorkspaceLoaded\"", xaml);
+        Assert.Contains("OnRound1WorkspaceLoaded(sender, e);", polish);
         Assert.Contains("OnWorkspaceLoaded(sender, e);", fixes);
         Assert.Contains("EditOverviewButton.Click += OnRound1EditOverview", fixes);
         Assert.Contains("var label = W(\"重点策略\"", fixes);
@@ -87,6 +89,53 @@ public sealed class ProjectWorkspaceRepairContractTests
     }
 
     [Fact]
+    public void ResearchQuestionsUseRepeatableRowsInsteadOfOneLargeTextBox()
+    {
+        var root = FindRepositoryRoot();
+        var polish = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round6.UiPolish.cs"));
+
+        Assert.Contains("CreateRound6ResearchQuestionMenu", polish);
+        Assert.Contains("OpenRound6ResearchQuestionEditor", polish);
+        Assert.Contains("new StrategyListEditor(", polish);
+        Assert.Contains("ParseRound6ResearchQuestions", polish);
+        Assert.Contains("SerializeRound6ResearchQuestions", polish);
+        Assert.Contains("＋ 添加研究问题", polish);
+        Assert.Contains("删除研究问题", polish);
+        Assert.DoesNotContain("MinHeight = 220", polish);
+    }
+
+    [Fact]
+    public void WorkspaceTilesAndOverviewUseSharedFirstLevelCardSurface()
+    {
+        var root = FindRepositoryRoot();
+        var polish = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round6.UiPolish.cs"));
+
+        Assert.Contains("ApplyRound6WorkspaceCardBackgrounds", polish);
+        Assert.Contains("ResourceBrush(\"CardBackgroundFillColorDefaultBrush\")", polish);
+        Assert.Contains("OverviewCard.Background = background", polish);
+        Assert.Contains("tile.Background = background", polish);
+        Assert.DoesNotContain("FromArgb(255, 252, 252, 252)", polish);
+        Assert.DoesNotContain("FromArgb(255, 43, 43, 43)", polish);
+    }
+
+    [Fact]
+    public void ReferenceLibraryBackNavigationUsesStandardButtons()
+    {
+        var root = FindRepositoryRoot();
+        foreach (var page in new[]
+        {
+            "RegulationsIndexPage.xaml",
+            "PlanningTerminologyPage.xaml",
+            "DesignConceptDictionaryPage.xaml"
+        })
+        {
+            var xaml = File.ReadAllText(Path.Combine(root, "Views", page));
+            Assert.Contains("<Button x:Name=\"BackButton\"", xaml);
+            Assert.DoesNotContain("<HyperlinkButton x:Name=\"BackButton\"", xaml);
+        }
+    }
+
+    [Fact]
     public void ResearchWorkspaceDoesNotOfferChartOrDataAndScriptsCards()
     {
         var root = FindRepositoryRoot();
@@ -97,12 +146,22 @@ public sealed class ProjectWorkspaceRepairContractTests
 
         Assert.DoesNotContain("ProjectWorkspacePanelKinds.Chart", researchKinds);
         Assert.DoesNotContain("ProjectWorkspacePanelKinds.DataAndScripts", researchKinds);
+        Assert.DoesNotContain("ProjectWorkspacePanelKinds.Literature", researchKinds);
+        Assert.DoesNotContain("ProjectWorkspacePanelKinds.TextNote", researchKinds);
+        Assert.DoesNotContain("ProjectWorkspacePanelKinds.Custom", researchKinds);
+
+        var designKindsStart = service.IndexOf("private static readonly string[] DesignKinds", StringComparison.Ordinal);
+        var designKindsEnd = service.IndexOf("private static readonly string[] ResearchKinds", designKindsStart, StringComparison.Ordinal);
+        var designKinds = service[designKindsStart..designKindsEnd];
+        Assert.DoesNotContain("ProjectWorkspacePanelKinds.TextNote", designKinds);
+        Assert.DoesNotContain("ProjectWorkspacePanelKinds.Custom", designKinds);
 
         var researchDefaultStart = service.IndexOf("if (string.Equals(projectKind, ProjectKindCodes.Research", StringComparison.Ordinal);
         var designDefaultStart = service.IndexOf("else", researchDefaultStart, StringComparison.Ordinal);
         var researchDefault = service[researchDefaultStart..designDefaultStart];
         Assert.DoesNotContain("ProjectWorkspacePanelKinds.Chart", researchDefault);
         Assert.DoesNotContain("ProjectWorkspacePanelKinds.DataAndScripts", researchDefault);
+        Assert.DoesNotContain("ProjectWorkspacePanelKinds.Literature", researchDefault);
     }
 
     [Fact]
