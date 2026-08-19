@@ -91,4 +91,24 @@
     <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
     <PublishTrimmed>false</PublishTrimmed>
   </PropertyGroup>
+
+  <!--
+    Every real MSIX package is self-contained with the latest immutable Data Pack 1.0
+    archives. The sync happens only for package-producing builds, so normal IDE/CI builds
+    stay offline. Set SkipBundledDataPackSync=true only for explicit packaging diagnostics.
+  -->
+  <Target Name="SyncLatestBundledReferenceDataPacks"
+          BeforeTargets="PrepareForBuild"
+          Condition="'$(GenerateAppxPackageOnBuild)' == 'true' and '$(SkipBundledDataPackSync)' != 'true'">
+    <Exec Command="pwsh -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\packaging\Sync-BundledDataPacks.ps1&quot;" />
+    <ItemGroup>
+      <Content Remove="Assets\DataPacks\Bundled\**\*" />
+      <Content Include="Assets\DataPacks\Bundled\catalog-v1.json"
+               CopyToOutputDirectory="PreserveNewest"
+               CopyToPublishDirectory="PreserveNewest" />
+      <Content Include="Assets\DataPacks\Bundled\*.uptdata"
+               CopyToOutputDirectory="PreserveNewest"
+               CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
 </Project>
