@@ -15,6 +15,12 @@ public sealed class ReferenceDataPackIntegrationContractTests
 
         Assert.Contains("catalog/catalog-v1.json", catalog, StringComparison.Ordinal);
         Assert.Contains("catalogVersion", catalog, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("raw.githubusercontent.com", catalog, StringComparison.Ordinal);
+        Assert.Contains("api.github.com/repos/KiYouJyo/UrbanPlanToolbox_Data/contents/catalog/catalog-v1.json", catalog, StringComparison.Ordinal);
+        Assert.Contains("application/vnd.github.raw+json", catalog, StringComparison.Ordinal);
+        Assert.Contains("catalog_fallback_used", catalog, StringComparison.Ordinal);
+        Assert.Contains("catalog-network-unavailable", catalog, StringComparison.Ordinal);
+        Assert.Contains("catalog-invalid", catalog, StringComparison.Ordinal);
         Assert.Contains("KiYouJyo/UrbanPlanToolbox_Data", installer, StringComparison.Ordinal);
         Assert.Contains("releases/download", installer, StringComparison.Ordinal);
         Assert.Contains("manifest.json", installer, StringComparison.Ordinal);
@@ -27,6 +33,32 @@ public sealed class ReferenceDataPackIntegrationContractTests
         Assert.Contains("DataPackCatalogService", facade, StringComparison.Ordinal);
         Assert.Contains("DataPackInstaller", facade, StringComparison.Ordinal);
         Assert.Contains("DataPackResolver", facade, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DataPackUiDistinguishesUncheckedAndFailedCatalogStates()
+    {
+        var root = FindRepositoryRoot();
+        var coordinator = File.ReadAllText(Path.Combine(root, "Services", "ReferenceDataPackPageCoordinator.cs"));
+        var text = File.ReadAllText(Path.Combine(root, "Services", "ReferenceLibraryText.cs"));
+
+        Assert.Contains("CloudNotChecked", coordinator, StringComparison.Ordinal);
+        Assert.Contains("CatalogNetworkUnavailable", coordinator, StringComparison.Ordinal);
+        Assert.Contains("CatalogInvalid", coordinator, StringComparison.Ordinal);
+        Assert.Contains("CloudNotChecked", text, StringComparison.Ordinal);
+        Assert.Contains("raw.githubusercontent.com", text, StringComparison.Ordinal);
+        Assert.Contains("GitHub API", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PackagedBuildsDeclareInternetClientForDataUpdates()
+    {
+        var root = FindRepositoryRoot();
+        var sideload = File.ReadAllText(Path.Combine(root, "Package.appxmanifest"));
+        var store = File.ReadAllText(Path.Combine(root, "Package.Store.appxmanifest"));
+
+        Assert.Contains("<Capability Name=\"internetClient\" />", sideload, StringComparison.Ordinal);
+        Assert.Contains("<Capability Name=\"internetClient\" />", store, StringComparison.Ordinal);
     }
 
     [Fact]
