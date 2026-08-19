@@ -1,5 +1,78 @@
 # 更改日志
 
+## 1.9.1
+
+### Engineering closeout and version governance
+
+- Aligns the application, assembly, sideload/Store manifests, candidate release metadata, and `docs/project-status.json` on `1.9.1` / `1.9.1.0`.
+- Strengthens documentation CI so the SSOT product version, GitHub/Store candidate versions, release metadata, project version, and both manifest package versions must agree.
+- Replaces the version-pinned v1.9.0 signed-acceptance workflow with a release-metadata-driven acceptance path so future maintenance versions do not require cloned workflow files.
+- Backfills the missing v1.8.1 through v1.9.0 history and adds trilingual plus structured v1.9.1 release notes.
+- Does not change project schema version 3, backup format version 2, updater behavior, or user-facing product functionality.
+
+### Release boundary
+
+- Candidate only at closeout start: GitHub publication and Microsoft Store submission are both disabled in `release/release.json` until validation and explicit release approval.
+
+## 1.9.0
+
+### Customizable tile project workspace
+
+- Redesigns design and research project pages around a fixed project overview plus a project-scoped customizable tile workspace.
+- Adds a canonical 12-column layout with add, move, resize, duplicate, remove, undo, and reset operations while preserving underlying project data.
+- Adds design/research-specific tiles for images, milestones, inspirations, files, strategies, research framework, questions, results, literature, data/scripts, and progress.
+- Adds responsive 12/8/6/single-column presentation without overwriting the saved canonical layout.
+- Moves overview, milestone, folder, and panel settings into focused editing surfaces; archived projects remain read-only and older projects receive a compatible saved workspace on first open.
+
+## 1.8.5
+
+### Settings, About, and inactive-window closeout
+
+- Expands Settings and About cards across the available content width while preserving existing spacing, card styling, controls, and responsive behavior.
+- Fixes title-bar and navigation-surface mismatch when the window becomes inactive; inactive chrome now uses consistent dark/light gray surfaces.
+- Limits the release to Settings, About, and inactive-window presentation without changing updater behavior, WebDAV, navigation logic, or other product features.
+
+## 1.8.4
+
+### Settings and About modernization
+
+- Modernizes Settings cards outside Update Management while preserving existing WinUI 3 card surfaces, borders, and theme resources.
+- Reorders Settings around appearance/language, background/startup, project notifications, data management, and app maintenance, with narrow-window vertical adaptation.
+- Refactors About application/project/privacy/legal cards while preserving the v1.8.3 Update Management presentation and removing diagnostics/log cards.
+- Unifies data-management and WebDAV action buttons on the default button treatment and foreground color.
+
+## 1.8.3
+
+### Update-management presentation fixes
+
+- Keeps available-version and release-note fields visible when Microsoft Store reports an update but target-version metadata is not yet resolved, while continuing to suppress stale target data.
+- Reworks About > Update Management into a more compact version comparison, release-note, and status layout with narrow-window vertical adaptation.
+- Shows a single ProgressRing inside the action button while checking for updates and removes duplicate loading-state presentation.
+- Prevents the release-notes scrollbar from covering text by reserving safe spacing.
+
+## 1.8.2
+
+### WebDAV cloud archives
+
+- Extends Settings > Data Management with WebDAV cloud archives while keeping local data authoritative and fully usable offline.
+- Reuses the `.uptbackup` format; archives are created and validated locally, uploaded to a temporary remote name, then promoted with `MOVE` to avoid partial archives appearing complete.
+- Adds WebDAV connection testing, manual archive creation, history listing, safe cloud restore, and remote archive deletion.
+- Routes cloud restore through existing manifest, SHA-256, format-version, pre-import safety-backup, and rollback validation.
+- Stores WebDAV passwords in Windows Credential Locker rather than `settings.json`, `.uptbackup`, or logs, and warns on plain HTTP endpoints.
+- Clearing local data removes local WebDAV configuration and credentials without deleting remote archives.
+- Places the existing export/import/clear-local-data actions horizontally to reduce card height.
+
+## 1.8.1
+
+### Background residency, tray menu, and project-page fixes
+
+- Fixes resident background processes potentially blocking normal MSIX uninstall by exiting when the current package is being removed.
+- Replaces the notification-area context menu with a compact WinUI 3 popup that remains accessible from pure background-resident state and avoids being covered by the Windows hidden-icons panel.
+- Hides the tray icon while the main toolbox window is visible on the taskbar and restores it when the main window closes back to background residency.
+- Prevents Microsoft Store update UI from showing the previous version number or previous release notes before a new update has actually been downloaded/resolved.
+- Simplifies design-project editing by hiding administrative-region and coordinate fields, merging project notes into basic information, removing the planning-requirements card, and moving save/reset actions to the page bottom.
+- Moves research-project save/reset actions to the page bottom while retaining compatibility for hidden legacy design-project fields.
+
 ## 1.8.0
 
 ### Desktop residency and inspiration recorder
