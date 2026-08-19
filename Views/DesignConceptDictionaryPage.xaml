@@ -2,87 +2,34 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:controls="using:UrbanPlanToolbox.Controls">
-  <Grid x:Name="PageRoot" HorizontalAlignment="Stretch">
-    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Disabled"
-                  HorizontalContentAlignment="Stretch">
-      <Grid HorizontalAlignment="Stretch">
-        <StackPanel x:Name="ContentPanel"
-                    Style="{StaticResource PageContentStackPanelStyle}"
-                    HorizontalAlignment="Stretch">
-          <Grid ColumnSpacing="12">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"/>
-            <Button x:Name="NewButton" Grid.Column="1" Click="OnNewClick" VerticalAlignment="Top"/>
-          </Grid>
-          <TextBlock x:Name="DescriptionText" TextWrapping="Wrap"/>
-
-          <StackPanel x:Name="ListPanel" Spacing="12">
-            <Grid x:Name="FilterPanel" ColumnSpacing="8" RowSpacing="8">
-              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-              <TextBox x:Name="SearchBox" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" TextChanged="OnSearchChanged"/>
-              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ProjectTypeFilter" Grid.Row="1" Grid.Column="0" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
-              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="TagFilter" Grid.Row="1" Grid.Column="1" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
-              <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="SortBox" Grid.Row="1" Grid.Column="2" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
-            </Grid>
-            <TextBlock x:Name="CountText" TextWrapping="Wrap"/>
-            <TextBlock x:Name="ListStatus" TextWrapping="Wrap"/>
-            <ListView x:Name="ConceptsList" SelectionMode="None" IsItemClickEnabled="False" HorizontalContentAlignment="Stretch">
-              <ListView.ItemTemplate>
-                <DataTemplate>
-                  <Button Tag="{Binding}" Click="OnConceptClick" Style="{StaticResource CardActionButtonStyle}" Margin="0,0,0,8" Padding="{StaticResource CardContentPadding}" AutomationProperties.Name="{Binding AutomationName}">
-                    <StackPanel Spacing="6">
-                      <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                      <TextBlock Text="{Binding Definition}" FontSize="14" TextWrapping="WrapWholeWords" MaxLines="4"/>
-                      <TextBlock Text="{Binding ProjectTypesText}" Opacity="0.8" TextWrapping="Wrap"/>
-                      <TextBlock Text="{Binding TagsText}" Opacity="0.8" TextWrapping="Wrap"/>
-                      <TextBlock Text="{Binding UpdatedText}" FontSize="12" Opacity="0.7"/>
-                    </StackPanel>
-                  </Button>
-                </DataTemplate>
-              </ListView.ItemTemplate>
-            </ListView>
-          </StackPanel>
-
-          <StackPanel x:Name="EditorPanel" Visibility="Collapsed" Spacing="12">
-            <Button x:Name="BackButton" Click="OnBackClick" HorizontalAlignment="Left"/>
-            <TextBlock x:Name="EditorTitle" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/>
-            <Grid x:Name="EditorForm" ColumnSpacing="16" RowSpacing="12">
-              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-              <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-              <TextBox x:Name="NameBox" Grid.Row="0" Grid.Column="0" TextChanged="OnEditorChanged" TextWrapping="Wrap"/>
-              <TextBox x:Name="DefinitionBox" Grid.Row="1" Grid.Column="0" TextChanged="OnEditorChanged" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="120"/>
-              <TextBox x:Name="NotesBox" Grid.Row="2" Grid.Column="0" TextChanged="OnEditorChanged" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="100"/>
-              <controls:EditableTagList x:Name="ProjectTypesEditor" Grid.Row="0" Grid.Column="1" ValuesChanged="OnTagValuesChanged"/>
-              <controls:EditableTagList x:Name="TagsEditor" Grid.Row="1" Grid.Column="1" ValuesChanged="OnTagValuesChanged"/>
-              <TextBox x:Name="SourceBox" Grid.Row="2" Grid.Column="1" TextChanged="OnEditorChanged" TextWrapping="Wrap"/>
-              <TextBlock x:Name="TimestampsText" Grid.Row="3" Grid.Column="1" TextWrapping="Wrap" Opacity="0.75"/>
-              <InfoBar x:Name="EditorStatus" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" IsOpen="False" IsClosable="True"/>
-              <StackPanel x:Name="EditorActions" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
-                <Button x:Name="SaveButton" Click="OnSaveClick"/><Button x:Name="ResetButton" Click="OnResetClick"/><Button x:Name="CopyButton" Click="OnCopyClick"/><Button x:Name="DeleteButton" Click="OnDeleteClick"/>
-              </StackPanel>
-              <VisualStateManager.VisualStateGroups>
-                <VisualStateGroup>
-                  <VisualState x:Name="NarrowEditor">
-                    <VisualState.Setters>
-                      <Setter Target="NameBox.(Grid.Column)" Value="0"/><Setter Target="NameBox.(Grid.Row)" Value="0"/><Setter Target="NameBox.(Grid.ColumnSpan)" Value="2"/>
-                      <Setter Target="DefinitionBox.(Grid.Column)" Value="0"/><Setter Target="DefinitionBox.(Grid.Row)" Value="1"/><Setter Target="DefinitionBox.(Grid.ColumnSpan)" Value="2"/>
-                      <Setter Target="NotesBox.(Grid.Column)" Value="0"/><Setter Target="NotesBox.(Grid.Row)" Value="2"/><Setter Target="NotesBox.(Grid.ColumnSpan)" Value="2"/>
-                      <Setter Target="ProjectTypesEditor.(Grid.Column)" Value="0"/><Setter Target="ProjectTypesEditor.(Grid.Row)" Value="3"/><Setter Target="ProjectTypesEditor.(Grid.ColumnSpan)" Value="2"/>
-                      <Setter Target="TagsEditor.(Grid.Column)" Value="0"/><Setter Target="TagsEditor.(Grid.Row)" Value="4"/><Setter Target="TagsEditor.(Grid.ColumnSpan)" Value="2"/>
-                      <Setter Target="SourceBox.(Grid.Column)" Value="0"/><Setter Target="SourceBox.(Grid.Row)" Value="5"/><Setter Target="SourceBox.(Grid.ColumnSpan)" Value="2"/>
-                      <Setter Target="TimestampsText.(Grid.Column)" Value="0"/><Setter Target="TimestampsText.(Grid.Row)" Value="6"/><Setter Target="TimestampsText.(Grid.ColumnSpan)" Value="2"/>
-                      <Setter Target="EditorStatus.(Grid.Row)" Value="7"/><Setter Target="EditorActions.(Grid.Row)" Value="8"/>
-                    </VisualState.Setters>
-                  </VisualState>
-                  <VisualState x:Name="WideEditor"><VisualState.StateTriggers><AdaptiveTrigger MinWindowWidth="720"/></VisualState.StateTriggers></VisualState>
-                </VisualStateGroup>
-              </VisualStateManager.VisualStateGroups>
-            </Grid>
-          </StackPanel>
-        </StackPanel>
-      </Grid>
-    </ScrollViewer>
+  <Grid x:Name="Root" Padding="{StaticResource PageContentPadding}" MaxWidth="1500" HorizontalAlignment="Stretch">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <StackPanel Grid.Row="0" Spacing="6">
+      <Button x:Name="BackButton" Click="OnBackClick" Background="Transparent" BorderThickness="0" HorizontalAlignment="Left" Padding="0,4"/>
+      <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"/><TextBlock x:Name="DescriptionText" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"><TextBlock x:Name="CloudVersionText" VerticalAlignment="Center" Opacity="0.72" TextWrapping="Wrap" MaxWidth="340"/><Button x:Name="HeaderCheckButton" Click="OnCheckUpdateClick"/></StackPanel></Grid>
+    </StackPanel>
+    <Border Grid.Row="1" Margin="0,14,0,0" Padding="16,12" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+      <Grid ColumnSpacing="10"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Spacing="3"><TextBlock x:Name="CurrentSourceLabel" FontSize="12" Opacity="0.62"/><TextBlock x:Name="SourceNameText" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock x:Name="SourceMetaText" FontSize="12" Opacity="0.76" TextWrapping="Wrap"/></StackPanel><Button x:Name="CheckButton" Grid.Column="1" Click="OnCheckUpdateClick" VerticalAlignment="Center"/><Button x:Name="ManageButton" Grid.Column="2" Click="OnManageSourceClick" VerticalAlignment="Center"/></Grid>
+    </Border>
+    <Grid x:Name="FilterGrid" Grid.Row="2" Margin="0,14,0,0" ColumnSpacing="10" RowSpacing="8">
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <Grid.ColumnDefinitions><ColumnDefinition Width="2.6*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <TextBox x:Name="SearchBox" Grid.Column="0" TextChanged="OnFilterChanged"/>
+      <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="ProjectTypeBox" Grid.Column="1" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
+      <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="TagBox" Grid.Column="2" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
+      <ComboBox controls:TransientComboBoxTheme.Apply="True" x:Name="SortBox" Grid.Column="3" DisplayMemberPath="Display" SelectedValuePath="Value" SelectionChanged="OnSelectionFilterChanged"/>
+      <Button x:Name="ResetButton" Grid.Column="4" Click="OnResetFiltersClick"/>
+    </Grid>
+    <TextBlock x:Name="CountText" Grid.Row="3" Margin="0,8,0,8" FontSize="12" Opacity="0.66"/>
+    <Grid x:Name="ContentGrid" Grid.Row="4" ColumnSpacing="16" MinHeight="0">
+      <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="0"/></Grid.RowDefinitions><Grid.ColumnDefinitions><ColumnDefinition Width="0.85*"/><ColumnDefinition Width="1.15*"/></Grid.ColumnDefinitions>
+      <Border x:Name="ListPanel" Grid.Row="0" Grid.Column="0" Padding="12" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" MinHeight="0">
+        <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><StackPanel Orientation="Horizontal" Spacing="10" Margin="4,0,0,10"><TextBlock x:Name="ListHeader" FontSize="16" FontWeight="SemiBold"/><Border Padding="10,3" CornerRadius="14" Background="{ThemeResource ControlFillColorSecondaryBrush}"><TextBlock x:Name="ListCountBadge" FontSize="12"/></Border></StackPanel><ListView Grid.Row="1" x:Name="ConceptsList" SelectionMode="Single" SelectionChanged="OnConceptSelectionChanged" HorizontalContentAlignment="Stretch" MinHeight="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"><ListView.ItemTemplate><DataTemplate><Grid Padding="8,10" MinHeight="92"><StackPanel Spacing="5"><TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding Definition}" FontSize="12" TextWrapping="WrapWholeWords" MaxLines="2"/><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding Metadata}" FontSize="10" Opacity="0.72" TextWrapping="Wrap"/><TextBlock Grid.Column="1" Text="{Binding TagsText}" FontSize="10" Opacity="0.62" TextWrapping="Wrap" MaxWidth="190"/></Grid></StackPanel></Grid></DataTemplate></ListView.ItemTemplate></ListView><TextBlock Grid.Row="2" x:Name="EmptyText" Margin="4,8,4,0" TextWrapping="Wrap"/></Grid>
+      </Border>
+      <Border x:Name="DetailPanel" Grid.Row="0" Grid.Column="1" Padding="20" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8" MinHeight="0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="11"><Grid ColumnSpacing="10"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Spacing="5"><TextBlock x:Name="DetailTitle" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock x:Name="DetailMeta" FontSize="11" Opacity="0.66" TextWrapping="Wrap"/></StackPanel><StackPanel Grid.Column="1" Spacing="8"><Border Padding="10,4" CornerRadius="14" Background="{ThemeResource ControlFillColorSecondaryBrush}"><TextBlock x:Name="CategoryBadge" FontSize="12"/></Border><Button x:Name="ViewSourceButton" Click="OnViewSourceClick"/></StackPanel></Grid><Rectangle Height="1" Fill="{ThemeResource CardStrokeColorDefaultBrush}" Margin="0,2"/><TextBlock x:Name="DefinitionHeader" FontSize="14" FontWeight="SemiBold"/><TextBlock x:Name="DetailDefinition" FontSize="14" TextWrapping="WrapWholeWords"/><TextBlock x:Name="ProjectTypesHeader" FontSize="12" Opacity="0.65" Margin="0,10,0,0"/><ItemsControl x:Name="ProjectTypesList"><ItemsControl.ItemsPanel><ItemsPanelTemplate><ItemsWrapGrid Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border Margin="0,0,6,6" Padding="10,4" CornerRadius="14" Background="{ThemeResource ControlFillColorSecondaryBrush}"><TextBlock Text="{Binding}" FontSize="12"/></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl><TextBlock x:Name="TagsHeader" FontSize="12" Opacity="0.65"/><ItemsControl x:Name="TagsList"><ItemsControl.ItemsPanel><ItemsPanelTemplate><ItemsWrapGrid Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><Border Margin="0,0,6,6" Padding="10,4" CornerRadius="14" Background="{ThemeResource ControlFillColorSecondaryBrush}"><TextBlock Text="{Binding}" FontSize="12"/></Border></DataTemplate></ItemsControl.ItemTemplate></ItemsControl><TextBlock x:Name="CaseHeader" FontSize="14" FontWeight="SemiBold" Margin="0,8,0,0"/><Border Padding="14" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" CornerRadius="7"><TextBlock x:Name="CaseText" FontSize="13" TextWrapping="WrapWholeWords"/></Border><Button x:Name="CopyButton" Click="OnCopyClick" HorizontalAlignment="Right" Margin="0,12,0,0"/></StackPanel></ScrollViewer>
+      </Border>
+    </Grid>
+    <InfoBar x:Name="StatusBar" Grid.Row="5" Margin="0,10,0,0" IsOpen="False" IsClosable="True"/>
   </Grid>
 </Page>

@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
-using System.Diagnostics;
+using Windows.ApplicationModel.DataTransfer;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
 
@@ -9,244 +8,277 @@ namespace UrbanPlanToolbox.Views;
 
 public sealed partial class DesignConceptDictionaryPage : Page
 {
+    private const string PackId = ReferenceDataPackIds.DesignConcepts;
     private readonly ILocalizationService _localization = LocalizationService.Default;
-    private readonly DesignConceptDictionaryService _storage = new(AppDataPathProvider.Default);
-    private DesignConceptDictionaryDocument _document = new();
-    private DesignConcept? _editing;
-    private DesignConcept? _savedEditing;
-    private DesignConceptEditSnapshot? _baseline;
-    private bool _isNew;
+    private ReferenceDataPackContent? _pack;
+    private DesignConceptsPackDocument? _document;
+    private DesignConceptRecord? _selected;
     private bool _loading;
-    private bool _dirty;
+    private bool _busy;
 
     public DesignConceptDictionaryPage()
     {
         InitializeComponent();
-        TitleText.Text = T("Tool_DesignConceptDictionary_Name");
-        DescriptionText.Text = T("Tool_DesignConceptDictionary_Description");
-        NewButton.Content = T("Concept_New");
-        SearchBox.PlaceholderText = T("Concept_SearchPlaceholder");
-        ProjectTypeFilter.PlaceholderText = T("Concept_ProjectTypeFilter");
-        TagFilter.PlaceholderText = T("Concept_TagFilter");
-        NameBox.Header = T("Concept_Name");
-        DefinitionBox.Header = T("Concept_Definition");
-        SourceBox.Header = T("Concept_Source");
-        NotesBox.Header = T("Concept_Notes");
-        ProjectTypesEditor.Label = T("Concept_ProjectTypes");
-        ProjectTypesEditor.AddButtonText = T("Concept_Add");
-        ProjectTypesEditor.PlaceholderText = T("Concept_ProjectTypePlaceholder");
-        TagsEditor.Label = T("Concept_Tags");
-        TagsEditor.AddButtonText = T("Concept_Add");
-        TagsEditor.PlaceholderText = T("Concept_TagPlaceholder");
-        AutomationProperties.SetName(ProjectTypeFilter, T("Concept_ProjectTypeFilter"));
-        AutomationProperties.SetName(TagFilter, T("Concept_TagFilter"));
-        AutomationProperties.SetName(SortBox, T("Concept_SortLastModified"));
-        BackButton.Content = T("Action_Back");
-        SaveButton.Content = T("Concept_Save");
-        ResetButton.Content = T("Concept_Reset");
-        CopyButton.Content = T("Concept_Copy");
-        DeleteButton.Content = T("Concept_Delete");
-        SortBox.ItemsSource = new[] { new FilterChoice("last", T("Concept_SortLastModified")), new FilterChoice("created", T("Concept_SortCreated")), new FilterChoice("name", T("Concept_SortName")) };
-        SortBox.SelectedIndex = 0;
-        Loaded += async (_, _) => await LoadAsync();
+        ApplyText();
+        DetailPanel.Visibility = Visibility.Collapsed;
+        Loaded += OnLoaded;
+        Root.SizeChanged += OnRootSizeChanged;
     }
 
-    private string T(string key) => _localization.GetString(key);
-    private string T(string key, params object[] args) => string.Format(_localization.GetString(key), args);
-
-    private async Task LoadAsync()
+    private void ApplyText()
     {
-        var result = await _storage.ReadAsync();
-        if (!result.HasValue)
+        BackButton.Content = ReferenceLibraryText.Get("BackDesign");
+        TitleText.Text = _localization.GetString("Tool_DesignConceptDictionary_Name");
+        DescriptionText.Text = _localization.GetString("Tool_DesignConceptDictionary_Description");
+        HeaderCheckButton.Content = ReferenceLibraryText.Get("CheckDataUpdate");
+        CurrentSourceLabel.Text = ReferenceLibraryText.Get("CurrentSource");
+        CheckButton.Content = ReferenceLibraryText.Get("CheckUpdate");
+        ManageButton.Content = ReferenceLibraryText.Get("ManageSource");
+        SearchBox.PlaceholderText = ReferenceLibraryText.Get("ConceptSearch");
+        ResetButton.Content = ReferenceLibraryText.Get("ResetFilters");
+        ListHeader.Text = ReferenceLibraryText.Get("ConceptEntries");
+        DefinitionHeader.Text = ReferenceLibraryText.Get("Definition");
+        ProjectTypesHeader.Text = ReferenceLibraryText.Get("ProjectTypes");
+        TagsHeader.Text = ReferenceLibraryText.Get("Tags");
+        CaseHeader.Text = ReferenceLibraryText.Get("CaseNote");
+        ViewSourceButton.Content = ReferenceLibraryText.Get("ViewSource");
+        CopyButton.Content = ReferenceLibraryText.Get("Copy");
+        CloudVersionText.Text = ReferenceLibraryText.Get("CloudUnavailable");
+    }
+
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        Loaded -= OnLoaded;
+        await ReloadAsync();
+        CloudVersionText.Text = await ReferenceDataPackPageCoordinator.GetCloudVersionTextAsync(PackId);
+    }
+
+    private async Task ReloadAsync()
+    {
+        _loading = true;
+        try
         {
-            ShowStatus(ListStatus, T("Concept_LoadFailed"));
+            _pack = await ReferenceDataPackService.Default.LoadActiveAsync(PackId);
+            _document = _pack is null ? null : ReferenceDataPackService.ParseDesignConcepts(_pack.DataJson);
+            _selected = null;
+            RenderSource();
+            RebuildFilters();
+            RefreshResults();
+        }
+        catch (Exception exception)
+        {
+            AppLogger.Default.Error(nameof(DesignConceptDictionaryPage), "design_concepts_pack_load_failed", exception);
+            _pack = null;
+            _document = null;
+            _selected = null;
+            RenderSource();
+            RebuildFilters();
+            RefreshResults();
+            ShowStatus(ReferenceLibraryText.Get("PackFailed", exception.Message), InfoBarSeverity.Error);
+        }
+        finally { _loading = false; }
+    }
+
+    private void RenderSource()
+    {
+        if (_pack is null || _document is null)
+        {
+            SourceNameText.Text = ReferenceLibraryText.Get("NoDataPack");
+            SourceMetaText.Text = ReferenceLibraryText.Get("NoDataPackHint");
             return;
         }
-        _document = result.Value!;
-        RefreshFilters();
-        RenderCards();
+        SourceNameText.Text = ReferenceDataPackService.GetLocalized(_pack.Manifest.DisplayName, _localization.CurrentLanguage);
+        SourceMetaText.Text = ReferenceLibraryText.Get("PackMeta", _pack.State.ArchiveFileName, _document.Entries.Count, _pack.Manifest.SchemaVersion);
     }
 
-    private void RefreshFilters()
+    private void RebuildFilters()
     {
-        var selectedProjectType = (ProjectTypeFilter.SelectedItem as FilterChoice)?.Value;
-        var selectedTag = (TagFilter.SelectedItem as FilterChoice)?.Value;
+        var projectType = (ProjectTypeBox.SelectedItem as Choice)?.Value;
+        var tag = (TagBox.SelectedItem as Choice)?.Value;
+        var sort = (SortBox.SelectedItem as Choice)?.Value;
+        var entries = _document?.Entries ?? [];
         _loading = true;
-        var projectChoices = new[] { new FilterChoice(string.Empty, T("Concept_AllProjectTypes")) }.Concat(DesignConceptDictionaryService.GetProjectTypes(_document).Select(value => new FilterChoice(value, value))).ToArray();
-        var tagChoices = new[] { new FilterChoice(string.Empty, T("Concept_AllTags")) }.Concat(DesignConceptDictionaryService.GetTags(_document).Select(value => new FilterChoice(value, value))).ToArray();
-        ProjectTypeFilter.ItemsSource = projectChoices;
-        TagFilter.ItemsSource = tagChoices;
-        ProjectTypeFilter.SelectedItem = projectChoices.FirstOrDefault(choice => string.Equals(choice.Value, selectedProjectType, StringComparison.OrdinalIgnoreCase)) ?? projectChoices[0];
-        TagFilter.SelectedItem = tagChoices.FirstOrDefault(choice => string.Equals(choice.Value, selectedTag, StringComparison.OrdinalIgnoreCase)) ?? tagChoices[0];
+        ProjectTypeBox.ItemsSource = new[] { new Choice(string.Empty, ReferenceLibraryText.Get("AllProjectTypes")) }.Concat(entries.SelectMany(entry => entry.ProjectTypes).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value).Select(value => new Choice(value, value))).ToArray();
+        TagBox.ItemsSource = new[] { new Choice(string.Empty, ReferenceLibraryText.Get("AllTags")) }.Concat(entries.SelectMany(entry => entry.Tags).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value).Select(value => new Choice(value, value))).ToArray();
+        SortBox.ItemsSource = new[] { new Choice("recent", ReferenceLibraryText.Get("Recent")), new Choice("name", ReferenceLibraryText.Get("NameSort")) };
+        SelectChoice(ProjectTypeBox, projectType);
+        SelectChoice(TagBox, tag);
+        SelectChoice(SortBox, string.IsNullOrWhiteSpace(sort) ? "recent" : sort);
         _loading = false;
     }
 
-    private void RenderCards()
+    private static void SelectChoice(ComboBox box, string? value)
     {
-        var sort = SortBox.SelectedItem is FilterChoice { Value: "created" } ? DesignConceptSort.Created : SortBox.SelectedItem is FilterChoice { Value: "name" } ? DesignConceptSort.Name : DesignConceptSort.LastModified;
-        var projectType = (ProjectTypeFilter.SelectedItem as FilterChoice)?.Value;
-        var tag = (TagFilter.SelectedItem as FilterChoice)?.Value;
-        var concepts = DesignConceptDictionaryService.Search(_document, SearchBox.Text, projectType, tag, sort);
-        ConceptsList.ItemsSource = concepts.Select(concept => new ConceptCard(concept, string.Join(" • ", concept.ApplicableProjectTypes), string.Join(" • ", concept.Tags), T("Concept_LastModified", concept.UpdatedAt.ToLocalTime().ToString("g")), concept.Name)).ToArray();
-        CountText.Text = T("Concept_Count", concepts.Count, _document.Concepts.Count);
-        ListStatus.Text = concepts.Count == 0 ? T("Concept_Empty") : string.Empty;
+        var choices = box.ItemsSource?.Cast<Choice>().ToArray() ?? [];
+        box.SelectedItem = choices.FirstOrDefault(choice => string.Equals(choice.Value, value, StringComparison.Ordinal)) ?? choices.FirstOrDefault();
     }
 
-    private void OnSearchChanged(object sender, TextChangedEventArgs args) { if (!_loading) RenderCards(); }
-    private void OnSelectionFilterChanged(object sender, SelectionChangedEventArgs args) { if (!_loading) RenderCards(); }
-
-    private void OnNewClick(object sender, RoutedEventArgs e) => BeginEdit(null);
-    private void OnConceptClick(object sender, RoutedEventArgs e) { if (sender is Button { Tag: ConceptCard card }) BeginEdit(_document.Concepts.FirstOrDefault(concept => concept.ConceptId == card.ConceptId)); }
-
-    private void BeginEdit(DesignConcept? source)
+    private void RefreshResults()
     {
-        _isNew = source is null;
-        _savedEditing = source is null ? new DesignConcept { ConceptId = Guid.NewGuid(), CreatedAt = DateTimeOffset.UtcNow, UpdatedAt = DateTimeOffset.UtcNow } : DesignConceptDictionaryService.Clone(source);
-        _editing = DesignConceptDictionaryService.Clone(_savedEditing);
-        ListPanel.Visibility = Visibility.Collapsed;
-        EditorPanel.Visibility = Visibility.Visible;
-        NewButton.Visibility = Visibility.Collapsed;
-        RenderEditor();
-        _dirty = false;
-    }
-
-    private void RenderEditor()
-    {
-        if (_editing is null) return;
-        _loading = true;
-        EditorTitle.Text = _isNew ? T("Concept_New") : _editing.Name;
-        NameBox.Text = _editing.Name;
-        DefinitionBox.Text = _editing.Definition;
-        ProjectTypesEditor.SetValues(_editing.ApplicableProjectTypes);
-        TagsEditor.SetValues(_editing.Tags);
-        SourceBox.Text = _editing.SourceOrReference ?? string.Empty;
-        NotesBox.Text = _editing.Notes ?? string.Empty;
-        TimestampsText.Text = _isNew ? string.Empty : T("Concept_Timestamps", _editing.CreatedAt.ToLocalTime().ToString("g"), _editing.UpdatedAt.ToLocalTime().ToString("g"));
-        _loading = false;
-        _baseline = DesignConceptDictionaryService.CreateEditSnapshot(_editing);
-    }
-
-    private void OnEditorChanged(object sender, TextChangedEventArgs e) { if (!_loading) UpdateDraftAndDirty(); }
-    private void OnTagValuesChanged(object? sender, EventArgs e) { if (!_loading) UpdateDraftAndDirty(); }
-
-    private void UpdateDraftAndDirty()
-    {
-        if (_editing is null) return;
-        _editing.Name = NameBox.Text;
-        _editing.Definition = DefinitionBox.Text;
-        _editing.ApplicableProjectTypes = ProjectTypesEditor.Values.ToList();
-        _editing.Tags = TagsEditor.Values.ToList();
-        _editing.SourceOrReference = SourceBox.Text;
-        _editing.Notes = NotesBox.Text;
-        var current = DesignConceptDictionaryService.CreateEditSnapshot(_editing);
-        _dirty = _baseline is not null && DesignConceptDictionaryService.HasBusinessChanges(_baseline, current);
-        if (_dirty && _baseline is not null) Debug.WriteLine($"DesignConceptDictionary dirty fields: {string.Join(',', DesignConceptDictionaryService.GetChangedFields(_baseline, current))}");
-        EditorStatus.IsOpen = false;
-    }
-
-    private async void OnSaveClick(object sender, RoutedEventArgs e)
-    {
-        if (_editing is null) return;
-        UpdateDraftAndDirty();
-        var draft = new DesignConceptDraft { Name = _editing.Name, Definition = _editing.Definition, ApplicableProjectTypes = [.. _editing.ApplicableProjectTypes], Tags = [.. _editing.Tags], SourceOrReference = _editing.SourceOrReference, Notes = _editing.Notes };
-        var now = DateTimeOffset.UtcNow;
-        var updatedAt = _isNew || _dirty ? now : _editing.UpdatedAt;
-        if (!DesignConceptDictionaryService.TryBuildConcept(draft, _editing.ConceptId, _editing.CreatedAt, updatedAt, out var concept, out var error)) { ShowEditorError(error); return; }
-        var next = DesignConceptDictionaryService.CloneDocument(_document);
-        var index = next.Concepts.FindIndex(item => item.ConceptId == concept.ConceptId);
-        if (index < 0) next.Concepts.Add(concept); else next.Concepts[index] = concept;
-        var result = await _storage.SaveAsync(next);
-        if (!result.Succeeded) { ShowEditorError("Concept_SaveFailed"); return; }
-        _document = next;
-        _isNew = false;
-        _savedEditing = DesignConceptDictionaryService.Clone(concept);
-        _editing = DesignConceptDictionaryService.Clone(concept);
-        _dirty = false;
-        RefreshFilters();
-        RenderEditor();
-        ShowEditorSuccess(T("Concept_Saved"));
-    }
-
-    private async void OnBackClick(object sender, RoutedEventArgs e)
-    {
-        UpdateDraftAndDirty();
-        if (_dirty && await ConfirmDiscardAsync() != ContentDialogResult.Primary) return;
-        ReturnToList();
-    }
-
-    private void OnResetClick(object sender, RoutedEventArgs e)
-    {
-        if (_savedEditing is null) return;
-        _editing = DesignConceptDictionaryService.Clone(_savedEditing);
-        RenderEditor();
-        _dirty = false;
-    }
-
-    private async void OnCopyClick(object sender, RoutedEventArgs e)
-    {
-        if (_editing is null) return;
-        UpdateDraftAndDirty();
-        if (_dirty && await ConfirmDiscardAsync() != ContentDialogResult.Primary) return;
-        var copy = DesignConceptDictionaryService.CreateCopy(_editing, T("Concept_CopySuffix"), DateTimeOffset.UtcNow);
-        var next = DesignConceptDictionaryService.CloneDocument(_document);
-        next.Concepts.Add(copy);
-        var result = await _storage.SaveAsync(next);
-        if (!result.Succeeded) { ShowEditorError("Concept_SaveFailed"); return; }
-        _document = next;
-        _isNew = false;
-        _savedEditing = DesignConceptDictionaryService.Clone(copy);
-        _editing = DesignConceptDictionaryService.Clone(copy);
-        RefreshFilters();
-        RenderEditor();
-        _dirty = false;
-        ShowEditorSuccess(T("Concept_Copied"));
-    }
-
-    private async void OnDeleteClick(object sender, RoutedEventArgs e)
-    {
-        if (_editing is null) return;
-        if (_isNew) { ReturnToList(); return; }
-        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = T("Concept_DeleteTitle"), Content = T("Concept_DeleteMessage", _editing.Name), PrimaryButtonText = T("Concept_Delete"), CloseButtonText = T("Action_Cancel"), DefaultButton = ContentDialogButton.Close };
-        if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return;
-        var next = DesignConceptDictionaryService.CloneDocument(_document);
-        next.Concepts.RemoveAll(concept => concept.ConceptId == _editing.ConceptId);
-        var result = await _storage.SaveAsync(next);
-        if (!result.Succeeded) { ShowEditorError("Concept_DeleteFailed"); return; }
-        _document = next;
-        ReturnToList();
-    }
-
-    private async Task<ContentDialogResult> ConfirmDiscardAsync() => await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = T("Concept_UnsavedTitle"), Content = T("Concept_UnsavedMessage"), PrimaryButtonText = T("Concept_Discard"), CloseButtonText = T("Action_Cancel"), DefaultButton = ContentDialogButton.Close });
-    private void ReturnToList()
-    {
-        _editing = null;
-        _savedEditing = null;
-        _baseline = null;
-        _dirty = false;
-        EditorPanel.Visibility = Visibility.Collapsed;
-        ListPanel.Visibility = Visibility.Visible;
-        NewButton.Visibility = Visibility.Visible;
-        RefreshFilters();
-        RenderCards();
-    }
-    private void ShowEditorError(string? error)
-    {
-        var resourceKey = error switch
+        var entries = _document?.Entries ?? [];
+        var query = SearchBox.Text.Trim();
+        var projectType = (ProjectTypeBox.SelectedItem as Choice)?.Value;
+        var tag = (TagBox.SelectedItem as Choice)?.Value;
+        var sort = (SortBox.SelectedItem as Choice)?.Value ?? "recent";
+        IEnumerable<DesignConceptRecord> filtered = entries.Where(entry =>
+            (string.IsNullOrWhiteSpace(projectType) || entry.ProjectTypes.Contains(projectType, StringComparer.Ordinal)) &&
+            (string.IsNullOrWhiteSpace(tag) || entry.Tags.Contains(tag, StringComparer.Ordinal)) &&
+            (query.Length == 0 || BuildSearchText(entry).Contains(query, StringComparison.OrdinalIgnoreCase)));
+        filtered = sort == "name"
+            ? filtered.OrderBy(entry => DisplayTitle(entry), StringComparer.CurrentCultureIgnoreCase)
+            : filtered.OrderByDescending(entry => ParseReviewed(entry.LastReviewed)).ThenBy(entry => entry.Id);
+        var results = filtered.Select(entry => new ConceptListItem(
+            entry,
+            DisplayTitle(entry),
+            DisplayDefinition(entry),
+            string.Join(" · ", new[] { entry.Category, entry.ProjectTypes.FirstOrDefault(), ReviewStatusLabel(entry.ReviewStatus) }.Where(value => !string.IsNullOrWhiteSpace(value))),
+            string.Join(" / ", entry.Tags.Take(3)))).ToArray();
+        ConceptsList.ItemsSource = results;
+        CountText.Text = ReferenceLibraryText.Get("ConceptCount", entries.Count, results.Length);
+        ListCountBadge.Text = results.Length.ToString();
+        EmptyText.Text = results.Length == 0 ? (_pack is null ? ReferenceLibraryText.Get("NoDataPackHint") : ReferenceLibraryText.Get("NoResults")) : string.Empty;
+        if (results.Length > 0)
         {
-            "ConceptNameRequired" => "Concept_NameRequired",
-            "ConceptDefinitionRequired" => "Concept_DefinitionRequired",
-            _ => error is null ? "Concept_SaveFailed" : error
-        };
-        EditorStatus.Severity = InfoBarSeverity.Error;
-        EditorStatus.Message = T(resourceKey);
-        EditorStatus.IsOpen = true;
+            var target = _selected is null ? results[0] : results.FirstOrDefault(item => item.Entry.StableId == _selected.StableId) ?? results[0];
+            ConceptsList.SelectedItem = target;
+        }
+        else
+        {
+            _selected = null;
+            DetailPanel.Visibility = Visibility.Collapsed;
+        }
     }
-    private void ShowEditorSuccess(string message) { EditorStatus.Severity = InfoBarSeverity.Success; EditorStatus.Message = message; EditorStatus.IsOpen = true; }
-    private static void ShowStatus(TextBlock block, string value) => block.Text = value;
 
-    private sealed record FilterChoice(string Value, string Display);
-    private sealed record ConceptCard(Guid ConceptId, string Name, string Definition, string ProjectTypesText, string TagsText, string UpdatedText, string AutomationName)
+    private void OnFilterChanged(object sender, TextChangedEventArgs e) { if (!_loading) RefreshResults(); }
+    private void OnSelectionFilterChanged(object sender, SelectionChangedEventArgs e) { if (!_loading) RefreshResults(); }
+    private void OnResetFiltersClick(object sender, RoutedEventArgs e)
     {
-        public ConceptCard(DesignConcept concept, string projectTypesText, string tagsText, string updatedText, string automationName) : this(concept.ConceptId, concept.Name, concept.Definition, projectTypesText, tagsText, updatedText, automationName) { }
+        _loading = true;
+        SearchBox.Text = string.Empty;
+        ProjectTypeBox.SelectedIndex = 0;
+        TagBox.SelectedIndex = 0;
+        SortBox.SelectedIndex = 0;
+        _loading = false;
+        RefreshResults();
     }
+
+    private void OnConceptSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ConceptsList.SelectedItem is not ConceptListItem item) return;
+        _selected = item.Entry;
+        RenderDetail(item.Entry);
+    }
+
+    private void RenderDetail(DesignConceptRecord entry)
+    {
+        DetailTitle.Text = DisplayTitle(entry);
+        CategoryBadge.Text = entry.Category;
+        DetailMeta.Text = $"{ReviewStatusLabel(entry.ReviewStatus)} · {entry.LastReviewed} · {entry.StableId}";
+        DetailDefinition.Text = DisplayDefinition(entry);
+        ProjectTypesList.ItemsSource = entry.ProjectTypes;
+        TagsList.ItemsSource = entry.Tags;
+        CaseText.Text = DisplayCaseNote(entry);
+        ViewSourceButton.Visibility = ResolveSources(entry).Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        DetailPanel.Visibility = Visibility.Visible;
+    }
+
+    private IReadOnlyList<DesignConceptSource> ResolveSources(DesignConceptRecord entry)
+    {
+        if (_document is null) return [];
+        var ids = entry.SourceIds.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return _document.Sources.Where(source => ids.Contains(source.Id)).ToArray();
+    }
+
+    private async void OnViewSourceClick(object sender, RoutedEventArgs e)
+    {
+        if (_selected is null) return;
+        var sources = ResolveSources(_selected);
+        if (sources.Count == 0) return;
+        var body = string.Join("\n\n", sources.Select(source =>
+        {
+            var name = ReferenceDataPackService.GetLocalized(source.Name, _localization.CurrentLanguage);
+            var note = ReferenceDataPackService.GetLocalized(source.Note, _localization.CurrentLanguage);
+            return string.Join("\n", new[] { name, source.Type, note }.Where(value => !string.IsNullOrWhiteSpace(value)));
+        }));
+        await AppDialogService.Default.ShowAsync(new ContentDialog { XamlRoot = XamlRoot, Title = ReferenceLibraryText.Get("Sources"), Content = body, CloseButtonText = ReferenceLibraryText.Get("Close") });
+    }
+
+    private void OnCopyClick(object sender, RoutedEventArgs e)
+    {
+        if (_selected is null) return;
+        var sourceNames = ResolveSources(_selected).Select(source => ReferenceDataPackService.GetLocalized(source.Name, _localization.CurrentLanguage));
+        var text = string.Join("\n", new[] { DisplayTitle(_selected), _selected.StableId, _pack?.Manifest.Version, string.Join("; ", sourceNames) }.Where(value => !string.IsNullOrWhiteSpace(value)));
+        var package = new DataPackage();
+        package.SetText(text);
+        Clipboard.SetContent(package);
+        ShowStatus(ReferenceLibraryText.Get("Copied"), InfoBarSeverity.Success);
+    }
+
+    private async void OnCheckUpdateClick(object sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+        SetBusy(true);
+        try
+        {
+            if (await ReferenceDataPackPageCoordinator.CheckAndInstallUpdateAsync(Root, PackId, StatusBar)) await ReloadAsync();
+            CloudVersionText.Text = await ReferenceDataPackPageCoordinator.GetCloudVersionTextAsync(PackId);
+        }
+        finally { SetBusy(false); }
+    }
+
+    private async void OnManageSourceClick(object sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+        SetBusy(true);
+        try { if (await ReferenceDataPackPageCoordinator.ManageAsync(Root, PackId, StatusBar)) await ReloadAsync(); }
+        finally { SetBusy(false); }
+    }
+
+    private void OnBackClick(object sender, RoutedEventArgs e) { if (Frame.CanGoBack) Frame.GoBack(); }
+
+    private void OnRootSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        var narrow = e.NewSize.Width > 0 && e.NewSize.Width < 900;
+        if (narrow)
+        {
+            ContentGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+            ContentGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+            ContentGrid.RowDefinitions[0].Height = new GridLength(Math.Clamp(Root.ActualHeight * 0.38, 260, 360));
+            ContentGrid.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
+            Grid.SetRow(ListPanel, 0); Grid.SetColumn(ListPanel, 0); Grid.SetColumnSpan(ListPanel, 2);
+            Grid.SetRow(DetailPanel, 1); Grid.SetColumn(DetailPanel, 0); Grid.SetColumnSpan(DetailPanel, 2);
+        }
+        else
+        {
+            ContentGrid.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
+            ContentGrid.RowDefinitions[1].Height = new GridLength(0);
+            ContentGrid.ColumnDefinitions[0].Width = new GridLength(0.85, GridUnitType.Star);
+            ContentGrid.ColumnDefinitions[1].Width = new GridLength(1.15, GridUnitType.Star);
+            Grid.SetRow(ListPanel, 0); Grid.SetColumn(ListPanel, 0); Grid.SetColumnSpan(ListPanel, 1);
+            Grid.SetRow(DetailPanel, 0); Grid.SetColumn(DetailPanel, 1); Grid.SetColumnSpan(DetailPanel, 1);
+        }
+    }
+
+    private string DisplayTitle(DesignConceptRecord entry) => ReferenceDataPackService.GetLocalized(entry.Title, _localization.CurrentLanguage);
+    private string DisplayDefinition(DesignConceptRecord entry) => ReferenceDataPackService.GetLocalized(entry.Definition, _localization.CurrentLanguage);
+    private string DisplayCaseNote(DesignConceptRecord entry)
+    {
+        var value = ReferenceDataPackService.GetLocalized(entry.CaseNote, _localization.CurrentLanguage);
+        if (!string.IsNullOrWhiteSpace(value)) return value;
+        return entry.CaseNote.TryGetValue("zh-CN", out var zh) ? zh : string.Empty;
+    }
+
+    private string BuildSearchText(DesignConceptRecord entry)
+    {
+        var sourceText = string.Join('\n', ResolveSources(entry).SelectMany(source => source.Name.Values.Concat(source.Note.Values)));
+        return string.Join('\n', entry.Title.Values.Concat(entry.Aliases).Concat(entry.Definition.Values).Concat(entry.ProjectTypes).Concat(entry.Tags).Concat(entry.CaseNote.Values).Append(entry.Category).Append(sourceText));
+    }
+
+    private string ReviewStatusLabel(string status) => status switch { "verified" => ReferenceLibraryText.Get("Verified"), "reviewed" => ReferenceLibraryText.Get("Reviewed"), _ => ReferenceLibraryText.Get("Seed") };
+    private static DateTimeOffset ParseReviewed(string value) => DateTimeOffset.TryParse(value, out var parsed) ? parsed : DateTimeOffset.MinValue;
+    private void SetBusy(bool value) { _busy = value; HeaderCheckButton.IsEnabled = CheckButton.IsEnabled = ManageButton.IsEnabled = !value; }
+    private void ShowStatus(string message, InfoBarSeverity severity) { StatusBar.Message = message; StatusBar.Severity = severity; StatusBar.IsOpen = true; }
+
+    private sealed record Choice(string Value, string Display);
+    private sealed record ConceptListItem(DesignConceptRecord Entry, string Name, string Definition, string Metadata, string TagsText);
 }

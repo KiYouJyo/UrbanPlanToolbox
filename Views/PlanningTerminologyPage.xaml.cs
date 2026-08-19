@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System.Text.Json;
 using Windows.ApplicationModel.DataTransfer;
 using UrbanPlanToolbox.Models;
 using UrbanPlanToolbox.Services;
@@ -70,8 +69,12 @@ public sealed partial class PlanningTerminologyPage : Page
         catch (Exception exception)
         {
             AppLogger.Default.Error(nameof(PlanningTerminologyPage), "terminology_pack_load_failed", exception);
-            _pack = null; _document = null; _selected = null;
-            RenderSource(); RebuildFilters(); RefreshResults();
+            _pack = null;
+            _document = null;
+            _selected = null;
+            RenderSource();
+            RebuildFilters();
+            RefreshResults();
             ShowStatus(ReferenceLibraryText.Get("PackFailed", exception.Message), InfoBarSeverity.Error);
         }
         finally { _loading = false; }
@@ -99,7 +102,8 @@ public sealed partial class PlanningTerminologyPage : Page
             .Concat(terms.Select(term => term.Jurisdiction).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value).Select(value => new Choice(value, value))).ToArray();
         CategoryBox.ItemsSource = new[] { new Choice(string.Empty, ReferenceLibraryText.Get("AllCategories")) }
             .Concat(terms.Select(term => term.Category).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value).Select(value => new Choice(value, value))).ToArray();
-        SelectChoice(JurisdictionBox, jurisdiction); SelectChoice(CategoryBox, category);
+        SelectChoice(JurisdictionBox, jurisdiction);
+        SelectChoice(CategoryBox, category);
         _loading = false;
     }
 
@@ -143,13 +147,15 @@ public sealed partial class PlanningTerminologyPage : Page
     {
         var result = new Dictionary<int, List<string>>();
         if (_document is null) return result;
+        foreach (var term in _document.Terms)
+        {
+            if (term.Aliases.Count == 0) continue;
+            result[term.Id] = [.. term.Aliases];
+        }
         foreach (var alias in _document.Aliases)
         {
-            var termId = ReadInt(alias, "termId", "termID", "id");
-            var text = ReadString(alias, "alias", "value", "text", "name");
-            if (termId is null || string.IsNullOrWhiteSpace(text)) continue;
-            if (!result.TryGetValue(termId.Value, out var values)) result[termId.Value] = values = [];
-            values.Add(text);
+            if (!result.TryGetValue(alias.TermId, out var values)) result[alias.TermId] = values = [];
+            if (!string.IsNullOrWhiteSpace(alias.Alias) && !values.Contains(alias.Alias, StringComparer.OrdinalIgnoreCase)) values.Add(alias.Alias);
         }
         return result;
     }
@@ -159,7 +165,12 @@ public sealed partial class PlanningTerminologyPage : Page
 
     private void OnResetFiltersClick(object sender, RoutedEventArgs e)
     {
-        _loading = true; SearchBox.Text = string.Empty; JurisdictionBox.SelectedIndex = 0; CategoryBox.SelectedIndex = 0; _loading = false; RefreshResults();
+        _loading = true;
+        SearchBox.Text = string.Empty;
+        JurisdictionBox.SelectedIndex = 0;
+        CategoryBox.SelectedIndex = 0;
+        _loading = false;
+        RefreshResults();
     }
 
     private void OnTermSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -200,57 +211,46 @@ public sealed partial class PlanningTerminologyPage : Page
         DetailPanel.Visibility = Visibility.Visible;
     }
 
-    private string CurrentDefinition(PlanningTerminologyRecord term) => _localization.CurrentLanguage.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? term.DefinitionJa : _localization.CurrentLanguage.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? term.DefinitionEn : term.DefinitionZh;
+    private string CurrentDefinition(PlanningTerminologyRecord term) =>
+        _localization.CurrentLanguage.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? term.DefinitionJa :
+        _localization.CurrentLanguage.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? term.DefinitionEn : term.DefinitionZh;
 
     private (string Context, string Text) FindComparison(PlanningTerminologyRecord term)
     {
         if (_document is not null)
         {
-            foreach (var item in _document.HighRisk)
-            {
-                var raw = item.GetRawText();
-                if (!raw.Contains(term.StableId, StringComparison.OrdinalIgnoreCase) && !raw.Contains(term.ZhCN, StringComparison.OrdinalIgnoreCase) && !raw.Contains(term.JaJP, StringComparison.OrdinalIgnoreCase)) continue;
-                var note = _localization.CurrentLanguage.StartsWith("ja", StringComparison.OrdinalIgnoreCase)
-                    ? ReadString(item, "noteJa", "differenceJa", "note", "difference")
-                    : _localization.CurrentLanguage.StartsWith("en", StringComparison.OrdinalIgnoreCase)
-                        ? ReadString(item, "noteEn", "differenceEn", "note", "difference")
-                        : ReadString(item, "noteZh", "differenceZh", "note", "difference");
-                if (!string.IsNullOrWhiteSpace(note)) return (ReadString(item, "context", "jurisdiction", "label") ?? EquivalenceLabel(term.Equivalence), note);
-            }
+            var highRisk = _document.HighRiskEquivalences.FirstOrDefault(item =>
+                TermNameMatches(item.TermA, term) || TermNameMatches(item.TermB, term));
+            if (highRisk is not null && !string.IsNullOrWhiteSpace(highRisk.NoteZh))
+                return ($"{highRisk.SystemA} ↔ {highRisk.SystemB}", highRisk.NoteZh);
         }
+        if (!string.IsNullOrWhiteSpace(term.ReviewNote)) return (EquivalenceLabel(term.Equivalence), term.ReviewNote);
+        if (!string.IsNullOrWhiteSpace(term.ConfusableOrRelated)) return (EquivalenceLabel(term.Equivalence), term.ConfusableOrRelated);
         return (EquivalenceLabel(term.Equivalence), EquivalenceExplanation(term.Equivalence));
     }
 
     private IReadOnlyList<PlanningTerminologyRecord> FindRelatedTerms(PlanningTerminologyRecord term)
     {
         if (_document is null) return [];
-        var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var edge in _document.Edges)
+        var ids = new HashSet<int>(term.RelatedTermIds);
+        foreach (var relation in _document.Relations)
         {
-            var source = ReadEndpoint(edge, "sourceId", "source", "from");
-            var target = ReadEndpoint(edge, "targetId", "target", "to");
-            if (EndpointMatches(source, term)) { if (!string.IsNullOrWhiteSpace(target)) ids.Add(target); }
-            else if (EndpointMatches(target, term)) { if (!string.IsNullOrWhiteSpace(source)) ids.Add(source); }
+            if (relation.SourceId == term.Id) ids.Add(relation.TargetId);
+            if (relation.TargetId == term.Id) ids.Add(relation.SourceId);
         }
-        return _document.Terms.Where(candidate => candidate.Id != term.Id && ids.Any(id => EndpointMatches(id, candidate))).Take(8).ToArray();
+        return _document.Terms.Where(candidate => candidate.Id != term.Id && ids.Contains(candidate.Id)).Take(8).ToArray();
     }
 
     private SourceInfo FindFirstSource(PlanningTerminologyRecord term)
     {
         if (_document is null) return new(string.Empty, string.Empty, string.Empty);
-        var sourceIds = new List<string>();
-        if (term.Extra.TryGetValue("sourceIds", out var ids) && ids.ValueKind == JsonValueKind.Array)
-            sourceIds.AddRange(ids.EnumerateArray().Select(ValueAsString).Where(value => !string.IsNullOrWhiteSpace(value))!);
-        foreach (var source in _document.Sources)
+        foreach (var sourceId in term.SourceIds)
         {
-            var id = ReadString(source, "id", "sourceId", "stableId");
-            if (sourceIds.Count > 0 && !sourceIds.Contains(id ?? string.Empty, StringComparer.OrdinalIgnoreCase)) continue;
-            var title = ReadString(source, "title", "name", "authority", "publisher") ?? "UrbanPlanToolbox_Data";
-            var status = string.Join(" · ", new[] { ReadString(source, "status", "reviewStatus"), ReadString(source, "verifiedDate", "lastReviewed", "date") }.Where(value => !string.IsNullOrWhiteSpace(value)));
-            var url = ReadString(source, "url", "officialUrl", "sourceUrl") ?? string.Empty;
-            return new(title, status, url);
+            if (!_document.Sources.TryGetValue(sourceId, out var source)) continue;
+            var title = string.Join(" · ", new[] { source.Authority, source.Title }.Where(value => !string.IsNullOrWhiteSpace(value)));
+            return new(title, source.Status, source.Url);
         }
-        return new(string.Empty, string.Empty, string.Empty);
+        return new(string.Empty, term.SourceStatus, string.Empty);
     }
 
     private void OnRelatedClick(object sender, RoutedEventArgs e)
@@ -264,24 +264,34 @@ public sealed partial class PlanningTerminologyPage : Page
     private void OnCopyClick(object sender, RoutedEventArgs e)
     {
         if (_selected is null) return;
-        var package = new DataPackage(); package.SetText($"{_selected.ZhCN}\n{_selected.JaJP}\n{_selected.EnUS}"); Clipboard.SetContent(package); ShowStatus(ReferenceLibraryText.Get("Copied"), InfoBarSeverity.Success);
+        var package = new DataPackage();
+        package.SetText($"{_selected.ZhCN}\n{_selected.JaJP}\n{_selected.EnUS}");
+        Clipboard.SetContent(package);
+        ShowStatus(ReferenceLibraryText.Get("Copied"), InfoBarSeverity.Success);
     }
 
     private async void OnOpenSourceClick(object sender, RoutedEventArgs e)
     {
-        if (!ExternalLinkService.IsSafeHttpUri(_selectedSourceUrl, out _) || !await ExternalLinkService.OpenAsync(_selectedSourceUrl)) ShowStatus(ReferenceLibraryText.Get("PackFailed", "URL"), InfoBarSeverity.Error);
+        if (!ExternalLinkService.IsSafeHttpUri(_selectedSourceUrl, out _) || !await ExternalLinkService.OpenAsync(_selectedSourceUrl))
+            ShowStatus(ReferenceLibraryText.Get("PackFailed", "URL"), InfoBarSeverity.Error);
     }
 
     private async void OnCheckUpdateClick(object sender, RoutedEventArgs e)
     {
-        if (_busy) return; SetBusy(true);
-        try { if (await ReferenceDataPackPageCoordinator.CheckAndInstallUpdateAsync(Root, PackId, StatusBar)) await ReloadAsync(); CloudVersionText.Text = await ReferenceDataPackPageCoordinator.GetCloudVersionTextAsync(PackId); }
+        if (_busy) return;
+        SetBusy(true);
+        try
+        {
+            if (await ReferenceDataPackPageCoordinator.CheckAndInstallUpdateAsync(Root, PackId, StatusBar)) await ReloadAsync();
+            CloudVersionText.Text = await ReferenceDataPackPageCoordinator.GetCloudVersionTextAsync(PackId);
+        }
         finally { SetBusy(false); }
     }
 
     private async void OnManageSourceClick(object sender, RoutedEventArgs e)
     {
-        if (_busy) return; SetBusy(true);
+        if (_busy) return;
+        SetBusy(true);
         try { if (await ReferenceDataPackPageCoordinator.ManageAsync(Root, PackId, StatusBar)) await ReloadAsync(); }
         finally { SetBusy(false); }
     }
@@ -293,54 +303,60 @@ public sealed partial class PlanningTerminologyPage : Page
         var narrow = e.NewSize.Width > 0 && e.NewSize.Width < 900;
         if (narrow)
         {
-            ContentGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star); ContentGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
-            ContentGrid.RowDefinitions[0].Height = new GridLength(Math.Clamp(Root.ActualHeight * 0.38, 260, 360)); ContentGrid.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
-            Grid.SetRow(ListPanel, 0); Grid.SetColumn(ListPanel, 0); Grid.SetColumnSpan(ListPanel, 2); Grid.SetRow(DetailPanel, 1); Grid.SetColumn(DetailPanel, 0); Grid.SetColumnSpan(DetailPanel, 2);
+            ContentGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+            ContentGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+            ContentGrid.RowDefinitions[0].Height = new GridLength(Math.Clamp(Root.ActualHeight * 0.38, 260, 360));
+            ContentGrid.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
+            Grid.SetRow(ListPanel, 0); Grid.SetColumn(ListPanel, 0); Grid.SetColumnSpan(ListPanel, 2);
+            Grid.SetRow(DetailPanel, 1); Grid.SetColumn(DetailPanel, 0); Grid.SetColumnSpan(DetailPanel, 2);
         }
         else
         {
-            ContentGrid.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star); ContentGrid.RowDefinitions[1].Height = new GridLength(0);
-            ContentGrid.ColumnDefinitions[0].Width = new GridLength(0.75, GridUnitType.Star); ContentGrid.ColumnDefinitions[1].Width = new GridLength(1.25, GridUnitType.Star);
-            Grid.SetRow(ListPanel, 0); Grid.SetColumn(ListPanel, 0); Grid.SetColumnSpan(ListPanel, 1); Grid.SetRow(DetailPanel, 0); Grid.SetColumn(DetailPanel, 1); Grid.SetColumnSpan(DetailPanel, 1);
+            ContentGrid.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
+            ContentGrid.RowDefinitions[1].Height = new GridLength(0);
+            ContentGrid.ColumnDefinitions[0].Width = new GridLength(0.75, GridUnitType.Star);
+            ContentGrid.ColumnDefinitions[1].Width = new GridLength(1.25, GridUnitType.Star);
+            Grid.SetRow(ListPanel, 0); Grid.SetColumn(ListPanel, 0); Grid.SetColumnSpan(ListPanel, 1);
+            Grid.SetRow(DetailPanel, 0); Grid.SetColumn(DetailPanel, 1); Grid.SetColumnSpan(DetailPanel, 1);
         }
     }
 
     private void SetBusy(bool value) { _busy = value; HeaderCheckButton.IsEnabled = CheckButton.IsEnabled = ManageButton.IsEnabled = !value; }
     private void ShowStatus(string message, InfoBarSeverity severity) { StatusBar.Message = message; StatusBar.Severity = severity; StatusBar.IsOpen = true; }
 
-    private string DisplayPrimary(PlanningTerminologyRecord term) => _localization.CurrentLanguage.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? term.JaJP : _localization.CurrentLanguage.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? term.EnUS : term.ZhCN;
-    private static string BuildSearchText(PlanningTerminologyRecord term, IReadOnlyList<string> aliases) => string.Join('\n', new[] { term.ZhCN, term.JaJP, term.JaReading, term.EnUS, term.Category, term.Jurisdiction, term.DefinitionZh, term.DefinitionJa, term.DefinitionEn }.Concat(aliases));
-    private static string ShortJurisdiction(string value) => value.StartsWith("中国", StringComparison.OrdinalIgnoreCase) ? "CN" : value.StartsWith("日本", StringComparison.OrdinalIgnoreCase) ? "JP" : value.StartsWith("通用", StringComparison.OrdinalIgnoreCase) ? "General" : value;
+    private string DisplayPrimary(PlanningTerminologyRecord term) =>
+        _localization.CurrentLanguage.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? term.JaJP :
+        _localization.CurrentLanguage.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? term.EnUS : term.ZhCN;
 
-    private string EquivalenceLabel(string value)
+    private static string BuildSearchText(PlanningTerminologyRecord term, IReadOnlyList<string> aliases) =>
+        string.Join('\n', new[] { term.ZhCN, term.JaJP, term.JaReading, term.EnUS, term.Category, term.Jurisdiction, term.ConceptType, term.DefinitionZh, term.DefinitionJa, term.DefinitionEn, term.ConfusableOrRelated }.Concat(aliases));
+
+    private string ShortJurisdiction(string value)
     {
-        var key = value switch { "exact" => "Terminology_Exact", "approximate" => "Terminology_Approximate", "translation-only" => "Terminology_TranslationOnly", _ => "Terminology_None" };
-        var label = _localization.GetString(key);
-        return label.StartsWith("!", StringComparison.Ordinal) ? value : label;
+        if (value.StartsWith("中国", StringComparison.OrdinalIgnoreCase)) return "CN";
+        if (value.StartsWith("日本", StringComparison.OrdinalIgnoreCase)) return "JP";
+        if (value.StartsWith("通用", StringComparison.OrdinalIgnoreCase)) return _localization.CurrentLanguage.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? "General" : value;
+        return value;
     }
 
-    private string EquivalenceExplanation(string value)
+    private string EquivalenceLabel(string value) => value switch
     {
-        var ja = _localization.CurrentLanguage.StartsWith("ja", StringComparison.OrdinalIgnoreCase);
-        var en = _localization.CurrentLanguage.StartsWith("en", StringComparison.OrdinalIgnoreCase);
-        return value switch
-        {
-            "exact" => en ? "The mapped terms are treated as a high-confidence conceptual match in this data pack." : ja ? "このデータパックでは高い確度で対応する概念として扱います。" : "该数据包将这些术语视为高置信度的概念对应。",
-            "approximate" => en ? "The terms are comparable but differ by institution, scope or planning context; avoid direct substitution." : ja ? "制度・範囲・計画文脈に差があるため、単純な置換は避けてください。" : "术语具有可比性，但制度、范围或规划语境存在差异，不宜直接互换。",
-            "translation-only" => en ? "This mapping is provided for translation and does not assert institutional equivalence." : ja ? "翻訳上の対応であり、制度的な同等性を示すものではありません。" : "该对应仅用于翻译，不表示制度层面的等同。",
-            _ => en ? "No direct cross-context equivalence is asserted." : ja ? "異なる文脈間での直接的な同等性は設定されていません。" : "该术语未声明跨语境的一一对应关系。"
-        };
-    }
+        "exact" => Local("高对应", "高対応", "High match"),
+        "approximate" => Local("近似对应", "近似対応", "Approximate"),
+        "translation-only" => Local("仅翻译", "翻訳のみ", "Translation only"),
+        _ => Local("不等同", "非同等", "Not equivalent")
+    };
 
-    private static string? ReadEndpoint(JsonElement element, params string[] names)
+    private string EquivalenceExplanation(string value) => value switch
     {
-        foreach (var name in names) if (element.TryGetProperty(name, out var property)) return ValueAsString(property);
-        return null;
-    }
-    private static bool EndpointMatches(string? endpoint, PlanningTerminologyRecord term) => !string.IsNullOrWhiteSpace(endpoint) && (string.Equals(endpoint, term.Id.ToString(), StringComparison.OrdinalIgnoreCase) || string.Equals(endpoint, term.StableId, StringComparison.OrdinalIgnoreCase) || string.Equals(endpoint, term.ZhCN, StringComparison.OrdinalIgnoreCase) || string.Equals(endpoint, term.JaJP, StringComparison.OrdinalIgnoreCase));
-    private static int? ReadInt(JsonElement element, params string[] names) { foreach (var name in names) if (element.TryGetProperty(name, out var property) && property.TryGetInt32(out var value)) return value; return null; }
-    private static string? ReadString(JsonElement element, params string[] names) { foreach (var name in names) if (element.TryGetProperty(name, out var property)) { var value = ValueAsString(property); if (!string.IsNullOrWhiteSpace(value)) return value; } return null; }
-    private static string? ValueAsString(JsonElement element) => element.ValueKind switch { JsonValueKind.String => element.GetString(), JsonValueKind.Number => element.GetRawText(), _ => null };
+        "exact" => Local("该数据包将这些术语视为高置信度的概念对应。", "このデータパックでは高い確度で対応する概念として扱います。", "The mapped terms are treated as a high-confidence conceptual match in this data pack."),
+        "approximate" => Local("术语具有可比性，但制度、范围或规划语境存在差异，不宜直接互换。", "制度・範囲・計画文脈に差があるため、単純な置換は避けてください。", "The terms are comparable but differ by institution, scope or planning context; avoid direct substitution."),
+        "translation-only" => Local("该对应仅用于翻译，不表示制度层面的等同。", "翻訳上の対応であり、制度的な同等性を示すものではありません。", "This mapping is provided for translation and does not assert institutional equivalence."),
+        _ => Local("该术语未声明跨语境的一一对应关系。", "異なる文脈間での直接的な同等性は設定されていません。", "No direct cross-context equivalence is asserted.")
+    };
+
+    private string Local(string zh, string ja, string en) => _localization.CurrentLanguage.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? ja : _localization.CurrentLanguage.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? en : zh;
+    private static bool TermNameMatches(string value, PlanningTerminologyRecord term) => string.Equals(value, term.ZhCN, StringComparison.OrdinalIgnoreCase) || string.Equals(value, term.JaJP, StringComparison.OrdinalIgnoreCase) || string.Equals(value, term.EnUS, StringComparison.OrdinalIgnoreCase);
 
     private sealed record Choice(string Value, string Display);
     private sealed record TermListItem(PlanningTerminologyRecord Term, string Metadata) { public string ZhCN => Term.ZhCN; public string JaJP => Term.JaJP; public string EnUS => Term.EnUS; }
