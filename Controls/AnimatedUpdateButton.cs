@@ -43,7 +43,7 @@ public sealed class AnimatedUpdateButton : Button
 
         if (page.FindName("BackButton") is HyperlinkButton backButton)
         {
-            backButton.Padding = new Thickness(10, 6);
+            backButton.Padding = new Thickness(10, 6, 10, 6);
             backButton.CornerRadius = new CornerRadius(7);
             backButton.BorderThickness = new Thickness(1);
             backButton.Background = ResolveBrush("CardBackgroundFillColorDefaultBrush");
