@@ -105,16 +105,34 @@ public sealed class ProjectWorkspaceRepairContractTests
     }
 
     [Fact]
-    public void WorkspaceTilesAndOverviewUseTheSameOpaqueThemeSurface()
+    public void WorkspaceTilesAndOverviewUseSharedFirstLevelCardSurface()
     {
         var root = FindRepositoryRoot();
         var polish = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round6.UiPolish.cs"));
 
         Assert.Contains("ApplyRound6WorkspaceCardBackgrounds", polish);
+        Assert.Contains("ResourceBrush(\"CardBackgroundFillColorDefaultBrush\")", polish);
         Assert.Contains("OverviewCard.Background = background", polish);
         Assert.Contains("tile.Background = background", polish);
-        Assert.Contains("FromArgb(255, 252, 252, 252)", polish);
-        Assert.Contains("FromArgb(255, 43, 43, 43)", polish);
+        Assert.DoesNotContain("FromArgb(255, 252, 252, 252)", polish);
+        Assert.DoesNotContain("FromArgb(255, 43, 43, 43)", polish);
+    }
+
+    [Fact]
+    public void ReferenceLibraryBackNavigationUsesStandardButtons()
+    {
+        var root = FindRepositoryRoot();
+        foreach (var page in new[]
+        {
+            "RegulationsIndexPage.xaml",
+            "PlanningTerminologyPage.xaml",
+            "DesignConceptDictionaryPage.xaml"
+        })
+        {
+            var xaml = File.ReadAllText(Path.Combine(root, "Views", page));
+            Assert.Contains("<Button x:Name=\"BackButton\"", xaml);
+            Assert.DoesNotContain("<HyperlinkButton x:Name=\"BackButton\"", xaml);
+        }
     }
 
     [Fact]
