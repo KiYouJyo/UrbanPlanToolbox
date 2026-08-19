@@ -1,20 +1,21 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.9.1", "packageVersion": "1.9.1.0" },
-  "classification": { "kind": "maintenance-release", "stability": "approved-for-publication", "storeMilestone": false },
-  "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.9.2", "packageVersion": "1.9.2.0" },
+  "classification": { "kind": "feature-release", "stability": "validation-pending", "storeMilestone": false },
+  "channels": { "github": { "publish": false }, "microsoftStore": { "submit": false } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.9.1 稳定性与项目工作台维护",
-    "ja-JP": "UrbanPlanToolbox v1.9.1 安定性とプロジェクトワークスペース保守",
-    "en-US": "UrbanPlanToolbox v1.9.1 Stability and project workspace maintenance"
+    "zh-CN": "UrbanPlanToolbox v1.9.2 专业资料库与 Data Pack 1.0",
+    "ja-JP": "UrbanPlanToolbox v1.9.2 専門データライブラリと Data Pack 1.0",
+    "en-US": "UrbanPlanToolbox v1.9.2 Professional libraries and Data Pack 1.0"
   },
   "languageLabels": { "zh-CN": "简体中文", "ja-JP": "日本語", "en-US": "English" },
   "items": [
-    { "id": "version-source-alignment", "zh-CN": "完成 1.9.1 版本事实源、三语发布说明、签名验收与双端发布治理收口。", "ja-JP": "1.9.1 のバージョン情報、三言語リリースノート、署名受け入れ、二系統公開ガバナンスを整理しました。", "en-US": "Closes out 1.9.1 version-source alignment, trilingual release notes, signed acceptance, and dual-channel release governance." },
-    { "id": "project-workspace-maintenance", "zh-CN": "维护项目工作台：设计项目概览使用重点策略信息，重点策略支持逐条维护，研究项目移除结果图表与数据/脚本卡片。", "ja-JP": "プロジェクトワークスペースを保守し、設計プロジェクト概要の重点戦略表示、戦略の個別編集、研究プロジェクトから結果チャートとデータ／スクリプトカードの削除を行いました。", "en-US": "Maintains the project workspace with key-strategy information in design overviews, item-by-item strategy editing, and removal of results-chart and data/scripts cards from research projects." },
-    { "id": "workspace-stability", "zh-CN": "修复进入项目时可能因布局更新反馈循环导致卡死或闪退的问题，并加强相关回归检查。", "ja-JP": "レイアウト更新のフィードバックループによりプロジェクトを開く際にフリーズまたは終了する可能性がある問題を修正し、回帰チェックを強化しました。", "en-US": "Fixes a layout-update feedback loop that could freeze or terminate the app when opening a project, with stronger regression coverage." },
-    { "id": "strategy-card-presentation", "zh-CN": "重点策略卡片支持按卡片宽度换行，并在内容超过卡片高度时纵向滚动。", "ja-JP": "重点戦略カードはカード幅に合わせて折り返し、内容が高さを超える場合は縦スクロールできます。", "en-US": "Key-strategy cards now wrap to the available card width and scroll vertically when content exceeds the card height." },
-    { "id": "legal-markdown", "zh-CN": "隐私政策与第三方声明改为格式化 Markdown 展示，不再直接显示 Markdown 源标记。", "ja-JP": "プライバシーポリシーと第三者通知を整形済み Markdown として表示し、Markdown のソース記号を直接表示しないようにしました。", "en-US": "Privacy and third-party notices now render as formatted Markdown instead of exposing Markdown source markers." }
+    { "id": "professional-library-ui", "zh-CN": "按新版 Figma 设计重构法规索引、规划术语库和设计理念词典，统一数据源、检索列表和详情面板。", "ja-JP": "新しい Figma デザインに合わせ、法規索引、都市計画用語集、デザインコンセプト辞典を共通のデータソース、検索リスト、詳細ペイン構成へ刷新しました。", "en-US": "Rebuilds the regulations index, planning terminology, and design concepts dictionary around a shared data-source, search-list, and detail-pane experience based on the new Figma designs." },
+    { "id": "datapack-repository", "zh-CN": "三套资料库正式接入 UrbanPlanToolbox_Data，数据版本与应用版本独立演进，新页面不再使用主仓库旧快照作为运行时数据源。", "ja-JP": "3 つのライブラリを UrbanPlanToolbox_Data に正式接続し、データ版をアプリ版から独立させ、新画面ではメインリポジトリの旧スナップショットを実行時データソースに使用しません。", "en-US": "Connects the three libraries to UrbanPlanToolbox_Data so data versions evolve independently from app versions; the redesigned pages no longer use legacy app-repository snapshots as runtime sources." },
+    { "id": "datapack-client", "zh-CN": "新增 DataPackResolver、DataPackCatalogService 与 DataPackInstaller，支持官方 Catalog、Release 下载、本地 .uptdata 导入和上一版本回退。", "ja-JP": "DataPackResolver、DataPackCatalogService、DataPackInstaller を追加し、公式 Catalog、Release 取得、ローカル .uptdata 読み込み、前版へのロールバックに対応しました。", "en-US": "Adds DataPackResolver, DataPackCatalogService, and DataPackInstaller for the official catalog, Release downloads, local .uptdata import, and rollback." },
+    { "id": "datapack-validation", "zh-CN": "Data Pack 1.0 激活前校验 Pack ID、Schema、最低应用版本、路径安全、文件大小和 SHA-256，并拒绝未声明文件与路径穿越。", "ja-JP": "Data Pack 1.0 は有効化前に Pack ID、Schema、最低アプリ版、パス安全性、サイズ、SHA-256 を検証し、未宣言ファイルとパストラバーサルを拒否します。", "en-US": "Data Pack 1.0 validates pack ID, schema, minimum app version, path safety, sizes, and SHA-256 before activation, rejecting undeclared files and path traversal." },
+    { "id": "initial-data", "zh-CN": "首批 2026.08.1 面向 221 条法规索引、140 个中日英规划术语及 18 条设计理念。", "ja-JP": "初回 2026.08.1 は法規索引 221 件、中日英用語 140 件、デザインコンセプト 18 件を対象とします。", "en-US": "The initial 2026.08.1 set targets 221 regulation entries, 140 trilingual planning terms, and 18 design concepts." },
+    { "id": "offline-boundary", "zh-CN": "数据更新仅由用户主动触发；已安装数据保持离线可用，并保留历史版本用于回退。", "ja-JP": "データ更新はユーザー操作時のみ行われ、インストール済みデータはオフライン利用可能で、旧版はロールバック用に保持されます。", "en-US": "Data updates are user-triggered; installed packs remain available offline and prior versions are retained for rollback." }
   ]
 }
