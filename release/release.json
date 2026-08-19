@@ -1,21 +1,19 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.9.0", "packageVersion": "1.9.0.0" },
-  "classification": { "kind": "customizable-project-workspace", "stability": "prepared-for-validation", "storeMilestone": false },
-  "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.9.1", "packageVersion": "1.9.1.0" },
+  "classification": { "kind": "engineering-closeout", "stability": "prepared-for-validation", "storeMilestone": false },
+  "channels": { "github": { "publish": false }, "microsoftStore": { "submit": false } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.9.0 自由磁贴项目工作台",
-    "ja-JP": "UrbanPlanToolbox v1.9.0 自由配置タイル型プロジェクトワークスペース",
-    "en-US": "UrbanPlanToolbox v1.9.0 Customizable tile project workspace"
+    "zh-CN": "UrbanPlanToolbox v1.9.1 工程收口与版本治理",
+    "ja-JP": "UrbanPlanToolbox v1.9.1 エンジニアリング・クローズアウトとバージョン管理",
+    "en-US": "UrbanPlanToolbox v1.9.1 Engineering closeout and version governance"
   },
   "languageLabels": { "zh-CN": "简体中文", "ja-JP": "日本語", "en-US": "English" },
   "items": [
-    { "id": "fixed-overview-custom-workspace", "zh-CN": "全面重绘设计项目与研究项目页面：顶部保留固定项目概览，下方改为可按项目独立编排的自由磁贴工作台，减少密集表单带来的视觉负担。", "ja-JP": "設計プロジェクト／研究プロジェクト画面を全面的に再設計しました。上部には固定のプロジェクト概要を残し、その下をプロジェクトごとに自由配置できるタイル型ワークスペースへ変更し、密集した入力フォームによる視覚的負担を減らしました。", "en-US": "Redesigns design and research project pages around a fixed project overview plus a project-scoped customizable tile workspace, replacing the dense always-visible form layout." },
-    { "id": "direct-layout-editing", "zh-CN": "支持在工作台中直接长按移动面板并拖动右下角调整大小，宽窗口使用 12 列布局，中等宽度自动映射为 8/6 列，窄窗口切换为单列阅读，同时保持跨窗口尺寸的一致布局。", "ja-JP": "ワークスペース上でパネルを長押しして移動し、右下のグリップでサイズ変更できます。広い画面では12列、中間幅では8／6列、狭い画面では1列表示へ自動変換し、画面サイズをまたいでもレイアウトの一貫性を保ちます。", "en-US": "Adds direct long-press panel movement and lower-right resize grips. The workspace renders as 12 columns on wide windows, maps to 8/6 columns at medium widths, and switches to a single-column reading view on narrow windows while preserving the canonical saved layout." },
-    { "id": "safe-layout-reset", "zh-CN": "恢复默认布局现在只重置面板位置和尺寸，并保留面板 ID、标题、设置及内容；删除面板也不会删除项目正文、图片、文件、灵感或时间节点等源数据。", "ja-JP": "既定レイアウトへの復元はパネルの位置とサイズだけをリセットし、ID・タイトル・設定・内容を保持します。パネルを削除しても、本文、画像、ファイル、アイデア、マイルストーンなどの元データは削除されません。", "en-US": "Restoring the default layout now resets only panel geometry while preserving panel IDs, titles, settings, and content. Removing a panel also leaves underlying project text, images, files, inspirations, and milestones intact." },
-    { "id": "image-showcase-viewer", "zh-CN": "重做图片展示架与图片查看器：展示架支持横向轮播、滚轮与翻页按钮；查看器默认完整居中适应图片，支持 25%–600% 缩放、滚动、左右切图和键盘控制，放大图片不会再遮挡翻页按钮。", "ja-JP": "画像ショーケースとビューアーを刷新しました。ショーケースは横スクロール、ホイール、前後ボタンに対応し、ビューアーは画像を中央に全体表示した状態から25%～600%のズーム、スクロール、前後移動、キーボード操作ができます。拡大画像がページ送りボタンを覆うこともありません。", "en-US": "Rebuilds the image showcase and viewer with horizontal carousel paging, mouse-wheel navigation, dedicated previous/next controls, centered Fit mode, 25%–600% zoom, scrolling, and keyboard navigation. Zoomed images no longer cover paging buttons." },
-    { "id": "milestones-inspirations-files", "zh-CN": "时间节点与研究进度面板会直接显示备注；关联灵感可阅读标题、正文、分类与更新时间；文件入口支持多个项目文件夹，并在升级或重新安装导致旧访问令牌失效时回退到已保存的文件系统路径继续打开。", "ja-JP": "マイルストーン／研究進捗パネルでメモを直接表示し、関連アイデアではタイトル、本文、分類、更新時刻を確認できます。ファイル入口は複数フォルダーに対応し、更新や再インストールで旧アクセス・トークンが失効しても保存済みパスから開き直せます。", "en-US": "Milestone and research-progress tiles now show notes directly; linked inspirations expose title, full content, category, and update time; Files supports multiple project folders and falls back to the persisted filesystem path when an old Windows access token becomes invalid after update or reinstall." },
-    { "id": "focused-editing-compatibility", "zh-CN": "项目概览、时间节点、图片展示架、文件入口及其他面板内容改为按需编辑；归档项目继续保持只读，旧项目首次打开时会自动建立并保存兼容的新工作台布局。", "ja-JP": "プロジェクト概要、マイルストーン、画像ショーケース、ファイル入口、そのほかのパネル内容は必要なときだけ編集する方式に整理しました。アーカイブ済みプロジェクトは読み取り専用のままで、旧プロジェクトは初回表示時に互換性のある新ワークスペースを自動生成・保存します。", "en-US": "Moves project overview, milestones, image showcase, files, and other panel content into focused on-demand editing. Archived projects remain read-only, while older projects automatically receive and persist a compatible workspace layout when first opened." }
+    { "id": "version-source-alignment", "zh-CN": "统一应用版本、程序集版本、GitHub 与 Store Manifest、候选发布元数据和项目状态 SSOT，消除 1.9.0 构建状态与旧 1.8.5 文档状态并存的问题。", "ja-JP": "アプリ、アセンブリ、GitHub／Store Manifest、候補リリースメタデータ、プロジェクト状態 SSOT のバージョンを統一し、1.9.0 のビルド状態と古い 1.8.5 の文書状態が併存する不整合を解消します。", "en-US": "Aligns application, assembly, GitHub/Store manifest, candidate release metadata, and project-status SSOT versions, eliminating the split between the 1.9.0 build state and stale 1.8.5 documentation state." },
+    { "id": "ssot-ci-guard", "zh-CN": "加强 CI 文档一致性检查：项目状态中的产品版本和候选包版本必须与 release/release.json、csproj 与两个 Manifest 保持一致，今后版本事实源漂移会直接阻断合并。", "ja-JP": "CI の文書整合性チェックを強化し、project-status の製品版／候補パッケージ版が release/release.json、csproj、両 Manifest と一致することを必須化します。今後のバージョン情報のずれはマージ前に検出されます。", "en-US": "Strengthens CI documentation consistency checks so project-status product/candidate versions must match release/release.json, the project file, and both manifests; future version-source drift now blocks merge." },
+    { "id": "generic-signed-acceptance", "zh-CN": "将写死 1.9.0 的签名验收流程改为读取当前发布元数据的版本无关流程，后续维护版本无需复制新的验收工作流。", "ja-JP": "1.9.0 固定だった署名受け入れフローを、現在のリリースメタデータからバージョンを取得する汎用フローへ変更し、今後の保守版ごとのワークフロー複製を不要にします。", "en-US": "Replaces the hard-coded 1.9.0 signed-acceptance path with a version-agnostic flow driven by current release metadata, removing the need to clone an acceptance workflow for each maintenance version." },
+    { "id": "history-closeout", "zh-CN": "补齐 1.8.1 至 1.9.0 的 CHANGELOG 历史，并为 1.9.1 建立三语发布说明和结构化运行时说明；本轮不改变项目/备份 Schema、更新器机制或用户功能。", "ja-JP": "1.8.1～1.9.0 の CHANGELOG 履歴を補完し、1.9.1 の三言語リリースノートと構造化ランタイムノートを追加します。プロジェクト／バックアップ Schema、更新機構、ユーザー機能は変更しません。", "en-US": "Backfills CHANGELOG history for 1.8.1 through 1.9.0 and adds trilingual plus structured 1.9.1 release notes. This closeout does not change project/backup schemas, updater behavior, or user features." }
   ]
 }
