@@ -2,7 +2,7 @@
     x:Class="UrbanPlanToolbox.Views.ProjectWorkspacePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Loaded="OnWorkspaceLoaded"
+    Loaded="OnRound1WorkspaceLoaded"
     SizeChanged="OnPageSizeChanged">
 
   <Grid>

@@ -8,22 +8,29 @@ public sealed class ProjectWorkspaceRepairContractTests
     public void DesignOverviewUsesKeyStrategiesInsteadOfAmbiguousCurrentStage()
     {
         var root = FindRepositoryRoot();
+        var xaml = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.xaml"));
         var fixes = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round1Fixes.cs"));
 
+        Assert.Contains("Loaded=\"OnRound1WorkspaceLoaded\"", xaml);
+        Assert.Contains("OnWorkspaceLoaded(sender, e);", fixes);
+        Assert.Contains("EditOverviewButton.Click += OnRound1EditOverview", fixes);
         Assert.Contains("OverviewLabel2.Text = W(\"重点策略\"", fixes);
         Assert.Contains("ProjectStrategyList.Count(_project.PlanningRequirements)", fixes);
         Assert.DoesNotContain("OverviewLabel2.Text = W(\"当前阶段\"", fixes);
     }
 
     [Fact]
-    public void WorkspaceCardEditorsCloseOnEscape()
+    public void WorkspaceCardEditorsSaveOnEscape()
     {
         var root = FindRepositoryRoot();
         var fixes = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round1Fixes.cs"));
 
         Assert.Contains("UIElement.KeyDownEvent", fixes);
         Assert.Contains("VirtualKey.Escape", fixes);
-        Assert.Contains("CloseDrawer();", fixes);
+        Assert.Contains("Project_Action_Save", fixes);
+        Assert.Contains("ButtonAutomationPeer", fixes);
+        Assert.Contains("IInvokeProvider", fixes);
+        Assert.Contains("invokeProvider.Invoke();", fixes);
         Assert.Contains("e.Handled = true;", fixes);
     }
 
@@ -37,6 +44,7 @@ public sealed class ProjectWorkspaceRepairContractTests
         Assert.Contains("StrategyListEditor", fixes);
         Assert.Contains("AddRow", fixes);
         Assert.Contains("RemoveRow", fixes);
+        Assert.Contains("OpenRound1StrategyEditor", fixes);
         Assert.Contains("ProjectStrategyList.Serialize", fixes);
         Assert.Contains("['\\r', '\\n', '；', ';']", strategyList);
         Assert.Contains("StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries", strategyList);
