@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text.Json;
 using UrbanPlanToolbox.Models;
@@ -10,6 +11,8 @@ public sealed class DataPackInstaller
     private const long MaxArchiveBytes = 64L * 1024 * 1024;
     private const long MaxExpandedBytes = 128L * 1024 * 1024;
     private const int MaxEntries = 64;
+    private const string OfficialReleasePrefix = "/KiYouJyo/UrbanPlanToolbox_Data/releases/download/";
+    private const string ReleaseApiPrefix = "https://api.github.com/repos/KiYouJyo/UrbanPlanToolbox_Data/releases/tags/";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { PropertyNameCaseInsensitive = true };
 
     private readonly DataPackStateStore _stateStore;
@@ -67,27 +70,26 @@ public sealed class DataPackInstaller
         if (entry.SchemaVersion != ReferenceDataPackService.SupportedSchemaVersion) throw new InvalidDataException("The catalog data schema is not supported.");
         if (!Uri.TryCreate(entry.DownloadUrl, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps || !string.Equals(uri.Host, "github.com", StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("The catalog download URL is invalid.");
-        if (!uri.AbsolutePath.Contains("/KiYouJyo/UrbanPlanToolbox_Data/releases/download/", StringComparison.OrdinalIgnoreCase))
+        if (!uri.AbsolutePath.Contains(OfficialReleasePrefix, StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("The catalog download URL does not target the official data repository.");
+        if (string.IsNullOrWhiteSpace(entry.Sha256)) throw new InvalidDataException("The catalog does not contain SHA-256 for this data pack.");
 
         var directory = _stateStore.GetPackDirectory(packId);
         var downloadPath = Path.Combine(directory, $".{packId}-{Guid.NewGuid():N}.download");
         try
         {
-            using var response = await _http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-            if (response.Content.Headers.ContentLength is > MaxArchiveBytes) throw new InvalidDataException("The remote data pack exceeds the supported size limit.");
-            await using (var input = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
-            await using (var output = new FileStream(downloadPath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true))
-                await CopyWithLimitAsync(input, output, MaxArchiveBytes, cancellationToken).ConfigureAwait(false);
+            await DownloadVerifiedArchiveAsync(uri, entry, downloadPath, cancellationToken).ConfigureAwait(false);
 
-            var downloadedLength = new FileInfo(downloadPath).Length;
-            if (entry.SizeBytes is > 0 && downloadedLength != entry.SizeBytes.Value) throw new InvalidDataException("The downloaded data-pack size does not match the catalog.");
-            if (string.IsNullOrWhiteSpace(entry.Sha256)) throw new InvalidDataException("The catalog does not contain SHA-256 for this data pack.");
-            VerifySha256(downloadPath, entry.Sha256);
-            var state = await InstallFromFileAsync(packId, downloadPath, "official", cancellationToken).ConfigureAwait(false);
-            if (!string.Equals(state.Version, entry.Version, StringComparison.Ordinal)) throw new InvalidDataException("The installed data-pack version does not match the catalog.");
-            return state;
+            // Verify the runtime manifest against the catalog before changing active-pack.json.
+            // InstallFromFileAsync validates again immediately before activation; the duplicate pass is
+            // intentional so a catalog/version mismatch can never leave a newly activated bad state.
+            var validated = await ValidateArchiveAsync(packId, downloadPath, cancellationToken).ConfigureAwait(false);
+            if (!string.Equals(validated.Manifest.Version, entry.Version, StringComparison.Ordinal))
+                throw new InvalidDataException("The downloaded data-pack version does not match the catalog.");
+            if (validated.Manifest.SchemaVersion != entry.SchemaVersion)
+                throw new InvalidDataException("The downloaded data-pack schema does not match the catalog.");
+
+            return await InstallFromFileAsync(packId, downloadPath, "official", cancellationToken).ConfigureAwait(false);
         }
         finally
         {
@@ -146,6 +148,103 @@ public sealed class DataPackInstaller
         using (var reader = new StreamReader(dataEntry.Open())) dataJson = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
         ReferenceDataPackService.ValidateFeatureData(packId, dataJson);
         return new DataPackValidationResult(manifest, dataJson);
+    }
+
+    private async Task DownloadVerifiedArchiveAsync(Uri primaryUri, ReferenceDataPackCatalogEntry entry, string downloadPath, CancellationToken cancellationToken)
+    {
+        var failures = new List<Exception>();
+
+        for (var attempt = 1; attempt <= 2; attempt++)
+        {
+            try
+            {
+                await DownloadOnceAsync(primaryUri, downloadPath, null, cancellationToken).ConfigureAwait(false);
+                VerifyCatalogDownload(downloadPath, entry);
+                if (attempt > 1)
+                    AppLogger.Default.Info(nameof(DataPackInstaller), "pack_download_retry_succeeded", $"{entry.PackId}@{entry.Version}; attempt={attempt}");
+                return;
+            }
+            catch (Exception exception) when (IsRetryableDownloadFailure(exception, cancellationToken))
+            {
+                failures.Add(exception);
+                AppLogger.Default.Warning(nameof(DataPackInstaller), "pack_download_attempt_failed", $"{entry.PackId}@{entry.Version}; direct attempt={attempt}; {exception.Message}");
+                TryDelete(downloadPath);
+                if (attempt < 2) await Task.Delay(TimeSpan.FromMilliseconds(350 * attempt), cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        try
+        {
+            var assetApiUri = await ResolveReleaseAssetApiUriAsync(primaryUri, entry.FileName, cancellationToken).ConfigureAwait(false);
+            await DownloadOnceAsync(assetApiUri, downloadPath, "application/octet-stream", cancellationToken).ConfigureAwait(false);
+            VerifyCatalogDownload(downloadPath, entry);
+            AppLogger.Default.Info(nameof(DataPackInstaller), "pack_download_api_fallback_succeeded", $"{entry.PackId}@{entry.Version}; asset={entry.FileName}");
+            return;
+        }
+        catch (Exception exception) when (IsRetryableDownloadFailure(exception, cancellationToken))
+        {
+            failures.Add(exception);
+            TryDelete(downloadPath);
+            AppLogger.Default.Warning(nameof(DataPackInstaller), "pack_download_api_fallback_failed", $"{entry.PackId}@{entry.Version}; {exception.Message}");
+        }
+
+        throw new HttpRequestException(
+            $"Unable to download and verify the official data pack after direct retries and the GitHub API fallback. {string.Join(" | ", failures.Select(item => item.Message))}",
+            failures.LastOrDefault());
+    }
+
+    private async Task DownloadOnceAsync(Uri uri, string downloadPath, string? accept, CancellationToken cancellationToken)
+    {
+        TryDelete(downloadPath);
+        using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+        if (!string.IsNullOrWhiteSpace(accept)) request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
+        request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
+
+        using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        if (response.Content.Headers.ContentLength is > MaxArchiveBytes) throw new InvalidDataException("The remote data pack exceeds the supported size limit.");
+        await using var input = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        await using var output = new FileStream(downloadPath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true);
+        await CopyWithLimitAsync(input, output, MaxArchiveBytes, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task<Uri> ResolveReleaseAssetApiUriAsync(Uri browserDownloadUri, string expectedFileName, CancellationToken cancellationToken)
+    {
+        var path = browserDownloadUri.AbsolutePath;
+        var prefixIndex = path.IndexOf(OfficialReleasePrefix, StringComparison.OrdinalIgnoreCase);
+        if (prefixIndex < 0) throw new InvalidDataException("The official release URL cannot be resolved to the GitHub API.");
+        var remainder = path[(prefixIndex + OfficialReleasePrefix.Length)..];
+        var separator = remainder.IndexOf('/');
+        if (separator <= 0 || separator >= remainder.Length - 1) throw new InvalidDataException("The official release URL is missing a tag or asset name.");
+        var tag = Uri.UnescapeDataString(remainder[..separator]);
+        var fileName = Uri.UnescapeDataString(remainder[(separator + 1)..]);
+        if (!string.IsNullOrWhiteSpace(expectedFileName) && !string.Equals(fileName, expectedFileName, StringComparison.Ordinal))
+            throw new InvalidDataException("The catalog file name does not match the release asset URL.");
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri(ReleaseApiPrefix + Uri.EscapeDataString(tag)));
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+        request.Headers.TryAddWithoutValidation("X-GitHub-Api-Version", "2022-11-28");
+        using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        var release = await JsonSerializer.DeserializeAsync<GitHubReleaseAssetEnvelope>(stream, JsonOptions, cancellationToken).ConfigureAwait(false)
+                      ?? throw new InvalidDataException("The GitHub release metadata is empty.");
+        var asset = release.Assets.FirstOrDefault(candidate => string.Equals(candidate.Name, fileName, StringComparison.Ordinal));
+        if (asset is null || !Uri.TryCreate(asset.Url, UriKind.Absolute, out var apiUri) || apiUri.Scheme != Uri.UriSchemeHttps || !string.Equals(apiUri.Host, "api.github.com", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("The matching official data-pack asset could not be resolved through the GitHub API.");
+        return apiUri;
+    }
+
+    private static bool IsRetryableDownloadFailure(Exception exception, CancellationToken cancellationToken) =>
+        exception is HttpRequestException or IOException or InvalidDataException ||
+        exception is OperationCanceledException && !cancellationToken.IsCancellationRequested;
+
+    private static void VerifyCatalogDownload(string downloadPath, ReferenceDataPackCatalogEntry entry)
+    {
+        var downloadedLength = new FileInfo(downloadPath).Length;
+        if (downloadedLength <= 0) throw new InvalidDataException("The downloaded data pack is empty.");
+        if (entry.SizeBytes is > 0 && downloadedLength != entry.SizeBytes.Value) throw new InvalidDataException("The downloaded data-pack size does not match the catalog.");
+        VerifySha256(downloadPath, entry.Sha256);
     }
 
     private static void ValidateManifest(string packId, ReferenceDataPackManifest manifest)
@@ -217,6 +316,22 @@ public sealed class DataPackInstaller
         var invalid = Path.GetInvalidFileNameChars();
         var value = string.Concat(fileName.Select(character => invalid.Contains(character) ? '_' : character));
         return value.EndsWith(".uptdata", StringComparison.OrdinalIgnoreCase) ? value : value + ".uptdata";
+    }
+
+    private static void TryDelete(string path)
+    {
+        try { if (File.Exists(path)) File.Delete(path); } catch { }
+    }
+
+    private sealed class GitHubReleaseAssetEnvelope
+    {
+        public List<GitHubReleaseAsset> Assets { get; init; } = [];
+    }
+
+    private sealed class GitHubReleaseAsset
+    {
+        public string Name { get; init; } = string.Empty;
+        public string Url { get; init; } = string.Empty;
     }
 }
 
