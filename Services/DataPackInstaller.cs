@@ -208,7 +208,7 @@ public sealed class DataPackInstaller
     private static void ValidateArchivePath(string path)
     {
         var normalized = path.Replace('\\', '/');
-        if (string.IsNullOrWhiteSpace(normalized) || normalized.StartsWith('/', StringComparison.Ordinal) || normalized.Contains(':', StringComparison.Ordinal)) throw new InvalidDataException("The .uptdata archive contains an unsafe path.");
+        if (string.IsNullOrWhiteSpace(normalized) || normalized.StartsWith("/", StringComparison.Ordinal) || normalized.Contains(':')) throw new InvalidDataException("The .uptdata archive contains an unsafe path.");
         if (normalized.Split('/', StringSplitOptions.RemoveEmptyEntries).Any(segment => segment is "." or "..")) throw new InvalidDataException("The .uptdata archive contains path traversal.");
     }
 
