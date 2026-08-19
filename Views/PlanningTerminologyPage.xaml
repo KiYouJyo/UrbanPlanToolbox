@@ -15,7 +15,7 @@
     </Grid.RowDefinitions>
 
     <StackPanel Grid.Row="0" Spacing="6">
-      <HyperlinkButton x:Name="BackButton" Click="OnBackClick" HorizontalAlignment="Left" Padding="0,4" Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+      <Button x:Name="BackButton" Click="OnBackClick" HorizontalAlignment="Left"/>
       <Grid ColumnSpacing="12">
         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <StackPanel Spacing="4">
