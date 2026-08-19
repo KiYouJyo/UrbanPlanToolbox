@@ -69,7 +69,7 @@ public sealed class ReferenceDataPackIntegrationContractTests
     }
 
     [Fact]
-    public void ProfessionalLibraryControlsUseTextBackLinksAnimatedUpdateButtonsAndRightFilterClusters()
+    public void ProfessionalLibraryControlsUseVisibleBackButtonsAnimatedUpdateButtonsAndRightFilterClusters()
     {
         var root = FindRepositoryRoot();
         foreach (var page in new[]
@@ -96,6 +96,36 @@ public sealed class ReferenceDataPackIntegrationContractTests
         var button = File.ReadAllText(Path.Combine(root, "Controls", "AnimatedUpdateButton.cs"));
         Assert.Contains("ProgressRing", button, StringComparison.Ordinal);
         Assert.Contains("_clickedBusy && !IsEnabled", button, StringComparison.Ordinal);
+        Assert.Contains("ApplyBackButtonChrome", button, StringComparison.Ordinal);
+        Assert.Contains("Color.FromArgb(255", button, StringComparison.Ordinal);
+        Assert.DoesNotContain("backButton.Background = ResolveBrush(\"CardBackgroundFillColorDefaultBrush\")", button, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PackagedSoftwareUpdatesBundleAndActivateLatestOfficialDataPacks()
+    {
+        var root = FindRepositoryRoot();
+        var project = File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj"));
+        var sync = File.ReadAllText(Path.Combine(root, "packaging", "Sync-BundledDataPacks.ps1"));
+        var facade = File.ReadAllText(Path.Combine(root, "Services", "ReferenceDataPackService.cs"));
+
+        Assert.Contains("SyncLatestBundledReferenceDataPacks", project, StringComparison.Ordinal);
+        Assert.Contains("GenerateAppxPackageOnBuild", project, StringComparison.Ordinal);
+        Assert.Contains("Sync-BundledDataPacks.ps1", project, StringComparison.Ordinal);
+        Assert.Contains("Assets\\DataPacks\\Bundled\\*.uptdata", project, StringComparison.Ordinal);
+        Assert.Contains("SkipBundledDataPackSync", project, StringComparison.Ordinal);
+
+        foreach (var packId in new[] { "planning-regulations", "planning-terminology", "design-concepts" })
+            Assert.Contains($"'{packId}'", sync, StringComparison.Ordinal);
+        Assert.Contains("UrbanPlanToolbox_Data/main/catalog/catalog-v1.json", sync, StringComparison.Ordinal);
+        Assert.Contains("Get-FileHash", sync, StringComparison.Ordinal);
+        Assert.Contains("SHA-256 mismatch", sync, StringComparison.Ordinal);
+        Assert.Contains("Test-ArchiveManifest", sync, StringComparison.Ordinal);
+
+        Assert.Contains("EnsureBundledPackCurrentAsync", facade, StringComparison.Ordinal);
+        Assert.Contains("Assets\", \"DataPacks\", \"Bundled", facade, StringComparison.Ordinal);
+        Assert.Contains("InstallFromFileAsync(packId, bestPath, \"bundled\"", facade, StringComparison.Ordinal);
+        Assert.Contains("bestVersion.CompareTo(currentVersion) <= 0", facade, StringComparison.Ordinal);
     }
 
     [Fact]
