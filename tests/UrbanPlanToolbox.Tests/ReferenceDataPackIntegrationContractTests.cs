@@ -36,6 +36,24 @@ public sealed class ReferenceDataPackIntegrationContractTests
     }
 
     [Fact]
+    public void OfficialPackDownloadRetriesAndFallsBackToGitHubAssetApiBeforeActivation()
+    {
+        var root = FindRepositoryRoot();
+        var installer = File.ReadAllText(Path.Combine(root, "Services", "DataPackInstaller.cs"));
+
+        Assert.Contains("DownloadVerifiedArchiveAsync", installer, StringComparison.Ordinal);
+        Assert.Contains("attempt <= 2", installer, StringComparison.Ordinal);
+        Assert.Contains("ReleaseApiPrefix", installer, StringComparison.Ordinal);
+        Assert.Contains("application/octet-stream", installer, StringComparison.Ordinal);
+        Assert.Contains("pack_download_api_fallback_succeeded", installer, StringComparison.Ordinal);
+        Assert.Contains("VerifyCatalogDownload(downloadPath, entry)", installer, StringComparison.Ordinal);
+
+        var validateIndex = installer.IndexOf("var validated = await ValidateArchiveAsync(packId, downloadPath", StringComparison.Ordinal);
+        var activateIndex = installer.IndexOf("InstallFromFileAsync(packId, downloadPath, \"official\"", StringComparison.Ordinal);
+        Assert.True(validateIndex >= 0 && activateIndex > validateIndex, "Catalog/manifest validation must complete before active-pack state is changed.");
+    }
+
+    [Fact]
     public void DataPackUiDistinguishesUncheckedAndFailedCatalogStates()
     {
         var root = FindRepositoryRoot();
@@ -48,6 +66,56 @@ public sealed class ReferenceDataPackIntegrationContractTests
         Assert.Contains("CloudNotChecked", text, StringComparison.Ordinal);
         Assert.Contains("raw.githubusercontent.com", text, StringComparison.Ordinal);
         Assert.Contains("GitHub API", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ProfessionalLibraryControlsUseTextBackLinksAnimatedUpdateButtonsAndRightFilterClusters()
+    {
+        var root = FindRepositoryRoot();
+        foreach (var page in new[]
+        {
+            "Views/RegulationsIndexPage.xaml",
+            "Views/PlanningTerminologyPage.xaml",
+            "Views/DesignConceptDictionaryPage.xaml"
+        })
+        {
+            var xaml = File.ReadAllText(Path.Combine(root, page));
+            Assert.Contains("<HyperlinkButton x:Name=\"BackButton\"", xaml, StringComparison.Ordinal);
+            Assert.Contains("AnimatedUpdateButton x:Name=\"HeaderCheckButton\"", xaml, StringComparison.Ordinal);
+            Assert.Contains("AnimatedUpdateButton x:Name=\"CheckButton\"", xaml, StringComparison.Ordinal);
+            Assert.Contains("x:Name=\"FilterOptionsPanel\"", xaml, StringComparison.Ordinal);
+            Assert.Contains("HorizontalAlignment=\"Right\"", xaml, StringComparison.Ordinal);
+            Assert.Contains("ReferenceFilterChoiceTemplate", xaml, StringComparison.Ordinal);
+            Assert.DoesNotContain("DisplayMemberPath=\"Display\"", xaml, StringComparison.Ordinal);
+        }
+
+        var text = File.ReadAllText(Path.Combine(root, "Services", "ReferenceLibraryText.cs"));
+        Assert.DoesNotContain("↻ 检查数据更新", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("↻ Check data updates", text, StringComparison.Ordinal);
+
+        var button = File.ReadAllText(Path.Combine(root, "Controls", "AnimatedUpdateButton.cs"));
+        Assert.Contains("ProgressRing", button, StringComparison.Ordinal);
+        Assert.Contains("_clickedBusy && !IsEnabled", button, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DynamicFilterTaxonomiesHaveJapaneseAndEnglishPresentationMappings()
+    {
+        var root = FindRepositoryRoot();
+        var converter = File.ReadAllText(Path.Combine(root, "Views", "ReferenceFilterLabelConverter.cs"));
+
+        foreach (var sourceValue in new[]
+        {
+            "中国", "欧盟/欧洲", "国土空间规划体系", "控制性详细规划",
+            "中国国土空间制度", "日本国土与都市计划制度", "通用/语境依赖",
+            "城市更新", "建筑设计", "站城一体", "社区营造", "触媒", "韧性", "骑行"
+        })
+        {
+            Assert.Contains($"[\"{sourceValue}\"]", converter, StringComparison.Ordinal);
+        }
+
+        Assert.Contains("language.StartsWith(\"ja\"", converter, StringComparison.Ordinal);
+        Assert.Contains("language.StartsWith(\"en\"", converter, StringComparison.Ordinal);
     }
 
     [Fact]
