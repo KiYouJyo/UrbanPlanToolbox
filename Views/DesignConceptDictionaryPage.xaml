@@ -12,7 +12,7 @@
   <Grid x:Name="Root" Padding="{StaticResource PageContentPadding}" MaxWidth="1500" HorizontalAlignment="Stretch">
     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
     <StackPanel Grid.Row="0" Spacing="6">
-      <HyperlinkButton x:Name="BackButton" Click="OnBackClick" HorizontalAlignment="Left" Padding="0,4" Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+      <Button x:Name="BackButton" Click="OnBackClick" HorizontalAlignment="Left"/>
       <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel Spacing="4"><TextBlock x:Name="TitleText" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap"/><TextBlock x:Name="DescriptionText" Style="{StaticResource SubtitleTextBlockStyle}" TextWrapping="Wrap"/></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"><TextBlock x:Name="CloudVersionText" VerticalAlignment="Center" Opacity="0.72" TextWrapping="Wrap" MaxWidth="340"/><controls:AnimatedUpdateButton x:Name="HeaderCheckButton" Click="OnCheckUpdateClick"/></StackPanel></Grid>
     </StackPanel>
     <Border Grid.Row="1" Margin="0,14,0,0" Padding="16,12" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
