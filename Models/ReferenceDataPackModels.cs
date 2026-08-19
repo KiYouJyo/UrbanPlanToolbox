@@ -24,7 +24,7 @@ public sealed class ReferenceDataPackManifest
     public string Channel { get; init; } = string.Empty;
 }
 
-public sealed class ReferenceDataPackState
+public sealed record ReferenceDataPackState
 {
     public string PackId { get; init; } = string.Empty;
     public string Version { get; init; } = string.Empty;
