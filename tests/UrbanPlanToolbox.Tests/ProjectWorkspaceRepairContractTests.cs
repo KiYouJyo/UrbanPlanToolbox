@@ -89,6 +89,35 @@ public sealed class ProjectWorkspaceRepairContractTests
     }
 
     [Fact]
+    public void ResearchQuestionsUseRepeatableRowsInsteadOfOneLargeTextBox()
+    {
+        var root = FindRepositoryRoot();
+        var polish = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round6.UiPolish.cs"));
+
+        Assert.Contains("CreateRound6ResearchQuestionMenu", polish);
+        Assert.Contains("OpenRound6ResearchQuestionEditor", polish);
+        Assert.Contains("new StrategyListEditor(", polish);
+        Assert.Contains("ParseRound6ResearchQuestions", polish);
+        Assert.Contains("SerializeRound6ResearchQuestions", polish);
+        Assert.Contains("＋ 添加研究问题", polish);
+        Assert.Contains("删除研究问题", polish);
+        Assert.DoesNotContain("MinHeight = 220", polish);
+    }
+
+    [Fact]
+    public void WorkspaceTilesAndOverviewUseTheSameOpaqueThemeSurface()
+    {
+        var root = FindRepositoryRoot();
+        var polish = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round6.UiPolish.cs"));
+
+        Assert.Contains("ApplyRound6WorkspaceCardBackgrounds", polish);
+        Assert.Contains("OverviewCard.Background = background", polish);
+        Assert.Contains("tile.Background = background", polish);
+        Assert.Contains("FromArgb(255, 252, 252, 252)", polish);
+        Assert.Contains("FromArgb(255, 43, 43, 43)", polish);
+    }
+
+    [Fact]
     public void ResearchWorkspaceDoesNotOfferChartOrDataAndScriptsCards()
     {
         var root = FindRepositoryRoot();
