@@ -14,9 +14,22 @@ public sealed class ProjectWorkspaceRepairContractTests
         Assert.Contains("Loaded=\"OnRound1WorkspaceLoaded\"", xaml);
         Assert.Contains("OnWorkspaceLoaded(sender, e);", fixes);
         Assert.Contains("EditOverviewButton.Click += OnRound1EditOverview", fixes);
-        Assert.Contains("OverviewLabel2.Text = W(\"重点策略\"", fixes);
+        Assert.Contains("var label = W(\"重点策略\"", fixes);
         Assert.Contains("ProjectStrategyList.Count(_project.PlanningRequirements)", fixes);
         Assert.DoesNotContain("OverviewLabel2.Text = W(\"当前阶段\"", fixes);
+    }
+
+    [Fact]
+    public void WorkspaceLayoutRepairIsIdempotentDuringLayoutUpdated()
+    {
+        var root = FindRepositoryRoot();
+        var fixes = File.ReadAllText(Path.Combine(root, "Views", "ProjectWorkspacePage.Round1Fixes.cs"));
+
+        Assert.Contains("TileCanvas.LayoutUpdated -= OnRound1CanvasLayoutUpdated", fixes);
+        Assert.Contains("TileCanvas.LayoutUpdated += OnRound1CanvasLayoutUpdated", fixes);
+        Assert.Contains("if (!string.Equals(OverviewLabel2.Text, label, StringComparison.Ordinal))", fixes);
+        Assert.Contains("if (!string.Equals(OverviewValue2.Text, value, StringComparison.Ordinal))", fixes);
+        Assert.DoesNotContain("RewireRound1OverviewEditor();\n            ApplyRound1OverviewMetrics();", fixes);
     }
 
     [Fact]
