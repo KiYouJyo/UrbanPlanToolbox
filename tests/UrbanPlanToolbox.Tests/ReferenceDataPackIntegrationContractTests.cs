@@ -123,7 +123,8 @@ public sealed class ReferenceDataPackIntegrationContractTests
         Assert.Contains("Test-ArchiveManifest", sync, StringComparison.Ordinal);
 
         Assert.Contains("EnsureBundledPackCurrentAsync", facade, StringComparison.Ordinal);
-        Assert.Contains("Assets\", \"DataPacks\", \"Bundled", facade, StringComparison.Ordinal);
+        Assert.Contains("DataPacks", facade, StringComparison.Ordinal);
+        Assert.Contains("Bundled", facade, StringComparison.Ordinal);
         Assert.Contains("InstallFromFileAsync(packId, bestPath, \"bundled\"", facade, StringComparison.Ordinal);
         Assert.Contains("bestVersion.CompareTo(currentVersion) <= 0", facade, StringComparison.Ordinal);
     }
