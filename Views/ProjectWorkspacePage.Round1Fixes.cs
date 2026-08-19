@@ -19,9 +19,7 @@ public sealed partial class ProjectWorkspacePage
     private void OnRound1WorkspaceLoaded(object sender, RoutedEventArgs e)
     {
         // Preserve the established Round4/Round5 initialization chain, then layer the
-        // repair hooks on the same guaranteed Page.Loaded path.  The previous
-        // OnApplyTemplate hook was not reliable for Page and could leave all design-only
-        // repairs dormant even though the code was packaged successfully.
+        // repair hooks on the same guaranteed Page.Loaded path.
         OnWorkspaceLoaded(sender, e);
 
         if (_round1FixesInitialized)
@@ -32,11 +30,15 @@ public sealed partial class ProjectWorkspacePage
 
         _round1FixesInitialized = true;
         DrawerLayer.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(OnRound1DrawerKeyDown), true);
+
+        // LayoutUpdated is only used to discover freshly recreated tiles.  All writes
+        // performed from this path are idempotent so the handler can never create a
+        // layout-update feedback loop.
+        TileCanvas.LayoutUpdated -= OnRound1CanvasLayoutUpdated;
         TileCanvas.LayoutUpdated += OnRound1CanvasLayoutUpdated;
 
-        // Wire this before the async project read necessarily completes.  The handler
-        // decides between research/design at click time, so it remains correct after
-        // navigation finishes loading the project record.
+        // The project record may still be loading here, but the edit handler itself
+        // resolves research/design at click time and is safe to wire immediately.
         RewireRound1OverviewEditor();
         DispatcherQueue.TryEnqueue(ApplyRound1Fixes);
     }
@@ -52,7 +54,11 @@ public sealed partial class ProjectWorkspacePage
         EditOverviewCompactButton.Click += OnRound1EditOverview;
     }
 
-    private void OnRound1CanvasLayoutUpdated(object? sender, object e) => ApplyRound1Fixes();
+    private void OnRound1CanvasLayoutUpdated(object? sender, object e)
+    {
+        if (_project is null) return;
+        ApplyRound1Fixes();
+    }
 
     private void ApplyRound1Fixes()
     {
@@ -60,7 +66,6 @@ public sealed partial class ProjectWorkspacePage
         _round1Applying = true;
         try
         {
-            RewireRound1OverviewEditor();
             ApplyRound1OverviewMetrics();
             UpgradeRound1StrategyTileMenus();
         }
@@ -75,10 +80,18 @@ public sealed partial class ProjectWorkspacePage
         if (_project?.Kind != ProjectKindCodes.Design) return;
 
         var count = ProjectStrategyList.Count(_project.PlanningRequirements);
-        OverviewLabel2.Text = W("重点策略", "Key strategies", "重点戦略");
-        OverviewValue2.Text = count == 0
+        var label = W("重点策略", "Key strategies", "重点戦略");
+        var value = count == 0
             ? W("未设置", "Not set", "未設定")
             : W($"{count} 条", $"{count} items", $"{count} 件");
+
+        // LayoutUpdated can run frequently.  Setting Text even to the same value can
+        // invalidate measure/arrange in WinUI, so never write unless the visible value
+        // actually changed.
+        if (!string.Equals(OverviewLabel2.Text, label, StringComparison.Ordinal))
+            OverviewLabel2.Text = label;
+        if (!string.Equals(OverviewValue2.Text, value, StringComparison.Ordinal))
+            OverviewValue2.Text = value;
     }
 
     private void UpgradeRound1StrategyTileMenus()
@@ -128,10 +141,9 @@ public sealed partial class ProjectWorkspacePage
     {
         if (e.Key != VirtualKey.Escape || DrawerLayer.Visibility != Visibility.Visible) return;
 
-        // Card editors place Cancel first and Save second in DrawerFooter.  Esc means
-        // "finish editing" in this workspace, so invoke the same Save button rather
-        // than silently discarding the current editor state.  Drawers without a save
-        // action (for example a picker/list drawer) still close normally.
+        // In card editors Esc means "finish editing": invoke the same Save action so
+        // the current values are persisted before the drawer closes.  Non-edit drawers
+        // that do not expose a Save button simply close.
         var saveText = _localization.GetString("Project_Action_Save");
         var saveButton = DrawerFooter.Children
             .OfType<Button>()
