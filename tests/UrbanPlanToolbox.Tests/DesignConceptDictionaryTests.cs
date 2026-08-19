@@ -120,13 +120,15 @@ public sealed class DesignConceptDictionaryTests : IDisposable
     }
 
     [Fact]
-    public void ConceptPageKeepsThreeDisplayMemberFiltersAndResponsiveTwoPaneLayout()
+    public void ConceptPageKeepsThreeLocalizedFiltersAndResponsiveTwoPaneLayout()
     {
         var root = FindRepositoryRoot();
         var xaml = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml"));
         var code = File.ReadAllText(Path.Combine(root, "Views", "DesignConceptDictionaryPage.xaml.cs"));
-        Assert.Equal(3, Count(xaml, "DisplayMemberPath=\"Display\""));
-        Assert.Equal(3, Count(xaml, "SelectedValuePath=\"Value\""));
+        Assert.Equal(3, Count(xaml, "ItemTemplate=\"{StaticResource ReferenceFilterChoiceTemplate}\""));
+        Assert.DoesNotContain("DisplayMemberPath=\"Display\"", xaml, StringComparison.Ordinal);
+        Assert.DoesNotContain("SelectedValuePath=\"Value\"", xaml, StringComparison.Ordinal);
+        Assert.Contains("ReferenceFilterLabelConverter", xaml, StringComparison.Ordinal);
         Assert.Contains("x:Name=\"ContentGrid\"", xaml);
         Assert.Contains("HorizontalContentAlignment=\"Stretch\"", xaml);
         Assert.Contains("Grid.SetRow(ListPanel, 0)", code);
