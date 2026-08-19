@@ -35,8 +35,7 @@ public sealed partial class ProjectWorkspacePage
     private void OnRound6ActualThemeChanged(FrameworkElement sender, object args)
     {
         ApplyRound6StateBadge();
-        foreach (var tile in _tileViews.Values)
-            tile.Background = ResourceBrush("CardBackgroundFillColorDefaultBrush");
+        ApplyRound6WorkspaceCardBackgrounds();
     }
 
     private void ApplyRound6Polish()
@@ -46,6 +45,7 @@ public sealed partial class ProjectWorkspacePage
         try
         {
             ApplyRound6StateBadge();
+            ApplyRound6WorkspaceCardBackgrounds();
 
             foreach (var stale in _round6HookedTiles.Keys.Where(id => !_tileViews.ContainsKey(id)).ToArray())
                 _round6HookedTiles.Remove(stale);
@@ -56,9 +56,6 @@ public sealed partial class ProjectWorkspacePage
                 if (panel is null) continue;
 
                 var tile = pair.Value;
-                // Match the project overview card in both light and dark themes.
-                tile.Background = ResourceBrush("CardBackgroundFillColorDefaultBrush");
-
                 var isNewTile = !_round6HookedTiles.TryGetValue(panel.Id, out var hooked) || !ReferenceEquals(hooked, tile);
                 if (!isNewTile) continue;
 
@@ -69,6 +66,7 @@ public sealed partial class ProjectWorkspacePage
                         break;
                     case ProjectWorkspacePanelKinds.ResearchQuestion:
                         ReplaceRound4TileBody(tile, BuildRound6ResearchQuestion());
+                        tile.ContextFlyout = CreateRound6ResearchQuestionMenu(panel);
                         break;
                 }
 
@@ -79,6 +77,21 @@ public sealed partial class ProjectWorkspacePage
         {
             _round6Applying = false;
         }
+    }
+
+    private void ApplyRound6WorkspaceCardBackgrounds()
+    {
+        // CardBackgroundFillColorDefaultBrush is intentionally translucent. The overview
+        // card and runtime-created Canvas tiles were therefore composited through two
+        // different visual paths and did not look identical. Give both surfaces the same
+        // opaque theme-aware brush so the workspace visually reads as one card system.
+        var dark = ActualTheme == ElementTheme.Dark;
+        var background = new SolidColorBrush(dark
+            ? Windows.UI.Color.FromArgb(255, 43, 43, 43)
+            : Windows.UI.Color.FromArgb(255, 252, 252, 252));
+        OverviewCard.Background = background;
+        foreach (var tile in _tileViews.Values)
+            tile.Background = background;
     }
 
     private void ApplyRound6StateBadge()
@@ -128,12 +141,9 @@ public sealed partial class ProjectWorkspacePage
     private UIElement BuildRound6ResearchQuestion()
     {
         var stack = new StackPanel { Spacing = 7 };
-        var source = _project?.ResearchDetails?.ResearchSubject;
-        var items = string.IsNullOrWhiteSpace(source)
-            ? Array.Empty<string>()
-            : source.Split(['\r', '\n', '；', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var items = ParseRound6ResearchQuestions(_project?.ResearchDetails?.ResearchSubject);
 
-        if (items.Length == 0)
+        if (items.Count == 0)
         {
             stack.Children.Add(new TextBlock
             {
@@ -166,4 +176,78 @@ public sealed partial class ProjectWorkspacePage
             Content = stack
         };
     }
+
+    private MenuFlyout CreateRound6ResearchQuestionMenu(ProjectWorkspacePanel panel)
+    {
+        var menu = new MenuFlyout();
+        var edit = new MenuFlyoutItem
+        {
+            Text = W("编辑内容", "Edit content", "内容を編集"),
+            IsEnabled = _project is { IsArchived: false }
+        };
+        edit.Click += (_, _) => OpenRound6ResearchQuestionEditor();
+        menu.Items.Add(edit);
+
+        if (_project is { IsArchived: false })
+        {
+            menu.Items.Add(new MenuFlyoutSeparator());
+            var remove = new MenuFlyoutItem
+            {
+                Text = W("删除面板", "Remove panel", "パネルを削除"),
+                Tag = panel.Id
+            };
+            remove.Click += OnRemovePanel;
+            menu.Items.Add(remove);
+        }
+        return menu;
+    }
+
+    private void OpenRound6ResearchQuestionEditor()
+    {
+        if (_project is null || _project.Kind != ProjectKindCodes.Research || _project.IsArchived) return;
+
+        DrawerTitle.Text = W("编辑核心研究问题", "Edit core research questions", "中心研究課題を編集");
+        DrawerSubtitle.Text = W(
+            "一条一条记录研究问题，与重点策略使用相同的编辑方式。",
+            "Record research questions as separate items, using the same editor pattern as key strategies.",
+            "重点戦略と同じ編集方式で、研究課題を1件ずつ記録します。");
+        DrawerContent.Children.Clear();
+        DrawerFooter.Children.Clear();
+
+        var questions = new StrategyListEditor(
+            ParseRound6ResearchQuestions(_project.ResearchDetails?.ResearchSubject),
+            W("研究问题", "Research question", "研究課題"),
+            W("删除研究问题", "Remove research question", "研究課題を削除"),
+            W("＋ 添加研究问题", "+ Add research question", "＋ 研究課題を追加"));
+        DrawerContent.Children.Add(questions.Root);
+
+        var cancel = new Button { Content = _localization.GetString("Action_Cancel") };
+        cancel.Click += (_, _) => CloseDrawer();
+        DrawerFooter.Children.Add(cancel);
+
+        var save = new Button { Content = _localization.GetString("Project_Action_Save") };
+        save.Click += async (_, _) =>
+        {
+            if (_project is null) return;
+            var candidate = CloneProject(_project);
+            candidate.ResearchDetails ??= new ResearchProjectDetails();
+            candidate.ResearchDetails.ResearchSubject = SerializeRound6ResearchQuestions(questions.Values);
+            candidate.UpdatedAtUtc = DateTimeOffset.UtcNow;
+            await SaveCandidateAsync(candidate);
+            CloseDrawer();
+            ApplyProject();
+        };
+        DrawerFooter.Children.Add(save);
+        ShowDrawer();
+    }
+
+    private static IReadOnlyList<string> ParseRound6ResearchQuestions(string? source) =>
+        string.IsNullOrWhiteSpace(source)
+            ? []
+            : source.Split(['\r', '\n', '；', ';'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(item => !string.IsNullOrWhiteSpace(item))
+                .ToArray();
+
+    private static string SerializeRound6ResearchQuestions(IEnumerable<string> values) =>
+        string.Join(Environment.NewLine, values.Select(value => value.Trim()).Where(value => value.Length > 0));
 }
