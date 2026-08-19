@@ -75,4 +75,6 @@ foreach ($readme in $readmes) {
     }
 }
 
+& (Join-Path $RepositoryRoot 'packaging/Test-WebDavPrivacyBoundary.ps1')
+
 Write-Host 'Release documentation consistency checks passed.'
