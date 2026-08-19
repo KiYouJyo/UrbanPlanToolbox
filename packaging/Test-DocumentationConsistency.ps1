@@ -38,7 +38,7 @@ if ($failures.Count -eq 0) {
         Test-Requirement ($release.schemaVersion -eq 1) 'release/release.json uses supported schemaVersion 1'
     }
     catch {
-        $failures.Add("project-status.json is not valid JSON: $($_.Exception.Message)")
+        $failures.Add("project-status.json or release/release.json is not valid JSON: $($_.Exception.Message)")
     }
 }
 
@@ -51,14 +51,22 @@ if ($status -and $release) {
     Test-Requirement ($release.channels.github.publish -is [bool]) 'Candidate Release Metadata declares GitHub publish policy'
     Test-Requirement ($release.channels.microsoftStore.submit -is [bool]) 'Candidate Release Metadata declares Microsoft Store submit policy'
 
+    Test-Requirement ($status.product.version -eq $release.product.version) 'SSOT product version matches Candidate Release Metadata'
+    Test-Requirement ($status.dataContracts.projectSchemaVersion -eq $release.compatibility.projectSchemaVersion) 'SSOT project schema matches Candidate Release Metadata compatibility'
+    Test-Requirement ($status.dataContracts.backupFormatVersion -eq $release.compatibility.backupFormatVersion) 'SSOT backup format matches Candidate Release Metadata compatibility'
+
     $github = $status.distribution.github
     Test-Requirement ($github.latestPublishedProductVersion -ne $null) 'SSOT records the latest confirmed GitHub publication separately'
     Test-Requirement ($github.latestPublishedPackageVersion -eq "$($github.latestPublishedProductVersion).0") 'Confirmed GitHub package version matches published product version'
     Test-Requirement ($github.latestPublishedReleaseTag -eq "v$($github.latestPublishedProductVersion)") 'Confirmed GitHub tag matches published product version'
+    Test-Requirement ($github.candidateProductVersion -eq $release.product.version) 'GitHub candidate product version matches Candidate Release Metadata'
+    Test-Requirement ($github.candidatePackageVersion -eq $release.product.packageVersion) 'GitHub candidate package version matches Candidate Release Metadata'
 
     $store = $status.distribution.microsoftStore
     Test-Requirement ($store.submittedPackageVersion -eq "$($store.submittedProductVersion).0") 'Confirmed Store submitted package version matches product version'
     Test-Requirement (-not ($store.state -eq 'certification-submitted' -and [string]::IsNullOrWhiteSpace($store.submittedProductVersion))) 'Store certification state has a submitted version'
+    Test-Requirement ($store.candidateProductVersion -eq $release.product.version) 'Store candidate product version matches Candidate Release Metadata'
+    Test-Requirement ($store.candidatePackageVersion -eq $release.product.packageVersion) 'Store candidate package version matches Candidate Release Metadata'
 
     foreach ($manifestName in @('Package.appxmanifest', 'Package.Store.appxmanifest')) {
         [xml]$manifest = Get-Content -LiteralPath (Join-Path $repositoryRoot $manifestName) -Raw

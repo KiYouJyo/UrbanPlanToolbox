@@ -29,6 +29,7 @@ Assert-Contains (Join-Path $RepositoryRoot 'docs/ROADMAP.md') 'does not assign u
 $project = [xml][System.IO.File]::ReadAllText((Join-Path $RepositoryRoot 'UrbanPlanToolbox.csproj'), [System.Text.Encoding]::UTF8)
 $version = @($project.Project.PropertyGroup | ForEach-Object Version | Where-Object { $_ })[0]
 if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Documentation check failed: unsupported project version '$version'." }
+Assert-Contains (Join-Path $RepositoryRoot 'CHANGELOG.md') "## $version"
 
 $markdownFiles = @(
     "docs/RELEASE-NOTES-v$version.md",
@@ -73,5 +74,7 @@ foreach ($readme in $readmes) {
         }
     }
 }
+
+& (Join-Path $RepositoryRoot 'packaging/Test-WebDavPrivacyBoundary.ps1')
 
 Write-Host 'Release documentation consistency checks passed.'

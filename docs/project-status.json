@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
-  "asOf": "2026-08-17",
+  "asOf": "2026-08-19",
   "repository": {
     "defaultBranch": "main",
     "documentationGovernance": "docs/DOCUMENTATION.md"
   },
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.8.5",
+    "version": "1.9.1",
     "lifecycle": "stable-1.x",
     "platform": "Windows",
     "supportedArchitecture": "x64",
@@ -18,9 +18,9 @@
       "latestPublishedProductVersion": "1.8.5",
       "latestPublishedPackageVersion": "1.8.5.0",
       "latestPublishedReleaseTag": "v1.8.5",
-      "candidateProductVersion": "1.8.5",
-      "candidatePackageVersion": "1.8.5.0",
-      "candidateState": "published-and-validated",
+      "candidateProductVersion": "1.9.1",
+      "candidatePackageVersion": "1.9.1.0",
+      "candidateState": "prepared-for-validation",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -30,9 +30,9 @@
       "state": "certification-submitted",
       "publicProductVersion": "1.8.2",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
-      "candidateProductVersion": "1.8.5",
-      "candidatePackageVersion": "1.8.5.0",
-      "candidateState": "certification-submitted",
+      "candidateProductVersion": "1.9.1",
+      "candidatePackageVersion": "1.9.1.0",
+      "candidateState": "not-approved-for-submission",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
@@ -64,11 +64,11 @@
         "signer Subject pinning",
         "signer Thumbprint pinning"
       ],
-      "validation": "validated; v1.8.5 changes Settings/About layout and inactive shell presentation only and do not reopen the existing download, verification, deployment, or restart path",
+      "validation": "validated and frozen; the v1.9.1 engineering closeout does not change download, verification, deployment, or restart behavior",
       "policy": "validated / frozen; future updater mechanism changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
-      "validation": "validated; v1.8.5 does not change the frozen Store download/install operation or its update-session behavior",
+      "validation": "validated and frozen; the v1.9.1 engineering closeout does not change the Store download/install operation or its update-session behavior",
       "policy": "validated / fully frozen after the successful real Microsoft Store 1.7.4 to 1.7.5 E2E acceptance on 2026-08-14; future updater mechanism changes require a proven bug, security issue, or Windows / Microsoft Store platform/API compatibility requirement plus end-to-end regression evidence on the affected channel. One user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
     }
   },
@@ -92,7 +92,7 @@
     "stage": "stabilization-and-productization",
     "nextVersion": null,
     "priorities": [
-      "complete documentation governance and keep current-state metadata single-sourced",
+      "keep documentation governance and current-state metadata single-sourced",
       "preserve the frozen updater mechanism and reopen it only for a proven bug, security issue, or Windows platform/API compatibility requirement with end-to-end regression evidence",
       "standardize tool-page layout, state presentation, responsive behavior, and accessibility",
       "make Project the context center for tool workflows without turning the app into a file manager",

@@ -1,18 +1,16 @@
-name: v1.9.0 Signed Acceptance
+name: Signed Acceptance
 
 on:
-  push:
-    branches:
-      - codex/v1.9.0-project-workspace
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: v1.9.0-signed-acceptance
+  group: signed-acceptance-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -22,61 +20,44 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - name: Checkout acceptance branch
+      - name: Checkout candidate
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-
-      - name: Verify workspace compiler compatibility
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $path = 'Views/ProjectWorkspacePage.xaml.cs'
-          $content = Get-Content -Raw $path
-          $old = @'
-                  var body = BuildPanelBody(panel);
-                  Grid.SetRow(body, 1);
-                  root.Children.Add(body);
-          '@
-          $new = @'
-                  var body = BuildPanelBody(panel);
-                  if (body is FrameworkElement bodyElement)
-                      Grid.SetRow(bodyElement, 1);
-                  root.Children.Add(body);
-          '@
-          if ($content.Contains($old)) {
-            throw 'Legacy UIElement Grid.SetRow placement remains in source.'
-          }
-          if ($content.Contains($new)) {
-            Write-Host 'Workspace compiler compatibility pattern verified.'
-          }
-          else {
-            Write-Host 'Workspace body placement was refactored; compile/build stages are authoritative.'
-          }
-          git diff --check
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
-      - name: Verify v1.9.0 source metadata
+      - name: Resolve and verify release metadata
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $release = Get-Content -Raw release/release.json | ConvertFrom-Json
+          $version = [string]$release.product.version
+          $packageVersion = [string]$release.product.packageVersion
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Unsupported release version: $version" }
+          if ($packageVersion -ne "$version.0") { throw "Package version mismatch in release metadata: $packageVersion" }
+
           [xml]$project = Get-Content -Raw UrbanPlanToolbox.csproj
           $projectVersion = @($project.Project.PropertyGroup | ForEach-Object Version | Where-Object { $_ })[0]
           $appVersion = (Get-Content Services/AppVersionProvider.cs -Raw | Select-String 'Version = "([^"]+)"' -AllMatches).Matches[0].Groups[1].Value
           [xml]$manifest = Get-Content -Raw Package.appxmanifest
           [xml]$storeManifest = Get-Content -Raw Package.Store.appxmanifest
-          $release = Get-Content -Raw release/release.json | ConvertFrom-Json
-          if ($projectVersion -ne '1.9.0') { throw "Project version mismatch: $projectVersion" }
-          if ($appVersion -ne '1.9.0') { throw "App version mismatch: $appVersion" }
-          if ($manifest.Package.Identity.Version -ne '1.9.0.0') { throw "Sideload manifest mismatch: $($manifest.Package.Identity.Version)" }
-          if ($storeManifest.Package.Identity.Version -ne '1.9.0.0') { throw "Store manifest mismatch: $($storeManifest.Package.Identity.Version)" }
-          if ($release.product.version -ne '1.9.0' -or $release.product.packageVersion -ne '1.9.0.0') { throw 'release/release.json version mismatch.' }
-          if (-not (Test-Path 'packaging/store-release-notes/1.9.0.json')) { throw 'Store release notes for 1.9.0 are missing.' }
+
+          if ($projectVersion -ne $version) { throw "Project version mismatch: expected $version, got $projectVersion" }
+          if ($appVersion -ne $version) { throw "App version mismatch: expected $version, got $appVersion" }
+          if ($manifest.Package.Identity.Version -ne $packageVersion) { throw "Sideload manifest mismatch: $($manifest.Package.Identity.Version)" }
+          if ($storeManifest.Package.Identity.Version -ne $packageVersion) { throw "Store manifest mismatch: $($storeManifest.Package.Identity.Version)" }
+          if ($release.channels.microsoftStore.submit -and -not (Test-Path "packaging/store-release-notes/$version.json")) {
+            throw "Store submission is enabled but packaging/store-release-notes/$version.json is missing."
+          }
+
+          "RELEASE_VERSION=$version" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          "PACKAGE_VERSION=$packageVersion" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "Acceptance candidate: v$version ($packageVersion)"
 
       - name: Validate release documentation
         shell: pwsh
@@ -112,7 +93,7 @@ jobs:
             throw 'GitHub release signing secrets are not configured.'
           }
 
-      - name: Build unsigned v1.9.0 x64 MSIX bundle
+      - name: Build unsigned x64 MSIX bundle
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -121,7 +102,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "MSIX build failed: $LASTEXITCODE" }
           $bundle = @(Get-ChildItem $output -Recurse -Filter '*.msixbundle') | Select-Object -First 1
           if (-not $bundle) { throw 'MSIX bundle was not produced.' }
-          if ($bundle.Name -ne 'UrbanPlanToolbox_1.9.0.0_x64.msixbundle') { throw "Unexpected bundle name: $($bundle.Name)" }
+          $expectedName = "UrbanPlanToolbox_$($env:PACKAGE_VERSION)_x64.msixbundle"
+          if ($bundle.Name -ne $expectedName) { throw "Unexpected bundle name: $($bundle.Name); expected $expectedName" }
           "BUNDLE_PATH=$($bundle.FullName)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
           "BUNDLE_FILE_NAME=$($bundle.Name)" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -132,7 +114,7 @@ jobs:
           RELEASE_CERTIFICATE_PASSWORD: ${{ secrets.GH_RELEASE_CERTIFICATE_PASSWORD }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $assets = Join-Path $env:RUNNER_TEMP 'UrbanPlanToolbox-v1.9.0-signed-acceptance'
+          $assets = Join-Path $env:RUNNER_TEMP "UrbanPlanToolbox-v$($env:RELEASE_VERSION)-signed-acceptance"
           New-Item -ItemType Directory -Force -Path $assets | Out-Null
           $pfx = Join-Path $assets 'release-signing.pfx'
           [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:RELEASE_CERTIFICATE_BASE64))
@@ -141,7 +123,7 @@ jobs:
           if ($certificate.Subject -cne 'CN=AppPublisher' -or $certificate.Thumbprint -cne 'BD85AD77A651C86CA01A480C8E9BC64952993F98' -or -not $certificate.HasPrivateKey) {
             throw "Unexpected signing certificate: Subject=$($certificate.Subject); Thumbprint=$($certificate.Thumbprint); HasPrivateKey=$($certificate.HasPrivateKey)"
           }
-          $cer = Join-Path $assets 'UrbanPlanToolbox-v1.9.0-acceptance.cer'
+          $cer = Join-Path $assets "UrbanPlanToolbox-v$($env:RELEASE_VERSION)-acceptance.cer"
           Export-Certificate -Cert $certificate -FilePath $cer | Out-Null
           $kitsRoot = [Environment]::GetEnvironmentVariable('ProgramFiles(x86)')
           $signtool = Get-ChildItem (Join-Path $kitsRoot 'Windows Kits\10\bin') -Recurse -Filter signtool.exe | Where-Object FullName -match '\\x64\\signtool.exe$' | Sort-Object FullName -Descending | Select-Object -First 1
@@ -166,14 +148,14 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $staging = Join-Path $env:ACCEPTANCE_ASSETS 'staging'
-          & ./packaging/New-GitHubOneClickInstallerPackage.ps1 -SignedBundlePath $env:BUNDLE_PATH -PublicCertificatePath $env:CERTIFICATE_PATH -OutputDirectory $staging -DisplayVersion '1.9.0' -PackageVersion '1.9.0.0'
-          $packageRoot = Join-Path $staging 'UrbanPlanToolbox-v1.9.0-x64-one-click'
+          & ./packaging/New-GitHubOneClickInstallerPackage.ps1 -SignedBundlePath $env:BUNDLE_PATH -PublicCertificatePath $env:CERTIFICATE_PATH -OutputDirectory $staging -DisplayVersion $env:RELEASE_VERSION -PackageVersion $env:PACKAGE_VERSION
+          $packageRoot = Join-Path $staging "UrbanPlanToolbox-v$($env:RELEASE_VERSION)-x64-one-click"
           & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory $packageRoot
-          $zip = Join-Path $env:ACCEPTANCE_ASSETS 'UrbanPlanToolbox-v1.9.0-x64-signed-acceptance.zip'
+          $zip = Join-Path $env:ACCEPTANCE_ASSETS "UrbanPlanToolbox-v$($env:RELEASE_VERSION)-x64-signed-acceptance.zip"
           Compress-Archive -LiteralPath $packageRoot -DestinationPath $zip -CompressionLevel Optimal
           $extracted = Join-Path $env:ACCEPTANCE_ASSETS 'verify-extracted'
           Expand-Archive -LiteralPath $zip -DestinationPath $extracted -Force
-          & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory (Join-Path $extracted 'UrbanPlanToolbox-v1.9.0-x64-one-click') -ZipPath $zip
+          & ./packaging/Test-GitHubOneClickInstallerPackage.ps1 -ReleaseDirectory (Join-Path $extracted "UrbanPlanToolbox-v$($env:RELEASE_VERSION)-x64-one-click") -ZipPath $zip
           Remove-Item -LiteralPath $staging,$extracted -Recurse -Force
 
       - name: Generate SHA-256 manifest
@@ -187,7 +169,7 @@ jobs:
       - name: Upload signed acceptance artifact
         uses: actions/upload-artifact@v6
         with:
-          name: UrbanPlanToolbox-v1.9.0-signed-acceptance
+          name: UrbanPlanToolbox-v${{ env.RELEASE_VERSION }}-signed-acceptance
           path: ${{ env.ACCEPTANCE_ASSETS }}
           if-no-files-found: error
           retention-days: 14
