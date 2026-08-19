@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Windows.UI;
 
 namespace UrbanPlanToolbox.Controls;
 
@@ -18,7 +17,7 @@ public sealed class AnimatedUpdateButton : Button
     private TextBlock? _label;
     private bool _updatingContent;
     private bool _clickedBusy;
-    private bool _libraryChromeApplied;
+    private bool _headerChromeApplied;
 
     public AnimatedUpdateButton()
     {
@@ -31,8 +30,8 @@ public sealed class AnimatedUpdateButton : Button
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        if (_libraryChromeApplied || !string.Equals(Name, "HeaderCheckButton", StringComparison.Ordinal)) return;
-        _libraryChromeApplied = true;
+        if (_headerChromeApplied || !string.Equals(Name, "HeaderCheckButton", StringComparison.Ordinal)) return;
+        _headerChromeApplied = true;
 
         // The source card owns the single update action. Keep the legacy named header
         // control detached from the visible interaction surface so existing code-behind
@@ -41,39 +40,11 @@ public sealed class AnimatedUpdateButton : Button
         IsTabStop = false;
 
         if (FindAncestorPage(this) is not { } page) return;
-
-        if (page.FindName("BackButton") is HyperlinkButton backButton)
-        {
-            ApplyBackButtonChrome(page, backButton);
-            page.ActualThemeChanged += (_, _) => ApplyBackButtonChrome(page, backButton);
-        }
-
         if (page.FindName("CloudVersionText") is TextBlock cloudVersion)
         {
             cloudVersion.HorizontalAlignment = HorizontalAlignment.Right;
             cloudVersion.TextAlignment = TextAlignment.Right;
         }
-    }
-
-    private static void ApplyBackButtonChrome(Page page, HyperlinkButton backButton)
-    {
-        // CardBackgroundFillColorDefaultBrush is translucent by design. That made the
-        // library back control visually disappear on the pale Mica surface. Use an
-        // opaque Fluent-like button surface so it has the same unmistakable button
-        // affordance as the project workspace back button.
-        var dark = page.ActualTheme == ElementTheme.Dark;
-        backButton.Padding = new Thickness(11, 6, 11, 6);
-        backButton.CornerRadius = new CornerRadius(7);
-        backButton.BorderThickness = new Thickness(1);
-        backButton.Background = new SolidColorBrush(dark
-            ? Color.FromArgb(255, 45, 45, 45)
-            : Color.FromArgb(255, 250, 250, 250));
-        backButton.BorderBrush = new SolidColorBrush(dark
-            ? Color.FromArgb(255, 74, 74, 74)
-            : Color.FromArgb(255, 205, 205, 205));
-        backButton.Foreground = new SolidColorBrush(dark
-            ? Color.FromArgb(255, 255, 255, 255)
-            : Color.FromArgb(255, 26, 26, 26));
     }
 
     private static Page? FindAncestorPage(DependencyObject child)
