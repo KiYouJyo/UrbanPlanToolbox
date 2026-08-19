@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 
 namespace UrbanPlanToolbox.Controls;
 
@@ -16,13 +17,60 @@ public sealed class AnimatedUpdateButton : Button
     private TextBlock? _label;
     private bool _updatingContent;
     private bool _clickedBusy;
+    private bool _libraryChromeApplied;
 
     public AnimatedUpdateButton()
     {
+        CornerRadius = new CornerRadius(7);
         Click += OnOwnClick;
+        Loaded += OnLoaded;
         RegisterPropertyChangedCallback(ContentProperty, OnContentChanged);
         RegisterPropertyChangedCallback(IsEnabledProperty, OnIsEnabledChanged);
     }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (_libraryChromeApplied || !string.Equals(Name, "HeaderCheckButton", StringComparison.Ordinal)) return;
+        _libraryChromeApplied = true;
+
+        // The source card owns the single update action. Keep the legacy named header
+        // control detached from the visible interaction surface so existing code-behind
+        // contracts can remain stable while the duplicated header action disappears.
+        Visibility = Visibility.Collapsed;
+        IsTabStop = false;
+
+        if (FindAncestorPage(this) is not { } page) return;
+
+        if (page.FindName("BackButton") is HyperlinkButton backButton)
+        {
+            backButton.Padding = new Thickness(10, 6);
+            backButton.CornerRadius = new CornerRadius(7);
+            backButton.BorderThickness = new Thickness(1);
+            backButton.Background = ResolveBrush("CardBackgroundFillColorDefaultBrush");
+            backButton.BorderBrush = ResolveBrush("CardStrokeColorDefaultBrush");
+            backButton.Foreground = ResolveBrush("TextFillColorPrimaryBrush");
+        }
+
+        if (page.FindName("CloudVersionText") is TextBlock cloudVersion)
+        {
+            cloudVersion.HorizontalAlignment = HorizontalAlignment.Right;
+            cloudVersion.TextAlignment = TextAlignment.Right;
+        }
+    }
+
+    private static Page? FindAncestorPage(DependencyObject child)
+    {
+        DependencyObject? current = child;
+        while (current is not null)
+        {
+            if (current is Page page) return page;
+            current = VisualTreeHelper.GetParent(current);
+        }
+        return null;
+    }
+
+    private static Brush? ResolveBrush(string key) =>
+        Application.Current.Resources.TryGetValue(key, out var value) ? value as Brush : null;
 
     private void OnOwnClick(object sender, RoutedEventArgs e)
     {
