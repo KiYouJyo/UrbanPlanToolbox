@@ -1,0 +1,135 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Windows.Storage.Pickers;
+using UrbanPlanToolbox.Models;
+
+namespace UrbanPlanToolbox.Services;
+
+public static class ReferenceDataPackPageCoordinator
+{
+    public static async Task<bool> CheckAndInstallUpdateAsync(FrameworkElement host, string packId, InfoBar statusBar, CancellationToken cancellationToken = default)
+    {
+        var service = ReferenceDataPackService.Default;
+        try
+        {
+            var update = await service.CheckForUpdateAsync(packId, cancellationToken);
+            if (update.Remote is null)
+            {
+                Show(statusBar, ReferenceLibraryText.Get("CatalogUnavailable"), InfoBarSeverity.Informational);
+                return false;
+            }
+            if (!update.UpdateAvailable)
+            {
+                Show(statusBar, ReferenceLibraryText.Get("AlreadyLatest"), InfoBarSeverity.Success);
+                return false;
+            }
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = host.XamlRoot,
+                Title = ReferenceLibraryText.Get("UpdateAvailable", update.Remote.Version),
+                Content = $"{update.Remote.PackId}\n{update.Remote.Version} · Schema {update.Remote.SchemaVersion}",
+                PrimaryButtonText = ReferenceLibraryText.Get("DownloadInstall"),
+                CloseButtonText = ReferenceLibraryText.Get("Close"),
+                DefaultButton = ContentDialogButton.Primary
+            };
+            if (await AppDialogService.Default.ShowAsync(dialog) != ContentDialogResult.Primary) return false;
+            if (string.IsNullOrWhiteSpace(update.Remote.DownloadUrl))
+            {
+                Show(statusBar, ReferenceLibraryText.Get("CatalogUnavailable"), InfoBarSeverity.Warning);
+                return false;
+            }
+            var installed = await service.DownloadAndInstallAsync(packId, update.Remote, cancellationToken);
+            Show(statusBar, ReferenceLibraryText.Get("UpdateInstalled", installed.Version), InfoBarSeverity.Success);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            AppLogger.Default.Error(nameof(ReferenceDataPackPageCoordinator), "data_update_failed", exception, packId);
+            Show(statusBar, ReferenceLibraryText.Get("PackFailed", exception.Message), InfoBarSeverity.Error);
+            return false;
+        }
+    }
+
+    public static async Task<bool> ManageAsync(FrameworkElement host, string packId, InfoBar statusBar, CancellationToken cancellationToken = default)
+    {
+        var service = ReferenceDataPackService.Default;
+        var state = await service.GetActiveStateAsync(packId, cancellationToken);
+        var installed = await service.GetInstalledVersionsAsync(packId, cancellationToken);
+        var canRollback = state is not null && installed.Any(candidate => ReferenceDataPackService.ParseDataVersion(candidate.Version).CompareTo(ReferenceDataPackService.ParseDataVersion(state.Version)) < 0);
+        var source = state?.SourceKind switch
+        {
+            "official" => ReferenceLibraryText.Get("SourceOfficial"),
+            "rollback" => ReferenceLibraryText.Get("SourceRollback"),
+            "installed" => ReferenceLibraryText.Get("SourceInstalled"),
+            _ => ReferenceLibraryText.Get("SourceLocal")
+        };
+        var current = state?.Version ?? ReferenceLibraryText.Get("NoDataPack");
+        var dialog = new ContentDialog
+        {
+            XamlRoot = host.XamlRoot,
+            Title = ReferenceLibraryText.Get("SourceManagerTitle"),
+            Content = ReferenceLibraryText.Get("SourceManagerBody", current, source),
+            PrimaryButtonText = ReferenceLibraryText.Get("ImportPack"),
+            SecondaryButtonText = canRollback ? ReferenceLibraryText.Get("Rollback") : string.Empty,
+            CloseButtonText = ReferenceLibraryText.Get("Close"),
+            DefaultButton = ContentDialogButton.Primary
+        };
+        var result = await AppDialogService.Default.ShowAsync(dialog);
+        if (result == ContentDialogResult.Secondary)
+        {
+            if (await service.RollbackAsync(packId, cancellationToken))
+            {
+                Show(statusBar, ReferenceLibraryText.Get("RollbackSucceeded"), InfoBarSeverity.Success);
+                return true;
+            }
+            Show(statusBar, ReferenceLibraryText.Get("NoRollback"), InfoBarSeverity.Informational);
+            return false;
+        }
+        if (result != ContentDialogResult.Primary) return false;
+        return await ImportFromPickerAsync(host, packId, statusBar, cancellationToken);
+    }
+
+    public static async Task<bool> ImportFromPickerAsync(FrameworkElement host, string packId, InfoBar statusBar, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".uptdata");
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow));
+            var file = await picker.PickSingleFileAsync();
+            if (file is null) return false;
+            var installed = await ReferenceDataPackService.Default.ImportAsync(packId, file.Path, "local", cancellationToken);
+            Show(statusBar, ReferenceLibraryText.Get("ImportSucceeded", installed.Version), InfoBarSeverity.Success);
+            return true;
+        }
+        catch (Exception exception)
+        {
+            AppLogger.Default.Error(nameof(ReferenceDataPackPageCoordinator), "data_import_failed", exception, packId);
+            Show(statusBar, ReferenceLibraryText.Get("PackFailed", exception.Message), InfoBarSeverity.Error);
+            return false;
+        }
+    }
+
+    public static async Task<string> GetCloudVersionTextAsync(string packId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var update = await ReferenceDataPackService.Default.CheckForUpdateAsync(packId, cancellationToken);
+            return update.Remote is null
+                ? ReferenceLibraryText.Get("CloudUnavailable")
+                : ReferenceLibraryText.Get("CloudVersion", update.Remote.Version, update.UpdateAvailable ? ReferenceLibraryText.Get("UpdateAvailable", update.Remote.Version) : ReferenceLibraryText.Get("Latest"));
+        }
+        catch
+        {
+            return ReferenceLibraryText.Get("CloudUnavailable");
+        }
+    }
+
+    private static void Show(InfoBar bar, string message, InfoBarSeverity severity)
+    {
+        bar.Message = message;
+        bar.Severity = severity;
+        bar.IsOpen = true;
+    }
+}
