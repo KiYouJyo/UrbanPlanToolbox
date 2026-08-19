@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Windows.UI;
 
 namespace UrbanPlanToolbox.Controls;
 
@@ -43,12 +44,8 @@ public sealed class AnimatedUpdateButton : Button
 
         if (page.FindName("BackButton") is HyperlinkButton backButton)
         {
-            backButton.Padding = new Thickness(10, 6, 10, 6);
-            backButton.CornerRadius = new CornerRadius(7);
-            backButton.BorderThickness = new Thickness(1);
-            backButton.Background = ResolveBrush("CardBackgroundFillColorDefaultBrush");
-            backButton.BorderBrush = ResolveBrush("CardStrokeColorDefaultBrush");
-            backButton.Foreground = ResolveBrush("TextFillColorPrimaryBrush");
+            ApplyBackButtonChrome(page, backButton);
+            page.ActualThemeChanged += (_, _) => ApplyBackButtonChrome(page, backButton);
         }
 
         if (page.FindName("CloudVersionText") is TextBlock cloudVersion)
@@ -56,6 +53,27 @@ public sealed class AnimatedUpdateButton : Button
             cloudVersion.HorizontalAlignment = HorizontalAlignment.Right;
             cloudVersion.TextAlignment = TextAlignment.Right;
         }
+    }
+
+    private static void ApplyBackButtonChrome(Page page, HyperlinkButton backButton)
+    {
+        // CardBackgroundFillColorDefaultBrush is translucent by design. That made the
+        // library back control visually disappear on the pale Mica surface. Use an
+        // opaque Fluent-like button surface so it has the same unmistakable button
+        // affordance as the project workspace back button.
+        var dark = page.ActualTheme == ElementTheme.Dark;
+        backButton.Padding = new Thickness(11, 6, 11, 6);
+        backButton.CornerRadius = new CornerRadius(7);
+        backButton.BorderThickness = new Thickness(1);
+        backButton.Background = new SolidColorBrush(dark
+            ? Color.FromArgb(255, 45, 45, 45)
+            : Color.FromArgb(255, 250, 250, 250));
+        backButton.BorderBrush = new SolidColorBrush(dark
+            ? Color.FromArgb(255, 74, 74, 74)
+            : Color.FromArgb(255, 205, 205, 205));
+        backButton.Foreground = new SolidColorBrush(dark
+            ? Color.FromArgb(255, 255, 255, 255)
+            : Color.FromArgb(255, 26, 26, 26));
     }
 
     private static Page? FindAncestorPage(DependencyObject child)
@@ -68,9 +86,6 @@ public sealed class AnimatedUpdateButton : Button
         }
         return null;
     }
-
-    private static Brush? ResolveBrush(string key) =>
-        Application.Current.Resources.TryGetValue(key, out var value) ? value as Brush : null;
 
     private void OnOwnClick(object sender, RoutedEventArgs e)
     {
