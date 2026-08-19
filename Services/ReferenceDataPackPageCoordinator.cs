@@ -19,7 +19,7 @@ public static class ReferenceDataPackPageCoordinator
             if (update.Remote is null)
             {
                 CloudVersionCache[packId] = ReferenceLibraryText.Get("CloudUnavailable");
-                Show(statusBar, ReferenceLibraryText.Get("CatalogUnavailable"), InfoBarSeverity.Informational);
+                Show(statusBar, GetCatalogFailureText(update.Status), GetCatalogFailureSeverity(update.Status));
                 return false;
             }
 
@@ -130,8 +130,22 @@ public static class ReferenceDataPackPageCoordinator
         cancellationToken.ThrowIfCancellationRequested();
         return Task.FromResult(CloudVersionCache.TryGetValue(packId, out var text)
             ? text
-            : ReferenceLibraryText.Get("CloudUnavailable"));
+            : ReferenceLibraryText.Get("CloudNotChecked"));
     }
+
+    private static string GetCatalogFailureText(string status) => status switch
+    {
+        "catalog-network-unavailable" or "catalog-timeout" => ReferenceLibraryText.Get("CatalogNetworkUnavailable"),
+        "catalog-invalid" => ReferenceLibraryText.Get("CatalogInvalid"),
+        "catalog-missing-pack" => ReferenceLibraryText.Get("CatalogMissingPack"),
+        _ => ReferenceLibraryText.Get("CatalogUnavailable")
+    };
+
+    private static InfoBarSeverity GetCatalogFailureSeverity(string status) => status switch
+    {
+        "catalog-invalid" or "catalog-missing-pack" => InfoBarSeverity.Warning,
+        _ => InfoBarSeverity.Informational
+    };
 
     private static void Show(InfoBar bar, string message, InfoBarSeverity severity)
     {
