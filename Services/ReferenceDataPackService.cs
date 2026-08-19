@@ -83,13 +83,20 @@ public sealed class ReferenceDataPackService
 
     internal static void ValidateFeatureData(string packId, string dataJson)
     {
-        _ = packId switch
+        switch (packId)
         {
-            ReferenceDataPackIds.PlanningRegulations => ParseRegulations(dataJson),
-            ReferenceDataPackIds.PlanningTerminology => ParseTerminology(dataJson),
-            ReferenceDataPackIds.DesignConcepts => ParseDesignConcepts(dataJson),
-            _ => throw new InvalidDataException("Unsupported reference data pack ID.")
-        };
+            case ReferenceDataPackIds.PlanningRegulations:
+                ParseRegulations(dataJson);
+                break;
+            case ReferenceDataPackIds.PlanningTerminology:
+                ParseTerminology(dataJson);
+                break;
+            case ReferenceDataPackIds.DesignConcepts:
+                ParseDesignConcepts(dataJson);
+                break;
+            default:
+                throw new InvalidDataException("Unsupported reference data pack ID.");
+        }
     }
 
     internal static void ValidatePackId(string packId)
