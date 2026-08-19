@@ -39,7 +39,7 @@ jobs:
             test "$actual_sha" = "${expected_sha[$id]}"
             unzip -t "$file"
             python - "$file" "$id" <<'PY'
-          import json, sys, zipfile
+          import hashlib, json, sys, zipfile
           path, expected_id = sys.argv[1:]
           with zipfile.ZipFile(path) as archive:
               manifest = json.loads(archive.read('manifest.json'))
@@ -50,13 +50,24 @@ jobs:
               assert manifest['publisher'] == 'UrbanPlanToolbox', manifest
               files = manifest['files']
               assert len(files) == 1, files
-              payload = json.loads(archive.read(files[0]['path']))
+              payload_bytes = archive.read(files[0]['path'])
+              assert files[0]['size'] == len(payload_bytes), (files[0]['size'], len(payload_bytes))
+              assert files[0]['sha256'].lower() == hashlib.sha256(payload_bytes).hexdigest(), files[0]['sha256']
+              payload = json.loads(payload_bytes)
               assert payload['schemaVersion'] == 1, payload.get('schemaVersion')
               assert payload['dataVersion'] == '2026.08.1', payload.get('dataVersion')
               collection = payload['terms'] if expected_id == 'planning-terminology' else payload['entries']
               assert collection, expected_id
               if expected_id == 'planning-regulations':
-                  assert all(item.get('stableId') and item.get('originalTitle') and item.get('officialUrl') for item in collection)
+                  string_fields = ('stableId','region','jurisdictionLevel','topic','documentLevel','originalTitle','chineseTitle','scopeAndPurpose','effectOrAdoption','officialUrl','verifiedDate')
+                  nullable_string_fields = ('identifierOrYear','downloadUrl','downloadAndCopyrightNote','searchKeywords')
+                  for index, item in enumerate(collection):
+                      assert isinstance(item.get('id'), int), (index, 'id', item.get('id'))
+                      for key in string_fields:
+                          assert isinstance(item.get(key), str) and item[key].strip(), (index, key, item.get(key), type(item.get(key)).__name__)
+                      for key in nullable_string_fields:
+                          assert item.get(key) is None or isinstance(item.get(key), str), (index, key, item.get(key), type(item.get(key)).__name__)
+                  assert len({item['stableId'] for item in collection}) == len(collection)
               print(f"{expected_id}: payload entries={len(collection)}")
           PY
           done
