@@ -109,11 +109,15 @@ jobs:
             Start-Sleep -Seconds 30
           } while ($true)
 
+          $publishedStatus = if ($published -is [System.Collections.IDictionary]) { Get-Text (Get-OptionalValue $published 'Status') } else { '' }
+          Write-Output "last_published_submission_id=$publishedId"
+          Write-Output "last_published_status=$publishedStatus"
+          Write-Output "last_published_package_versions=$($publishedVersions -join ',')"
+
           if ($publishedVersions -contains $expectedVersion) {
-            $status = Get-Text (Get-OptionalValue $published 'Status')
             Write-Output 'store_result=published'
             Write-Output "store_submission_id=$publishedId"
-            Write-Output "store_status=$status"
+            Write-Output "store_status=$publishedStatus"
             Write-Output "store_package_version=$expectedVersion"
             exit 0
           }
