@@ -1,0 +1,55 @@
+name: One-shot data pack copy update
+
+on:
+  push:
+    branches:
+      - fix/data-pack-latest-copy
+    paths:
+      - .github/workflows/one-shot-data-pack-copy.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-copy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/data-pack-latest-copy
+
+      - name: Rewrite data pack section
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('docs/index.html')
+          text = path.read_text(encoding='utf-8')
+
+          replacements = {
+              '<span class="pill version">Data Pack 1.0</span>': '<span class="pill version">Data Pack Framework 1.0</span>',
+              '<h3><span class="l zh">资料数据与应用版本独立演进</span><span class="l ja">データとアプリを独立して更新</span><span class="l en">Data evolves independently from the app</span></h3>': '<h3><span class="l zh">最新数据包 · 2026.08.3</span><span class="l ja">最新データパック · 2026.08.3</span><span class="l en">Latest data pack · 2026.08.3</span></h3>',
+              '<p class="l zh">v1.9.2 建立三套专业资料库与独立 UrbanPlanToolbox_Data / Data Pack 1.0 框架；v1.9.3 将设计理念数据库升级至 2026.08.3，共 109 条，并补齐分类、适用项目类型、标签、案例备注与来源说明的中日英三语。应用继续支持官方 Catalog、.uptdata 下载/导入、完整性校验与回退。</p>': '<p class="l zh">当前官方数据包为 2026.08.3。本次更新将设计理念数据库从 68 条扩展至 109 条，并补齐分类、适用项目类型、标签、案例备注与来源说明的中日英三语；法规索引保持 221 条，规划术语库保持 140 条。Data Pack Framework 1.0 独立于应用版本，支持通过官方 Catalog 检查更新、下载或导入 .uptdata、完整性校验与上一版本回退。</p>',
+              '<p class="l ja">v1.9.2 で3つの専門ライブラリと独立した UrbanPlanToolbox_Data / Data Pack 1.0 基盤を構築し、v1.9.3 ではデザインコンセプトDBを 2026.08.3・109件へ更新しました。カテゴリ、適用プロジェクト種別、タグ、事例メモ、出典説明まで中日英3言語に対応し、Catalog、.uptdata の取得/読み込み、完全性検証、ロールバックも継続して利用できます。</p>': '<p class="l ja">現在の公式データパックは 2026.08.3 です。今回の更新ではデザインコンセプトDBを 68 件から 109 件へ拡張し、カテゴリ、適用プロジェクト種別、タグ、事例メモ、出典説明まで中日英3言語を補完しました。法規索引は 221 件、都市計画用語集は 140 件です。Data Pack Framework 1.0 はアプリ版とは独立しており、公式 Catalog による更新確認、.uptdata の取得・読み込み、完全性検証、前版へのロールバックに対応します。</p>',
+              '<p class="l en">v1.9.2 established the three professional libraries on the independent UrbanPlanToolbox_Data / Data Pack 1.0 foundation; v1.9.3 upgrades the Design Concepts database to 2026.08.3 with 109 entries and completes trilingual categories, applicable project types, tags, case notes, and source notes. Official catalog checks, .uptdata download/import, integrity validation, and rollback remain supported.</p>': '<p class="l en">The current official data pack is 2026.08.3. This update expands the Design Concepts database from 68 to 109 entries and completes Chinese, Japanese, and English localization for categories, applicable project types, tags, case notes, and source notes. The regulations index remains at 221 entries and the planning terminology library at 140. Data Pack Framework 1.0 evolves independently from the app and supports official Catalog checks, .uptdata download/import, integrity validation, and rollback to the previous pack.</p>',
+              '<div class="stats" aria-label="Current professional library statistics">': '<div class="stats" aria-label="Data Pack 2026.08.3 statistics">',
+          }
+
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f'Expected source text not found: {old[:120]}')
+              text = text.replace(old, new, 1)
+
+          path.write_text(text, encoding='utf-8', newline='\n')
+          PY
+
+      - name: Commit updated copy
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html
+          git commit -m "docs: describe latest data pack instead of app versions"
+          git push origin HEAD:fix/data-pack-latest-copy
