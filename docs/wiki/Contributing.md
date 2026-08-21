@@ -6,14 +6,14 @@
 
 建议先阅读：
 
-- [`README.md`](../../README.md)
-- [`docs/DOCUMENTATION.md`](../DOCUMENTATION.md)
-- [`docs/project-status.json`](../project-status.json)
-- [`docs/RELEASE.md`](../RELEASE.md)
-- [`docs/LOCALIZATION.md`](../LOCALIZATION.md)
-- [`docs/DATA_STORAGE.md`](../DATA_STORAGE.md)
-- [`docs/DATA_BACKUP.md`](../DATA_BACKUP.md)
-- [`CHANGELOG.md`](../../CHANGELOG.md)
+- [`README.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/README.md)
+- [`docs/DOCUMENTATION.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/DOCUMENTATION.md)
+- [`docs/project-status.json`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/project-status.json)
+- [`docs/RELEASE.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/RELEASE.md)
+- [`docs/LOCALIZATION.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/LOCALIZATION.md)
+- [`docs/DATA_STORAGE.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/DATA_STORAGE.md)
+- [`docs/DATA_BACKUP.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/DATA_BACKUP.md)
+- [`CHANGELOG.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/CHANGELOG.md)
 
 当前产品线是稳定的 1.x，贡献应优先保持兼容性、数据安全与既有更新链稳定。
 
@@ -28,7 +28,7 @@ dotnet restore UrbanPlanToolbox.slnx -p:Configuration=Debug -p:Platform=x64
 dotnet test UrbanPlanToolbox.slnx -c Debug -p:Platform=x64 --no-restore
 ```
 
-正式打包、签名、Release 和 Microsoft Store 流程请严格遵循 [`docs/RELEASE.md`](../RELEASE.md)，不要根据 Wiki 自行推断发布步骤。
+正式打包、签名、Release 和 Microsoft Store 流程请严格遵循 [`docs/RELEASE.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/RELEASE.md)，不要根据 Wiki 自行推断发布步骤。
 
 ## 修改功能时
 
