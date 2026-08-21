@@ -4,7 +4,7 @@
 
 UrbanPlanToolbox 是一款面向城乡规划、建筑设计与空间研究的 **离线优先 Windows 工具箱**。本 Wiki 面向实际使用者与贡献者，重点回答“怎么安装、怎么用、数据在哪里、各功能之间是什么关系”；版本与发布状态则继续以仓库中的单一事实源为准。
 
-> 本 Wiki 基线按 UrbanPlanToolbox **v1.9.3** 整理。当前状态以 [`docs/project-status.json`](../project-status.json) 为准，历史变化以 [`CHANGELOG.md`](../../CHANGELOG.md) 与 GitHub Releases 为准。
+> 本 Wiki 基线按 UrbanPlanToolbox **v1.9.3** 整理。当前状态以 [`docs/project-status.json`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/project-status.json) 为准，历史变化以 [`CHANGELOG.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/CHANGELOG.md) 与 [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) 为准。
 
 ## 从这里开始
 
@@ -33,12 +33,12 @@ UrbanPlanToolbox 是一款面向城乡规划、建筑设计与空间研究的 **
 
 Wiki 是“使用与理解”的入口，不替代以下正式文档：
 
-- 当前版本与发行状态：[`docs/project-status.json`](../project-status.json)
-- 历史变更：[`CHANGELOG.md`](../../CHANGELOG.md)
-- 发布与签名流程：[`docs/RELEASE.md`](../RELEASE.md)
-- 数据存储合同：[`docs/DATA_STORAGE.md`](../DATA_STORAGE.md)
-- 备份格式合同：[`docs/DATA_BACKUP.md`](../DATA_BACKUP.md)
-- 本地化工程规范：[`docs/LOCALIZATION.md`](../LOCALIZATION.md)
-- 隐私政策：[`PRIVACY.md`](../../PRIVACY.md)
+- 当前版本与发行状态：[`docs/project-status.json`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/project-status.json)
+- 历史变更：[`CHANGELOG.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/CHANGELOG.md)
+- 发布与签名流程：[`docs/RELEASE.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/RELEASE.md)
+- 数据存储合同：[`docs/DATA_STORAGE.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/DATA_STORAGE.md)
+- 备份格式合同：[`docs/DATA_BACKUP.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/DATA_BACKUP.md)
+- 本地化工程规范：[`docs/LOCALIZATION.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/LOCALIZATION.md)
+- 隐私政策：[`PRIVACY.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/PRIVACY.md)
 
 如果 Wiki 与这些正式文档发生冲突，应以正式文档和当前代码为准，并同步修正 Wiki。
