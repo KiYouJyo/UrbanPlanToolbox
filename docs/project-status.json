@@ -27,12 +27,12 @@
     "microsoftStore": {
       "submittedProductVersion": "1.9.3",
       "submittedPackageVersion": "1.9.3.0",
-      "state": "certification-submitted",
-      "publicProductVersion": "1.9.2",
+      "state": "published",
+      "publicProductVersion": "1.9.3",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
       "candidateProductVersion": "1.9.3",
       "candidatePackageVersion": "1.9.3.0",
-      "candidateState": "certification-submitted",
+      "candidateState": "published",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
