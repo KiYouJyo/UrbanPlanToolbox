@@ -189,16 +189,10 @@ public sealed class ReferenceDataPackIntegrationContractTests
     public void V192FactsAndReleaseNotesStayAligned()
     {
         var root = FindRepositoryRoot();
-        var project = File.ReadAllText(Path.Combine(root, "UrbanPlanToolbox.csproj"));
-        var sideload = File.ReadAllText(Path.Combine(root, "Package.appxmanifest"));
-        var store = File.ReadAllText(Path.Combine(root, "Package.Store.appxmanifest"));
-        var version = File.ReadAllText(Path.Combine(root, "Services", "AppVersionProvider.cs"));
         var notes = File.ReadAllText(Path.Combine(root, "Assets", "Data", "ReleaseNotes", "1.9.2.json"));
 
-        Assert.Contains("<Version>1.9.2</Version>", project, StringComparison.Ordinal);
-        Assert.Contains("Version=\"1.9.2.0\"", sideload, StringComparison.Ordinal);
-        Assert.Contains("Version=\"1.9.2.0\"", store, StringComparison.Ordinal);
-        Assert.Contains("Version = \"1.9.2\"", version, StringComparison.Ordinal);
+        // v1.9.2 is a historical release contract. Keep its packaged notes immutable
+        // without pinning the current application version to 1.9.2.
         Assert.Contains("\"version\":\"1.9.2\"", notes, StringComparison.Ordinal);
         Assert.Contains("Data Pack 1.0", notes, StringComparison.Ordinal);
     }

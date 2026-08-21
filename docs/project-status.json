@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
-  "asOf": "2026-08-19",
+  "asOf": "2026-08-21",
   "repository": {
     "defaultBranch": "main",
     "documentationGovernance": "docs/DOCUMENTATION.md"
   },
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.9.2",
+    "version": "1.9.3",
     "lifecycle": "stable-1.x",
     "platform": "Windows",
     "supportedArchitecture": "x64",
@@ -18,9 +18,9 @@
       "latestPublishedProductVersion": "1.9.2",
       "latestPublishedPackageVersion": "1.9.2.0",
       "latestPublishedReleaseTag": "v1.9.2",
-      "candidateProductVersion": "1.9.2",
-      "candidatePackageVersion": "1.9.2.0",
-      "candidateState": "published",
+      "candidateProductVersion": "1.9.3",
+      "candidatePackageVersion": "1.9.3.0",
+      "candidateState": "approved-for-publication",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -30,9 +30,9 @@
       "state": "certification-submitted",
       "publicProductVersion": "1.8.2",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
-      "candidateProductVersion": "1.9.2",
-      "candidatePackageVersion": "1.9.2.0",
-      "candidateState": "certification-submitted",
+      "candidateProductVersion": "1.9.3",
+      "candidatePackageVersion": "1.9.3.0",
+      "candidateState": "approved-for-submission",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path"
     }
@@ -64,11 +64,11 @@
         "signer Subject pinning",
         "signer Thumbprint pinning"
       ],
-      "validation": "validated and frozen; v1.9.2 does not change application update download, verification, deployment, or restart behavior",
+      "validation": "validated and frozen; v1.9.3 does not change application update download, verification, deployment, or restart behavior",
       "policy": "validated / frozen; future updater mechanism changes require a proven bug, security issue, or Windows platform/API compatibility requirement plus end-to-end regression evidence"
     },
     "microsoftStore": {
-      "validation": "validated and frozen; v1.9.2 does not change the Store download/install operation or its update-session behavior",
+      "validation": "validated and frozen; v1.9.3 does not change the Store download/install operation or its update-session behavior",
       "policy": "validated / fully frozen after the successful real Microsoft Store 1.7.4 to 1.7.5 E2E acceptance on 2026-08-14; future updater mechanism changes require a proven bug, security issue, or Windows / Microsoft Store platform/API compatibility requirement plus end-to-end regression evidence on the affected channel. One user action invokes the Windows-native combined download-and-install operation; register Windows restart recovery before it starts, use app restart only when the process survives, and keep Store and GitHub identities separate"
     }
   },

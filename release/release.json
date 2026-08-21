@@ -1,21 +1,20 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.9.2", "packageVersion": "1.9.2.0" },
+  "product": { "name": "UrbanPlanToolbox", "version": "1.9.3", "packageVersion": "1.9.3.0" },
   "classification": { "kind": "feature-release", "stability": "approved-for-publication", "storeMilestone": false },
   "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
   "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.9.2 专业资料库与 Data Pack 1.0",
-    "ja-JP": "UrbanPlanToolbox v1.9.2 専門データライブラリと Data Pack 1.0",
-    "en-US": "UrbanPlanToolbox v1.9.2 Professional libraries and Data Pack 1.0"
+    "zh-CN": "UrbanPlanToolbox v1.9.3 设计理念数据库第三版",
+    "ja-JP": "UrbanPlanToolbox v1.9.3 デザインコンセプトDB 第3版",
+    "en-US": "UrbanPlanToolbox v1.9.3 Design Concepts Database v3"
   },
   "languageLabels": { "zh-CN": "简体中文", "ja-JP": "日本語", "en-US": "English" },
   "items": [
-    { "id": "professional-library-ui", "zh-CN": "按新版 Figma 设计重构法规索引、规划术语库和设计理念词典，统一数据源、检索列表和详情面板。", "ja-JP": "新しい Figma デザインに合わせ、法規索引、都市計画用語集、デザインコンセプト辞典を共通のデータソース、検索リスト、詳細ペイン構成へ刷新しました。", "en-US": "Rebuilds the regulations index, planning terminology, and design concepts dictionary around a shared data-source, search-list, and detail-pane experience based on the new Figma designs." },
-    { "id": "datapack-repository", "zh-CN": "三套资料库正式接入 UrbanPlanToolbox_Data，数据版本与应用版本独立演进，新页面不再使用主仓库旧快照作为运行时数据源。", "ja-JP": "3 つのライブラリを UrbanPlanToolbox_Data に正式接続し、データ版をアプリ版から独立させ、新画面ではメインリポジトリの旧スナップショットを実行時データソースに使用しません。", "en-US": "Connects the three libraries to UrbanPlanToolbox_Data so data versions evolve independently from app versions; the redesigned pages no longer use legacy app-repository snapshots as runtime sources." },
-    { "id": "datapack-client", "zh-CN": "新增 DataPackResolver、DataPackCatalogService 与 DataPackInstaller，支持官方 Catalog、Release 下载、本地 .uptdata 导入和上一版本回退。", "ja-JP": "DataPackResolver、DataPackCatalogService、DataPackInstaller を追加し、公式 Catalog、Release 取得、ローカル .uptdata 読み込み、前版へのロールバックに対応しました。", "en-US": "Adds DataPackResolver, DataPackCatalogService, and DataPackInstaller for the official catalog, Release downloads, local .uptdata import, and rollback." },
-    { "id": "datapack-validation", "zh-CN": "Data Pack 1.0 激活前校验 Pack ID、Schema、最低应用版本、路径安全、文件大小和 SHA-256，并拒绝未声明文件与路径穿越。", "ja-JP": "Data Pack 1.0 は有効化前に Pack ID、Schema、最低アプリ版、パス安全性、サイズ、SHA-256 を検証し、未宣言ファイルとパストラバーサルを拒否します。", "en-US": "Data Pack 1.0 validates pack ID, schema, minimum app version, path safety, sizes, and SHA-256 before activation, rejecting undeclared files and path traversal." },
-    { "id": "initial-data", "zh-CN": "首批 2026.08.1 面向 221 条法规索引、140 个中日英规划术语及 18 条设计理念。", "ja-JP": "初回 2026.08.1 は法規索引 221 件、中日英用語 140 件、デザインコンセプト 18 件を対象とします。", "en-US": "The initial 2026.08.1 set targets 221 regulation entries, 140 trilingual planning terms, and 18 design concepts." },
-    { "id": "offline-boundary", "zh-CN": "数据更新仅由用户主动触发；已安装数据保持离线可用，并保留历史版本用于回退。", "ja-JP": "データ更新はユーザー操作時のみ行われ、インストール済みデータはオフライン利用可能で、旧版はロールバック用に保持されます。", "en-US": "Data updates are user-triggered; installed packs remain available offline and prior versions are retained for rollback." }
+    { "id": "design-concepts-v3", "zh-CN": "设计理念数据包升级至 2026.08.3：新增 41 条经审核 canonical 理念，数据库由 68 条扩展至 109 条。", "ja-JP": "デザインコンセプト Data Pack を 2026.08.3 へ更新し、審査済み canonical コンセプト 41 件を追加して 68 件から 109 件へ拡張しました。", "en-US": "Upgrades the Design Concepts data pack to 2026.08.3, adding 41 reviewed canonical concepts and expanding the database from 68 to 109 entries." },
+    { "id": "design-concepts-full-i18n", "zh-CN": "设计理念的分类、适用项目类型、标签、案例备注与来源说明全部补齐中日英三语，日文/英文界面不再残留中文。", "ja-JP": "カテゴリ、適用プロジェクト種別、タグ、事例メモ、出典説明まで中日英3言語を補完し、日本語・英語画面に中国語が残る問題を解消しました。", "en-US": "Completes Chinese, Japanese and English localization for categories, applicable project types, tags, case notes and source notes, eliminating Chinese leakage in Japanese and English UI." },
+    { "id": "localized-metadata-catalog", "zh-CN": "新增数据包级三语标签目录，保留现有中文 canonical 键作为稳定筛选值，同时向界面提供完整本地化显示。", "ja-JP": "既存の中国語 canonical キーを安定したフィルター値として維持しつつ、データパックに3言語ラベルカタログを追加しました。", "en-US": "Adds a pack-level trilingual label catalog while retaining existing canonical Chinese keys as stable filter values." },
+    { "id": "no-cross-language-fallback", "zh-CN": "旧数据包仍保持兼容；在缺少目标语言内容时，日文或英文界面不再错误回退到中文案例或元数据。", "ja-JP": "旧データパックとの互換性を維持し、対象言語が欠ける場合も日本語・英語画面で中国語の事例やメタデータへ誤フォールバックしません。", "en-US": "Keeps older packs compatible while preventing Japanese or English UI from incorrectly falling back to Chinese case notes or metadata when translations are absent." },
+    { "id": "localized-search", "zh-CN": "搜索范围扩展到三语分类、项目类型与标签，切换语言后仍可按当前语言查找理念。", "ja-JP": "検索対象を3言語のカテゴリ、プロジェクト種別、タグへ拡張し、表示言語のままコンセプトを検索できます。", "en-US": "Extends search to localized categories, project types and tags so concepts remain searchable in the active UI language." }
   ]
 }

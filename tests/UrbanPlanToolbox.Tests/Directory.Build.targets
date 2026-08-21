@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup>
+    <Compile Include="../../Services/DesignConceptLocalization.cs" Link="Services/DesignConceptLocalization.cs" />
+  </ItemGroup>
+</Project>

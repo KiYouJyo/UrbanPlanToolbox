@@ -1,5 +1,16 @@
 # 更改日志
 
+## 1.9.3
+
+### Design Concepts Database v3 and complete trilingual metadata
+
+- Upgrades the Design Concepts data pack to `2026.08.3`, adding 41 reviewed canonical concepts and expanding the database from 68 to 109 entries.
+- Completes Chinese, Japanese, and English localization for concept categories, applicable project types, tags, case notes, and source notes.
+- Adds a trilingual metadata label catalog while preserving canonical Chinese filter keys for backward compatibility.
+- Prevents Japanese and English UI from falling back to Chinese when an older data pack lacks localized case notes or metadata.
+- Extends concept search to all three languages for categories, project types, and tags.
+- Keeps project schema version 3, backup format version 2, and the existing GitHub/Microsoft Store updater mechanisms unchanged.
+
 ## 1.9.2
 
 ### Professional libraries and Data Pack 1.0

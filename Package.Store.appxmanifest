@@ -8,7 +8,7 @@
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap uap5 com desktop rescap">
-  <Identity Name="JoKiy.UrbanPlanToolbox" Publisher="CN=C4E4B33A-7B77-4121-897C-7D720A5471F8" Version="1.9.2.0" />
+  <Identity Name="JoKiy.UrbanPlanToolbox" Publisher="CN=C4E4B33A-7B77-4121-897C-7D720A5471F8" Version="1.9.3.0" />
   <Properties><DisplayName>ms-resource:AppDisplayName</DisplayName><PublisherDisplayName>Jo Kiyō</PublisherDisplayName><Logo>Assets\StoreLogo.png</Logo></Properties>
   <Dependencies><TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0" /><TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26226.0" /></Dependencies>
   <Resources><Resource Language="zh-CN" /><Resource Language="ja-JP" /><Resource Language="en-US" /></Resources>
