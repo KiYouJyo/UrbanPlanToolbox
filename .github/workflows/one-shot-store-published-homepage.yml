@@ -1,0 +1,69 @@
+name: One-shot homepage distribution sync
+
+on:
+  push:
+    branches:
+      - fix/store-published-and-direct-download
+    paths:
+      - .github/workflows/one-shot-store-published-homepage.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-homepage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/store-published-and-direct-download
+
+      - name: Update Store publication state and GitHub direct download
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          status_path = Path('docs/project-status.json')
+          status = json.loads(status_path.read_text(encoding='utf-8'))
+          store = status['distribution']['microsoftStore']
+          if store.get('submittedPackageVersion') != '1.9.3.0':
+              raise SystemExit('Unexpected Store submitted package version')
+          store['state'] = 'published'
+          store['publicProductVersion'] = '1.9.3'
+          store['candidateState'] = 'published'
+          status_path.write_text(json.dumps(status, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          index_path = Path('docs/index.html')
+          text = index_path.read_text(encoding='utf-8')
+
+          direct_url = 'https://github.com/KiYouJyo/UrbanPlanToolbox/releases/download/v1.9.3/UrbanPlanToolbox-v1.9.3-x64-one-click.zip'
+          old_hero = '<a class="button primary" href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest"><span class="l zh">下载 GitHub 正式版</span><span class="l ja">GitHub 正式版を入手</span><span class="l en">Download GitHub release</span></a>'
+          new_hero = f'<a class="button primary" href="{direct_url}"><span class="l zh">下载 GitHub 一键安装包</span><span class="l ja">GitHub ワンクリック導入版をダウンロード</span><span class="l en">Download GitHub one-click installer</span></a>'
+          if old_hero not in text:
+              raise SystemExit('Expected hero download button not found')
+          text = text.replace(old_hero, new_hero, 1)
+
+          replacements = {
+              '<span id="store-public">1.9.2</span>': '<span id="store-public">1.9.3</span>',
+              '<span id="store-public-2">1.9.2</span>': '<span id="store-public-2">1.9.3</span>',
+              '<span id="store-status-badge" class="status-badge pending"><span class="l zh">认证中</span><span class="l ja">審査中</span><span class="l en">In certification</span></span>': '<span id="store-status-badge" class="status-badge ok"><span class="l zh">已发布</span><span class="l ja">公開済み</span><span class="l en">Published</span></span>',
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f'Expected homepage fallback text not found: {old}')
+              text = text.replace(old, new, 1)
+
+          index_path.write_text(text, encoding='utf-8', newline='\n')
+          PY
+
+      - name: Commit synced website state
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/project-status.json docs/index.html
+          git commit -m "docs: mark Store 1.9.3 published and link installer"
+          git push origin HEAD:fix/store-published-and-direct-download
