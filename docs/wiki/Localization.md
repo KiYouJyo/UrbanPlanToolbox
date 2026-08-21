@@ -114,6 +114,6 @@ Strings/
 
 ## 相关正式文档
 
-- [`docs/LOCALIZATION.md`](../LOCALIZATION.md)
+- [`docs/LOCALIZATION.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/LOCALIZATION.md)
 - [专业知识库与 Data Pack](Professional-Libraries.md)
 - [贡献指南](Contributing.md)
