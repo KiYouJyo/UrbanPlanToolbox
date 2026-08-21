@@ -2,7 +2,7 @@
 
 本页解释 UrbanPlanToolbox 的版本和路线图怎么读，不建立另一套独立发布记录。
 
-> **当前状态的唯一权威来源**是 [`docs/project-status.json`](../project-status.json)。历史版本变化以 [`CHANGELOG.md`](../../CHANGELOG.md) 和 GitHub Releases 为准。
+> **当前状态的唯一权威来源**是 [`docs/project-status.json`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/project-status.json)。历史版本变化以 [`CHANGELOG.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/CHANGELOG.md) 和 [GitHub Releases](https://github.com/KiYouJyo/UrbanPlanToolbox/releases) 为准。
 
 ## 当前稳定线
 
