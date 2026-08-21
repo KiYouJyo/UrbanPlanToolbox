@@ -140,6 +140,6 @@ WebDAV 密码保存在 **Windows Credential Locker**，不会写入：
 
 ## 相关正式文档
 
-- [`docs/DATA_STORAGE.md`](../DATA_STORAGE.md)
-- [`docs/DATA_BACKUP.md`](../DATA_BACKUP.md)
-- [`PRIVACY.md`](../../PRIVACY.md)
+- [`docs/DATA_STORAGE.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/DATA_STORAGE.md)
+- [`docs/DATA_BACKUP.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/docs/DATA_BACKUP.md)
+- [`PRIVACY.md`](https://github.com/KiYouJyo/UrbanPlanToolbox/blob/main/PRIVACY.md)
