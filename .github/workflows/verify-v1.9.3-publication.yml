@@ -1,0 +1,126 @@
+name: Verify v1.9.3 publication state
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-v1.9.3-publication.yml'
+      - 'docs/project-status.json'
+      - '.github/workflows/assist-v1.9.3-changelog.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-publication:
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 20
+    steps:
+      - name: Verify GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tag = 'v1.9.3'
+          $releaseJson = gh api "repos/${{ github.repository }}/releases/tags/$tag"
+          if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($releaseJson)) { throw "GitHub Release $tag is not readable." }
+          $release = $releaseJson | ConvertFrom-Json
+          if ($release.tag_name -cne $tag -or $release.draft -or $release.prerelease) { throw 'GitHub Release metadata is not final.' }
+          $expected = @('UrbanPlanToolbox_1.9.3.0_x64.msixbundle','UrbanPlanToolbox-v1.9.3-x64-one-click.zip','SHA256SUMS.txt')
+          $actual = @($release.assets | ForEach-Object { $_.name })
+          if ($actual.Count -ne $expected.Count) { throw "GitHub Release asset count mismatch: $($actual.Count)" }
+          foreach ($name in $expected) { if ($actual -cnotcontains $name) { throw "Missing GitHub Release asset: $name" } }
+          Write-Output 'github_release=published'
+          Write-Output "github_tag=$($release.tag_name)"
+          Write-Output "github_release_id=$($release.id)"
+          Write-Output "github_assets=$($actual -join ',')"
+
+      - name: Verify Microsoft Store submission
+        shell: pwsh
+        env:
+          TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+          CLIENT_ID: ${{ secrets.AZURE_AD_APPLICATION_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.AZURE_AD_APPLICATION_SECRET }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+          $productId = '9MWDPJG1BHKW'
+          $expectedVersion = '1.9.3.0'
+          $acceptedStatuses = @('CommitStarted','PreProcessing','Certification','PendingPublication','Release','Publishing','Published','InTheStore')
+
+          function Get-OptionalValue {
+            param([System.Collections.IDictionary]$Dictionary,[string]$Name)
+            $key = @($Dictionary.Keys | Where-Object { [string]::Equals([string]$_,$Name,[StringComparison]::OrdinalIgnoreCase) }) | Select-Object -First 1
+            if ($null -eq $key) { return $null }
+            return $Dictionary[$key]
+          }
+          function Get-Text { param($Value) if ($null -eq $Value) { return '' }; return ([string]$Value).Trim() }
+          function Get-PackageVersion {
+            param([System.Collections.IDictionary]$Package)
+            foreach ($name in @('Version','PackageVersion','PackageVersionString')) {
+              $value = Get-Text (Get-OptionalValue $Package $name)
+              if (-not [string]::IsNullOrWhiteSpace($value)) { return $value }
+            }
+            $fileName = Get-Text (Get-OptionalValue $Package 'FileName')
+            if ($fileName -match '(?i)_(\d+\.\d+\.\d+\.\d+)(?:_|\.|$)') { return $matches[1] }
+            return ''
+          }
+          function Get-Submission {
+            param([string]$Id,[hashtable]$Headers,[string]$ApplicationUri)
+            if ([string]::IsNullOrWhiteSpace($Id)) { return $null }
+            return (Invoke-WebRequest -Method Get -Uri "$ApplicationUri/submissions/$Id" -Headers $Headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+          }
+          function Get-Versions {
+            param($Submission)
+            if ($Submission -isnot [System.Collections.IDictionary]) { return @() }
+            $packages = @(Get-OptionalValue $Submission 'ApplicationPackages')
+            return @($packages | Where-Object { $_ -is [System.Collections.IDictionary] } | ForEach-Object { Get-PackageVersion $_ } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -Unique)
+          }
+
+          foreach ($name in @('TENANT_ID','CLIENT_ID','CLIENT_SECRET')) {
+            if ([string]::IsNullOrWhiteSpace((Get-Item "env:$name").Value)) { throw "Missing Store credential: $name" }
+          }
+          $token = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$env:TENANT_ID/oauth2/v2.0/token" -ContentType 'application/x-www-form-urlencoded' -Body @{
+            client_id = $env:CLIENT_ID
+            client_secret = $env:CLIENT_SECRET
+            scope = 'https://manage.devcenter.microsoft.com/.default'
+            grant_type = 'client_credentials'
+          }
+          if ([string]::IsNullOrWhiteSpace([string]$token.access_token)) { throw 'Partner Center token response did not contain an access token.' }
+          $headers = @{ Authorization = "Bearer $($token.access_token)"; TenantId = $env:TENANT_ID; Accept = 'application/json' }
+          $applicationUri = "https://manage.devcenter.microsoft.com/v1.0/my/applications/$productId"
+          $deadline = [DateTimeOffset]::UtcNow.AddMinutes(12)
+          do {
+            $application = (Invoke-WebRequest -Method Get -Uri $applicationUri -Headers $headers).Content | ConvertFrom-Json -AsHashtable -Depth 100
+            $pendingRef = Get-OptionalValue $application 'PendingApplicationSubmission'
+            $publishedRef = Get-OptionalValue $application 'LastPublishedApplicationSubmission'
+            $pendingId = if ($pendingRef -is [System.Collections.IDictionary]) { Get-Text (Get-OptionalValue $pendingRef 'Id') } else { '' }
+            $publishedId = if ($publishedRef -is [System.Collections.IDictionary]) { Get-Text (Get-OptionalValue $publishedRef 'Id') } else { '' }
+            $pending = Get-Submission $pendingId $headers $applicationUri
+            $published = Get-Submission $publishedId $headers $applicationUri
+            $pendingVersions = @(Get-Versions $pending)
+            $publishedVersions = @(Get-Versions $published)
+            if (($pendingVersions -contains $expectedVersion) -or ($publishedVersions -contains $expectedVersion)) { break }
+            if ([DateTimeOffset]::UtcNow -ge $deadline) {
+              throw "Store v$expectedVersion was not found before timeout. Pending=$($pendingVersions -join ',') LastPublished=$($publishedVersions -join ',')"
+            }
+            Write-Output "Waiting for Store v$expectedVersion. Pending=$($pendingVersions -join ',') LastPublished=$($publishedVersions -join ',')"
+            Start-Sleep -Seconds 30
+          } while ($true)
+
+          if ($publishedVersions -contains $expectedVersion) {
+            $status = Get-Text (Get-OptionalValue $published 'Status')
+            Write-Output 'store_result=published'
+            Write-Output "store_submission_id=$publishedId"
+            Write-Output "store_status=$status"
+            Write-Output "store_package_version=$expectedVersion"
+            exit 0
+          }
+
+          $status = Get-Text (Get-OptionalValue $pending 'Status')
+          if ($acceptedStatuses -notcontains $status) { throw "Store v$expectedVersion is present but status '$status' is not an accepted post-commit state." }
+          Write-Output 'store_result=certification-submitted'
+          Write-Output "store_submission_id=$pendingId"
+          Write-Output "store_status=$status"
+          Write-Output "store_package_version=$expectedVersion"
