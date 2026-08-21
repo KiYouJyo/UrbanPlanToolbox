@@ -30,11 +30,26 @@ $metadata = [ordered]@{
     releaseApiUri = "https://api.github.com/repos/KiYouJyo/UrbanPlanToolbox/releases/tags/v$DisplayVersion"; checksumFileName = 'SHA256SUMS.txt'
 }
 $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'InstallerMetadata.json') -Encoding UTF8
-$rootEntryScripts = @(Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.cmd' | Sort-Object Name)
-if ($rootEntryScripts.Count -ne 2) { throw "Expected exactly two root CMD entry scripts, found $($rootEntryScripts.Count)." }
-foreach ($entryScript in $rootEntryScripts) { Copy-Item -LiteralPath $entryScript.FullName -Destination $root }
-$readme = Get-ChildItem -LiteralPath $PSScriptRoot -File -Filter '*.txt' | Select-Object -First 1
-(Get-Content -Raw -LiteralPath $readme.FullName -Encoding UTF8).Replace('{{DISPLAY_VERSION}}',$DisplayVersion).Replace('{{PACKAGE_VERSION}}',$PackageVersion) | Set-Content -LiteralPath (Join-Path $root $readme.Name) -Encoding UTF8
+
+# User-facing root entry names are an international distribution contract.
+# Keep them ASCII/English so the package remains understandable and robust across locales/code pages.
+$installEntryName = '1-Install-UrbanPlanToolbox.cmd'
+$uninstallEntryName = '2-Uninstall-UrbanPlanToolbox.cmd'
+$readmeName = 'README.txt'
+$expectedRootFileNames = @($installEntryName, $uninstallEntryName, $readmeName) | Sort-Object
+foreach ($sourceName in $expectedRootFileNames) {
+    $sourcePath = Join-Path $PSScriptRoot $sourceName
+    if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) { throw "Missing one-click root template: $sourceName" }
+}
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot $installEntryName) -Destination (Join-Path $root $installEntryName)
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot $uninstallEntryName) -Destination (Join-Path $root $uninstallEntryName)
+(Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot $readmeName) -Encoding UTF8).Replace('{{DISPLAY_VERSION}}',$DisplayVersion).Replace('{{PACKAGE_VERSION}}',$PackageVersion) | Set-Content -LiteralPath (Join-Path $root $readmeName) -Encoding UTF8
+
+$actualRootFileNames = @(Get-ChildItem -LiteralPath $root -File | Select-Object -ExpandProperty Name | Sort-Object)
+if (($actualRootFileNames -join "`n") -cne ($expectedRootFileNames -join "`n")) { throw "Unexpected one-click root files: $($actualRootFileNames -join ', ')" }
+$nonAsciiRootNames = @($actualRootFileNames | Where-Object { $_.ToCharArray() | Where-Object { [int]$_ -gt 127 } })
+if ($nonAsciiRootNames.Count -gt 0) { throw "One-click root filenames must be ASCII/English: $($nonAsciiRootNames -join ', ')" }
+
 function Copy-PayloadPowerShellScript([string]$SourceName, [string]$DestinationName) {
     $content = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot $SourceName) -Encoding UTF8
     [IO.File]::WriteAllText((Join-Path $payload $DestinationName), $content, [Text.UTF8Encoding]::new($true))

@@ -3,11 +3,22 @@ param([Parameter(Mandatory)][string]$ReleaseDirectory, [string]$ZipPath)
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path -LiteralPath $ReleaseDirectory).Path
 $payload = Join-Path $root 'payload'
-$rootCmdFiles = @(Get-ChildItem -LiteralPath $root -File -Filter '*.cmd' | Sort-Object Name)
-if ($rootCmdFiles.Count -ne 2 -or $rootCmdFiles[0].Name[0] -ne [char]0x2460 -or $rootCmdFiles[1].Name[0] -ne [char]0x2461) { throw 'Missing one-click root installer/uninstaller CMD entry files.' }
-$rootTextFiles = @(Get-ChildItem -LiteralPath $root -File -Filter '*.txt')
-if ($rootTextFiles.Count -ne 1 -or $rootTextFiles[0].Name[0] -ne [char]0x8BF7) { throw 'Missing one-click root readme text file.' }
+
+$expectedRootFileNames = @('1-Install-UrbanPlanToolbox.cmd','2-Uninstall-UrbanPlanToolbox.cmd','README.txt') | Sort-Object
+$actualRootFileNames = @(Get-ChildItem -LiteralPath $root -File | Select-Object -ExpandProperty Name | Sort-Object)
+if (($actualRootFileNames -join "`n") -cne ($expectedRootFileNames -join "`n")) { throw "Unexpected one-click root files. Expected: $($expectedRootFileNames -join ', '); actual: $($actualRootFileNames -join ', ')" }
+$nonAsciiRootNames = @($actualRootFileNames | Where-Object { $_.ToCharArray() | Where-Object { [int]$_ -gt 127 } })
+if ($nonAsciiRootNames.Count -gt 0) { throw "One-click root filenames must remain ASCII/English: $($nonAsciiRootNames -join ', ')" }
+
+$installCommandPath = Join-Path $root '1-Install-UrbanPlanToolbox.cmd'
+$uninstallCommandPath = Join-Path $root '2-Uninstall-UrbanPlanToolbox.cmd'
+$readmePath = Join-Path $root 'README.txt'
 if (-not (Test-Path -LiteralPath $payload -PathType Container)) { throw 'Missing one-click payload directory: payload' }
+$readme = Get-Content -Raw -LiteralPath $readmePath -Encoding UTF8
+foreach ($requiredReadmeText in @('English','1-Install-UrbanPlanToolbox.cmd','2-Uninstall-UrbanPlanToolbox.cmd','中文','日本語')) {
+    if ($readme -notmatch [regex]::Escape($requiredReadmeText)) { throw "README.txt is missing international installer guidance: $requiredReadmeText" }
+}
+
 $metadata = Get-Content -Raw -LiteralPath (Join-Path $payload 'InstallerMetadata.json') -Encoding UTF8 | ConvertFrom-Json
 $displayVersionText = [string]$metadata.displayVersion
 $packageVersionText = [string]$metadata.packageVersion
@@ -21,13 +32,13 @@ $downloadResolver = Get-Content -Raw -LiteralPath (Join-Path $payload 'ReleaseDo
 $installLauncher = Get-Content -Raw -LiteralPath (Join-Path $payload 'InstallLauncher.ps1')
 $uninstall = Get-Content -Raw -LiteralPath (Join-Path $payload 'Uninstall.ps1')
 $uninstallLauncher = Get-Content -Raw -LiteralPath (Join-Path $payload 'UninstallLauncher.ps1')
-$installCommand = Get-Content -Raw -LiteralPath $rootCmdFiles[0].FullName
-$uninstallCommand = Get-Content -Raw -LiteralPath $rootCmdFiles[1].FullName
+$installCommand = Get-Content -Raw -LiteralPath $installCommandPath
+$uninstallCommand = Get-Content -Raw -LiteralPath $uninstallCommandPath
 foreach ($entry in @($installCommand, $uninstallCommand)) { if ($entry.ToCharArray() | Where-Object { [int]$_ -gt 127 }) { throw 'Root CMD entry files must contain ASCII-only content.' } }
 $forbiddenProtocolFiles = @{
     'Install.ps1' = $install
     'InstallLauncher.ps1' = $installLauncher
-    $rootCmdFiles[0].Name = $installCommand
+    '1-Install-UrbanPlanToolbox.cmd' = $installCommand
 }
 foreach ($entry in $forbiddenProtocolFiles.GetEnumerator()) {
     if ($entry.Value -match '(?i)ms-appinstaller:') { throw "One-click installer must not rely on the disabled ms-appinstaller URI protocol: $($entry.Key)" }

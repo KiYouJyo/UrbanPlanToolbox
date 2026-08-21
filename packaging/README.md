@@ -15,6 +15,17 @@ GitHub updater acceptance must query the GitHub sideload identity exactly. The S
 
 `New-GitHubOneClickInstallerPackage.ps1` creates a lightweight online bootstrap, not an offline package. It carries only scripts, metadata, the public certificate, and payload checksums. It never carries an MSIXBundle or `.appinstaller`.
 
+The user-facing root layout is an international distribution contract and must use ASCII/English filenames only:
+
+```text
+payload/
+README.txt
+1-Install-UrbanPlanToolbox.cmd
+2-Uninstall-UrbanPlanToolbox.cmd
+```
+
+Do not reintroduce localized or non-ASCII root filenames. Localized guidance belongs inside `README.txt`; the filename itself remains stable and language-neutral. `New-GitHubOneClickInstallerPackage.ps1` and `Test-GitHubOneClickInstallerPackage.ps1` both enforce this contract so future release packaging fails if the root layout drifts.
+
 The GitHub install path is:
 
 ```text
@@ -28,8 +39,8 @@ GitHub Releases API
 The Release contains only:
 
 ```text
-UrbanPlanToolbox-v1.5.6-x64-one-click.zip
-UrbanPlanToolbox_1.5.6.0_x64.msixbundle
+UrbanPlanToolbox-v<version>-x64-one-click.zip
+UrbanPlanToolbox_<package-version>_x64.msixbundle
 SHA256SUMS.txt
 ```
 
