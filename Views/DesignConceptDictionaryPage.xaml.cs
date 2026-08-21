@@ -13,6 +13,7 @@ public sealed partial class DesignConceptDictionaryPage : Page
     private ReferenceDataPackContent? _pack;
     private DesignConceptsPackDocument? _document;
     private DesignConceptRecord? _selected;
+    private DesignConceptLocalization _conceptLocalization = DesignConceptLocalization.Empty;
     private bool _loading;
     private bool _busy;
 
@@ -60,6 +61,7 @@ public sealed partial class DesignConceptDictionaryPage : Page
         {
             _pack = await ReferenceDataPackService.Default.LoadActiveAsync(PackId);
             _document = _pack is null ? null : ReferenceDataPackService.ParseDesignConcepts(_pack.DataJson);
+            _conceptLocalization = _pack is null ? DesignConceptLocalization.Empty : DesignConceptLocalization.Parse(_pack.DataJson);
             _selected = null;
             RenderSource();
             RebuildFilters();
@@ -71,6 +73,7 @@ public sealed partial class DesignConceptDictionaryPage : Page
             _pack = null;
             _document = null;
             _selected = null;
+            _conceptLocalization = DesignConceptLocalization.Empty;
             RenderSource();
             RebuildFilters();
             RefreshResults();
@@ -97,9 +100,27 @@ public sealed partial class DesignConceptDictionaryPage : Page
         var tag = (TagBox.SelectedItem as Choice)?.Value;
         var sort = (SortBox.SelectedItem as Choice)?.Value;
         var entries = _document?.Entries ?? [];
+        var language = _localization.CurrentLanguage;
         _loading = true;
-        ProjectTypeBox.ItemsSource = new[] { new Choice(string.Empty, ReferenceLibraryText.Get("AllProjectTypes")) }.Concat(entries.SelectMany(entry => entry.ProjectTypes).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value).Select(value => new Choice(value, value))).ToArray();
-        TagBox.ItemsSource = new[] { new Choice(string.Empty, ReferenceLibraryText.Get("AllTags")) }.Concat(entries.SelectMany(entry => entry.Tags).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal).OrderBy(value => value).Select(value => new Choice(value, value))).ToArray();
+
+        var projectChoices = entries
+            .SelectMany(entry => entry.ProjectTypes)
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Distinct(StringComparer.Ordinal)
+            .Select(value => new Choice(value, _conceptLocalization.ProjectType(value, language)))
+            .Where(choice => !string.IsNullOrWhiteSpace(choice.Display))
+            .OrderBy(choice => choice.Display, StringComparer.CurrentCultureIgnoreCase);
+        ProjectTypeBox.ItemsSource = new[] { new Choice(string.Empty, ReferenceLibraryText.Get("AllProjectTypes")) }.Concat(projectChoices).ToArray();
+
+        var tagChoices = entries
+            .SelectMany(entry => entry.Tags)
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Distinct(StringComparer.Ordinal)
+            .Select(value => new Choice(value, _conceptLocalization.Tag(value, language)))
+            .Where(choice => !string.IsNullOrWhiteSpace(choice.Display))
+            .OrderBy(choice => choice.Display, StringComparer.CurrentCultureIgnoreCase);
+        TagBox.ItemsSource = new[] { new Choice(string.Empty, ReferenceLibraryText.Get("AllTags")) }.Concat(tagChoices).ToArray();
+
         SortBox.ItemsSource = new[] { new Choice("recent", ReferenceLibraryText.Get("Recent")), new Choice("name", ReferenceLibraryText.Get("NameSort")) };
         SelectChoice(ProjectTypeBox, projectType);
         SelectChoice(TagBox, tag);
@@ -120,6 +141,7 @@ public sealed partial class DesignConceptDictionaryPage : Page
         var projectType = (ProjectTypeBox.SelectedItem as Choice)?.Value;
         var tag = (TagBox.SelectedItem as Choice)?.Value;
         var sort = (SortBox.SelectedItem as Choice)?.Value ?? "recent";
+        var language = _localization.CurrentLanguage;
         IEnumerable<DesignConceptRecord> filtered = entries.Where(entry =>
             (string.IsNullOrWhiteSpace(projectType) || entry.ProjectTypes.Contains(projectType, StringComparer.Ordinal)) &&
             (string.IsNullOrWhiteSpace(tag) || entry.Tags.Contains(tag, StringComparer.Ordinal)) &&
@@ -131,8 +153,13 @@ public sealed partial class DesignConceptDictionaryPage : Page
             entry,
             DisplayTitle(entry),
             DisplayDefinition(entry),
-            string.Join(" · ", new[] { entry.Category, entry.ProjectTypes.FirstOrDefault(), ReviewStatusLabel(entry.ReviewStatus) }.Where(value => !string.IsNullOrWhiteSpace(value))),
-            string.Join(" / ", entry.Tags.Take(3)))).ToArray();
+            string.Join(" · ", new[]
+            {
+                _conceptLocalization.Category(entry.Category, language),
+                entry.ProjectTypes.Select(value => _conceptLocalization.ProjectType(value, language)).FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)),
+                ReviewStatusLabel(entry.ReviewStatus)
+            }.Where(value => !string.IsNullOrWhiteSpace(value))),
+            string.Join(" / ", _conceptLocalization.Tags(entry.Tags.Take(3), language)))).ToArray();
         ConceptsList.ItemsSource = results;
         CountText.Text = ReferenceLibraryText.Get("ConceptCount", entries.Count, results.Length);
         ListCountBadge.Text = results.Length.ToString();
@@ -171,12 +198,13 @@ public sealed partial class DesignConceptDictionaryPage : Page
 
     private void RenderDetail(DesignConceptRecord entry)
     {
+        var language = _localization.CurrentLanguage;
         DetailTitle.Text = DisplayTitle(entry);
-        CategoryBadge.Text = entry.Category;
+        CategoryBadge.Text = _conceptLocalization.Category(entry.Category, language);
         DetailMeta.Text = $"{ReviewStatusLabel(entry.ReviewStatus)} · {entry.LastReviewed} · {entry.StableId}";
         DetailDefinition.Text = DisplayDefinition(entry);
-        ProjectTypesList.ItemsSource = entry.ProjectTypes;
-        TagsList.ItemsSource = entry.Tags;
+        ProjectTypesList.ItemsSource = _conceptLocalization.ProjectTypes(entry.ProjectTypes, language);
+        TagsList.ItemsSource = _conceptLocalization.Tags(entry.Tags, language);
         CaseText.Text = DisplayCaseNote(entry);
         ViewSourceButton.Visibility = ResolveSources(entry).Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         DetailPanel.Visibility = Visibility.Visible;
@@ -263,15 +291,16 @@ public sealed partial class DesignConceptDictionaryPage : Page
     private string DisplayDefinition(DesignConceptRecord entry) => ReferenceDataPackService.GetLocalized(entry.Definition, _localization.CurrentLanguage);
     private string DisplayCaseNote(DesignConceptRecord entry)
     {
-        var value = ReferenceDataPackService.GetLocalized(entry.CaseNote, _localization.CurrentLanguage);
-        if (!string.IsNullOrWhiteSpace(value)) return value;
-        return entry.CaseNote.TryGetValue("zh-CN", out var zh) ? zh : string.Empty;
+        var language = _localization.CurrentLanguage;
+        var locale = language.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? "ja-JP" : language.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? "en-US" : "zh-CN";
+        return entry.CaseNote.TryGetValue(locale, out var value) && !string.IsNullOrWhiteSpace(value) ? value : string.Empty;
     }
 
     private string BuildSearchText(DesignConceptRecord entry)
     {
         var sourceText = string.Join('\n', ResolveSources(entry).SelectMany(source => source.Name.Values.Concat(source.Note.Values)));
-        return string.Join('\n', entry.Title.Values.Concat(entry.Aliases).Concat(entry.Definition.Values).Concat(entry.ProjectTypes).Concat(entry.Tags).Concat(entry.CaseNote.Values).Append(entry.Category).Append(sourceText));
+        var labelText = string.Join('\n', _conceptLocalization.SearchTerms(entry.Category, entry.ProjectTypes, entry.Tags));
+        return string.Join('\n', entry.Title.Values.Concat(entry.Aliases).Concat(entry.Definition.Values).Concat(entry.ProjectTypes).Concat(entry.Tags).Concat(entry.CaseNote.Values).Append(entry.Category).Append(labelText).Append(sourceText));
     }
 
     private string ReviewStatusLabel(string status) => status switch { "verified" => ReferenceLibraryText.Get("Verified"), "reviewed" => ReferenceLibraryText.Get("Reviewed"), _ => ReferenceLibraryText.Get("Seed") };
