@@ -1,6 +1,8 @@
 name: Prepare v1.9.3 changelog
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [codex/v1.9.3-design-concepts-i18n]
     paths:
@@ -11,6 +13,7 @@ permissions:
 
 jobs:
   prepend:
+    if: github.event_name == 'push' || github.head_ref == 'codex/v1.9.3-design-concepts-i18n'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
