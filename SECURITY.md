@@ -1,103 +1,20 @@
-# Security Policy
+# 安全政策
 
-[简体中文](SECURITY.zh-CN.md) | [日本語](SECURITY.ja.md)
+[English](SECURITY.en.md) | [日本語](SECURITY.ja.md)
 
-## Supported Versions
+## 支持版本
 
-UrbanPlanToolbox is actively maintained. Security fixes are provided for the latest stable release.
+仅最新正式版本提供安全修复支持。旧版本可能不会收到修复，请先升级到最新版本再确认问题是否仍然存在。
 
-| Version | Supported |
-| ------- | --------- |
-| Latest release | ✅ |
-| Previous minor versions | ⚠️ |
-| Older versions | ❌ |
+## 报告安全漏洞
 
-For the best security and compatibility, users are encouraged to keep UrbanPlanToolbox updated to the latest version.
+请不要通过公开 Issue 报告尚未修复的安全漏洞。请使用 GitHub 的私密安全报告渠道与维护者联系。
 
----
+报告中请尽量包含：
 
-## Reporting a Vulnerability
+- 问题描述和潜在影响
+- 受影响的版本、安装渠道和 Windows 版本
+- 可复现步骤或最小示例
+- 相关日志或截图（请先移除个人数据、本机路径和凭据）
 
-If you discover a security vulnerability in UrbanPlanToolbox, please do not publicly disclose it through:
-
-- GitHub Issues
-- Discussions
-- Pull Requests
-
-before the issue has been reviewed and fixed.
-
-Instead, please report it privately through GitHub's private vulnerability reporting feature:
-
-https://github.com/KiYouJyo/UrbanPlanToolbox/security
-
-If private reporting is unavailable, you may contact the project maintainers through the repository contact channels.
-
----
-
-## What to Include in a Report
-
-A useful security report should include:
-
-- A description of the vulnerability
-- Steps to reproduce the issue
-- Affected versions
-- Expected behavior
-- Actual behavior
-- Potential impact
-- Any suggested mitigation
-
-Screenshots, logs, or proof-of-concept examples are welcome when appropriate.
-
----
-
-## Response Process
-
-After receiving a security report, maintainers will:
-
-1. Confirm receipt of the report
-2. Investigate and reproduce the issue
-3. Evaluate severity and impact
-4. Prepare a fix if necessary
-5. Release a security update
-6. Publish appropriate disclosure information
-
-The timeline depends on the complexity and severity of the issue.
-
----
-
-## Security Considerations
-
-UrbanPlanToolbox is designed with a privacy-oriented and offline-first approach.
-
-Key security principles:
-
-- Core functionality does not require cloud services
-- User data is stored locally by default
-- No unnecessary data collection
-- Network access is limited to required features such as update checking
-- External resources are handled with caution
-
-Users should only install releases from trusted sources:
-
-- Official GitHub Releases
-- Verified distribution channels
-
----
-
-## Scope
-
-Security reports related to the following areas are welcome:
-
-- Code execution vulnerabilities
-- Privilege escalation
-- Data exposure
-- Unsafe file handling
-- Authentication or authorization issues
-- Dependency vulnerabilities
-- Update mechanism security
-
-Reports about general bugs, feature requests, or usability issues should be submitted through GitHub Issues instead.
-
----
-
-Thank you for helping improve the security of UrbanPlanToolbox.
+维护者会在确认后评估影响范围、修复方案和公开披露时间。请不要在报告中提交密码、Token、私钥或其他机密信息。
