@@ -1,5 +1,7 @@
 # 贡献指南
 
+[English](CONTRIBUTING.en.md) | [日本語](CONTRIBUTING.ja.md)
+
 欢迎提交问题、文档改进和经过充分说明的代码变更。请先通过 Issue 说明问题或提案，再提交 PR。
 
 ## 支持范围
@@ -27,3 +29,8 @@ dotnet build UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore
 ## 数据与机密
 
 不要提交证书、私钥、PFX、Token、用户数据、本机路径、MSIX 或其他构建产物。应用坚持本地优先和不自动上传用户数据的原则。
+
+## 社区文档
+
+- [安全政策](SECURITY.zh-CN.md)
+- [行为准则](CODE_OF_CONDUCT.zh-CN.md)
