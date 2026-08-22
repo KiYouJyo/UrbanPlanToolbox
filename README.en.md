@@ -66,7 +66,7 @@ The interface supports Simplified Chinese, 日本語, and English, with immediat
 - [Data storage](docs/DATA_STORAGE.md) · [Data backup](docs/DATA_BACKUP.md)
 - [Changelog](CHANGELOG.md)
 - [Privacy policy](PRIVACY.md) · [Third-party notices](THIRD-PARTY-NOTICES.md)
-- [Contributing guide](CONTRIBUTING.en.md) · [Security policy](SECURITY.en.md) · [Code of conduct](CODE_OF_CONDUCT.en.md)
+- [Contributing guide](CONTRIBUTING.en.md) · [Security policy](SECURITY.en.md) · [Code of conduct](docs/community/CODE_OF_CONDUCT.en.md)
 
 ## Development and build
 
