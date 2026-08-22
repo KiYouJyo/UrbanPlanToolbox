@@ -1,5 +1,7 @@
 # Security Policy
 
+[简体中文](SECURITY.zh-CN.md) | [日本語](SECURITY.ja.md)
+
 ## Supported Versions
 
 UrbanPlanToolbox is actively maintained. Security fixes are provided for the latest stable release.
