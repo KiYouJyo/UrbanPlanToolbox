@@ -32,5 +32,5 @@ dotnet build UrbanPlanToolbox.slnx -c Release -p:Platform=x64 --no-restore
 
 ## 社区文档
 
-- [安全政策](SECURITY.zh-CN.md)
-- [行为准则](CODE_OF_CONDUCT.zh-CN.md)
+- [安全政策](SECURITY.md)
+- [行为准则](CODE_OF_CONDUCT.md)
