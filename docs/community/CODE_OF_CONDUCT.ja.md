@@ -1,6 +1,6 @@
 # 行動規範
 
-[简体中文](CODE_OF_CONDUCT.md) | [English](CODE_OF_CONDUCT.en.md)
+[简体中文](docs/community/CODE_OF_CONDUCT.md) | [English](docs/community/CODE_OF_CONDUCT.en.md)
 
 ## 私たちの約束
 

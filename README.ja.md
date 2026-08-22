@@ -66,7 +66,7 @@ Windows 10 17763 以降、x64。
 - [データ保存](docs/DATA_STORAGE.md) · [データバックアップ](docs/DATA_BACKUP.md)
 - [変更履歴](CHANGELOG.md)
 - [プライバシーポリシー](PRIVACY.md) · [第三者通知](THIRD-PARTY-NOTICES.md)
-- [貢献ガイド](CONTRIBUTING.ja.md) · [セキュリティポリシー](SECURITY.ja.md) · [行動規範](CODE_OF_CONDUCT.ja.md)
+- [貢献ガイド](CONTRIBUTING.ja.md) · [セキュリティポリシー](SECURITY.ja.md) · [行動規範](docs/community/CODE_OF_CONDUCT.ja.md)
 
 ## 開発とビルド
 
