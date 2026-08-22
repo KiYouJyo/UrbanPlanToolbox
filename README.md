@@ -70,6 +70,7 @@ Windows 10 17763 或更高版本，x64。
 - [数据存储](docs/DATA_STORAGE.md) · [数据备份](docs/DATA_BACKUP.md)
 - [更改日志](CHANGELOG.md)
 - [隐私政策](PRIVACY.md) · [第三方声明](THIRD-PARTY-NOTICES.md)
+- [贡献指南](CONTRIBUTING.md) · [安全政策](SECURITY.zh-CN.md) · [行为准则](CODE_OF_CONDUCT.zh-CN.md)
 
 ## 开发与构建
 
