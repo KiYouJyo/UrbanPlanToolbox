@@ -6,9 +6,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:UrbanPlanToolbox"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="Transparent"
     mc:Ignorable="d">
 
     <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True"
+                    Background="Transparent"
                     Loaded="OnNavigationLoaded" ItemInvoked="OnNavigationItemInvoked">
         <NavigationView.MenuItems>
             <NavigationViewItem x:Name="WelcomeItem" Tag="welcome" Icon="Home" />
@@ -20,6 +22,6 @@
         <NavigationView.FooterMenuItems>
             <NavigationViewItem x:Name="AboutItem" Tag="about" Icon="Help" />
         </NavigationView.FooterMenuItems>
-        <Frame x:Name="ContentFrame" />
+        <Frame x:Name="ContentFrame" Background="Transparent" />
     </NavigationView>
 </Page>

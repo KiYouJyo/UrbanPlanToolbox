@@ -13,21 +13,21 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="RootLayout" Loaded="OnRootLayoutLoaded">
-        <Grid x:Name="MainContent" Opacity="0" IsHitTestVisible="False">
+    <Grid x:Name="RootLayout" Loaded="OnRootLayoutLoaded" Background="Transparent">
+        <Grid x:Name="MainContent" Opacity="0" IsHitTestVisible="False" Background="Transparent">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TitleBar x:Name="AppTitleBar" Title="UrbanPlanToolbox">
+            <TitleBar x:Name="AppTitleBar" Title="UrbanPlanToolbox" Background="Transparent">
                 <TitleBar.IconSource>
                     <ImageIconSource ImageSource="ms-appx:///Assets/Icon-Small-Dark-256.png" />
                 </TitleBar.IconSource>
             </TitleBar>
 
-            <!-- The shell prepares behind the transparent startup overlay. -->
-            <Frame x:Name="RootFrame" Grid.Row="1" />
+            <!-- Keep the entire shell content path transparent so the native Mica backdrop remains visible. -->
+            <Frame x:Name="RootFrame" Grid.Row="1" Background="Transparent" />
             <InfoBar x:Name="NotificationBar" Grid.Row="1" Margin="24" VerticalAlignment="Top"
                      HorizontalAlignment="Stretch" IsOpen="False" IsClosable="True" />
             <views:FirstRunGuideHost x:Name="FirstRunGuide" Grid.RowSpan="2" Canvas.ZIndex="10" />

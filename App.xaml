@@ -28,7 +28,7 @@
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">
                     <SolidColorBrush x:Key="ShellNavigationPaneBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
-                    <SolidColorBrush x:Key="ShellNavigationPaneInactiveBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+                    <StaticResource x:Key="ShellNavigationPaneInactiveBackgroundBrush" ResourceKey="SystemColorWindowBrush" />
                     <StaticResource x:Key="AppTransientSurfaceBrush" ResourceKey="SystemColorWindowBrush" />
                     <StaticResource x:Key="AppTransientSurfaceBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
                 </ResourceDictionary>
