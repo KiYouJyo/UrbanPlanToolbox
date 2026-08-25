@@ -30,6 +30,26 @@ public sealed class ShellActivationRegressionTests
         Assert.Contains("themeResources?[brushKey]", shell);
     }
 
+    [Fact]
+    public void CustomTitleBarUsesTheSameSemanticSurfacesAsNavigationPane()
+    {
+        var root = FindRepositoryRoot();
+        var windowXaml = File.ReadAllText(Path.Combine(root, "MainWindow.xaml"));
+        var behavior = File.ReadAllText(Path.Combine(root, "WindowChromeThemeBehavior.cs"));
+
+        Assert.Contains("TitleBarSurface", windowXaml);
+        Assert.Contains("WindowChromeThemeBehavior.IsEnabled=\"True\"", windowXaml);
+        Assert.Contains("ShellNavigationPaneBackgroundBrush", behavior);
+        Assert.Contains("ShellNavigationPaneInactiveBackgroundBrush", behavior);
+        Assert.Contains("WindowActivationState.Deactivated", behavior);
+        Assert.Contains("titleBar.BackgroundColor = activeBrush.Color", behavior);
+        Assert.Contains("titleBar.InactiveBackgroundColor = inactiveBrush.Color", behavior);
+        Assert.Contains("titleBar.ButtonBackgroundColor = activeBrush.Color", behavior);
+        Assert.Contains("titleBar.ButtonInactiveBackgroundColor = inactiveBrush.Color", behavior);
+        Assert.Contains("titleBar.BackgroundColor = null", behavior);
+        Assert.Contains("High Contrast remains wholly system-driven", behavior);
+    }
+
     private static string FindRepositoryRoot()
     {
         for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
