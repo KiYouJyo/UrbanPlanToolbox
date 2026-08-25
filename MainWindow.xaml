@@ -20,11 +20,13 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TitleBar x:Name="AppTitleBar" Title="UrbanPlanToolbox">
-                <TitleBar.IconSource>
-                    <ImageIconSource ImageSource="ms-appx:///Assets/Icon-Small-Dark-256.png" />
-                </TitleBar.IconSource>
-            </TitleBar>
+            <Grid x:Name="TitleBarSurface" local:WindowChromeThemeBehavior.IsEnabled="True">
+                <TitleBar x:Name="AppTitleBar" Title="UrbanPlanToolbox">
+                    <TitleBar.IconSource>
+                        <ImageIconSource ImageSource="ms-appx:///Assets/Icon-Small-Dark-256.png" />
+                    </TitleBar.IconSource>
+                </TitleBar>
+            </Grid>
 
             <!-- The shell prepares behind the transparent startup overlay. -->
             <Frame x:Name="RootFrame" Grid.Row="1" />
