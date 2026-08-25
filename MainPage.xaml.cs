@@ -154,7 +154,7 @@ public sealed partial class MainPage : Page
 
     private static void ApplyNavigationItem(NavigationViewItem item, string routeId)
     {
-        if (PrimaryNavigation.Default.TryGet(item.Tag?.ToString(), out var route) && route is not null)
+        if (PrimaryNavigation.Default.TryGet(routeId, out var route) && route is not null)
         {
             var label = LocalizationService.Default.GetString(route.NameResourceKey);
             item.Content = label;
