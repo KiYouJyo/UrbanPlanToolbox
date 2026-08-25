@@ -21,6 +21,7 @@ public sealed partial class MainPage : Page
     private readonly ShellNavigationState? _initialState;
     private SplitView? _navigationSplitView;
     private bool _isNavigationPaneBackgroundHooked;
+    private bool _isWindowActive = true;
 
     public MainPage()
         : this(null)
@@ -38,7 +39,6 @@ public sealed partial class MainPage : Page
 
     private void OnNavigationLoaded(object sender, RoutedEventArgs e)
     {
-
         if (Navigation.SettingsItem is NavigationViewItem settingsItem)
         {
             var settingsLabel = LocalizationService.Default.GetString("Navigation_Settings");
@@ -93,8 +93,24 @@ public sealed partial class MainPage : Page
             _isNavigationPaneBackgroundHooked = true;
             Navigation.PaneOpening += (_, _) => QueueNavigationPaneBackgroundUpdate();
             ActualThemeChanged += (_, _) => QueueNavigationPaneBackgroundUpdate();
+            App.MainWindow.Activated += OnMainWindowActivated;
+            Unloaded += OnMainPageUnloaded;
         }
         QueueNavigationPaneBackgroundUpdate();
+    }
+
+    private void OnMainWindowActivated(object sender, WindowActivatedEventArgs args)
+    {
+        _isWindowActive = args.WindowActivationState != WindowActivationState.Deactivated;
+        QueueNavigationPaneBackgroundUpdate();
+    }
+
+    private void OnMainPageUnloaded(object sender, RoutedEventArgs e)
+    {
+        if (!_isNavigationPaneBackgroundHooked) return;
+        App.MainWindow.Activated -= OnMainWindowActivated;
+        Unloaded -= OnMainPageUnloaded;
+        _isNavigationPaneBackgroundHooked = false;
     }
 
     private void QueueNavigationPaneBackgroundUpdate() => DispatcherQueue.TryEnqueue(ApplySharedNavigationPaneBackground);
@@ -102,11 +118,15 @@ public sealed partial class MainPage : Page
     private void ApplySharedNavigationPaneBackground()
     {
         _navigationSplitView ??= FindDescendant<SplitView>(Navigation);
-        var themeKey = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast
+        var highContrast = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast;
+        var themeKey = highContrast
             ? "HighContrast"
             : Navigation.ActualTheme == ElementTheme.Dark ? "Dark" : "Light";
+        var brushKey = _isWindowActive
+            ? "ShellNavigationPaneBackgroundBrush"
+            : "ShellNavigationPaneInactiveBackgroundBrush";
         var themeResources = Application.Current.Resources.ThemeDictionaries[themeKey] as ResourceDictionary;
-        if (_navigationSplitView is not null && themeResources?["ShellNavigationPaneBackgroundBrush"] is Brush brush)
+        if (_navigationSplitView is not null && themeResources?[brushKey] is Brush brush)
             _navigationSplitView.PaneBackground = brush;
     }
 
@@ -122,7 +142,6 @@ public sealed partial class MainPage : Page
         return null;
     }
 
-
     private void ApplyLocalizedNavigation()
     {
         ApplyNavigationItem(WelcomeItem, PrimaryNavigationIds.Welcome);
@@ -135,7 +154,7 @@ public sealed partial class MainPage : Page
 
     private static void ApplyNavigationItem(NavigationViewItem item, string routeId)
     {
-        if (PrimaryNavigation.Default.TryGet(routeId, out var route) && route is not null)
+        if (PrimaryNavigation.Default.TryGet(item.Tag?.ToString(), out var route) && route is not null)
         {
             var label = LocalizationService.Default.GetString(route.NameResourceKey);
             item.Content = label;
