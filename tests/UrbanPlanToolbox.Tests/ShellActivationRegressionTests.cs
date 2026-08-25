@@ -31,23 +31,20 @@ public sealed class ShellActivationRegressionTests
     }
 
     [Fact]
-    public void CustomTitleBarUsesTheSameSemanticSurfacesAsNavigationPane()
+    public void NativeMicaRemainsVisibleThroughTheEntireShellContentPath()
     {
         var root = FindRepositoryRoot();
         var windowXaml = File.ReadAllText(Path.Combine(root, "MainWindow.xaml"));
-        var behavior = File.ReadAllText(Path.Combine(root, "WindowChromeThemeBehavior.cs"));
+        var pageXaml = File.ReadAllText(Path.Combine(root, "MainPage.xaml"));
 
-        Assert.Contains("TitleBarSurface", windowXaml);
-        Assert.Contains("WindowChromeThemeBehavior.IsEnabled=\"True\"", windowXaml);
-        Assert.Contains("ShellNavigationPaneBackgroundBrush", behavior);
-        Assert.Contains("ShellNavigationPaneInactiveBackgroundBrush", behavior);
-        Assert.Contains("WindowActivationState.Deactivated", behavior);
-        Assert.Contains("titleBar.BackgroundColor = activeBrush.Color", behavior);
-        Assert.Contains("titleBar.InactiveBackgroundColor = inactiveBrush.Color", behavior);
-        Assert.Contains("titleBar.ButtonBackgroundColor = activeBrush.Color", behavior);
-        Assert.Contains("titleBar.ButtonInactiveBackgroundColor = inactiveBrush.Color", behavior);
-        Assert.Contains("titleBar.BackgroundColor = null", behavior);
-        Assert.Contains("High Contrast remains wholly system-driven", behavior);
+        Assert.Contains("<MicaBackdrop />", windowXaml);
+        Assert.DoesNotContain("WindowChromeThemeBehavior", windowXaml);
+        Assert.DoesNotContain("TitleBarSurface", windowXaml);
+        Assert.Contains("<TitleBar x:Name=\"AppTitleBar\" Title=\"UrbanPlanToolbox\" Background=\"Transparent\">", windowXaml);
+        Assert.Contains("<Frame x:Name=\"RootFrame\" Grid.Row=\"1\" Background=\"Transparent\" />", windowXaml);
+        Assert.Contains("Background=\"Transparent\"", pageXaml);
+        Assert.Contains("<Frame x:Name=\"ContentFrame\" Background=\"Transparent\" />", pageXaml);
+        Assert.False(File.Exists(Path.Combine(root, "WindowChromeThemeBehavior.cs")));
     }
 
     private static string FindRepositoryRoot()
