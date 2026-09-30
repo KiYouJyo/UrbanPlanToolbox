@@ -6,9 +6,29 @@
   <meta name="description" content="UrbanPlanToolbox — 面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。">
   <meta name="theme-color" content="#0f6cbd">
   <title>UrbanPlanToolbox · 规划工具箱</title>
+  <script>
+function readPreference(key){try{return localStorage.getItem(key)}catch{return null}}
+function writePreference(key,value){try{localStorage.setItem(key,value)}catch{}}
+const systemTheme=matchMedia('(prefers-color-scheme: dark)');
+let themePreference=readPreference('upt-theme')||'system';
+if(!['system','light','dark'].includes(themePreference))themePreference='system';
+function applyTheme(){
+  const theme=themePreference==='system'?(systemTheme.matches?'dark':'light'):themePreference;
+  document.documentElement.dataset.theme=theme;
+  const color=document.querySelector('meta[name="theme-color"]');if(color)color.content=theme==='dark'?'#0f1012':'#f5f7fa';
+  const toggle=document.getElementById('theme-toggle');
+  if(toggle){const lang=document.documentElement.lang.startsWith('ja')?'ja':document.documentElement.lang.startsWith('zh')?'zh':'en';const labels={zh:['切换到浅色模式','切换到深色模式'],ja:['ライトモードに切り替え','ダークモードに切り替え'],en:['Switch to light mode','Switch to dark mode']}[lang];const label=labels[theme==='dark'?0:1];toggle.setAttribute('aria-label',label);toggle.title=label}
+  const badgeTheme=theme==='dark'?'light':'dark';
+  document.querySelectorAll('ms-store-badge').forEach(b=>b.setAttribute('theme',badgeTheme));
+  const lang=document.documentElement.lang.startsWith('ja')?'ja':document.documentElement.lang.startsWith('zh')?'zh-cn':'en-us';
+  document.querySelectorAll('.store-fallback img').forEach(img=>img.src='https://get.microsoft.com/images/'+lang+'%20'+badgeTheme+'.svg');
+}
+applyTheme();
+systemTheme.addEventListener('change',()=>{if(themePreference==='system')applyTheme()});
+  </script>
   <style>
     :root {
-      color-scheme: light dark;
+      color-scheme: light;
       font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
       --page: #f5f7fa;
       --surface: rgba(255,255,255,.86);
@@ -26,8 +46,7 @@
       --radius-lg: 16px;
       --max: 1180px;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
+:root[data-theme="dark"]{color-scheme:dark;
         --page: #0f1012;
         --surface: rgba(31,32,35,.88);
         --surface-strong: #202124;
@@ -41,7 +60,20 @@
         --warning: #f0c75e;
         --shadow: 0 18px 48px rgba(0,0,0,.28);
       }
-    }
+    @media(prefers-color-scheme:dark){:root:not([data-theme]){color-scheme:dark;
+        --page: #0f1012;
+        --surface: rgba(31,32,35,.88);
+        --surface-strong: #202124;
+        --text: #f5f5f5;
+        --muted: #b4bac2;
+        --line: rgba(255,255,255,.12);
+        --accent: #60aeea;
+        --accent-strong: #8bc8f5;
+        --accent-soft: rgba(96,174,234,.13);
+        --success: #7ccf7c;
+        --warning: #f0c75e;
+        --shadow: 0 18px 48px rgba(0,0,0,.28);
+      }}
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
@@ -65,13 +97,6 @@
     }
     .topbar-inner { min-height: 64px; display: flex; align-items: center; gap: 18px; }
     .brand { display: flex; align-items: center; gap: 10px; font-weight: 650; text-decoration: none; white-space: nowrap; }
-    .brand-mark {
-      width: 30px; height: 30px; border-radius: 9px;
-      display: grid; place-items: center; color: white;
-      background: linear-gradient(145deg, #0f6cbd, #3a96dd);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.24);
-      font-size: 12px; font-weight: 750; letter-spacing: -.4px;
-    }
     nav { display: flex; gap: 6px; margin-left: auto; align-items: center; }
     nav a, .lang-switch button {
       border: 0; background: transparent; color: var(--muted); text-decoration: none;
@@ -162,13 +187,17 @@
       .release-head { flex-direction: column; }
     }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    .hero-actions{align-items:center}.store-download{display:inline-block;max-width:100%;line-height:0}.store-download ms-store-badge{display:block;max-width:100%}.store-download ms-store-badge::part(img){width:240px;max-width:100%;height:auto}.store-download ms-store-badge:not(:defined){display:none}.store-download ms-store-badge:defined+.store-fallback{display:none}.store-fallback{display:inline-block;max-width:100%}.store-fallback img{display:block;max-width:100%;height:auto}.card .store-download{margin-top:16px}
+    .theme-toggle{width:38px;height:38px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer}.theme-toggle:hover{background:var(--accent-soft);color:var(--accent)}.theme-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.theme-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.theme-toggle .sun{display:none}:root[data-theme="dark"] .theme-toggle .sun{display:block}:root[data-theme="dark"] .theme-toggle .moon{display:none}@media(max-width:620px){.topbar-inner{flex-wrap:wrap;padding-block:8px}}
+    .brand img{width:31px;height:31px;border-radius:9px;object-fit:contain;background:#000}h1{font-size:clamp(30px,5.5vw,64px);overflow-wrap:anywhere}
   </style>
+  <script type="module" src="https://get.microsoft.com/badge/ms-store-badge.bundled.js"></script>
 </head>
 <body class="lang-zh">
   <header class="topbar">
     <div class="shell topbar-inner">
       <a class="brand" href="./" aria-label="UrbanPlanToolbox home">
-        <span class="brand-mark">UP</span><span>UrbanPlanToolbox</span>
+        <img src="assets/toolbox-icon.png" alt=""><span>UrbanPlanToolbox</span>
       </a>
       <nav aria-label="Site navigation">
         <a href="#features"><span class="l zh">功能</span><span class="l ja">機能</span><span class="l en">Features</span></a>
@@ -182,6 +211,10 @@
         <button type="button" data-set-lang="ja" aria-pressed="false">日</button>
         <button type="button" data-set-lang="en" aria-pressed="false">EN</button>
       </div>
+  <button id="theme-toggle" class="theme-toggle" type="button" aria-label="切换到深色模式" title="切换到深色模式">
+    <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+    <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.9 13.1A9 9 0 0 1 10.9 3.1 9 9 0 1 0 20.9 13.1Z"></path></svg>
+  </button>
     </div>
   </header>
 
@@ -199,8 +232,8 @@
           <p class="hero-lead l ja">都市・地域計画、建築設計、空間研究のためのモダンな Windows ツールボックス。プロジェクト、専門データ、GIS・調査支援、アイデア記録、バックアップをオフライン優先の WinUI 3 アプリに統合します。</p>
           <p class="hero-lead l en">A modern Windows toolbox for urban planning, architectural design, and spatial research—bringing project workspaces, professional references, GIS/survey helpers, idea capture, and backup into one offline-first WinUI 3 app.</p>
           <div class="hero-actions">
-            <a class="button primary" href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/download/v1.9.3/UrbanPlanToolbox-v1.9.3-x64-one-click.zip"><span class="l zh">下载 GitHub 一键安装包</span><span class="l ja">GitHub ワンクリック導入版をダウンロード</span><span class="l en">Download GitHub one-click installer</span></a>
-            <a class="button" href="https://apps.microsoft.com/detail/9MWDPJG1BHKW">Microsoft Store</a>
+            <div class="store-download"><ms-store-badge id="download-primary" productid="9MWDPJG1BHKW" productname="规划工具箱" window-mode="direct" theme="auto" size="large" language="zh-cn" animation="on"></ms-store-badge><a class="store-fallback" href="https://get.microsoft.com/installer/download/9MWDPJG1BHKW?referrer=appbadge"><img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="240" alt="从 Microsoft Store 下载规划工具箱"></a></div>
+            <a class="button" href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest">GitHub Release</a>
             <a class="button" href="https://github.com/KiYouJyo/UrbanPlanToolbox">GitHub</a>
           </div>
         </div>
@@ -209,17 +242,17 @@
           <h2><span class="l zh">当前发行状态</span><span class="l ja">現在の配布状況</span><span class="l en">Current distribution status</span></h2>
           <div class="status-row">
             <div>
-              <div class="status-label">GitHub Releases</div>
-              <div class="status-sub"><span class="l zh">当前正式版本</span><span class="l ja">現在の正式版</span><span class="l en">Current stable release</span> · <span id="github-version">1.9.3</span></div>
-            </div>
-            <span class="status-badge ok"><span class="l zh">已发布</span><span class="l ja">公開済み</span><span class="l en">Published</span></span>
-          </div>
-          <div class="status-row">
-            <div>
               <div class="status-label">Microsoft Store</div>
               <div class="status-sub"><span class="l zh">已提交</span><span class="l ja">提出済み</span><span class="l en">Submitted</span> · <span id="store-candidate">1.9.3.0</span><br><span class="l zh">已确认公开版本</span><span class="l ja">確認済み公開版</span><span class="l en">Verified public version</span> · <span id="store-public">1.9.3</span></div>
             </div>
             <span id="store-status-badge" class="status-badge ok"><span class="l zh">已发布</span><span class="l ja">公開済み</span><span class="l en">Published</span></span>
+          </div>
+          <div class="status-row">
+            <div>
+              <div class="status-label">GitHub Releases</div>
+              <div class="status-sub"><span class="l zh">当前正式版本</span><span class="l ja">現在の正式版</span><span class="l en">Current stable release</span> · <span id="github-version">1.9.3</span></div>
+            </div>
+            <span class="status-badge ok"><span class="l zh">已发布</span><span class="l ja">公開済み</span><span class="l en">Published</span></span>
           </div>
           <p class="fine-print l zh">两个渠道使用独立包身份与更新链，不能相互覆盖升级。Store 公开状态以 Microsoft Store / Partner Center 为准。</p>
           <p class="fine-print l ja">2つの配布経路はパッケージ ID と更新経路が独立しており、相互に上書きできません。Store の公開状態は Microsoft Store / Partner Center を基準とします。</p>
@@ -276,16 +309,16 @@
         <div class="section-head"><div><h2><span class="l zh">选择发行渠道</span><span class="l ja">配布経路を選択</span><span class="l en">Choose a distribution channel</span></h2><p class="l zh">GitHub 更新更快；Microsoft Store 更适合希望由商店管理安装与更新的用户。</p><p class="l ja">GitHub は更新が速く、Microsoft Store はインストールと更新を Store に任せたいユーザー向けです。</p><p class="l en">GitHub updates more frequently; Microsoft Store is better for users who prefer Store-managed installation and updates.</p></div></div>
         <div class="grid channels">
           <article class="card channel-card">
+            <h3><span class="l zh">推荐：Microsoft Store</span><span class="l ja">推奨：Microsoft Store</span><span class="l en">Recommended: Microsoft Store</span></h3>
+            <p class="l zh">由 Microsoft Store 管理安装与更新。当前提交版本、认证状态与已确认公开版本会从项目状态事实源加载，并以 Store / Partner Center 为准。</p><p class="l ja">インストールと更新は Microsoft Store が管理します。提出版、認証状態、確認済み公開版はプロジェクト状態の SSOT から読み込み、Store / Partner Center を基準とします。</p><p class="l en">Installation and updates are managed by Microsoft Store. The submitted build, certification state, and verified public version are loaded from the project-status source of truth and follow Store / Partner Center.</p>
+            <div class="channel-meta"><span><strong><span class="l zh">提交：</span><span class="l ja">提出：</span><span class="l en">Submitted: </span></strong><span id="store-candidate-2">1.9.3.0</span></span><span><strong><span class="l zh">已确认公开：</span><span class="l ja">確認済み公開：</span><span class="l en">Verified public: </span></strong><span id="store-public-2">1.9.3</span></span></div>
+            <div class="hero-actions"><div class="store-download"><ms-store-badge productid="9MWDPJG1BHKW" productname="规划工具箱" window-mode="direct" theme="auto" size="large" language="zh-cn" animation="on"></ms-store-badge><a class="store-fallback" href="https://get.microsoft.com/installer/download/9MWDPJG1BHKW?referrer=appbadge"><img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="240" alt="从 Microsoft Store 下载规划工具箱"></a></div></div>
+          </article>
+          <article class="card channel-card">
             <h3>GitHub Releases</h3>
             <p class="l zh">提供 x64 自签名旁加载版本与一键安装包。首次安装完成后，可在应用内主动检查、下载并验证正式更新。</p><p class="l ja">x64 自己署名サイドロード版とワンクリック導入パッケージを提供します。導入後はアプリ内から正式更新を確認・取得・検証できます。</p><p class="l en">Provides the self-signed x64 sideload build and one-click installer. After first install, the app can explicitly check, download, and verify stable updates.</p>
             <div class="channel-meta"><span><strong><span class="l zh">当前：</span><span class="l ja">現在：</span><span class="l en">Current: </span></strong><span id="github-version-2">1.9.3</span></span><span>SHA-256 · WinVerifyTrust · MSIX signature verification</span></div>
             <div class="hero-actions"><a class="button primary" href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest"><span class="l zh">前往最新 Release</span><span class="l ja">最新 Release へ</span><span class="l en">Open latest release</span></a></div>
-          </article>
-          <article class="card channel-card">
-            <h3>Microsoft Store</h3>
-            <p class="l zh">由 Microsoft Store 管理安装与更新。当前提交版本、认证状态与已确认公开版本会从项目状态事实源加载，并以 Store / Partner Center 为准。</p><p class="l ja">インストールと更新は Microsoft Store が管理します。提出版、認証状態、確認済み公開版はプロジェクト状態の SSOT から読み込み、Store / Partner Center を基準とします。</p><p class="l en">Installation and updates are managed by Microsoft Store. The submitted build, certification state, and verified public version are loaded from the project-status source of truth and follow Store / Partner Center.</p>
-            <div class="channel-meta"><span><strong><span class="l zh">提交：</span><span class="l ja">提出：</span><span class="l en">Submitted: </span></strong><span id="store-candidate-2">1.9.3.0</span></span><span><strong><span class="l zh">已确认公开：</span><span class="l ja">確認済み公開：</span><span class="l en">Verified public: </span></strong><span id="store-public-2">1.9.3</span></span></div>
-            <div class="hero-actions"><a class="button" href="https://apps.microsoft.com/detail/9MWDPJG1BHKW"><span class="l zh">在 Store 中查看</span><span class="l ja">Store で表示</span><span class="l en">View in Store</span></a></div>
           </article>
         </div>
       </div>
@@ -336,7 +369,7 @@
       const langButtons = [...document.querySelectorAll('[data-set-lang]')];
       const htmlLang = { zh: 'zh-CN', ja: 'ja-JP', en: 'en' };
       const noteKey = { zh: 'zh-CN', ja: 'ja-JP', en: 'en-US' };
-      let currentLang = localStorage.getItem('upt-lang') || ((navigator.language || '').toLowerCase().startsWith('ja') ? 'ja' : (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'zh');
+      let currentLang = readPreference('upt-lang') || ((navigator.language || '').toLowerCase().startsWith('ja') ? 'ja' : (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'zh');
       if (!htmlLang[currentLang]) currentLang = 'zh';
 
       function applyLanguage(lang) {
@@ -345,7 +378,10 @@
         body.classList.add(`lang-${lang}`);
         document.documentElement.lang = htmlLang[lang];
         langButtons.forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.setLang === lang)));
-        localStorage.setItem('upt-lang', lang);
+        writePreference('upt-lang', lang);
+        document.querySelectorAll('ms-store-badge').forEach(b=>b.setAttribute('language',{zh:'zh-cn',ja:'ja',en:'en'}[lang]));
+        document.querySelectorAll('.store-fallback img').forEach(img=>img.alt={zh:'从 Microsoft Store 下载规划工具箱',ja:'Microsoft Store から UrbanPlanToolbox を入手',en:'Get UrbanPlanToolbox from Microsoft Store'}[lang]);
+        applyTheme();
         renderReleaseNotes();
       }
       langButtons.forEach(btn => btn.addEventListener('click', () => applyLanguage(btn.dataset.setLang)));
@@ -411,6 +447,7 @@
         } catch (_) { }
       }
 
+      document.getElementById('theme-toggle').addEventListener('click',()=>{themePreference=document.documentElement.dataset.theme==='dark'?'light':'dark';writePreference('upt-theme',themePreference);applyTheme()});
       applyLanguage(currentLang);
       hydrateStatus();
     })();

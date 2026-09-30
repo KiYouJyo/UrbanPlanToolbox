@@ -1,14 +1,25 @@
-简体中文 | [日本語](README.ja.md) | [English](README.en.md)
-
-# UrbanPlanToolbox
-
-面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。
-
-[![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver&color=2F81F7&label=Release)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![Closed PRs](https://img.shields.io/github/issues-pr-closed/KiYouJyo/UrbanPlanToolbox?color=8250DF&label=Closed%20PRs)](https://github.com/KiYouJyo/UrbanPlanToolbox/pulls?q=is%3Apr+is%3Aclosed) [![Last Commit](https://img.shields.io/github/last-commit/KiYouJyo/UrbanPlanToolbox?color=57606A&label=Last%20Commit)](https://github.com/KiYouJyo/UrbanPlanToolbox/commits/main/)
-
-[![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW) [![WinGet](https://img.shields.io/badge/WinGet-msstore-0078D4?logo=windows&logoColor=white)](#获取应用) [![Windows](https://img.shields.io/badge/Windows-WinUI%203-0078D4?logo=windows&logoColor=white)](https://github.com/KiYouJyo/UrbanPlanToolbox) [![Architecture](https://img.shields.io/badge/Architecture-x64-005A9E)](#系统要求)
-
-[![Languages](https://img.shields.io/badge/Languages-%E4%B8%AD%E6%96%87%20%7C%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%7C%20English-6F42C1)](#语言) [![Offline First](https://img.shields.io/badge/Offline-First-2EA043)](#隐私与离线设计) [![MIT License](https://img.shields.io/badge/License-MIT-D4A72C)](LICENSE)
+<p align="center">
+  <img src="docs/assets/toolbox-icon.png" width="128" height="128" alt="UrbanPlanToolbox">
+</p>
+<h1 align="center">UrbanPlanToolbox</h1>
+<p align="center">面向城乡规划、建筑设计与空间研究的离线优先 Windows 工具箱。</p>
+<p align="center">
+  <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest"><img src="https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&amp;sort=semver&amp;color=2F81F7&amp;label=Release" alt="GitHub Release"></a>
+  <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml"><img src="https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/pulls?q=is%3Apr+is%3Aclosed"><img src="https://img.shields.io/github/issues-pr-closed/KiYouJyo/UrbanPlanToolbox?color=8250DF&amp;label=Closed%20PRs" alt="Closed PRs"></a>
+  <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/commits/main/"><img src="https://img.shields.io/github/last-commit/KiYouJyo/UrbanPlanToolbox?color=57606A&amp;label=Last%20Commit" alt="Last Commit"></a>
+  <a href="#获取应用"><img src="https://img.shields.io/badge/WinGet-msstore-0078D4?logo=windows&amp;logoColor=white" alt="WinGet"></a>
+  <a href="https://github.com/KiYouJyo/UrbanPlanToolbox"><img src="https://img.shields.io/badge/Windows-WinUI%203-0078D4?logo=windows&amp;logoColor=white" alt="Windows"></a>
+  <a href="#系统要求"><img src="https://img.shields.io/badge/Architecture-x64-005A9E" alt="Architecture"></a>
+  <a href="#语言"><img src="https://img.shields.io/badge/Languages-%E4%B8%AD%E6%96%87%20%7C%20%E6%97%A5%E6%9C%AC%E8%AA%9E%20%7C%20English-6F42C1" alt="Languages"></a>
+  <a href="#隐私与离线设计"><img src="https://img.shields.io/badge/Offline-First-2EA043" alt="Offline First"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-D4A72C" alt="MIT License"></a>
+  <a href="https://kiyoujyo.github.io/UrbanPlanToolbox/"><img src="https://img.shields.io/badge/Website-UrbanPlanToolbox-0078D4" alt="Website"></a>
+</p>
+<p align="center">
+  <a href="https://get.microsoft.com/installer/download/9MWDPJG1BHKW?referrer=appbadge"><img src="https://get.microsoft.com/images/zh-cn%20dark.svg" width="240" alt="从 Microsoft Store 下载规划工具箱"></a>
+</p>
+<p align="center">简体中文 | <a href="README.ja.md">日本語</a> | <a href="README.en.md">English</a></p>
 
 ## 获取应用
 

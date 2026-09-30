@@ -8,7 +8,7 @@ function Assert-Contains {
     param([string]$Path, [string]$Text)
 
     $content = [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8)
-    if (-not $content.Contains($Text)) {
+    if (-not [System.Net.WebUtility]::HtmlDecode($content).Contains($Text)) {
         throw "Documentation check failed: '$Path' does not contain '$Text'."
     }
 }
