@@ -1,10 +1,19 @@
-日本語 | [简体中文](README.md) | [English](README.en.md)
-
-# UrbanPlanToolbox
-
-都市・地域計画、建築設計、空間研究向けのオフライン優先 Windows ツールボックスです。
-
-[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![CI](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml) [![GitHub Release](https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&sort=semver)](https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest) [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows)](https://github.com/KiYouJyo/UrbanPlanToolbox) [![Microsoft Store](https://img.shields.io/badge/Microsoft%20Store-Download-0078D4?logo=microsoftstore&logoColor=white)](https://apps.microsoft.com/detail/9MWDPJG1BHKW)
+<p align="center">
+  <img src="docs/assets/toolbox-icon.png" width="128" height="128" alt="UrbanPlanToolbox">
+</p>
+<h1 align="center">UrbanPlanToolbox</h1>
+<p align="center">都市・地域計画、建築設計、空間研究向けのオフライン優先 Windows ツールボックスです。</p>
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
+  <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml"><img src="https://github.com/KiYouJyo/UrbanPlanToolbox/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/KiYouJyo/UrbanPlanToolbox/releases/latest"><img src="https://img.shields.io/github/v/release/KiYouJyo/UrbanPlanToolbox?display_name=tag&amp;sort=semver" alt="GitHub Release"></a>
+  <a href="https://github.com/KiYouJyo/UrbanPlanToolbox"><img src="https://img.shields.io/badge/platform-Windows%20%7C%20WinUI%203-0078D4?logo=windows" alt="Platform"></a>
+  <a href="https://kiyoujyo.github.io/UrbanPlanToolbox/"><img src="https://img.shields.io/badge/Website-UrbanPlanToolbox-0078D4" alt="Website"></a>
+</p>
+<p align="center">
+  <a href="https://get.microsoft.com/installer/download/9MWDPJG1BHKW?referrer=appbadge"><img src="https://get.microsoft.com/images/ja%20dark.svg" width="240" alt="Microsoft Store から UrbanPlanToolbox を入手"></a>
+</p>
+<p align="center"><a href="README.md">简体中文</a> | 日本語 | <a href="README.en.md">English</a></p>
 
 ## 入手
 
