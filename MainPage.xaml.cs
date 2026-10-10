@@ -39,7 +39,6 @@ public sealed partial class MainPage : Page
 
     private void OnNavigationLoaded(object sender, RoutedEventArgs e)
     {
-
         if (Navigation.SettingsItem is NavigationViewItem settingsItem)
         {
             var settingsLabel = LocalizationService.Default.GetString("Navigation_Settings");
@@ -94,8 +93,8 @@ public sealed partial class MainPage : Page
             _isNavigationPaneBackgroundHooked = true;
             Navigation.PaneOpening += (_, _) => QueueNavigationPaneBackgroundUpdate();
             ActualThemeChanged += (_, _) => QueueNavigationPaneBackgroundUpdate();
-            if (App.MainWindow is not null)
-                App.MainWindow.Activated += OnMainWindowActivated;
+            App.MainWindow.Activated += OnMainWindowActivated;
+            Unloaded += OnMainPageUnloaded;
         }
         QueueNavigationPaneBackgroundUpdate();
     }
@@ -106,12 +105,21 @@ public sealed partial class MainPage : Page
         QueueNavigationPaneBackgroundUpdate();
     }
 
+    private void OnMainPageUnloaded(object sender, RoutedEventArgs e)
+    {
+        if (!_isNavigationPaneBackgroundHooked) return;
+        App.MainWindow.Activated -= OnMainWindowActivated;
+        Unloaded -= OnMainPageUnloaded;
+        _isNavigationPaneBackgroundHooked = false;
+    }
+
     private void QueueNavigationPaneBackgroundUpdate() => DispatcherQueue.TryEnqueue(ApplySharedNavigationPaneBackground);
 
     private void ApplySharedNavigationPaneBackground()
     {
         _navigationSplitView ??= FindDescendant<SplitView>(Navigation);
-        var themeKey = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast
+        var highContrast = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast;
+        var themeKey = highContrast
             ? "HighContrast"
             : Navigation.ActualTheme == ElementTheme.Dark ? "Dark" : "Light";
         var brushKey = _isWindowActive
@@ -133,7 +141,6 @@ public sealed partial class MainPage : Page
         }
         return null;
     }
-
 
     private void ApplyLocalizedNavigation()
     {

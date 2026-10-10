@@ -1,5 +1,15 @@
 # 更改日志
 
+## 1.9.4
+
+### Theme consistency and inactive chrome synchronization
+
+- Restores and locks the active NavigationView shell surface to Light `#E5F9F9` and Dark `#1A2323` so Windows / Windows App SDK environment differences cannot alter the established teal theme.
+- Defines explicit inactive shell surfaces, Light `#F3F3F3` and Dark `#202020`, and applies them only while the main window is genuinely deactivated so navigation chrome matches the system title bar.
+- Restores the teal surface immediately when the window becomes active again and keeps High Contrast on Windows system resources.
+- Adds activation/deactivation regression coverage, including event subscription lifetime, theme switching, and active/inactive resource selection.
+- Keeps project schema version 3, backup format version 2, and the existing GitHub/Microsoft Store updater mechanisms unchanged.
+
 ## 1.9.3
 
 ### Design Concepts Database v3 and complete trilingual metadata
