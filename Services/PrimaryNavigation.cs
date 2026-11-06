@@ -11,6 +11,7 @@ public sealed class PrimaryNavigation
     [
         new(PrimaryNavigationIds.Welcome, "Navigation_Projects", typeof(Views.HomePage)),
         new(PrimaryNavigationIds.CommonTools, "Navigation_Search", typeof(Views.CommonToolsPage)),
+        new(PrimaryNavigationIds.Database, "Navigation_Database", typeof(Views.DatabasePage)),
         new(PrimaryNavigationIds.DesignTools, "Navigation_DesignTools", typeof(Views.DesignToolsPage)),
         new(PrimaryNavigationIds.ResearchTools, "Navigation_ResearchTools", typeof(Views.ResearchToolsPage)),
         new(PrimaryNavigationIds.ProjectArchive, "Navigation_ProjectArchive", typeof(Views.ProjectArchivePage)),

@@ -15,6 +15,7 @@ public sealed class PrimaryNavigationTests
         [
             PrimaryNavigationIds.Welcome,
             PrimaryNavigationIds.CommonTools,
+            PrimaryNavigationIds.Database,
             PrimaryNavigationIds.DesignTools,
             PrimaryNavigationIds.ResearchTools,
             PrimaryNavigationIds.ProjectArchive,
@@ -29,6 +30,7 @@ public sealed class PrimaryNavigationTests
     [Theory]
     [InlineData(PrimaryNavigationIds.Welcome, typeof(Views.HomePage))]
     [InlineData(PrimaryNavigationIds.CommonTools, typeof(Views.CommonToolsPage))]
+    [InlineData(PrimaryNavigationIds.Database, typeof(Views.DatabasePage))]
     [InlineData(PrimaryNavigationIds.DesignTools, typeof(Views.DesignToolsPage))]
     [InlineData(PrimaryNavigationIds.ResearchTools, typeof(Views.ResearchToolsPage))]
     [InlineData(PrimaryNavigationIds.ProjectArchive, typeof(Views.ProjectArchivePage))]

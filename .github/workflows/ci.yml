@@ -27,6 +27,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Test administrative database matching
+        run: node --test tests/database-core.test.mjs
+
       - name: Determine CI change scope
         id: change-scope
         shell: pwsh
