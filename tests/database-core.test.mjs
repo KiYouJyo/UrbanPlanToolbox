@@ -13,7 +13,7 @@ test('matching separates missing, unknown and duplicate rows',()=>{
 test('joins retain dataset identity, original fields and missing versus zero',()=>{
  const datasets=[{id:'one',title:'人口',year:'2020',source:'Test',unit:'人',definition:'常住人口',fields:['人口'],rows:[{code:'43101',values:{人口:0}}]}];
  const a=joinedProperties({properties:{officialCode:'43101',name:'中央区'}},datasets),b=joinedProperties({properties:{officialCode:'43102',name:'東区'}},datasets);
- assert.equal(a.d1_人口,0);assert.equal(b.d1_人口,null);assert.equal(a.d1_year,'2020');assert.equal(a.boundary_date,'2026-01-01');
+ assert.equal(a.d1_人口,0);datasets[0].rows.push({code:'43103',values:{人口:''}});assert.equal(joinedProperties({properties:{officialCode:'43103'}},datasets).d1_人口,null);assert.equal(b.d1_人口,null);assert.equal(a.d1_year,'2020');assert.equal(a.boundary_date,'2026-01-01');
 });
 test('numeric conversion treats blank and suppression symbols as missing',()=>{
  for(const v of ['',null,' ','—','秘匿'])assert.equal(numeric(v),null);

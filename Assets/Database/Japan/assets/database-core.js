@@ -17,6 +17,6 @@ export function matchRows(rows,codeColumn,knownCodes){
 }
 export function joinedProperties(feature,datasets){
   const p=feature.properties,out={code:p.officialCode,name:p.name,prefecture:p.prefecture,city:p.city,ward:p.ward,level:p.administrativeLevel,boundary_date:'2026-01-01'};
-  datasets.forEach((d,i)=>{const values=d.rows.find(r=>r.code===p.officialCode)?.values;out[`d${i+1}_title`]=d.title;out[`d${i+1}_year`]=d.year;out[`d${i+1}_source`]=d.source;out[`d${i+1}_unit`]=d.unit;out[`d${i+1}_definition`]=d.definition;for(const field of d.fields)out[`d${i+1}_${field}`]=numeric(values?.[field])??values?.[field]??null;});return out;
+  datasets.forEach((d,i)=>{const values=d.rows.find(r=>r.code===p.officialCode)?.values;out[`d${i+1}_title`]=d.title;out[`d${i+1}_year`]=d.year;out[`d${i+1}_source`]=d.source;out[`d${i+1}_unit`]=d.unit;out[`d${i+1}_definition`]=d.definition;for(const field of d.fields)out[`d${i+1}_${field}`]=values?.[field]===undefined||values?.[field]===null||String(values[field]).trim()===''?null:numeric(values[field])??values[field];});return out;
 }
 export function numeric(value){if(value===null||value===undefined||String(value).trim()==='')return null;const s=String(value).replace(/,/g,'').trim();return /^[-+]?(?:\d+\.?\d*|\.\d+)$/.test(s)&&Number.isFinite(Number(s))?Number(s):null;}
