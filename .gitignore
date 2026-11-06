@@ -66,3 +66,11 @@ _ReSharper*/
 # Generated files
 Generated\ Files/
 *_wpftmp.csproj
+
+# Pinned map dependencies restored by Prepare-DatabaseAssets.ps1
+/Assets/Database/Japan/assets/leaflet.js
+/Assets/Database/Japan/assets/leaflet.css
+/Assets/Database/Japan/assets/polygon-clipping.js
+/Assets/Database/Japan/assets/xlsx.full.min.js
+/Assets/Database/Japan/data/prefectures.geojson
+/Assets/Database/Japan/data/municipalities.geojson
