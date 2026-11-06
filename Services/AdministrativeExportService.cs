@@ -5,6 +5,8 @@ using System.Text.Json;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO.Esri;
+using NetTopologySuite.IO.Esri.Dbf.Fields;
+using NetTopologySuite.IO.Esri.Shapefiles.Writers;
 
 namespace UrbanPlanToolbox.Services;
 
@@ -27,18 +29,28 @@ public static class AdministrativeExportService
             else if (format == "shp")
             {
                 var files = Path.Combine(temporary, "files"); Directory.CreateDirectory(files);
-                var features = rows.Select(row =>
+                var dbfFields = new List<DbfField>();
+                var numericFields = fields.Select(name => rows.Any(row => row.GetProperty("properties").TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number) && rows.All(row => !row.GetProperty("properties").TryGetProperty(name, out var value) || value.ValueKind is JsonValueKind.Null or JsonValueKind.Number)).ToArray();
+                for (var i = 0; i < fields.Length; i++)
                 {
-                    var attributes = new AttributesTable();
-                    for (var i = 0; i < fields.Length; i++)
+                    var name = "F" + i.ToString("D4", CultureInfo.InvariantCulture);
+                    if (numericFields[i]) dbfFields.AddNumericDoubleField(name);
+                    else dbfFields.AddCharacterField(name, 254);
+                }
+                var options = new ShapefileWriterOptions(ShapeType.Polygon, dbfFields.ToArray()) { Encoding = Encoding.UTF8 };
+                using (var writer = Shapefile.OpenWrite(Path.Combine(files, "areas.shp"), options))
+                {
+                    foreach (var row in rows)
                     {
-                        var value = row.GetProperty("properties").TryGetProperty(fields[i], out var v) ? Value(v) : "";
-                        // DBF field names are limited to 10 bytes; retain full names and values in accompanying files.
-                        attributes.Add("F" + i.ToString("D4", CultureInfo.InvariantCulture), LimitUtf8(value, 254));
+                        writer.Geometry = ReadGeometry(row.GetProperty("geometry"));
+                        for (var i = 0; i < fields.Length; i++)
+                        {
+                            var exists = row.GetProperty("properties").TryGetProperty(fields[i], out var value);
+                            dbfFields[i].Value = !exists || value.ValueKind == JsonValueKind.Null ? null : numericFields[i] ? value.GetDouble() : LimitUtf8(Value(value), 254);
+                        }
+                        writer.Write();
                     }
-                    return (IFeature)new Feature(ReadGeometry(row.GetProperty("geometry")), attributes);
-                }).ToArray();
-                Shapefile.WriteAllFeatures(features, Path.Combine(files, "areas.shp"), encoding: Encoding.UTF8);
+                }
                 File.WriteAllText(Path.Combine(files, "areas.cpg"), "UTF-8", new UTF8Encoding(false));
                 File.WriteAllText(Path.Combine(files, "areas.prj"), "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433]]");
                 File.WriteAllText(Path.Combine(files, "fields.json"), JsonSerializer.Serialize(fields.Select((name, i) => new { field = "F" + i.ToString("D4"), name })));

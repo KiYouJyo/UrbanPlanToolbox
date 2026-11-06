@@ -13,8 +13,8 @@ public sealed partial class DatabasePage : Page
         TitleText.Text = l.GetString("Navigation_Database");
         DescriptionText.Text = l.GetString("Database_Description");
         EmptyText.Text = l.GetString("Database_Empty");
-        foreach (var region in new[] { "Asia", "Europe", "Americas", "Africa", "Oceania" })
-            Regions.Items.Add(new ListViewItem { Content = l.GetString("Database_" + region), Tag = region });
+        foreach (var (region, key) in new[] { ("Asia", "Database_Asia"), ("Europe", "Database_Europe"), ("Americas", "Database_Americas"), ("Africa", "Database_Africa"), ("Oceania", "Database_Oceania") })
+            Regions.Items.Add(new ListViewItem { Content = l.GetString(key), Tag = region });
         Regions.SelectedIndex = 0;
     }
     private void OnRegionChanged(object sender, SelectionChangedEventArgs e)
