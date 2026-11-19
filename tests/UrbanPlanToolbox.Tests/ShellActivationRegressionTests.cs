@@ -5,23 +5,23 @@ namespace UrbanPlanToolbox.Tests;
 public sealed class ShellActivationRegressionTests
 {
     [Fact]
-    public void NavigationPaneTracksMainWindowActivationAndTheme()
+    public void NavigationPaneUsesAcrylicBackedTransparentThemeInsteadOfActivationColors()
     {
         var root = FindRepositoryRoot();
         var app = File.ReadAllText(Path.Combine(root, "App.xaml"));
         var shell = File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs"));
+        var navigation = File.ReadAllText(Path.Combine(root, "MainPage.xaml"));
+        var window = File.ReadAllText(Path.Combine(root, "MainWindow.xaml"));
 
-        Assert.Contains("ShellNavigationPaneBackgroundBrush", app);
-        Assert.Contains("ShellNavigationPaneInactiveBackgroundBrush", app);
-        Assert.Contains("Color=\"#E5F9F9\"", app);
-        Assert.Contains("Color=\"#1A2323\"", app);
-        Assert.Contains("Color=\"#F3F3F3\"", app);
-        Assert.Contains("Color=\"#202020\"", app);
-        Assert.Contains("App.MainWindow.Activated += OnMainWindowActivated", shell);
-        Assert.Contains("args.WindowActivationState != WindowActivationState.Deactivated", shell);
-        Assert.Contains("? \"ShellNavigationPaneBackgroundBrush\"", shell);
-        Assert.Contains(": \"ShellNavigationPaneInactiveBackgroundBrush\"", shell);
-        Assert.Contains("Navigation.ActualTheme == ElementTheme.Dark", shell);
+        const string transparentBrush = "<SolidColorBrush x:Key=\"NavigationViewExpandedPaneBackground\" Color=\"Transparent\" />";
+        Assert.Equal(2, app.Split(transparentBrush, StringSplitOptions.None).Length - 1);
+        Assert.Contains("NavigationViewExpandedPaneBackground\" Color=\"{ThemeResource SystemColorWindowColor}\"", app);
+        Assert.Contains("<NavigationView x:Name=\"Navigation\" Background=\"Transparent\"", navigation);
+        Assert.Contains("<DesktopAcrylicBackdrop", window);
+        Assert.DoesNotContain("ShellNavigationPaneBackgroundBrush", app + shell);
+        Assert.DoesNotContain("ShellNavigationPaneInactiveBackgroundBrush", app + shell);
+        Assert.DoesNotContain("PaneBackground =", shell);
+        Assert.DoesNotContain("App.MainWindow.Activated += OnMainWindowActivated", shell);
     }
 
     private static string FindRepositoryRoot()
