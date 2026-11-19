@@ -19,9 +19,9 @@ public sealed class SettingsPageContractTests
         Assert.Single(Regex.Matches(xaml, "<VisualStateManager.VisualStateGroups>").Cast<Match>());
         Assert.Contains("x:Name=\"SettingsContent\" HorizontalAlignment=\"Stretch\" Spacing=\"16\"", xaml);
         Assert.DoesNotContain("x:Name=\"SettingsContent\" HorizontalAlignment=\"Stretch\" MaxWidth=", xaml);
-        foreach (var name in new[] { "ThemeBox", "BackdropBox", "LanguageBox", "ExportButton", "ImportButton", "ClearDataButton", "ApplicationSettingsTitle" })
+        foreach (var name in new[] { "ThemeBox", "LanguageBox", "ExportButton", "ImportButton", "ClearDataButton", "ApplicationSettingsTitle" })
             Assert.Single(Regex.Matches(xaml, $"x:Name=\"{name}\"").Cast<Match>());
-        foreach (var name in new[] { "ThemeBox", "BackdropBox", "LanguageBox" })
+        foreach (var name in new[] { "ThemeBox", "LanguageBox" })
             Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"1\"[\\s\\S]*?Width=\"250\"[\\s\\S]*?HorizontalAlignment=\"Right\"", xaml);
         foreach (var name in new[] { "BackgroundResidencyToggle", "SilentStartupToggle", "MilestoneNotificationsToggle", "RestoreDefaultsButton", "ReopenFirstRunGuideButton" })
             Assert.Matches($"x:Name=\"{name}\"[\\s\\S]*?Grid.Row=\"0\"[\\s\\S]*?Grid.Column=\"1\"[\\s\\S]*?HorizontalAlignment=\"Right\"", xaml);
@@ -44,13 +44,28 @@ public sealed class SettingsPageContractTests
         Assert.DoesNotContain("AutoCalculateToggle", xaml);
         Assert.DoesNotContain("AppearanceLanguageSummary", xaml);
         Assert.Contains("Action_RestoreDefaults", xaml);
-        Assert.Contains("OnBackdropChanged", xaml);
-        Assert.Contains("Setting_Backdrop_Mica", xaml);
-        Assert.Contains("Setting_Backdrop_Acrylic", xaml);
+        Assert.DoesNotContain("BackdropBox", xaml);
+        Assert.DoesNotContain("BackdropLabel", xaml);
+        Assert.DoesNotContain("OnBackdropChanged", xaml);
         Assert.Contains("DataManagementTitle", xaml);
         Assert.Contains("MilestoneNotificationsToggle", xaml);
         Assert.DoesNotContain("Canvas", xaml);
         Assert.DoesNotContain("Margin=\"-", xaml);
+    }
+
+    [Fact]
+    public void OnlyAcrylicBackdropIsUsedByWindowXaml()
+    {
+        var root = FindRepositoryRoot();
+        foreach (var path in new[] { "MainWindow.xaml", "Views/InspirationRecorderWindow.xaml" })
+        {
+            var xaml = File.ReadAllText(Path.Combine(root, path));
+            Assert.Contains("<DesktopAcrylicBackdrop", xaml);
+            Assert.DoesNotContain("<MicaBackdrop", xaml);
+        }
+        var policy = File.ReadAllText(Path.Combine(root, "Services", "WindowBackdropPreference.cs"));
+        Assert.Contains("new DesktopAcrylicBackdrop()", policy);
+        Assert.DoesNotContain("new MicaBackdrop()", policy);
     }
 
     [Fact]

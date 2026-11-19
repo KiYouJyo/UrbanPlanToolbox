@@ -135,20 +135,22 @@ public sealed class SettingsAndFormattingTests
     }
 
     [Fact]
-    public void BackdropMaterialPersistsAndDefaultsToMica()
+    public void LegacyBackdropMaterialIsAlwaysNormalizedToAcrylic()
     {
         var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");
         try
         {
             var service = new SettingsService(path);
-            Assert.Equal("Mica", service.Load().BackdropMaterial);
-            service.Save(new AppSettings { BackdropMaterial = "Acrylic" });
-            Assert.Equal("Acrylic", new SettingsService(path).Load().BackdropMaterial);
-            service.Save(new AppSettings { BackdropMaterial = "invalid", Theme = "Dark" });
-            Assert.Equal("Mica", service.Load().BackdropMaterial);
+            Assert.Equal("Acrylic", service.Load().BackdropMaterial);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, "{\"Theme\":\"Dark\",\"BackdropMaterial\":\"Mica\"}");
+            Assert.Equal("Acrylic", service.Load().BackdropMaterial); // Prior Mica preferences cannot reactivate Mica.
             Assert.Equal("Dark", service.Load().Theme);
-            Assert.Equal(AppBackdropMaterial.Acrylic, SettingsService.NormalizeBackdropMaterial("Acrylic"));
-            Assert.Equal(AppBackdropMaterial.Mica, SettingsService.NormalizeBackdropMaterial(null));
+            service.Save(new AppSettings { BackdropMaterial = "invalid", Theme = "Light" });
+            Assert.Equal("Acrylic", new SettingsService(path).Load().BackdropMaterial);
+            Assert.Equal("Light", service.Load().Theme);
+            Assert.Equal("Acrylic", SettingsService.NormalizeBackdropMaterial("Mica"));
+            Assert.Equal("Acrylic", SettingsService.NormalizeBackdropMaterial(null));
         }
         finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
     }

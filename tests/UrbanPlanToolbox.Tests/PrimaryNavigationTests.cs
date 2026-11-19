@@ -42,6 +42,26 @@ public sealed class PrimaryNavigationTests
     }
 
     [Fact]
+    public void UnfinishedDatabaseEntryIsHiddenWithoutRemovingItsRoute()
+    {
+        var root = FindRepositoryRoot();
+        var sidebar = File.ReadAllText(Path.Combine(root, "MainPage.xaml"));
+        var code = File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs"));
+        Assert.DoesNotContain("DatabaseItem", sidebar);
+        Assert.DoesNotContain("DatabaseItem", code);
+        Assert.DoesNotContain("Tag=\"database\"", sidebar);
+        Assert.True(PrimaryNavigation.Default.TryGet(PrimaryNavigationIds.Database, out var route));
+        Assert.Equal(typeof(Views.DatabasePage), route!.PageType);
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.slnx"))) directory = directory.Parent;
+        return directory?.FullName ?? throw new DirectoryNotFoundException();
+    }
+
+    [Fact]
     public void MissingRouteReturnsSafeFailure()
     {
         Assert.False(PrimaryNavigation.Default.TryGet("removed-route", out var route));
