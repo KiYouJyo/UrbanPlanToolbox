@@ -177,7 +177,7 @@ public partial class App : Application
         ActivatePendingRedirectedWindow();
         StartupTiming.Default.Mark("Startup.WindowCreated");
         StartupTiming.Default.Mark("T4 Root content ready");
-        MainWindow.ApplyBackdrop(settings.BackdropMaterial);
+        MainWindow.ApplyBackdrop();
         MainWindow.ApplyTheme(settings.Theme);
         StartupTiming.Default.Mark("Startup.ThemeResolved");
         StartupTiming.Default.Mark("T5 Theme ready");

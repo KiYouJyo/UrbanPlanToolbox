@@ -21,8 +21,6 @@ public sealed partial class SettingsPage : Page
         AppearanceLanguageDescription.Text = _localization.GetString("Settings_AppearanceLanguageDescription");
         ThemeLabel.Text = _localization.GetString("Settings_ThemeLabel");
         ThemeDescription.Text = _localization.GetString("Settings_ThemeDescription");
-        BackdropLabel.Text = _localization.GetString("Settings_BackdropLabel");
-        BackdropDescription.Text = _localization.GetString("Settings_BackdropDescription");
         LanguageLabel.Text = _localization.GetString("Settings_LanguageLabel");
         LanguageDescription.Text = _localization.GetString("Settings_LanguageDescription_Runtime");
 
@@ -77,7 +75,6 @@ public sealed partial class SettingsPage : Page
         SilentStartupDescription.Text = _localization.GetString("Residency_SilentStartupRecorderDescription");
 
         ConfigureAccessibility(ThemeBox, ThemeLabel.Text, ThemeDescription.Text);
-        ConfigureAccessibility(BackdropBox, BackdropLabel.Text, BackdropDescription.Text);
         ConfigureAccessibility(LanguageBox, LanguageLabel.Text, LanguageDescription.Text);
         ConfigureAccessibility(MilestoneNotificationsToggle, MilestoneNotificationsLabel.Text, MilestoneNotificationsRowDescription.Text);
         ConfigureAccessibility(MilestoneNotificationsRepeatBox, MilestoneNotificationsRepeatLabel.Text, MilestoneRepeatDescription.Text);
@@ -95,7 +92,7 @@ public sealed partial class SettingsPage : Page
     }
     private async void OnRestore(object sender, RoutedEventArgs e)
     {
-        var settings = _settingsService.Update(current => { current.Theme = "System"; current.BackdropMaterial = "Mica"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; current.ProjectMilestoneNotificationsEnabled = AppSettings.DefaultProjectMilestoneNotificationsEnabled; current.ProjectMilestoneReminderRepeatInterval = MilestoneReminderRepeatInterval.None; });
+        var settings = _settingsService.Update(current => { current.Theme = "System"; current.BackdropMaterial = "Acrylic"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; current.ProjectMilestoneNotificationsEnabled = AppSettings.DefaultProjectMilestoneNotificationsEnabled; current.ProjectMilestoneReminderRepeatInterval = MilestoneReminderRepeatInterval.None; });
         Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults");
         await MilestoneReminderService.Default.RefreshAsync();
         if (!string.Equals(_localization.CurrentLanguage, LanguagePreference.ResolveEffectiveLanguage(settings.Language, Windows.System.UserProfile.GlobalizationPreferences.Languages), StringComparison.OrdinalIgnoreCase))
@@ -107,14 +104,6 @@ public sealed partial class SettingsPage : Page
         var settings = _settingsService.Update(current => current.Theme = (ThemeBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "System");
         ApplyTheme(settings.Theme); StatusText.Text = _localization.GetString("Status_SettingsSaved");
     }
-    private void OnBackdropChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (_isApplying || BackdropBox.SelectedItem is not ComboBoxItem item) return;
-        var settings = _settingsService.Update(current => current.BackdropMaterial = item.Tag?.ToString() ?? "Mica");
-        App.MainWindow?.ApplyBackdrop(settings.BackdropMaterial);
-        StatusText.Text = _localization.GetString("Status_SettingsSaved");
-    }
-
     private async void OnLanguageChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isApplying) return;
@@ -135,14 +124,13 @@ public sealed partial class SettingsPage : Page
     {
         _isApplying = true;
         ThemeBox.SelectedIndex = settings.Theme switch { "Light" => 1, "Dark" => 2, _ => 0 };
-        BackdropBox.SelectedIndex = SettingsService.NormalizeBackdropMaterial(settings.BackdropMaterial) == AppBackdropMaterial.Acrylic ? 1 : 0;
         var language = LanguagePreference.Normalize(settings.Language); ApplyLanguageSelection(language);
         MilestoneNotificationsToggle.IsOn = settings.IsProjectMilestoneNotificationsEnabled;
         BackgroundResidencyToggle.IsOn = settings.BackgroundResidencyEnabled; SilentStartupToggle.IsOn = settings.SilentStartupShowRecorder;
         ApplyMilestoneReminderSettings(settings);
         _isApplying = false;
         ApplyTheme(settings.Theme);
-        App.MainWindow?.ApplyBackdrop(settings.BackdropMaterial);
+        App.MainWindow?.ApplyBackdrop();
     }
     private async void OnBackgroundResidencyToggled(object sender, RoutedEventArgs e)
     {

@@ -165,7 +165,7 @@ public sealed partial class MainWindow : Window
         ApplyWindowChromeTheme(WindowIconTheme.Resolve(preference, SystemUsesLightTheme()));
     }
 
-    public void ApplyBackdrop(string? material) => WindowBackdropPreference.Apply(this, material);
+    public void ApplyBackdrop() => WindowBackdropPreference.Apply(this);
 
     private void OnSystemColorValuesChanged(Windows.UI.ViewManagement.UISettings sender, object args)
     {

@@ -3,22 +3,13 @@ using Microsoft.UI.Xaml.Media;
 
 namespace UrbanPlanToolbox.Services;
 
-/// <summary>Changes the native window backdrop without rebuilding its content.</summary>
+/// <summary>Enforces Acrylic for all app windows, including previously configured Mica installations.</summary>
 public static class WindowBackdropPreference
 {
-    public static void Apply(Window window, string? material)
+    public static void Apply(Window window)
     {
         ArgumentNullException.ThrowIfNull(window);
-        switch (SettingsService.NormalizeBackdropMaterial(material))
-        {
-            case AppBackdropMaterial.Acrylic:
-                if (window.SystemBackdrop is not DesktopAcrylicBackdrop)
-                    window.SystemBackdrop = new DesktopAcrylicBackdrop();
-                break;
-            default:
-                if (window.SystemBackdrop is not MicaBackdrop)
-                    window.SystemBackdrop = new MicaBackdrop();
-                break;
-        }
+        if (window.SystemBackdrop is not DesktopAcrylicBackdrop)
+            window.SystemBackdrop = new DesktopAcrylicBackdrop();
     }
 }
