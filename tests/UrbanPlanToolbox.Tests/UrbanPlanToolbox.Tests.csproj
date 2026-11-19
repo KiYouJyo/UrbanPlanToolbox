@@ -138,6 +138,7 @@
   <Compile Include="../../Services/DifferenceAnalysisService.cs" Link="Services/DifferenceAnalysisService.cs" />
   <Compile Include="../../Services/DrawingExportService.cs" Link="Services/DrawingExportService.cs" />
   <Compile Include="../../Models/CoordinateBatchModels.cs" Link="Models/CoordinateBatchModels.cs" />
+  <Compile Include="../../Services/AdministrativeExportService.cs" Link="Services/AdministrativeExportService.cs" />
   <Compile Include="../../Services/CoordinateBatchConversionService.cs" Link="Services/CoordinateBatchConversionService.cs" />
  </ItemGroup>
  <ItemGroup>

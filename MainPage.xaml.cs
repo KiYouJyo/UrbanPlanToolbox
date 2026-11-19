@@ -139,6 +139,7 @@ public sealed partial class MainPage : Page
     {
         ApplyNavigationItem(WelcomeItem, PrimaryNavigationIds.Welcome);
         ApplyNavigationItem(SearchItem, PrimaryNavigationIds.CommonTools);
+        ApplyNavigationItem(DatabaseItem, PrimaryNavigationIds.Database);
         ApplyNavigationItem(DesignItem, PrimaryNavigationIds.DesignTools);
         ApplyNavigationItem(ResearchItem, PrimaryNavigationIds.ResearchTools);
         ApplyNavigationItem(ArchiveItem, PrimaryNavigationIds.ProjectArchive);

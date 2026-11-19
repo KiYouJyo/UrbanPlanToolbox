@@ -27,6 +27,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Test administrative database matching
+        run: node --test tests/database-core.test.mjs
+
       - name: Determine CI change scope
         id: change-scope
         shell: pwsh
@@ -221,8 +224,8 @@ jobs:
         shell: pwsh
         run: |
           $cmdFiles = @(
-            'packaging/① 安装规划工具箱.cmd',
-            'packaging/② 卸载规划工具箱.cmd'
+            'packaging/1-Install-UrbanPlanToolbox.cmd',
+            'packaging/2-Uninstall-UrbanPlanToolbox.cmd'
           )
 
           foreach ($relativePath in $cmdFiles) {

@@ -25,10 +25,10 @@
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
     "microsoftStore": {
-      "submittedProductVersion": "1.9.2",
-      "submittedPackageVersion": "1.9.2.0",
-      "state": "certification-submitted",
-      "publicProductVersion": "1.8.2",
+      "submittedProductVersion": "1.9.3",
+      "submittedPackageVersion": "1.9.3.0",
+      "state": "published",
+      "publicProductVersion": "1.9.3",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
       "candidateProductVersion": "1.9.4",
       "candidatePackageVersion": "1.9.4.0",

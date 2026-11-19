@@ -30,6 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Assets\Database\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="PRIVACY.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="SUPPORT.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="THIRD-PARTY-NOTICES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
@@ -109,6 +110,13 @@
       <Content Include="Assets\DataPacks\Bundled\*.uptdata"
                CopyToOutputDirectory="PreserveNewest"
                CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+  <Target Name="PrepareDatabaseAssets" BeforeTargets="PrepareForBuild">
+    <Exec Command="pwsh -NoLogo -NoProfile -NonInteractive -File &quot;$(MSBuildProjectDirectory)\packaging\Prepare-DatabaseAssets.ps1&quot;" />
+    <ItemGroup>
+      <Content Remove="Assets\Database\**\*" />
+      <Content Include="Assets\Database\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
 </Project>

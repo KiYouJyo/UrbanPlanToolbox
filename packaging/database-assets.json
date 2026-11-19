@@ -1,0 +1,32 @@
+[
+  {
+    "path": "assets/leaflet.js",
+    "url": "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js",
+    "sha256": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a"
+  },
+  {
+    "path": "assets/leaflet.css",
+    "url": "https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css",
+    "sha256": "a7837102824184820dfa198d1ebcd109ff6d0ff9a2672a074b9a1b4d147d04c6"
+  },
+  {
+    "path": "assets/polygon-clipping.js",
+    "url": "https://cdn.jsdelivr.net/npm/polygon-clipping@0.15.7/dist/polygon-clipping.umd.min.js",
+    "sha256": "7f8619e84a86ce8dd400c9b50430e9c8cf8f26027b19eeb479f109f5c1a9d688"
+  },
+  {
+    "path": "assets/xlsx.full.min.js",
+    "url": "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+    "sha256": "c9506197caf809a075b6dee1da0d36fb19da7158ffe8a88e7b0c96c5d8623c99"
+  },
+  {
+    "path": "data/prefectures.geojson",
+    "url": "https://geo.maderaojen.me/datasets/jp-prefectures/releases/v1/2026-08-04.1/data.geojson",
+    "sha256": "c823cde901bb077cd3f861632bbcdd3676283d9e6f30c76b0d0fab330ebf157e"
+  },
+  {
+    "path": "data/municipalities.geojson",
+    "url": "https://geo.maderaojen.me/datasets/jp-municipalities/releases/v1/2026-08-04.1/data.geojson",
+    "sha256": "f1ddca348115553297ada27271543e7515fde8d80d279931a83c2c1e66b91924"
+  }
+]

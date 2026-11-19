@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1826">
+  <meta name="description" content="基于国土交通省 N03-2026 数据的日本全国行政区划动态地图">
+  <title>Japan Admin Explorer — 日本行政区划地图</title>
+
+
+  <link rel="stylesheet" href="./assets/leaflet.css">
+  <link rel="stylesheet" href="./assets/style.css">
+  <script src="./assets/leaflet.js" defer></script>
+  <script src="./assets/polygon-clipping.js" defer></script>
+  <script src="./assets/xlsx.full.min.js" defer></script>
+  <script src="./assets/app.js" type="module"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none"><path d="m12 7 12 3 5 9-7 14-12-7-3-12 5-7Z" stroke="currentColor" stroke-width="1.6"/><path d="m12 7 4 11-6 8M16 18l13 1M16 18l6 15" stroke="currentColor" stroke-width="1.2"/><circle cx="16" cy="18" r="3.6" fill="currentColor"/></svg>
+        </div>
+        <div class="brand-text"><span class="brand-overline">GEOGRAPHIC INTELLIGENCE</span><h1>Japan Admin <b>Explorer</b></h1></div>
+      </div>
+      <div class="sidebar-scroll">
+        <div class="dataset-card">
+          <div class="dataset-top"><span class="live-dot"></span> <span id="data-availability">等待地图数据</span><span class="dataset-tag">N03 / 2026</span></div>
+          <div class="dataset-numbers"><div><strong id="pref-count">47</strong><small>都道府県</small></div><div class="vertical-rule"></div><div><strong id="muni-count">—</strong><small>市区町村・行政区</small></div></div>
+          <div class="dataset-foot">国土交通省 · 2026年1月1日基准</div>
+        </div>
+
+        <section class="control-section">
+          <div class="section-heading"><span class="section-index">01</span>行政区划层级</div>
+          <p class="section-description">切换不同行政等级，或根据缩放比例自动显示。</p>
+          <div class="level-options" id="level-options" role="group" aria-label="行政区划层级">
+            <button class="level-option active" data-level="auto"><span class="option-icon">◎</span><span>智能</span></button>
+            <button class="level-option" data-level="prefecture"><span class="option-icon">▧</span><span>都道府县</span></button>
+            <button class="level-option" data-level="municipality"><span class="option-icon">▦</span><span>市町村</span></button>
+            <button class="level-option" data-level="ward"><span class="option-icon">▤</span><span>详细</span></button>
+          </div>
+          <div class="level-note"><span class="small-indicator"></span><span id="active-level-text">当前显示：都道府县</span></div>
+        </section>
+
+        <section class="control-section">
+          <div class="section-heading"><span class="section-index">02</span>地图底图</div>
+          <div class="tile-choices" id="basemap-options" role="group" aria-label="底图样式">
+            <button data-basemap="pale" class="tile-choice active"><span class="tile-preview pale"></span><span>淡色地図</span></button>
+            <button data-basemap="standard" class="tile-choice"><span class="tile-preview standard"></span><span>標準地図</span></button>
+            <button data-basemap="blank" class="tile-choice"><span class="tile-preview blank"></span><span>无底图</span></button>
+          </div>
+          <label class="toggle-row"><span><i class="toggle-glyph">◇</i> 区划边界</span><input id="boundaries-toggle" type="checkbox" checked><span class="switch"></span></label>
+          <label class="toggle-row"><span><i class="toggle-glyph">◈</i> 区域填充</span><input id="fills-toggle" type="checkbox" checked><span class="switch"></span></label>
+        </section>
+
+        <section class="control-section quick-section">
+          <div class="section-heading"><span class="section-index">03</span>快速定位</div>
+          <div class="quick-links" id="quick-links">
+            <button data-place="東京都">东京 <span>↗</span></button>
+            <button data-place="大阪府">大阪 <span>↗</span></button>
+            <button data-place="熊本県">熊本 <span>↗</span></button>
+            <button data-place="北海道">北海道 <span>↗</span></button>
+            <button data-place="福岡県">福冈 <span>↗</span></button>
+            <button data-place="沖縄県">冲绳 <span>↗</span></button>
+          </div>
+        </section>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="info-icon">ⓘ</div>
+        <p>行政边界根据 N03-2026 公开数据加工，不构成法律或领土争议裁定。<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2026.html" target="_blank" rel="noopener">查看官方数据 ↗</a></p>
+        <div class="sidebar-version">JAPAN ADMIN EXPLORER <span>v0.2.0</span></div>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="topbar-title"><span class="eyebrow">INTERACTIVE MAP</span><strong>日本全国行政区域</strong><span class="title-divider"></span><span class="date-note">令和8年版</span></div>
+        <div class="topbar-actions"><span class="status-pill"><span class="live-dot"></span><span id="top-status">数据加载中</span></span><button class="icon-button" id="reset-map" title="返回全国视图" aria-label="返回全国视图">⌗</button></div>
+      </header>
+
+      <div class="map-space">
+        <div id="map" aria-label="日本行政区划交互地图"></div>
+        <div class="map-vignette"></div>
+        <div class="map-toolbar">
+          <div class="search-wrap">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 4.4 4.4"/></svg>
+            <input type="search" id="search" placeholder="搜索都道府县、市町村、行政代码..." autocomplete="off" aria-label="搜索行政区划" disabled>
+            <kbd>/</kbd>
+            <div id="suggestions" class="suggestions hidden" role="listbox"></div>
+          </div>
+          <button class="map-tool-button" id="clear-selection" title="取消选中" aria-label="取消选中" hidden>× <span>清除</span></button>
+        </div>
+        <div class="map-zoom"><button id="zoom-in" aria-label="放大">+</button><span class="zoom-divider"></span><button id="zoom-out" aria-label="缩小">−</button></div>
+        <div class="map-legend"><span class="legend-icon"></span><span id="legend-text">都道府県境界</span><span class="legend-sep"></span><span id="map-zoom-label">Z 4.5</span></div>
+        <div class="map-copyright">国土地理院（底图） · 国土数値情報 N03-2026（行政界）</div>
+
+        <div class="loader-overlay" id="loader-overlay">
+          <div class="loader-card">
+            <div class="loader-logo"><span class="loader-spinner"></span></div>
+            <h2>正在准备日本全国区划</h2>
+            <p id="loader-description">正在加载交互地图组件...</p>
+            <div class="progress-track"><div class="progress-inner" id="progress-inner"></div></div>
+            <small>网站首次打开需要加载约 16 MB 行政区划数据，后续可利用浏览器缓存。</small>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="inspector">
+      <div class="inspector-top"><span>区域信息</span><span class="inspector-caption">FEATURE INSPECTOR</span></div>
+      <div class="inspector-content" id="inspector-content">
+        <div class="empty-inspector">
+          <div class="empty-symbol"><svg width="96" height="96" viewBox="0 0 96 96" fill="none"><path d="m22 28 24-14 28 17-6 35-23 17-27-20 4-35Z" stroke="currentColor" stroke-width="1.6"/><path d="m22 28 23 19 29-16M45 47v36M18 63l27-16" stroke="currentColor" stroke-width="1.6" stroke-dasharray="4 5"/><circle cx="45" cy="47" r="6" fill="#0a8c8c" stroke="white" stroke-width="2"/></svg></div>
+          <h2>探索日本的行政区划</h2>
+          <p>在地图上点击一个行政区域，查看名称、行政代码、所属层级及面积等详细信息。</p>
+          <div class="empty-hint"><span>◉</span> 支持按区划等级精确选取</div>
+        </div>
+      </div>
+      <div class="inspector-footer"><span>属性数据 · N03 / 2026</span><span class="secure-icon">◆</span></div>
+    </aside>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
