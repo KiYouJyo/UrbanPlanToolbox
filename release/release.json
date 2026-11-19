@@ -56,6 +56,12 @@
       "zh-CN": "保留浅色、深色和跟随系统主题；项目数据、备份格式及现有更新机制不变。",
       "ja-JP": "ライト・ダーク・システムテーマに引き続き対応し、プロジェクト、バックアップ、更新機能との互換性を維持します。",
       "en-US": "Retains light, dark and system themes without changing project data, backup format or existing updater behavior."
+    },
+    {
+      "id": "acrylic-sidebar",
+      "zh-CN": "修复左侧导航栏被浅青色不透明填充覆盖的问题，让展开式导航直接显示亚克力窗口背景，并为高对比度模式保留系统背景。",
+      "ja-JP": "左側ナビゲーションの不透明な薄青色背景を修正しました。展開時はウィンドウのアクリル背景を表示し、ハイコントラスト時はシステム背景を維持します。",
+      "en-US": "Fixes the opaque pale-cyan navigation pane so the expanded sidebar reveals the window's Acrylic backdrop, while high-contrast mode retains a solid system background."
     }
   ]
 }

@@ -7,6 +7,7 @@
 - Standardizes the main window and Inspiration Recorder on Acrylic and removes the transient material selector.
 - Migrates older Mica preferences to Acrylic; does not instantiate Mica window backdrops.
 - Hides the unfinished database from primary navigation without removing its code or data packs.
+- Fixes the opaque navigation sidebar so the expanded pane reveals the Acrylic backdrop; high-contrast mode retains its accessible system background.
 - Preserves theme switching, project schema, backup format, and update mechanisms.
 
 ## 1.9.3
