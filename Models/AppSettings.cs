@@ -7,6 +7,7 @@ public sealed class AppSettings
     public const bool DefaultProjectMilestoneNotificationsEnabled = false;
     public int SchemaVersion { get; set; } = 1;
     public string Theme { get; set; } = "System";
+    public string BackdropMaterial { get; set; } = "Acrylic";
     public int DecimalPlaces { get; set; } = 2;
     public bool AutoCalculate { get; set; }
     public string Language { get; set; } = LanguagePreference.SystemValue;

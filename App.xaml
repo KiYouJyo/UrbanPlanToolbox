@@ -11,24 +11,23 @@
             </ResourceDictionary.MergedDictionaries>
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="ShellNavigationPaneBackgroundBrush" Color="#E5F9F9" />
-                    <SolidColorBrush x:Key="ShellNavigationPaneInactiveBackgroundBrush" Color="#F3F3F3" />
+                    <!-- The expanded sidebar reveals the window's DesktopAcrylicBackdrop. -->
+                    <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="Transparent" />
                     <SolidColorBrush x:Key="AppTransientSurfaceBrush" Color="#E5F9F9" />
                     <StaticResource x:Key="AppTransientSurfaceBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
                     <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="AppTransientSurfaceBrush" />
                     <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="ShellNavigationPaneBackgroundBrush" Color="#1A2323" />
-                    <SolidColorBrush x:Key="ShellNavigationPaneInactiveBackgroundBrush" Color="#202020" />
+                    <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="Transparent" />
                     <SolidColorBrush x:Key="AppTransientSurfaceBrush" Color="#1A2323" />
                     <StaticResource x:Key="AppTransientSurfaceBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
                     <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="AppTransientSurfaceBrush" />
                     <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">
-                    <SolidColorBrush x:Key="ShellNavigationPaneBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
-                    <SolidColorBrush x:Key="ShellNavigationPaneInactiveBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+                    <!-- High contrast must retain an opaque system background for legibility. -->
+                    <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="{ThemeResource SystemColorWindowColor}" />
                     <StaticResource x:Key="AppTransientSurfaceBrush" ResourceKey="SystemColorWindowBrush" />
                     <StaticResource x:Key="AppTransientSurfaceBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
                 </ResourceDictionary>

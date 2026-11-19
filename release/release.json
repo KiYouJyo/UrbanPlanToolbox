@@ -1,20 +1,67 @@
 {
   "schemaVersion": 1,
-  "product": { "name": "UrbanPlanToolbox", "version": "1.9.3", "packageVersion": "1.9.3.0" },
-  "classification": { "kind": "feature-release", "stability": "approved-for-publication", "storeMilestone": false },
-  "channels": { "github": { "publish": true }, "microsoftStore": { "submit": true } },
-  "compatibility": { "projectSchemaVersion": 3, "backupFormatVersion": 2 },
-  "title": {
-    "zh-CN": "UrbanPlanToolbox v1.9.3 设计理念数据库第三版",
-    "ja-JP": "UrbanPlanToolbox v1.9.3 デザインコンセプトDB 第3版",
-    "en-US": "UrbanPlanToolbox v1.9.3 Design Concepts Database v3"
+  "product": {
+    "name": "UrbanPlanToolbox",
+    "version": "1.9.4",
+    "packageVersion": "1.9.4.0"
   },
-  "languageLabels": { "zh-CN": "简体中文", "ja-JP": "日本語", "en-US": "English" },
+  "classification": {
+    "kind": "feature-release",
+    "stability": "approved-for-publication",
+    "storeMilestone": false
+  },
+  "channels": {
+    "github": {
+      "publish": true
+    },
+    "microsoftStore": {
+      "submit": true
+    }
+  },
+  "compatibility": {
+    "projectSchemaVersion": 3,
+    "backupFormatVersion": 2
+  },
+  "title": {
+    "zh-CN": "UrbanPlanToolbox v1.9.4 亚克力背景与导航整理",
+    "ja-JP": "UrbanPlanToolbox v1.9.4 アクリル背景とナビゲーション整理",
+    "en-US": "UrbanPlanToolbox v1.9.4 Acrylic Backdrop and Navigation Cleanup"
+  },
+  "languageLabels": {
+    "zh-CN": "简体中文",
+    "ja-JP": "日本語",
+    "en-US": "English"
+  },
   "items": [
-    { "id": "design-concepts-v3", "zh-CN": "设计理念数据包升级至 2026.08.3：新增 41 条经审核 canonical 理念，数据库由 68 条扩展至 109 条。", "ja-JP": "デザインコンセプト Data Pack を 2026.08.3 へ更新し、審査済み canonical コンセプト 41 件を追加して 68 件から 109 件へ拡張しました。", "en-US": "Upgrades the Design Concepts data pack to 2026.08.3, adding 41 reviewed canonical concepts and expanding the database from 68 to 109 entries." },
-    { "id": "design-concepts-full-i18n", "zh-CN": "设计理念的分类、适用项目类型、标签、案例备注与来源说明全部补齐中日英三语，日文/英文界面不再残留中文。", "ja-JP": "カテゴリ、適用プロジェクト種別、タグ、事例メモ、出典説明まで中日英3言語を補完し、日本語・英語画面に中国語が残る問題を解消しました。", "en-US": "Completes Chinese, Japanese and English localization for categories, applicable project types, tags, case notes and source notes, eliminating Chinese leakage in Japanese and English UI." },
-    { "id": "localized-metadata-catalog", "zh-CN": "新增数据包级三语标签目录，保留现有中文 canonical 键作为稳定筛选值，同时向界面提供完整本地化显示。", "ja-JP": "既存の中国語 canonical キーを安定したフィルター値として維持しつつ、データパックに3言語ラベルカタログを追加しました。", "en-US": "Adds a pack-level trilingual label catalog while retaining existing canonical Chinese keys as stable filter values." },
-    { "id": "no-cross-language-fallback", "zh-CN": "旧数据包仍保持兼容；在缺少目标语言内容时，日文或英文界面不再错误回退到中文案例或元数据。", "ja-JP": "旧データパックとの互換性を維持し、対象言語が欠ける場合も日本語・英語画面で中国語の事例やメタデータへ誤フォールバックしません。", "en-US": "Keeps older packs compatible while preventing Japanese or English UI from incorrectly falling back to Chinese case notes or metadata when translations are absent." },
-    { "id": "localized-search", "zh-CN": "搜索范围扩展到三语分类、项目类型与标签，切换语言后仍可按当前语言查找理念。", "ja-JP": "検索対象を3言語のカテゴリ、プロジェクト種別、タグへ拡張し、表示言語のままコンセプトを検索できます。", "en-US": "Extends search to localized categories, project types and tags so concepts remain searchable in the active UI language." }
+    {
+      "id": "acrylic-only",
+      "zh-CN": "主窗口和独立灵感记录器统一采用亚克力背景，不再使用云母材质。",
+      "ja-JP": "メインウィンドウと独立したインスピレーションレコーダーの背景をアクリルに統一し、マイカの使用を停止しました。",
+      "en-US": "Uses Acrylic exclusively for the main window and standalone Inspiration Recorder; Mica is no longer instantiated."
+    },
+    {
+      "id": "legacy-mica-migration",
+      "zh-CN": "移除背景材质下拉设置；旧版保存的云母偏好将自动归一为亚克力，无需手动调整。",
+      "ja-JP": "背景素材の選択項目を非表示にし、旧設定のマイカ指定も自動的にアクリルへ正規化します。",
+      "en-US": "Removes the background material selector and automatically normalizes saved legacy Mica preferences to Acrylic."
+    },
+    {
+      "id": "hide-unfinished-database",
+      "zh-CN": "未完成的数据库模块暂时从主导航栏隐藏，保留数据库页面、数据包和服务代码，供后续继续开发。",
+      "ja-JP": "開発途中のデータベースをメインナビゲーションから一時的に非表示にします。ページとデータパック、サービスの実装は保持します。",
+      "en-US": "Temporarily hides the unfinished database entry from primary navigation while retaining the database pages, data packs and services for later development."
+    },
+    {
+      "id": "compatibility",
+      "zh-CN": "保留浅色、深色和跟随系统主题；项目数据、备份格式及现有更新机制不变。",
+      "ja-JP": "ライト・ダーク・システムテーマに引き続き対応し、プロジェクト、バックアップ、更新機能との互換性を維持します。",
+      "en-US": "Retains light, dark and system themes without changing project data, backup format or existing updater behavior."
+    },
+    {
+      "id": "acrylic-sidebar",
+      "zh-CN": "修复左侧导航栏被浅青色不透明填充覆盖的问题，让展开式导航直接显示亚克力窗口背景，并为高对比度模式保留系统背景。",
+      "ja-JP": "左側ナビゲーションの不透明な薄青色背景を修正しました。展開時はウィンドウのアクリル背景を表示し、ハイコントラスト時はシステム背景を維持します。",
+      "en-US": "Fixes the opaque pale-cyan navigation pane so the expanded sidebar reveals the window's Acrylic backdrop, while high-contrast mode retains a solid system background."
+    }
   ]
 }

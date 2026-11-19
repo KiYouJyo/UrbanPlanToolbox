@@ -92,7 +92,7 @@ public sealed partial class SettingsPage : Page
     }
     private async void OnRestore(object sender, RoutedEventArgs e)
     {
-        var settings = _settingsService.Update(current => { current.Theme = "System"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; current.ProjectMilestoneNotificationsEnabled = AppSettings.DefaultProjectMilestoneNotificationsEnabled; current.ProjectMilestoneReminderRepeatInterval = MilestoneReminderRepeatInterval.None; });
+        var settings = _settingsService.Update(current => { current.Theme = "System"; current.BackdropMaterial = "Acrylic"; current.DecimalPlaces = 2; current.AutoCalculate = false; current.Language = LanguagePreference.SystemValue; current.ProjectMilestoneNotificationsEnabled = AppSettings.DefaultProjectMilestoneNotificationsEnabled; current.ProjectMilestoneReminderRepeatInterval = MilestoneReminderRepeatInterval.None; });
         Apply(settings); StatusText.Text = _localization.GetString("Status_RestoredDefaults");
         await MilestoneReminderService.Default.RefreshAsync();
         if (!string.Equals(_localization.CurrentLanguage, LanguagePreference.ResolveEffectiveLanguage(settings.Language, Windows.System.UserProfile.GlobalizationPreferences.Languages), StringComparison.OrdinalIgnoreCase))
@@ -130,6 +130,7 @@ public sealed partial class SettingsPage : Page
         ApplyMilestoneReminderSettings(settings);
         _isApplying = false;
         ApplyTheme(settings.Theme);
+        App.MainWindow?.ApplyBackdrop();
     }
     private async void OnBackgroundResidencyToggled(object sender, RoutedEventArgs e)
     {

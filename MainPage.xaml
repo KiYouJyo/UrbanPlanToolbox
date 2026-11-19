@@ -8,12 +8,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True"
+    <NavigationView x:Name="Navigation" Background="Transparent" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True"
                     Loaded="OnNavigationLoaded" ItemInvoked="OnNavigationItemInvoked">
         <NavigationView.MenuItems>
             <NavigationViewItem x:Name="WelcomeItem" Tag="welcome" Icon="Home" />
             <NavigationViewItem x:Name="SearchItem" Tag="common-tools" Icon="Find" />
-            <NavigationViewItem x:Name="DatabaseItem" Tag="database" Icon="World" />
             <NavigationViewItem x:Name="DesignItem" Tag="design-tools" Icon="Edit" />
             <NavigationViewItem x:Name="ResearchItem" Tag="research-tools" Icon="Library" />
             <NavigationViewItem x:Name="ArchiveItem" Tag="project-archive" Icon="Folder" />

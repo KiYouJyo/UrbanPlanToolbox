@@ -225,16 +225,19 @@ public sealed class VisualPolishPackagingTests
     }
 
     [Fact]
-    public void NavigationPaneUsesTheSharedShellSurface()
+    public void NavigationPaneUsesTransparentExpandedAcrylicSurface()
     {
         var root = FindRepositoryRoot();
         var page = File.ReadAllText(Path.Combine(root, "MainPage.xaml"));
+        var shell = File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs"));
         var app = File.ReadAllText(Path.Combine(root, "App.xaml"));
-        Assert.Contains("ShellNavigationPaneBackgroundBrush", page + File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
-        Assert.Contains("Navigation.ActualTheme == ElementTheme.Dark", File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
-        Assert.DoesNotContain("Windows.UI.Color.FromArgb", File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
-        Assert.Contains("x:Key=\"ShellNavigationPaneBackgroundBrush\"", app);
+        var guide = File.ReadAllText(Path.Combine(root, "Views", "FirstRunGuideHost.xaml"));
+        Assert.Contains("<NavigationView x:Name=\"Navigation\" Background=\"Transparent\"", page);
+        Assert.Contains("x:Key=\"NavigationViewExpandedPaneBackground\" Color=\"Transparent\"", app);
+        Assert.DoesNotContain("ShellNavigationPaneBackgroundBrush", page + shell + app + guide);
+        Assert.DoesNotContain("PaneBackground =", shell);
         Assert.DoesNotContain("FirstRunGuideBackgroundBrush", app);
+        Assert.Contains("Background=\"{ThemeResource SolidBackgroundFillColorBaseBrush}\"", guide);
         Assert.DoesNotContain("PaneDisplayMode=\"Left\"", page);
     }
 

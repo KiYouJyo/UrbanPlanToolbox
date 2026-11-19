@@ -14,7 +14,7 @@ public sealed class FirstRunGuideContractTests
         Assert.Contains("x:Name=\"FirstRunGuide\"", window);
         Assert.Contains("Grid.RowSpan=\"2\"", window);
         Assert.Contains("Canvas.ZIndex=\"10\"", window);
-        Assert.Contains("Background=\"{ThemeResource ShellNavigationPaneBackgroundBrush}\"", guide);
+        Assert.Contains("Background=\"{ThemeResource SolidBackgroundFillColorBaseBrush}\"", guide);
         Assert.Contains("x:Name=\"OverlayRoot\"", guide);
         Assert.Contains("x:Name=\"GuideCard\"", guide);
         Assert.Contains("x:Name=\"BodyScrollViewer\"", guide);
@@ -24,20 +24,24 @@ public sealed class FirstRunGuideContractTests
     }
 
     [Fact]
-    public void FirstRunOuterUsesTheSharedShellNavigationSurface()
+    public void FirstRunOverlayIsOpaqueButExpandedNavigationRemainsAcrylicBacked()
     {
         var root = FindRepositoryRoot();
         var app = File.ReadAllText(Path.Combine(root, "App.xaml"));
-
+        var guide = File.ReadAllText(Path.Combine(root, "Views", "FirstRunGuideHost.xaml"));
         var page = File.ReadAllText(Path.Combine(root, "MainPage.xaml"));
-        Assert.Contains("x:Key=\"ShellNavigationPaneBackgroundBrush\"", app);
+        var pageCode = File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs"));
+
+        Assert.Contains("Background=\"{ThemeResource SolidBackgroundFillColorBaseBrush}\"", guide);
         Assert.Contains("<ResourceDictionary x:Key=\"Light\">", app);
         Assert.Contains("<ResourceDictionary x:Key=\"Dark\">", app);
         Assert.Contains("<ResourceDictionary x:Key=\"HighContrast\">", app);
-        Assert.Contains("ShellNavigationPaneBackgroundBrush", page + File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
-        Assert.Contains("Navigation.ActualTheme == ElementTheme.Dark", File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
-        Assert.DoesNotContain("Windows.UI.Color.FromArgb", File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs")));
+        Assert.Contains("NavigationViewExpandedPaneBackground\" Color=\"Transparent\"", app);
+        Assert.Contains("NavigationViewExpandedPaneBackground\" Color=\"{ThemeResource SystemColorWindowColor}\"", app);
+        Assert.Contains("<NavigationView x:Name=\"Navigation\" Background=\"Transparent\"", page);
+        Assert.DoesNotContain("ShellNavigationPaneBackgroundBrush", guide + app + pageCode);
         Assert.DoesNotContain("FirstRunGuideBackgroundBrush", app);
+        Assert.DoesNotContain("PaneBackground =", pageCode);
     }
 
     [Fact]

@@ -10,7 +10,7 @@
     Title="UrbanPlanToolbox"
     mc:Ignorable="d">
     <Window.SystemBackdrop>
-        <MicaBackdrop />
+        <DesktopAcrylicBackdrop />
     </Window.SystemBackdrop>
 
     <Grid x:Name="RootLayout" Loaded="OnRootLayoutLoaded">

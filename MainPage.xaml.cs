@@ -1,7 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using UrbanPlanToolbox.Models.Navigation;
 using UrbanPlanToolbox.Services;
 using UrbanPlanToolbox.Models;
@@ -19,9 +18,6 @@ namespace UrbanPlanToolbox;
 public sealed partial class MainPage : Page
 {
     private readonly ShellNavigationState? _initialState;
-    private SplitView? _navigationSplitView;
-    private bool _isNavigationPaneBackgroundHooked;
-    private bool _isWindowActive = true;
 
     public MainPage()
         : this(null)
@@ -32,7 +28,6 @@ public sealed partial class MainPage : Page
     {
         _initialState = initialState;
         InitializeComponent();
-        HookNavigationPaneBackground();
         ApplyLocalizedNavigation();
         NavigateTo(typeof(Views.HomePage));
     }
@@ -87,59 +82,10 @@ public sealed partial class MainPage : Page
         NavigateTo(typeof(Views.HomePage));
     }
 
-    private void HookNavigationPaneBackground()
-    {
-        if (!_isNavigationPaneBackgroundHooked)
-        {
-            _isNavigationPaneBackgroundHooked = true;
-            Navigation.PaneOpening += (_, _) => QueueNavigationPaneBackgroundUpdate();
-            ActualThemeChanged += (_, _) => QueueNavigationPaneBackgroundUpdate();
-            if (App.MainWindow is not null)
-                App.MainWindow.Activated += OnMainWindowActivated;
-        }
-        QueueNavigationPaneBackgroundUpdate();
-    }
-
-    private void OnMainWindowActivated(object sender, WindowActivatedEventArgs args)
-    {
-        _isWindowActive = args.WindowActivationState != WindowActivationState.Deactivated;
-        QueueNavigationPaneBackgroundUpdate();
-    }
-
-    private void QueueNavigationPaneBackgroundUpdate() => DispatcherQueue.TryEnqueue(ApplySharedNavigationPaneBackground);
-
-    private void ApplySharedNavigationPaneBackground()
-    {
-        _navigationSplitView ??= FindDescendant<SplitView>(Navigation);
-        var themeKey = new Windows.UI.ViewManagement.AccessibilitySettings().HighContrast
-            ? "HighContrast"
-            : Navigation.ActualTheme == ElementTheme.Dark ? "Dark" : "Light";
-        var brushKey = _isWindowActive
-            ? "ShellNavigationPaneBackgroundBrush"
-            : "ShellNavigationPaneInactiveBackgroundBrush";
-        var themeResources = Application.Current.Resources.ThemeDictionaries[themeKey] as ResourceDictionary;
-        if (_navigationSplitView is not null && themeResources?[brushKey] is Brush brush)
-            _navigationSplitView.PaneBackground = brush;
-    }
-
-    private static T? FindDescendant<T>(DependencyObject parent) where T : DependencyObject
-    {
-        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(parent); index++)
-        {
-            var child = VisualTreeHelper.GetChild(parent, index);
-            if (child is T match) return match;
-            var descendant = FindDescendant<T>(child);
-            if (descendant is not null) return descendant;
-        }
-        return null;
-    }
-
-
     private void ApplyLocalizedNavigation()
     {
         ApplyNavigationItem(WelcomeItem, PrimaryNavigationIds.Welcome);
         ApplyNavigationItem(SearchItem, PrimaryNavigationIds.CommonTools);
-        ApplyNavigationItem(DatabaseItem, PrimaryNavigationIds.Database);
         ApplyNavigationItem(DesignItem, PrimaryNavigationIds.DesignTools);
         ApplyNavigationItem(ResearchItem, PrimaryNavigationIds.ResearchTools);
         ApplyNavigationItem(ArchiveItem, PrimaryNavigationIds.ProjectArchive);

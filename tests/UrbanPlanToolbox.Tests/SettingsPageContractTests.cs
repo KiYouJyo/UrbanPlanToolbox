@@ -44,10 +44,28 @@ public sealed class SettingsPageContractTests
         Assert.DoesNotContain("AutoCalculateToggle", xaml);
         Assert.DoesNotContain("AppearanceLanguageSummary", xaml);
         Assert.Contains("Action_RestoreDefaults", xaml);
+        Assert.DoesNotContain("BackdropBox", xaml);
+        Assert.DoesNotContain("BackdropLabel", xaml);
+        Assert.DoesNotContain("OnBackdropChanged", xaml);
         Assert.Contains("DataManagementTitle", xaml);
         Assert.Contains("MilestoneNotificationsToggle", xaml);
         Assert.DoesNotContain("Canvas", xaml);
         Assert.DoesNotContain("Margin=\"-", xaml);
+    }
+
+    [Fact]
+    public void OnlyAcrylicBackdropIsUsedByWindowXaml()
+    {
+        var root = FindRepositoryRoot();
+        foreach (var path in new[] { "MainWindow.xaml", "Views/InspirationRecorderWindow.xaml" })
+        {
+            var xaml = File.ReadAllText(Path.Combine(root, path));
+            Assert.Contains("<DesktopAcrylicBackdrop", xaml);
+            Assert.DoesNotContain("<MicaBackdrop", xaml);
+        }
+        var policy = File.ReadAllText(Path.Combine(root, "Services", "WindowBackdropPreference.cs"));
+        Assert.Contains("new DesktopAcrylicBackdrop()", policy);
+        Assert.DoesNotContain("new MicaBackdrop()", policy);
     }
 
     [Fact]

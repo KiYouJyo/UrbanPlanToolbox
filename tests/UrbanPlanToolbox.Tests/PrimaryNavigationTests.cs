@@ -42,6 +42,52 @@ public sealed class PrimaryNavigationTests
     }
 
     [Fact]
+    public void UnfinishedDatabaseEntryIsHiddenWithoutRemovingItsRoute()
+    {
+        var root = FindRepositoryRoot();
+        var sidebar = File.ReadAllText(Path.Combine(root, "MainPage.xaml"));
+        var code = File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs"));
+        Assert.DoesNotContain("DatabaseItem", sidebar);
+        Assert.DoesNotContain("DatabaseItem", code);
+        Assert.DoesNotContain("Tag=\"database\"", sidebar);
+        Assert.True(PrimaryNavigation.Default.TryGet(PrimaryNavigationIds.Database, out var route));
+        Assert.Equal(typeof(Views.DatabasePage), route!.PageType);
+    }
+
+    private static string FindRepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "UrbanPlanToolbox.slnx"))) directory = directory.Parent;
+        return directory?.FullName ?? throw new DirectoryNotFoundException();
+    }
+
+    [Fact]
+    public void ExpandedNavigationPaneRevealsAcrylicInsteadOfOpaqueCustomColor()
+    {
+        var root = FindRepositoryRoot();
+        var resources = File.ReadAllText(Path.Combine(root, "App.xaml"));
+        var sidebar = File.ReadAllText(Path.Combine(root, "MainPage.xaml"));
+        var sidebarCode = File.ReadAllText(Path.Combine(root, "MainPage.xaml.cs"));
+        var mainWindow = File.ReadAllText(Path.Combine(root, "MainWindow.xaml"));
+
+        // Left-expanded NavigationView uses its own brush, independent of Window.SystemBackdrop.
+        const string transparentBrush =
+            "<SolidColorBrush x:Key=\"NavigationViewExpandedPaneBackground\" Color=\"Transparent\" />";
+        Assert.Equal(2, resources.Split(transparentBrush, StringSplitOptions.None).Length - 1);
+        Assert.Contains(
+            "<SolidColorBrush x:Key=\"NavigationViewExpandedPaneBackground\" Color=\"{ThemeResource SystemColorWindowColor}\" />",
+            resources);
+        Assert.DoesNotContain("ShellNavigationPaneBackgroundBrush", resources);
+        Assert.DoesNotContain("ShellNavigationPaneInactiveBackgroundBrush", resources);
+
+        Assert.Contains("<NavigationView x:Name=\"Navigation\" Background=\"Transparent\"", sidebar);
+        Assert.DoesNotContain("PaneBackground =", sidebarCode);
+        Assert.DoesNotContain("HookNavigationPaneBackground", sidebarCode);
+        Assert.Contains("<DesktopAcrylicBackdrop", mainWindow);
+        Assert.DoesNotContain("<MicaBackdrop", mainWindow);
+    }
+
+    [Fact]
     public void MissingRouteReturnsSafeFailure()
     {
         Assert.False(PrimaryNavigation.Default.TryGet("removed-route", out var route));

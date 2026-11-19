@@ -5,6 +5,7 @@ public static class SettingsKeys
 {
     public const string SchemaVersion = "SchemaVersion";
     public const string Theme = "Theme";
+    public const string BackdropMaterial = "BackdropMaterial";
     public const string DecimalPlaces = "DecimalPlaces";
     public const string AutoCalculate = "AutoCalculate";
     public const string Language = "Language";
