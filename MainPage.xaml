@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <NavigationView x:Name="Navigation" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True"
+    <NavigationView x:Name="Navigation" Background="Transparent" AlwaysShowHeader="False" IsBackButtonVisible="Collapsed" IsSettingsVisible="True"
                     Loaded="OnNavigationLoaded" ItemInvoked="OnNavigationItemInvoked">
         <NavigationView.MenuItems>
             <NavigationViewItem x:Name="WelcomeItem" Tag="welcome" Icon="Home" />
