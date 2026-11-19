@@ -2,12 +2,12 @@
 
 ## 1.9.4
 
-### Mica and Acrylic background selection
+### Acrylic-only background and unfinished database navigation
 
-- Adds a persistent Mica/Acrylic selector in Appearance and language, applied immediately.
-- Keeps the main window and Inspiration Recorder in sync, defaulting to Mica for older settings.
-- Supports all three languages and responsive settings layouts.
-- Preserves existing project, backup, and updater compatibility.
+- Standardizes the main window and Inspiration Recorder on Acrylic and removes the transient material selector.
+- Migrates older Mica preferences to Acrylic; does not instantiate Mica window backdrops.
+- Hides the unfinished database from primary navigation without removing its code or data packs.
+- Preserves theme switching, project schema, backup format, and update mechanisms.
 
 ## 1.9.3
 

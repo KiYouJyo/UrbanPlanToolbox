@@ -23,9 +23,9 @@
     "backupFormatVersion": 2
   },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.9.4 云母与亚克力切换",
-    "ja-JP": "UrbanPlanToolbox v1.9.4 マイカ・アクリル切り替え",
-    "en-US": "UrbanPlanToolbox v1.9.4 Mica and Acrylic Selection"
+    "zh-CN": "UrbanPlanToolbox v1.9.4 亚克力背景与导航整理",
+    "ja-JP": "UrbanPlanToolbox v1.9.4 アクリル背景とナビゲーション整理",
+    "en-US": "UrbanPlanToolbox v1.9.4 Acrylic Backdrop and Navigation Cleanup"
   },
   "languageLabels": {
     "zh-CN": "简体中文",
@@ -34,28 +34,28 @@
   },
   "items": [
     {
-      "id": "backdrop-selector",
-      "zh-CN": "在“设置 → 外观与语言”中新增背景材质选择，可在云母和亚克力间即时切换。",
-      "ja-JP": "「設定 → 外観と言語」でマイカとアクリルを即時に切り替えられるようになりました。",
-      "en-US": "Adds instant Mica/Acrylic selection in Settings → Appearance and language."
+      "id": "acrylic-only",
+      "zh-CN": "主窗口和独立灵感记录器统一采用亚克力背景，不再使用云母材质。",
+      "ja-JP": "メインウィンドウと独立したインスピレーションレコーダーの背景をアクリルに統一し、マイカの使用を停止しました。",
+      "en-US": "Uses Acrylic exclusively for the main window and standalone Inspiration Recorder; Mica is no longer instantiated."
     },
     {
-      "id": "backdrop-persistence",
-      "zh-CN": "选择保存在现有设置文件中，重启后仍然有效；旧设置默认使用云母。",
-      "ja-JP": "選択は保存され再起動後も引き継がれます。既存設定の既定値はマイカです。",
-      "en-US": "Persists the choice across restarts while keeping Mica as the default for existing installations."
+      "id": "legacy-mica-migration",
+      "zh-CN": "移除背景材质下拉设置；旧版保存的云母偏好将自动归一为亚克力，无需手动调整。",
+      "ja-JP": "背景素材の選択項目を非表示にし、旧設定のマイカ指定も自動的にアクリルへ正規化します。",
+      "en-US": "Removes the background material selector and automatically normalizes saved legacy Mica preferences to Acrylic."
     },
     {
-      "id": "unified-window-backdrop",
-      "zh-CN": "主窗口和灵感记录器窗口同步采用所选材质，兼容浅色、深色及系统主题。",
-      "ja-JP": "メインウィンドウとインスピレーションレコーダーで同じ素材を使用し、すべてのテーマに対応します。",
-      "en-US": "Applies the selected material to the main window and Inspiration Recorder alongside all theme modes."
+      "id": "hide-unfinished-database",
+      "zh-CN": "未完成的数据库模块暂时从主导航栏隐藏，保留数据库页面、数据包和服务代码，供后续继续开发。",
+      "ja-JP": "開発途中のデータベースをメインナビゲーションから一時的に非表示にします。ページとデータパック、サービスの実装は保持します。",
+      "en-US": "Temporarily hides the unfinished database entry from primary navigation while retaining the database pages, data packs and services for later development."
     },
     {
-      "id": "backdrop-localization",
-      "zh-CN": "补齐中日英三语、窄屏布局和设置回归测试；项目、备份与更新机制保持不变。",
-      "ja-JP": "3言語UI、コンパクト表示、回帰テストを追加し、プロジェクト・バックアップ・更新機構を維持しました。",
-      "en-US": "Adds trilingual text, compact layout, and regression tests without changing project, backup, or update mechanisms."
+      "id": "compatibility",
+      "zh-CN": "保留浅色、深色和跟随系统主题；项目数据、备份格式及现有更新机制不变。",
+      "ja-JP": "ライト・ダーク・システムテーマに引き続き対応し、プロジェクト、バックアップ、更新機能との互換性を維持します。",
+      "en-US": "Retains light, dark and system themes without changing project data, backup format or existing updater behavior."
     }
   ]
 }
