@@ -128,9 +128,29 @@ public sealed class SettingsAndFormattingTests
     public void SettingsKeysAreCanonicalAndCentralized()
     {
         Assert.Equal("Theme", SettingsKeys.Theme);
+        Assert.Equal("BackdropMaterial", SettingsKeys.BackdropMaterial);
         Assert.Equal("Language", SettingsKeys.Language);
         Assert.Equal("ProjectMilestoneNotificationsEnabled", SettingsKeys.ProjectMilestoneNotificationsEnabled);
         Assert.Equal("ProjectMilestoneReminderRepeatInterval", SettingsKeys.ProjectMilestoneReminderRepeatInterval);
+    }
+
+    [Fact]
+    public void BackdropMaterialPersistsAndDefaultsToMica()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"UrbanPlanToolbox-{Guid.NewGuid():N}", "settings.json");
+        try
+        {
+            var service = new SettingsService(path);
+            Assert.Equal("Mica", service.Load().BackdropMaterial);
+            service.Save(new AppSettings { BackdropMaterial = "Acrylic" });
+            Assert.Equal("Acrylic", new SettingsService(path).Load().BackdropMaterial);
+            service.Save(new AppSettings { BackdropMaterial = "invalid", Theme = "Dark" });
+            Assert.Equal("Mica", service.Load().BackdropMaterial);
+            Assert.Equal("Dark", service.Load().Theme);
+            Assert.Equal(AppBackdropMaterial.Acrylic, SettingsService.NormalizeBackdropMaterial("Acrylic"));
+            Assert.Equal(AppBackdropMaterial.Mica, SettingsService.NormalizeBackdropMaterial(null));
+        }
+        finally { var folder = Path.GetDirectoryName(path)!; if (Directory.Exists(folder)) Directory.Delete(folder, recursive: true); }
     }
 
     [Fact]

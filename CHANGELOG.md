@@ -1,5 +1,14 @@
 # 更改日志
 
+## 1.9.4
+
+### Mica and Acrylic background selection
+
+- Adds a persistent Mica/Acrylic selector in Appearance and language, applied immediately.
+- Keeps the main window and Inspiration Recorder in sync, defaulting to Mica for older settings.
+- Supports all three languages and responsive settings layouts.
+- Preserves existing project, backup, and updater compatibility.
+
 ## 1.9.3
 
 ### Design Concepts Database v3 and complete trilingual metadata

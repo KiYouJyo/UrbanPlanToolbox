@@ -11,6 +11,8 @@ public enum AppTheme
     Dark
 }
 
+public enum AppBackdropMaterial { Mica, Acrylic }
+
 public sealed class SettingsService
 {
     public const int CurrentSchemaVersion = 1;
@@ -29,6 +31,7 @@ public sealed class SettingsService
             var settings = CreateDefaults();
             TryRead(root, SettingsKeys.SchemaVersion, (int value) => settings.SchemaVersion = value);
             TryRead(root, SettingsKeys.Theme, (string value) => settings.Theme = value);
+            TryRead(root, SettingsKeys.BackdropMaterial, (string value) => settings.BackdropMaterial = value);
             TryRead(root, SettingsKeys.DecimalPlaces, (int value) => settings.DecimalPlaces = value);
             TryRead(root, SettingsKeys.AutoCalculate, (bool value) => settings.AutoCalculate = value);
             TryRead(root, SettingsKeys.Language, (string value) => settings.Language = value);
@@ -91,12 +94,15 @@ public sealed class SettingsService
         _ => AppTheme.System
     };
 
+    public static AppBackdropMaterial NormalizeBackdropMaterial(string? value) => value?.Trim() == "Acrylic" ? AppBackdropMaterial.Acrylic : AppBackdropMaterial.Mica;
+
     public static AppSettings CreateDefaults() => new()
     {
         SchemaVersion = CurrentSchemaVersion,
         DecimalPlaces = DefaultDecimalPlaces,
         AutoCalculate = DefaultAutoCalculate,
         Theme = "System",
+        BackdropMaterial = "Mica",
         Language = LanguagePreference.SystemValue,
         ProjectMilestoneReminderRepeatInterval = MilestoneReminderRepeatInterval.None,
         FavoriteToolIds = []
@@ -107,6 +113,7 @@ public sealed class SettingsService
         ArgumentNullException.ThrowIfNull(settings);
         settings.SchemaVersion = CurrentSchemaVersion;
         settings.Theme = NormalizeTheme(settings.Theme).ToString();
+        settings.BackdropMaterial = NormalizeBackdropMaterial(settings.BackdropMaterial).ToString();
         settings.Language = LanguagePreference.Normalize(settings.Language);
         settings.DecimalPlaces = Math.Clamp(settings.DecimalPlaces, 0, 6);
         if (!Enum.IsDefined(settings.ProjectMilestoneReminderRepeatInterval))
