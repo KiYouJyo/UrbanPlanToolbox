@@ -130,6 +130,13 @@ public partial class App : Application
             }
         }
 
+        if (activationArguments.Data is Windows.ApplicationModel.Activation.ILaunchActivatedEventArgs launched &&
+            launched.Arguments.Contains("--open-inspiration-recorder", StringComparison.OrdinalIgnoreCase))
+        {
+            existingWindow.DispatcherQueue.TryEnqueue(async () => await ShowInspirationRecorderAsync());
+            return;
+        }
+
         existingWindow.DispatcherQueue.TryEnqueue(() =>
         {
             NotifyMainWindowShown();
@@ -190,6 +197,8 @@ public partial class App : Application
         {
             _window.Activate();
             NotifyMainWindowShown();
+            if (Program.IsWidgetRecorderLaunch)
+                _window.DispatcherQueue.TryEnqueue(async () => await ShowInspirationRecorderAsync());
         }
         else
         {

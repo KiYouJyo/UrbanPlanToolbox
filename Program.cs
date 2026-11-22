@@ -16,11 +16,19 @@ public static class Program
     private static string? _currentPackageFullName;
 
     public static bool IsBackgroundStartup { get; private set; }
+    public static bool IsWidgetRecorderLaunch { get; private set; }
 
     [STAThread]
     public static void Main(string[] args)
     {
         ComWrappersSupport.InitializeComWrappers();
+        // COM activation of the Widgets Board must not start WinUI or join app single-instance arbitration.
+        if (args.Contains("--widget-provider", StringComparer.OrdinalIgnoreCase))
+        {
+            Widgets.InspirationWidgetHost.Run();
+            return;
+        }
+        IsWidgetRecorderLaunch = args.Contains("--open-inspiration-recorder", StringComparer.OrdinalIgnoreCase);
         StartPackageUninstallExitWatcher();
 
         var currentInstance = AppInstance.GetCurrent();
