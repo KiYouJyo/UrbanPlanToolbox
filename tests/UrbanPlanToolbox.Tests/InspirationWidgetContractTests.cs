@@ -63,13 +63,13 @@ public sealed class InspirationWidgetContractTests
     }
 
     [Fact]
-    public void VersionAndReleaseAreGatedUntilWindowsVerification()
+    public void VersionAndDualChannelReleaseAreAuthorized()
     {
         using var json = JsonDocument.Parse(File.ReadAllText(Path.Combine(FindRoot(), "release", "release.json")));
         Assert.Equal("1.9.5", AppVersionProvider.Version);
         Assert.Equal("1.9.5", json.RootElement.GetProperty("product").GetProperty("version").GetString());
-        Assert.False(json.RootElement.GetProperty("channels").GetProperty("github").GetProperty("publish").GetBoolean());
-        Assert.False(json.RootElement.GetProperty("channels").GetProperty("microsoftStore").GetProperty("submit").GetBoolean());
+        Assert.True(json.RootElement.GetProperty("channels").GetProperty("github").GetProperty("publish").GetBoolean());
+        Assert.True(json.RootElement.GetProperty("channels").GetProperty("microsoftStore").GetProperty("submit").GetBoolean());
     }
 
     [Fact]
