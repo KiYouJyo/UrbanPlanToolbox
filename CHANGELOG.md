@@ -6,6 +6,7 @@
 
 - Adds a native Windows Widgets Board provider to the existing packaged WinUI 3 executable.
 - Simplifies the large-only widget to match the original recorder: 3:1 name/category header, multiline details, previous/next/new navigation, and Delete/Save buttons; removes the history picker and extra confirmation UI.
+- Reserves large-card height and stretches the editable details field into the previously unused vertical space while preserving the bottom actions.
 - Keeps all widget editing within Widgets Board: no desktop-recorder shortcut or application activation.
 - Serializes inspiration JSON read-modify-write operations across application and widget processes.
 - Keeps the v1.9.4 release branch and production publication state unchanged pending Windows package and widget-host validation.
