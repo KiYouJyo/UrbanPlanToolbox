@@ -1,6 +1,6 @@
 # 更改日志
 
-## 1.9.5 (开发分支，待 Windows 11 实机验收)
+## 1.9.5
 
 ### Inspiration Recorder widget
 
@@ -9,7 +9,7 @@
 - Reserves large-card height and stretches the editable details field into the previously unused vertical space while preserving the bottom actions.
 - Keeps all widget editing within Widgets Board: no desktop-recorder shortcut or application activation.
 - Serializes inspiration JSON read-modify-write operations across application and widget processes.
-- Keeps the v1.9.4 release branch and production publication state unchanged pending Windows package and widget-host validation.
+- Keeps the existing project and backup schemas unchanged; Adaptive Cards editable area height still depends on the Windows Widgets Board host.
 
 ## 1.9.4
 

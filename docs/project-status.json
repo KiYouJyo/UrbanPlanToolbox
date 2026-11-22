@@ -20,7 +20,7 @@
       "latestPublishedReleaseTag": "v1.9.4",
       "candidateProductVersion": "1.9.5",
       "candidatePackageVersion": "1.9.5.0",
-      "candidateState": "signed-acceptance-pending",
+      "candidateState": "dual-channel-release-requested",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -32,7 +32,7 @@
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
       "candidateProductVersion": "1.9.5",
       "candidatePackageVersion": "1.9.5.0",
-      "candidateState": "development-testing",
+      "candidateState": "dual-channel-release-requested",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path",
       "latestSubmittedSubmissionId": "1152921505702445666"

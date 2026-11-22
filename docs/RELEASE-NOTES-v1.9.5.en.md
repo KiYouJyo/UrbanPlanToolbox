@@ -4,4 +4,4 @@
 
 - Provides only the large Windows 11 widget, with name/category side by side and a multiline details field.
 - Reuses previous, next, new, delete, and save; removes the history picker and load button.
-- Uses the same data as the desktop app with cross-process transaction protection; Windows 11 acceptance is pending.
+- Preserves existing inspiration, project and backup formats with cross-process storage protection; details editor height remains constrained by the Windows widget host.

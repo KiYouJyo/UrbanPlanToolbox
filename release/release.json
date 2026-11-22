@@ -7,15 +7,15 @@
   },
   "classification": {
     "kind": "feature-release",
-    "stability": "awaiting-windows-widget-acceptance",
-    "storeMilestone": false
+    "stability": "stable-release-requested",
+    "storeMilestone": true
   },
   "channels": {
     "github": {
-      "publish": false
+      "publish": true
     },
     "microsoftStore": {
-      "submit": false
+      "submit": true
     }
   },
   "compatibility": {
@@ -47,9 +47,9 @@
     },
     {
       "id": "compatibility",
-      "zh-CN": "维持既有灵感 JSON 数据结构、项目模式和备份格式。待 Windows 11 实机验收后再开放发行。",
-      "ja-JP": "既存のインスピレーションJSON、プロジェクトスキーマ、バックアップ形式を維持し、Windows 11での検証後に公開します。",
-      "en-US": "Preserves existing inspiration JSON, project schema, and backup format; release stays gated until Windows 11 acceptance."
+      "zh-CN": "保持原有灵感 JSON、项目模式及备份格式；小组件文本框的实际伸展高度受 Windows 小组件宿主限制。",
+      "ja-JP": "既存のインスピレーションJSON、プロジェクトスキーマ、バックアップ形式を維持します。入力欄の高さはWindowsウィジェットのホスト側の制約を受けます。",
+      "en-US": "Preserves existing inspiration JSON, project schema, and backup format; multiline editor height remains subject to Windows widget host limitations."
     }
   ]
 }
