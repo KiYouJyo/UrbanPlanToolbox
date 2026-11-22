@@ -52,6 +52,17 @@ public sealed class InspirationWidgetContractTests
     }
 
     [Fact]
+    public void LargeWidgetExpandsTheActualMultilineEditorBeforeBottomActions()
+    {
+        var provider = File.ReadAllText(Path.Combine(FindRoot(), "Widgets", "InspirationWidgetProvider.cs"));
+        Assert.Contains("minHeight = \"410px\"", provider);
+        Assert.Contains("type = \"Container\", height = \"stretch\"", provider);
+        Assert.Contains("isMultiline = true, height = \"stretch\"", provider);
+        Assert.Contains("type = \"ActionSet\"", provider);
+        Assert.DoesNotContain("rows =", provider);
+    }
+
+    [Fact]
     public void VersionAndReleaseAreGatedUntilWindowsVerification()
     {
         using var json = JsonDocument.Parse(File.ReadAllText(Path.Combine(FindRoot(), "release", "release.json")));

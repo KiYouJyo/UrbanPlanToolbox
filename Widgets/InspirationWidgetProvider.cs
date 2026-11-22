@@ -253,11 +253,23 @@ internal sealed class InspirationWidgetProvider : IWidgetProvider
                         }
                     }
                 },
+                // Reserve the large widget's remaining card height for the editor, not
+                // a one-line textarea followed by empty space. Both the section and
+                // Input.Text request stretch so native Adaptive Card renderers can grow
+                // the *actual editable control*, rather than just its outer background.
                 new
                 {
-                    type = "Input.Text", id = "content", label = labels[2],
-                    value = selected?.Content ?? draft?.Content ?? "",
-                    placeholder = labels[2], isMultiline = true, maxLength = 4000
+                    type = "Container", height = "stretch",
+                    items = new object[]
+                    {
+                        new
+                        {
+                            type = "Input.Text", id = "content", label = labels[2],
+                            value = selected?.Content ?? draft?.Content ?? "",
+                            placeholder = labels[2], isMultiline = true, height = "stretch",
+                            maxLength = 4000
+                        }
+                    }
                 },
 
                 // The host renders controls, but the two button groups preserve the
@@ -313,6 +325,11 @@ internal sealed class InspirationWidgetProvider : IWidgetProvider
             {
                 type = "AdaptiveCard",
                 version = "1.6",
+                // The Widgets Board supplies a large card, but Adaptive Cards
+                // default to content height. Give the stretch editor room to grow.
+                // 410 epx keeps bottom controls in view on large widget boards.
+                minHeight = "410px",
+                verticalContentAlignment = "top",
                 body
             });
             WidgetManager.GetDefault().UpdateWidget(new WidgetUpdateRequestOptions(context.Id)
