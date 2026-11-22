@@ -21,6 +21,12 @@ public static class Program
     public static void Main(string[] args)
     {
         ComWrappersSupport.InitializeComWrappers();
+        // COM activation of the Widgets Board must not start WinUI or join app single-instance arbitration.
+        if (args.Contains("--widget-provider", StringComparer.OrdinalIgnoreCase))
+        {
+            Widgets.InspirationWidgetHost.Run();
+            return;
+        }
         StartPackageUninstallExitWatcher();
 
         var currentInstance = AppInstance.GetCurrent();

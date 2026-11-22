@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.9.4",
-    "packageVersion": "1.9.4.0"
+    "version": "1.9.5",
+    "packageVersion": "1.9.5.0"
   },
   "classification": {
     "kind": "feature-release",
-    "stability": "approved-for-publication",
-    "storeMilestone": false
+    "stability": "stable-release-requested",
+    "storeMilestone": true
   },
   "channels": {
     "github": {
@@ -23,9 +23,9 @@
     "backupFormatVersion": 2
   },
   "title": {
-    "zh-CN": "UrbanPlanToolbox v1.9.4 亚克力背景与导航整理",
-    "ja-JP": "UrbanPlanToolbox v1.9.4 アクリル背景とナビゲーション整理",
-    "en-US": "UrbanPlanToolbox v1.9.4 Acrylic Backdrop and Navigation Cleanup"
+    "zh-CN": "UrbanPlanToolbox v1.9.5 灵感记录器小组件",
+    "ja-JP": "UrbanPlanToolbox v1.9.5 インスピレーションレコーダーのウィジェット",
+    "en-US": "UrbanPlanToolbox v1.9.5 Inspiration Recorder Widget"
   },
   "languageLabels": {
     "zh-CN": "简体中文",
@@ -34,34 +34,22 @@
   },
   "items": [
     {
-      "id": "acrylic-only",
-      "zh-CN": "主窗口和独立灵感记录器统一采用亚克力背景，不再使用云母材质。",
-      "ja-JP": "メインウィンドウと独立したインスピレーションレコーダーの背景をアクリルに統一し、マイカの使用を停止しました。",
-      "en-US": "Uses Acrylic exclusively for the main window and standalone Inspiration Recorder; Mica is no longer instantiated."
+      "id": "inspiration-widget",
+      "zh-CN": "仅提供大尺寸 Windows 11 灵感记录器小组件，复用原记录器的名称／分类、详细信息与上一条／下一条／新建／删除／保存交互。",
+      "ja-JP": "Windows 11の大型ウィジェットのみを提供。既存レコーダーの名称・分類・詳細情報と前へ／次へ／新規／削除／保存の操作を踏襲します。",
+      "en-US": "Offers only the large Windows 11 widget, matching the existing recorder's name/category, details and previous/next/new/delete/save controls."
     },
     {
-      "id": "legacy-mica-migration",
-      "zh-CN": "移除背景材质下拉设置；旧版保存的云母偏好将自动归一为亚克力，无需手动调整。",
-      "ja-JP": "背景素材の選択項目を非表示にし、旧設定のマイカ指定も自動的にアクリルへ正規化します。",
-      "en-US": "Removes the background material selector and automatically normalizes saved legacy Mica preferences to Acrylic."
-    },
-    {
-      "id": "hide-unfinished-database",
-      "zh-CN": "未完成的数据库模块暂时从主导航栏隐藏，保留数据库页面、数据包和服务代码，供后续继续开发。",
-      "ja-JP": "開発途中のデータベースをメインナビゲーションから一時的に非表示にします。ページとデータパック、サービスの実装は保持します。",
-      "en-US": "Temporarily hides the unfinished database entry from primary navigation while retaining the database pages, data packs and services for later development."
+      "id": "atomic-storage",
+      "zh-CN": "灵感文件的读取与写入改为跨进程互斥事务，保护桌面程序与小组件同时保存时的数据一致性。",
+      "ja-JP": "デスクトップアプリとウィジェットの同時保存による競合を防ぐため、インスピレーションの保存処理をプロセス間排他に変更しました。",
+      "en-US": "Serializes inspiration read-modify-write operations across widget and desktop processes to protect concurrent saves."
     },
     {
       "id": "compatibility",
-      "zh-CN": "保留浅色、深色和跟随系统主题；项目数据、备份格式及现有更新机制不变。",
-      "ja-JP": "ライト・ダーク・システムテーマに引き続き対応し、プロジェクト、バックアップ、更新機能との互換性を維持します。",
-      "en-US": "Retains light, dark and system themes without changing project data, backup format or existing updater behavior."
-    },
-    {
-      "id": "acrylic-sidebar",
-      "zh-CN": "修复左侧导航栏被浅青色不透明填充覆盖的问题，让展开式导航直接显示亚克力窗口背景，并为高对比度模式保留系统背景。",
-      "ja-JP": "左側ナビゲーションの不透明な薄青色背景を修正しました。展開時はウィンドウのアクリル背景を表示し、ハイコントラスト時はシステム背景を維持します。",
-      "en-US": "Fixes the opaque pale-cyan navigation pane so the expanded sidebar reveals the window's Acrylic backdrop, while high-contrast mode retains a solid system background."
+      "zh-CN": "保持原有灵感 JSON、项目模式及备份格式；小组件文本框的实际伸展高度受 Windows 小组件宿主限制。",
+      "ja-JP": "既存のインスピレーションJSON、プロジェクトスキーマ、バックアップ形式を維持します。入力欄の高さはWindowsウィジェットのホスト側の制約を受けます。",
+      "en-US": "Preserves existing inspiration JSON, project schema, and backup format; multiline editor height remains subject to Windows widget host limitations."
     }
   ]
 }

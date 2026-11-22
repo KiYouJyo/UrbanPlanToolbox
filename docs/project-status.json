@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
-  "asOf": "2026-11-19",
+  "asOf": "2026-11-22",
   "repository": {
     "defaultBranch": "main",
     "documentationGovernance": "docs/DOCUMENTATION.md"
   },
   "product": {
     "name": "UrbanPlanToolbox",
-    "version": "1.9.4",
+    "version": "1.9.5",
     "lifecycle": "stable-1.x",
     "platform": "Windows",
     "supportedArchitecture": "x64",
@@ -18,9 +18,9 @@
       "latestPublishedProductVersion": "1.9.4",
       "latestPublishedPackageVersion": "1.9.4.0",
       "latestPublishedReleaseTag": "v1.9.4",
-      "candidateProductVersion": "1.9.4",
-      "candidatePackageVersion": "1.9.4.0",
-      "candidateState": "published",
+      "candidateProductVersion": "1.9.5",
+      "candidatePackageVersion": "1.9.5.0",
+      "candidateState": "dual-channel-release-requested",
       "state": "published",
       "updatePath": "in-app direct MSIXBundle download -> SHA-256 verification -> Authenticode/MSIX signature verification -> Windows package deployment -> restart"
     },
@@ -30,9 +30,9 @@
       "state": "certification-submitted",
       "publicProductVersion": "1.9.3",
       "publicVersionAuthority": "Partner Center and the Microsoft Store client",
-      "candidateProductVersion": "1.9.4",
-      "candidatePackageVersion": "1.9.4.0",
-      "candidateState": "certification-submitted",
+      "candidateProductVersion": "1.9.5",
+      "candidatePackageVersion": "1.9.5.0",
+      "candidateState": "dual-channel-release-requested",
       "storeId": "9MWDPJG1BHKW",
       "updatePath": "Microsoft Store managed update path",
       "latestSubmittedSubmissionId": "1152921505702445666"
