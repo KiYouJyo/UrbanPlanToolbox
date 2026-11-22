@@ -25,6 +25,9 @@ public sealed class InspirationWidgetContractTests
                 .Where(node => (string?)node.Attribute("Name") == "com.microsoft.windows.widgets"));
             Assert.Contains(extension.Descendants(), node => node.Name.LocalName == "Definition" &&
                 (string?)node.Attribute("Id") == "InspirationRecorder");
+            var sizes = extension.Descendants().Where(node => node.Name.LocalName == "Size")
+                .Select(node => (string?)node.Attribute("Name")).ToArray();
+            Assert.Equal(new[] { "large" }, sizes);
             Assert.Equal("1.9.5.0", document.Descendants()
                 .First(node => node.Name.LocalName == "Identity").Attribute("Version")?.Value);
         }
@@ -34,11 +37,16 @@ public sealed class InspirationWidgetContractTests
     public void WidgetIsSelfContainedWithoutDesktopRecorderAction()
     {
         var provider = File.ReadAllText(Path.Combine(FindRoot(), "Widgets", "InspirationWidgetProvider.cs"));
-        foreach (var verb in new[] { "\"new\"", "\"load\"", "\"save\"", "\"save-draft\"", "\"delete\"", "\"confirm-delete\"", "\"cancel-delete\"" })
+        foreach (var verb in new[] { "\"previous\"", "\"next\"", "\"new\"", "\"save\"", "\"delete\"" })
             Assert.Contains(verb, provider);
         Assert.Contains("isMultiline = true", provider);
         Assert.Contains("Input.ChoiceSet", provider);
         Assert.Contains("CustomState", provider);
+        Assert.Contains("ColumnSet", provider);
+        Assert.Contains("ActionSet", provider);
+        Assert.DoesNotContain("historyId", provider);
+        Assert.DoesNotContain("case \"load\"", provider);
+        Assert.DoesNotContain("save-draft", provider);
         Assert.DoesNotContain("Process.Start(", provider);
         Assert.DoesNotContain("LaunchRecorder(", provider);
     }

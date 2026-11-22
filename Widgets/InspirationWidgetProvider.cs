@@ -8,22 +8,22 @@ using UrbanPlanToolbox.Services;
 namespace UrbanPlanToolbox.Widgets;
 
 /// <summary>
-/// Self-contained Inspiration Recorder within Windows 11 Widgets Board.
-/// Never opens or depends on the desktop recorder window.
+/// Large-only Adaptive Card reproduction of the original Inspiration Recorder.
+/// The host draws the controls; all navigation and persistence stay inside the widget.
 /// </summary>
 internal sealed class InspirationWidgetProvider : IWidgetProvider
 {
     private sealed class EditState
     {
         public Guid? SelectedId { get; set; }
-        public bool ConfirmDelete { get; set; }
+        public bool IsDraft { get; set; }
     }
 
     public void CreateWidget(WidgetContext widgetContext) => Update(widgetContext, new EditState());
 
     public void DeleteWidget(string widgetId, string customState)
     {
-        // Unpinning does not remove user records.
+        // Unpin does not delete saved ideas or drafts.
         if (WidgetManager.GetDefault().GetWidgetInfos().Length == 0)
             InspirationWidgetHost.RequestStop();
     }
@@ -37,124 +37,148 @@ internal sealed class InspirationWidgetProvider : IWidgetProvider
         var context = args.WidgetContext;
         try
         {
-            using var json = JsonDocument.Parse(args.Data ?? "{}");
-            var payload = json.RootElement;
-            var state = LoadState(context.Id);
+            using var document = JsonDocument.Parse(args.Data ?? "{}");
+            var payload = document.RootElement;
             var service = InspirationService.Default;
+            var items = service.ListAsync().GetAwaiter().GetResult()
+                .OrderBy(idea => idea.CreatedAt).ToArray();
+            var state = Normalize(LoadState(context.Id), items);
+            var index = GetIndex(state, items);
+
             switch (args.Verb)
             {
-                case "new":
-                    Update(context, new EditState());
-                    return;
-                case "load":
-                    if (Guid.TryParse(GetString(payload, "historyId"), out var chosenId))
-                        Update(context, new EditState { SelectedId = chosenId });
-                    return;
-                case "cancel-delete":
-                    state.ConfirmDelete = false;
-                    Update(context, state);
-                    return;
-                case "delete":
-                    if (state.SelectedId.HasValue)
-                    {
-                        state.ConfirmDelete = true;
-                        Update(context, state);
-                    }
-                    return;
-                case "confirm-delete":
-                    if (state.SelectedId.HasValue && state.ConfirmDelete)
-                    {
-                        service.DeleteAsync(state.SelectedId.Value).GetAwaiter().GetResult();
-                        RefreshAll(new EditState());
-                    }
-                    return;
-                case "save-draft":
-                case "save":
+                case "previous":
+                case "next":
                 {
-                    var title = GetString(payload, "title")?.Trim() ?? string.Empty;
-                    var content = GetString(payload, "content")?.Trim() ?? string.Empty;
-                    if (title.Length > 120 || content.Length > 4000) return;
-                    var category = string.Equals(GetString(payload, "category"), "Research",
-                        StringComparison.OrdinalIgnoreCase) ? InspirationCategory.Research : InspirationCategory.Design;
-                    if (args.Verb == "save-draft")
-                    {
-                        // Keep the existing draft model distinct from saved inspiration cards.
-                        service.SaveDraftAsync(new InspirationDraft
-                        {
-                            Title = title, Content = content, Category = category
-                        }).GetAwaiter().GetResult();
-                        Update(context, new EditState());
-                        return;
-                    }
-                    if (string.IsNullOrWhiteSpace(title)) return;
-                    Guid savedId;
-                    if (state.SelectedId is Guid id)
-                    {
-                        // Preserve project association and creation timestamp when editing.
-                        var item = service.ListAsync().GetAwaiter().GetResult().FirstOrDefault(x => x.Id == id);
-                        if (item is null) { Update(context, new EditState()); return; }
-                        item.Title = title;
-                        item.Content = content;
-                        item.Category = category;
-                        if (!service.SaveAsync(item).GetAwaiter().GetResult()) return;
-                        savedId = id;
-                    }
-                    else
-                    {
-                        savedId = Guid.NewGuid();
-                        var now = DateTimeOffset.UtcNow;
-                        if (!service.CreateAsync(new Inspiration
-                        {
-                            Id = savedId,
-                            Title = title,
-                            Content = content,
-                            Category = category,
-                            CreatedAt = now,
-                            UpdatedAt = now
-                        }).GetAwaiter().GetResult()) return;
-                    }
-                    RefreshAll(new EditState { SelectedId = savedId });
+                    var nextIndex = index + (args.Verb == "previous" ? -1 : 1);
+                    if (nextIndex < 0 || nextIndex > items.Length) return;
+                    if (!PersistEditor(service, state, payload)) return;
+                    Update(context, StateAt(nextIndex, items));
                     return;
                 }
+                case "new":
+                    if (index == items.Length) return;
+                    if (!PersistEditor(service, state, payload)) return;
+                    // Same behavior as "+" in InspirationRecorderWindow: start a fresh draft.
+                    var category = ParseCategory(GetString(payload, "category"));
+                    service.SaveDraftAsync(new InspirationDraft { Category = category })
+                        .GetAwaiter().GetResult();
+                    Update(context, new EditState { IsDraft = true });
+                    return;
+                case "delete":
+                    if (index >= items.Length) return;
+                    if (!service.DeleteAsync(items[index].Id).GetAwaiter().GetResult()) return;
+                    var remaining = service.ListAsync().GetAwaiter().GetResult()
+                        .OrderBy(idea => idea.CreatedAt).ToArray();
+                    RefreshAll(StateAt(Math.Min(index, remaining.Length), remaining));
+                    return;
+                case "save":
+                    if (!PersistEditor(service, state, payload)) return;
+                    if (state.IsDraft)
+                    {
+                        var created = service.SaveDraftAsInspirationAsync().GetAwaiter().GetResult();
+                        if (created is not null)
+                            RefreshAll(new EditState { SelectedId = created.Id });
+                    }
+                    else
+                        RefreshAll(state);
+                    return;
                 default:
                     return;
             }
         }
         catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
         {
-            // Never log idea text or raw action payloads.
+            // Never log user-entered inspiration text.
             Trace.TraceError("Inspiration widget action: " + exception.GetType().Name);
         }
     }
 
-    private static string? GetString(JsonElement payload, string name)
+    /// <summary>
+    /// Navigation actions gather form inputs as well as changing the selected record.
+    /// This mirrors the desktop recorder's persist-on-navigation behavior.
+    /// Drafts are stored without creating a saved card until Save is clicked.
+    /// </summary>
+    private static bool PersistEditor(InspirationService service, EditState state, JsonElement payload)
     {
-        if (payload.ValueKind != JsonValueKind.Object ||
-            !payload.TryGetProperty(name, out var element) || element.ValueKind != JsonValueKind.String)
-            return null;
-        return element.GetString();
+        var title = GetString(payload, "title")?.Trim();
+        var content = GetString(payload, "content")?.Trim();
+        if (title is null || content is null || title.Length > 120 || content.Length > 4000)
+            return false;
+
+        var category = ParseCategory(GetString(payload, "category"));
+        if (state.IsDraft)
+        {
+            service.SaveDraftAsync(new InspirationDraft
+            {
+                Title = title, Content = content, Category = category
+            }).GetAwaiter().GetResult();
+            return true;
+        }
+
+        if (state.SelectedId is not Guid id || string.IsNullOrWhiteSpace(title))
+            return false;
+        var item = service.ListAsync().GetAwaiter().GetResult().FirstOrDefault(x => x.Id == id);
+        if (item is null) return false;
+        if (item.Title == title && item.Content == content && item.Category == category)
+            return true;
+
+        item.Title = title;
+        item.Content = content;
+        item.Category = category;
+        return service.SaveAsync(item).GetAwaiter().GetResult();
     }
+
+    private static InspirationCategory ParseCategory(string? value) =>
+        string.Equals(value, "Research", StringComparison.OrdinalIgnoreCase)
+            ? InspirationCategory.Research : InspirationCategory.Design;
+
+    private static string? GetString(JsonElement payload, string name) =>
+        payload.ValueKind == JsonValueKind.Object &&
+        payload.TryGetProperty(name, out var node) &&
+        node.ValueKind == JsonValueKind.String ? node.GetString() : null;
 
     private static EditState LoadState(string widgetId)
     {
         try
         {
-            var customState = WidgetManager.GetDefault().GetWidgetInfo(widgetId).CustomState;
-            if (!string.IsNullOrWhiteSpace(customState))
-                return JsonSerializer.Deserialize<EditState>(customState) ?? new EditState();
+            var state = WidgetManager.GetDefault().GetWidgetInfo(widgetId).CustomState;
+            if (!string.IsNullOrWhiteSpace(state))
+                return JsonSerializer.Deserialize<EditState>(state) ?? new EditState();
         }
         catch (Exception exception) when (exception is JsonException or ArgumentException)
         {
-            Trace.TraceInformation("Inspiration widget reset state: " + exception.GetType().Name);
+            Trace.TraceInformation("Inspiration widget state fallback: " + exception.GetType().Name);
         }
         return new EditState();
     }
 
-    private static void RefreshAll(EditState? selectedState = null)
+    private static EditState Normalize(EditState state, Inspiration[] items)
+    {
+        if (state.IsDraft || items.Length == 0)
+            return new EditState { IsDraft = true };
+        if (state.SelectedId is Guid id && items.Any(x => x.Id == id))
+            return new EditState { SelectedId = id };
+        return new EditState { SelectedId = items[0].Id };
+    }
+
+    private static int GetIndex(EditState state, Inspiration[] items)
+    {
+        if (state.IsDraft) return items.Length;
+        var index = Array.FindIndex(items, x => x.Id == state.SelectedId);
+        return index >= 0 ? index : items.Length;
+    }
+
+    private static EditState StateAt(int index, Inspiration[] items) =>
+        index >= items.Length
+            ? new EditState { IsDraft = true }
+            : new EditState { SelectedId = items[index].Id };
+
+    private static void RefreshAll(EditState state)
     {
         foreach (var widget in WidgetManager.GetDefault().GetWidgetInfos())
             if (widget.WidgetContext.DefinitionId == "InspirationRecorder")
-                Update(widget.WidgetContext, selectedState);
+                Update(widget.WidgetContext, state);
     }
 
     private static void Update(WidgetContext context, EditState? requestedState = null)
@@ -162,106 +186,134 @@ internal sealed class InspirationWidgetProvider : IWidgetProvider
         if (context.DefinitionId != "InspirationRecorder") return;
         try
         {
-            var state = requestedState ?? LoadState(context.Id);
             var service = InspirationService.Default;
             var ideas = service.ListAsync().GetAwaiter().GetResult()
-                .OrderByDescending(x => x.CreatedAt).ToArray();
-            var selected = state.SelectedId is Guid id
-                ? ideas.FirstOrDefault(x => x.Id == id) : null;
-            if (state.SelectedId.HasValue && selected is null)
-                state = new EditState();
+                .OrderBy(idea => idea.CreatedAt).ToArray();
+            var state = Normalize(requestedState ?? LoadState(context.Id), ideas);
+            var index = GetIndex(state, ideas);
+            var selected = index < ideas.Length ? ideas[index] : null;
+            var draft = state.IsDraft ? service.GetDraftAsync().GetAwaiter().GetResult() : null;
 
-            var draft = selected is null ? service.GetDraftAsync().GetAwaiter().GetResult() : null;
-            var language = GetLanguage();
-            var labels = language switch
+            var labels = GetLanguage() switch
             {
-                "ja" => new[] { "インスピレーション", "新しい記録", "既存の記録", "選択して編集", "タイトル", "内容", "デザイン", "研究", "保存", "新規", "削除", "削除しますか？", "削除を確定", "キャンセル", "下書きを保存", "読み込む", "記録なし" },
-                "en" => new[] { "Inspiration Recorder", "New idea", "Saved ideas", "Choose an idea to edit", "Title", "Details", "Design", "Research", "Save", "New", "Delete", "Delete this idea?", "Confirm delete", "Cancel", "Save draft", "Load", "No saved ideas" },
-                _ => new[] { "灵感记录器", "新灵感", "历史灵感", "选择灵感以编辑", "标题", "正文", "设计", "科研", "保存", "新建", "删除", "确定删除这条灵感？", "确认删除", "取消", "保存草稿", "加载", "暂无历史记录" }
+                "ja" => new[] { "名称", "分類", "詳細情報", "デザイン", "研究", "削除", "保存", "新規", "未保存" },
+                "en" => new[] { "Name", "Category", "Details", "Design", "Research", "Delete", "Save", "New", "Unsaved" },
+                _ => new[] { "名称", "分类", "详细信息", "设计", "科研", "删除", "保存", "新建", "未保存" }
             };
+
+            var currentCategory = (selected?.Category ?? draft?.Category ?? InspirationCategory.Design).ToString();
+            var status = state.IsDraft
+                ? labels[7] + ((draft?.IsDirty ?? false) ? " · " + labels[8] : "")
+                : (index + 1).ToString(CultureInfo.InvariantCulture) +
+                  " / " + ideas.Length.ToString(CultureInfo.InvariantCulture);
 
             var body = new List<object>
             {
-                new { type = "TextBlock", text = labels[0], size = "Medium", weight = "Bolder" },
-                new { type = "TextBlock", text = selected is null ? labels[1] : selected.Title,
-                    size = "Small", weight = "Bolder", wrap = true, maxLines = 2 }
-            };
+                // The Widgets Board already supplies the widget's app/title chrome.
+                // A single position line avoids the previous repeated headings.
+                new { type = "TextBlock", text = status, size = "Medium", weight = "Bolder" },
 
-            if (ideas.Length > 0)
-            {
-                body.Add(new { type = "TextBlock", text = labels[2], isSubtle = true, spacing = "Small" });
-                body.Add(new
+                // Mirrors InspirationRecorderWindow.xaml's 3:1 Name/Category header row.
+                new
                 {
-                    type = "Input.ChoiceSet", id = "historyId", style = "compact", placeholder = labels[3],
-                    choices = ideas.Take(50).Select(item => new
+                    type = "ColumnSet",
+                    spacing = "Medium",
+                    columns = new object[]
                     {
-                        title = (item.Category == InspirationCategory.Research ? labels[7] : labels[6])
-                                + " · " + Truncate(item.Title, 36),
-                        value = item.Id.ToString("D")
-                    }).ToArray()
-                });
-                body.Add(new
+                        new
+                        {
+                            type = "Column", width = "3",
+                            items = new object[]
+                            {
+                                new
+                                {
+                                    type = "Input.Text", id = "title", label = labels[0],
+                                    value = selected?.Title ?? draft?.Title ?? "",
+                                    placeholder = labels[0], maxLength = 120
+                                }
+                            }
+                        },
+                        new
+                        {
+                            type = "Column", width = "1",
+                            items = new object[]
+                            {
+                                new
+                                {
+                                    type = "Input.ChoiceSet", id = "category",
+                                    label = labels[1], style = "compact",
+                                    value = currentCategory,
+                                    choices = new[]
+                                    {
+                                        new { title = labels[3], value = "Design" },
+                                        new { title = labels[4], value = "Research" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                new
                 {
-                    type = "ActionSet",
-                    actions = new[] { new { type = "Action.Execute", verb = "load", title = labels[15] } }
-                });
-            }
-            else
-            {
-                body.Add(new { type = "TextBlock", text = labels[16], isSubtle = true });
-            }
+                    type = "Input.Text", id = "content", label = labels[2],
+                    value = selected?.Content ?? draft?.Content ?? "",
+                    placeholder = labels[2], isMultiline = true, maxLength = 4000
+                },
 
-            body.Add(new
-            {
-                type = "Input.Text", id = "title", label = labels[4],
-                placeholder = labels[4], value = selected?.Title ?? draft?.Title ?? "",
-                maxLength = 120
-            });
-            body.Add(new
-            {
-                type = "Input.Text", id = "content", label = labels[5],
-                placeholder = labels[5], value = selected?.Content ?? draft?.Content ?? "",
-                isMultiline = true, maxLength = 4000
-            });
-            body.Add(new
-            {
-                type = "Input.ChoiceSet", id = "category", style = "compact",
-                value = (selected?.Category ?? draft?.Category ?? InspirationCategory.Design).ToString(),
-                choices = new[]
+                // The host renders controls, but the two button groups preserve the
+                // recorder's bottom-left ‹ › + and bottom-right Delete Save layout.
+                new
                 {
-                    new { title = labels[6], value = "Design" },
-                    new { title = labels[7], value = "Research" }
+                    type = "ColumnSet",
+                    spacing = "Small",
+                    columns = new object[]
+                    {
+                        new
+                        {
+                            type = "Column", width = "stretch",
+                            items = new object[]
+                            {
+                                new
+                                {
+                                    type = "ActionSet",
+                                    actions = new object[]
+                                    {
+                                        new { type = "Action.Execute", title = "‹", verb = "previous",
+                                            isEnabled = index > 0 },
+                                        new { type = "Action.Execute", title = "›", verb = "next",
+                                            isEnabled = index < ideas.Length },
+                                        new { type = "Action.Execute", title = "+", verb = "new",
+                                            isEnabled = index < ideas.Length }
+                                    }
+                                }
+                            }
+                        },
+                        new
+                        {
+                            type = "Column", width = "auto",
+                            items = new object[]
+                            {
+                                new
+                                {
+                                    type = "ActionSet",
+                                    actions = new object[]
+                                    {
+                                        new { type = "Action.Execute", title = labels[5], verb = "delete",
+                                            associatedInputs = "none", isEnabled = index < ideas.Length },
+                                        new { type = "Action.Execute", title = labels[6], verb = "save" }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-            });
-
-            var actions = new List<object>
-            {
-                new { type = "Action.Execute", title = labels[8], verb = "save" },
-                new { type = "Action.Execute", title = labels[9], verb = "new", associatedInputs = "none" }
             };
-
-            if (selected is not null)
-            {
-                if (state.ConfirmDelete)
-                {
-                    body.Add(new { type = "TextBlock", text = labels[11], color = "Attention", wrap = true });
-                    actions.Add(new { type = "Action.Execute", title = labels[12], verb = "confirm-delete", associatedInputs = "none" });
-                    actions.Add(new { type = "Action.Execute", title = labels[13], verb = "cancel-delete", associatedInputs = "none" });
-                }
-                else
-                    actions.Add(new { type = "Action.Execute", title = labels[10], verb = "delete", associatedInputs = "none" });
-            }
-            else
-            {
-                actions.Add(new { type = "Action.Execute", title = labels[14], verb = "save-draft" });
-            }
 
             var card = JsonSerializer.Serialize(new
             {
                 type = "AdaptiveCard",
                 version = "1.6",
-                body,
-                actions
+                body
             });
             WidgetManager.GetDefault().UpdateWidget(new WidgetUpdateRequestOptions(context.Id)
             {
@@ -276,9 +328,6 @@ internal sealed class InspirationWidgetProvider : IWidgetProvider
             Trace.TraceError("Inspiration widget update: " + exception.GetType().Name);
         }
     }
-
-    private static string Truncate(string text, int maxLength) =>
-        text.Length > maxLength ? text[..(maxLength - 1)] + "…" : text;
 
     private static string GetLanguage()
     {

@@ -35,9 +35,9 @@
   "items": [
     {
       "id": "inspiration-widget",
-      "zh-CN": "Windows 11 小组件中可完整记录与管理灵感：查看历史、加载编辑、新增、保存草稿、分类、保存及删除，无须打开桌面窗口。",
-      "ja-JP": "Windows 11のウィジェット内で記録の閲覧・編集・新規作成・下書き保存・分類・保存・削除が可能です。デスクトップ画面の起動は不要です。",
-      "en-US": "Manage ideas directly in Windows 11 widgets: browse, load, edit, create, save drafts, categorize, save, and delete without opening a desktop window."
+      "zh-CN": "仅提供大尺寸 Windows 11 灵感记录器小组件，复用原记录器的名称／分类、详细信息与上一条／下一条／新建／删除／保存交互。",
+      "ja-JP": "Windows 11の大型ウィジェットのみを提供。既存レコーダーの名称・分類・詳細情報と前へ／次へ／新規／削除／保存の操作を踏襲します。",
+      "en-US": "Offers only the large Windows 11 widget, matching the existing recorder's name/category, details and previous/next/new/delete/save controls."
     },
     {
       "id": "atomic-storage",
