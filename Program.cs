@@ -16,7 +16,6 @@ public static class Program
     private static string? _currentPackageFullName;
 
     public static bool IsBackgroundStartup { get; private set; }
-    public static bool IsWidgetRecorderLaunch { get; private set; }
 
     [STAThread]
     public static void Main(string[] args)
@@ -28,7 +27,6 @@ public static class Program
             Widgets.InspirationWidgetHost.Run();
             return;
         }
-        IsWidgetRecorderLaunch = args.Contains("--open-inspiration-recorder", StringComparer.OrdinalIgnoreCase);
         StartPackageUninstallExitWatcher();
 
         var currentInstance = AppInstance.GetCurrent();

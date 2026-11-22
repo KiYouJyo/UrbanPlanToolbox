@@ -5,8 +5,8 @@
 ### Inspiration Recorder widget
 
 - Adds a native Windows Widgets Board provider to the existing packaged WinUI 3 executable.
-- Shows recent ideas and allows design/research quick capture from medium and large widgets.
-- Opens the existing desktop recorder without routing widget COM startup through WinUI single-instance arbitration.
+- Adds a self-contained Design/Research idea editor in medium and large widgets, with history selection, title, content, draft, update, and confirmed deletion.
+- Keeps all widget editing within Widgets Board: no desktop-recorder shortcut or application activation.
 - Serializes inspiration JSON read-modify-write operations across application and widget processes.
 - Keeps the v1.9.4 release branch and production publication state unchanged pending Windows package and widget-host validation.
 

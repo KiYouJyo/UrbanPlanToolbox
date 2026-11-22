@@ -35,9 +35,9 @@
   "items": [
     {
       "id": "inspiration-widget",
-      "zh-CN": "为 Windows 11 小组件面板增加灵感记录器，支持显示近期灵感、设计与科研分类、快速输入和打开桌面记录器。",
-      "ja-JP": "Windows 11のウィジェットボードにインスピレーションレコーダーを追加し、最近の記録の表示、分類、素早い入力、デスクトップ画面の起動に対応します。",
-      "en-US": "Adds an Inspiration Recorder widget for Windows 11 with recent entries, design/research categories, quick capture, and a shortcut to the desktop recorder."
+      "zh-CN": "Windows 11 小组件中可完整记录与管理灵感：查看历史、加载编辑、新增、保存草稿、分类、保存及删除，无须打开桌面窗口。",
+      "ja-JP": "Windows 11のウィジェット内で記録の閲覧・編集・新規作成・下書き保存・分類・保存・削除が可能です。デスクトップ画面の起動は不要です。",
+      "en-US": "Manage ideas directly in Windows 11 widgets: browse, load, edit, create, save drafts, categorize, save, and delete without opening a desktop window."
     },
     {
       "id": "atomic-storage",
